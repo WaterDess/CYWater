@@ -113,7 +113,7 @@ const I18N = {
   /* ---------- home ---------- */
   home: {
     heroEyebrow: { en: "Contemporary Young Scholars · Water Sciences", zh: "青年学者 · 水科学" },
-    heroTitle:   { en: "Advancing water sciences, empowering young scholars.", zh: "推动水科学发展，赋能青年学者。" },
+    heroTitle:   { en: "<span class=\"hero-title-line\">Advancing water sciences,</span><span class=\"hero-title-line\">empowering young scholars.</span>", zh: "推动水科学发展，赋能青年学者。" },
     heroLead:    { en: "An international, non-profit association advancing water sciences education, research, and professional development — through scientific exchange, publications, and conferences.",
                     zh: "一个国际性、非营利协会，通过学术交流、出版与会议，推动水科学教育、研究与职业发展。" },
     heroCta1:    { en: "Join CYWater", zh: "加入 CYWater" },
@@ -593,8 +593,6 @@ const I18N = {
     responseVal: { en: "Within 2 business days", zh: "2 个工作日内" },
   },
 };
-
-I18N.home.heroTitle.en = "Advancing water sciences,<br>empowering young scholars.";
 
 /* ---------- controller ---------- */
 const LANG_KEY = "cywater-lang";

@@ -457,6 +457,15 @@ body.nav-open .nav-toggle span::after { transform: translateY(-6px) rotate(-45de
 }
 .hero .lead { margin-bottom: var(--sp-6); max-width: 52ch; }
 .hero h1 { max-width: 24ch; }
+.hero-title-line {
+  display: block;
+  white-space: nowrap;
+}
+html[lang="en"] .hero h1 {
+  font-size: 3.1rem;
+  line-height: 1.12;
+  max-width: none;
+}
 .hero-actions { display: flex; flex-wrap: wrap; gap: var(--sp-3); }
 .hero-watermark {
   position: absolute;

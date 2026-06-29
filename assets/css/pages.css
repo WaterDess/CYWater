@@ -753,6 +753,10 @@
   .tiers { grid-template-columns: 1fr; }
 }
 
+@media (max-width: 960px) {
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+}
+
 /* ============================ Mobile nav ============================ */
 /* 桌面端默认完全隐藏（避免移动端导航以文档流方式冗余显示） */
 .nav-mobile {
@@ -768,7 +772,7 @@
 
   /* mobile drawer — 仅在移动端显示为抽屉 */
   .nav-mobile {
-    display: flex;
+    display: none;
     flex-direction: column;
     gap: var(--sp-2);
     position: fixed;
@@ -776,11 +780,11 @@
     background: var(--paper);
     padding: var(--sp-6) clamp(1.25rem, 4vw, 2.5rem);
     overflow-y: auto;
-    transform: translateX(100%);
+    transform: none;
     transition: transform var(--dur) var(--ease);
     z-index: 99;
   }
-  body.nav-open .nav-mobile { transform: none; }
+  body.nav-open .nav-mobile { display: flex; }
   .nav-mobile a {
     padding: 0.9rem 0;
     font-family: var(--font-display);
@@ -821,4 +825,16 @@
 @media (max-width: 460px) {
   .board-grid, .exec-grid, .speaker-grid, .journal-grid { grid-template-columns: 1fr; }
   .hero h1 { font-size: 2.2rem; }
+}
+
+@media (max-width: 720px) {
+  html[lang="en"] .hero h1 {
+    font-size: 2.4rem;
+  }
+}
+
+@media (max-width: 520px) {
+  html[lang="en"] .hero h1 {
+    font-size: 2rem;
+  }
 }
