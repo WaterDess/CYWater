@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" data-root="../">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Board — CYWater</title>
+  <meta name="description" content="The Board, executive committee and advisors steering CYWater.">
+  <link rel="icon" type="image/png" href="../assets/img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/components.css">
+  <link rel="stylesheet" href="../assets/css/pages.css">
+</head>
+<body data-page="board">
+
+  <div id="site-header"></div>
+
+  <main>
+    <section class="page-hero">
+      <div class="container">
+        <div class="crumbs">
+          <a href="../index.html" data-i18n="nav.home"></a><span>/</span>
+          <a href="./index.html" data-i18n="nav.about"></a><span>/</span>
+          <span data-i18n="nav.board"></span>
+        </div>
+        <span class="eyebrow" style="color:var(--teal-soft)" data-i18n="board.heroEyebrow"></span>
+        <h1 data-i18n="board.heroTitle"></h1>
+        <p class="lead" data-i18n="board.heroLead"></p>
+      </div>
+    </section>
+
+    <!-- Executive -->
+    <section class="section">
+      <div class="container">
+        <div class="section-head" data-reveal>
+          <span class="eyebrow" data-i18n="board.execTitle"></span>
+          <h2 data-i18n="board.execTitle"></h2>
+        </div>
+        <div class="board-grid exec-grid">
+          <div class="member-card" data-reveal>
+            <div class="avatar"><div class="avatar-initials">LZ</div></div>
+            <div class="member-info">
+              <div class="member-name">Dr. Lin Zhao</div>
+              <div class="member-role">President</div>
+              <div class="member-affil">Tsinghua University</div>
+            </div>
+          </div>
+          <div class="member-card" data-reveal>
+            <div class="avatar"><div class="avatar-initials">MC</div></div>
+            <div class="member-info">
+              <div class="member-name">Dr. Maria Chen</div>
+              <div class="member-role">President-Elect</div>
+              <div class="member-affil">Massachusetts Institute of Technology</div>
+            </div>
+          </div>
+          <div class="member-card" data-reveal>
+            <div class="avatar"><div class="avatar-initials">JW</div></div>
+            <div class="member-info">
+              <div class="member-name">Dr. Jian Wang</div>
+              <div class="member-role">Treasurer</div>
+              <div class="member-affil">Peking University</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Board -->
+    <section class="section section-tint">
+      <div class="container">
+        <div class="section-head" data-reveal>
+          <span class="eyebrow" data-i18n="board.boardTitle"></span>
+          <h2 data-i18n="board.boardTitle"></h2>
+        </div>
+        <div class="board-grid">
+          <div class="member-card" data-reveal><div class="avatar"><div class="avatar-initials">YL</div></div><div class="member-info"><div class="member-name">Dr. Yan Liu</div><div class="member-affil">Nanjing University</div></div></div>
+          <div class="member-card" data-reveal><div class="avatar"><div class="avatar-initials">DK</div></div><div class="member-info"><div class="member-name">Prof. David Kim</div><div class="member-affil">Stanford University</div></div></div>
+          <div class="member-card" data-reveal><div class="avatar"><div class="avatar-initials">HS</div></div><div class="member-info"><div class="member-name">Dr. Hua Sun</div><div class="member-affil">Chinese Academy of Sciences</div></div></div>
+          <div class="member-card" data-reveal><div class="avatar"><div class="avatar-initials">AB</div></div><div class="member-info"><div class="member-name">Dr. Anna Brooks</div><div class="member-affil">ETH Zürich</div></div></div>
+          <div class="member-card" data-reveal><div class="avatar"><div class="avatar-initials">XZ</div></div><div class="member-info"><div class="member-name">Dr. Xuan Zhang</div><div class="member-affil">Hohai University</div></div></div>
+          <div class="member-card" data-reveal><div class="avatar"><div class="avatar-initials">RP</div></div><div class="member-info"><div class="member-name">Prof. Raj Patel</div><div class="member-affil">University of Tokyo</div></div></div>
+          <div class="member-card" data-reveal><div class="avatar"><div class="avatar-initials">MG</div></div><div class="member-info"><div class="member-name">Dr. Mei Gao</div><div class="member-affil">Tongji University</div></div></div>
+          <div class="member-card" data-reveal><div class="avatar"><div class="avatar-initials">TF</div></div><div class="member-info"><div class="member-name">Dr. Tom Fischer</div><div class="member-affil">UC Berkeley</div></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Executive office -->
+    <section class="section">
+      <div class="container">
+        <div class="section-head" data-reveal>
+          <span class="eyebrow" data-i18n="board.advisorsTitle"></span>
+          <h2 data-i18n="board.advisorsTitle"></h2>
+        </div>
+        <div class="board-grid exec-grid">
+          <div class="member-card" data-reveal>
+            <div class="avatar"><div class="avatar-initials">CZ</div></div>
+            <div class="member-info">
+              <div class="member-name">Prof. Chen Zhou</div>
+              <div class="member-role">Executive Director</div>
+              <div class="member-affil">CYWater Secretariat</div>
+            </div>
+          </div>
+        </div>
+      </div>
+        </section>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="../assets/js/i18n.js"></script>
+  <script src="../assets/js/layout.js"></script>
+  <script src="../assets/js/main.js"></script>
+</body>
+</html>

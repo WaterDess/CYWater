@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en" data-root="../">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About — CYWater</title>
+  <meta name="description" content="CYWater is a member-run bilingual association serving water researchers, practitioners and students.">
+  <link rel="icon" type="image/png" href="../assets/img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/components.css">
+  <link rel="stylesheet" href="../assets/css/pages.css">
+</head>
+<body data-page="about">
+
+  <div id="site-header"></div>
+
+  <main>
+    <!-- page hero -->
+    <section class="page-hero">
+      <div class="container">
+        <span class="eyebrow" style="color:var(--teal-soft)" data-i18n="about.heroEyebrow"></span>
+        <h1 data-i18n="about.heroTitle"></h1>
+        <p class="lead" data-i18n="about.heroLead"></p>
+      </div>
+    </section>
+
+    <!-- story + image -->
+    <section class="section">
+      <div class="container">
+        <div class="about-intro-grid">
+          <div data-reveal>
+            <span class="eyebrow" data-i18n="about.storyTitle"></span>
+            <div class="stack" style="--flow:1.25rem; margin-top:var(--sp-4)">
+              <p data-i18n="about.storyP1"></p>
+              <p data-i18n="about.storyP2"></p>
+            </div>
+
+            <hr class="divider" style="margin:var(--sp-7) 0">
+
+            <span class="eyebrow" data-i18n="about.valuesTitle"></span>
+            <div class="values-list" style="margin-top:var(--sp-5)">
+              <div class="value-item">
+                <span class="value-num">01</span>
+                <div>
+                  <h3 style="font-size:var(--fs-md)" data-i18n="about.v1T"></h3>
+                  <p style="font-size:var(--fs-sm); margin-top:.3rem" data-i18n="about.v1D"></p>
+                </div>
+              </div>
+              <div class="value-item">
+                <span class="value-num">02</span>
+                <div>
+                  <h3 style="font-size:var(--fs-md)" data-i18n="about.v2T"></h3>
+                  <p style="font-size:var(--fs-sm); margin-top:.3rem" data-i18n="about.v2D"></p>
+                </div>
+              </div>
+              <div class="value-item">
+                <span class="value-num">03</span>
+                <div>
+                  <h3 style="font-size:var(--fs-md)" data-i18n="about.v3T"></h3>
+                  <p style="font-size:var(--fs-sm); margin-top:.3rem" data-i18n="about.v3D"></p>
+                </div>
+              </div>
+              <div class="value-item">
+                <span class="value-num">04</span>
+                <div>
+                  <h3 style="font-size:var(--fs-md)" data-i18n="about.v4T"></h3>
+                  <p style="font-size:var(--fs-sm); margin-top:.3rem" data-i18n="about.v4D"></p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="media-frame" data-reveal>
+            <img src="../assets/img/photos/water-river.jpg" alt="River flowing through a valley" loading="lazy">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- timeline -->
+    <section class="section section-tint">
+      <div class="container container-narrow">
+        <div class="section-head center" data-reveal>
+          <span class="eyebrow center" data-i18n="about.timelineTitle"></span>
+          <h2 data-i18n="about.timelineTitle"></h2>
+        </div>
+        <div class="timeline" data-reveal>
+          <div class="timeline-item">
+            <div class="timeline-year">2011</div>
+            <p style="margin-top:.3rem" data-i18n="about.t1"></p>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2014</div>
+            <p style="margin-top:.3rem" data-i18n="about.t2"></p>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2020</div>
+            <p style="margin-top:.3rem" data-i18n="about.t3"></p>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2026</div>
+            <p style="margin-top:.3rem" data-i18n="about.t4"></p>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2026</div>
+            <p style="margin-top:.3rem" data-i18n="about.t5"></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- governance -->
+    <section class="section">
+      <div class="container container-narrow">
+        <div class="section-head center" data-reveal>
+          <span class="eyebrow center" data-i18n="about.governanceTitle"></span>
+          <h2 data-i18n="about.governanceTitle"></h2>
+        </div>
+        <p class="lead" style="text-align:center; margin-bottom:var(--sp-6)" data-i18n="about.governanceP"></p>
+        <div class="hero-actions" style="justify-content:center">
+          <a class="btn btn-outline" href="./board.html" data-i18n="nav.board"></a>
+          <a class="btn btn-outline" href="./bylaws.html" data-i18n="nav.bylaws"></a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="../assets/js/i18n.js"></script>
+  <script src="../assets/js/layout.js"></script>
+  <script src="../assets/js/main.js"></script>
+</body>
+</html>
