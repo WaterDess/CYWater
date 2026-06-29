@@ -457,9 +457,14 @@ body.nav-open .nav-toggle span::after { transform: translateY(-6px) rotate(-45de
   font-size: clamp(2.25rem, 5vw, 3.75rem);
   max-width: 16ch;            /* 限制宽度，让中英文都自然换行成 2-3 句，视觉一致 */
   text-wrap: balance;         /* 换行更均衡（支持现代浏览器） */
-  margin-bottom: var(--sp-5);
+  line-height: 1.2;
+  margin-bottom: var(--sp-6);
 }
-.hero .lead { margin-bottom: var(--sp-6); max-width: 52ch; }
+.hero .lead {
+  line-height: 1.82;
+  margin-bottom: var(--sp-7);
+  max-width: 52ch;
+}
 .hero h1 { max-width: 24ch; }
 .hero-title-line {
   display: block;
@@ -467,7 +472,7 @@ body.nav-open .nav-toggle span::after { transform: translateY(-6px) rotate(-45de
 }
 html[lang="en"] .hero h1 {
   font-size: 3.1rem;
-  line-height: 1.12;
+  line-height: 1.18;
   max-width: none;
 }
 .hero-actions { display: flex; flex-wrap: wrap; gap: var(--sp-3); }
