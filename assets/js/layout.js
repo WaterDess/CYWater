@@ -32,11 +32,6 @@
     <a href="${r}about/index.html" data-i18n="nav.about"></a>
     <a href="${r}about/board.html" data-i18n="nav.board"></a>
     <a href="${r}about/bylaws.html" data-i18n="nav.bylaws"></a>`;
-  const engageChildren = `
-    <a href="${r}events/index.html" data-i18n="nav.events"></a>
-    <a href="${r}news/index.html" data-i18n="nav.news"></a>
-    <a href="${r}journal/index.html" data-i18n="nav.journal"></a>`;
-
   const headerHTML = `
   <header class="site-header">
     <div class="container header-inner">
@@ -47,7 +42,7 @@
         <ul class="nav-list">
           ${navItem("about", `${r}about/index.html`, aboutChildren)}
           ${navItem("membership", `${r}membership/index.html`)}
-          ${navItem("events", `${r}events/index.html`, engageChildren)}
+          ${navItem("events", `${r}events/index.html`)}
           ${navItem("news", `${r}news/index.html`)}
           ${navItem("journal", `${r}journal/index.html`)}
           ${navItem("contact", `${r}contact/index.html`)}

@@ -17,8 +17,11 @@
 .site-header.is-scrolled { border-bottom-color: var(--line); }
 
 .header-inner {
+  width: 100%;
+  max-width: none;
+  padding-inline: clamp(1.5rem, 3.2vw, 3rem);
   display: grid;
-  grid-template-columns: minmax(120px, 1fr) auto minmax(260px, 1fr);
+  grid-template-columns: minmax(260px, 1fr) auto minmax(260px, 1fr);
   align-items: center;
   justify-content: space-between;  /* brand 左、actions 右、nav 居中：文本长度变化时对称伸缩，不漂移 */
   gap: var(--sp-5);
@@ -28,6 +31,7 @@
 .brand {
   display: flex;
   align-items: center;
+  justify-self: start;
   gap: 0.7rem;
   flex-shrink: 0;
   font-family: var(--font-display);
