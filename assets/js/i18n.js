@@ -38,8 +38,8 @@ const I18N = {
                       zh: "每季度推送研究、活动与机会动态。" },
     emailPlaceholder: { en: "you@email.com", zh: "你的邮箱" },
     subscribe:  { en: "Subscribe", zh: "订阅" },
-    tagline:    { en: "A bilingual association for water researchers, practitioners and students across China and the world.",
-                  zh: "面向中外水领域研究者、从业者和学生的双语协会。" },
+    tagline:    { en: "A non-profit, non-governmental, international member-based association advancing water sciences education, research, and professional development through scientific exchange, publications, and conferences.",
+                  zh: "一个非营利、非政府、国际性会员制协会，通过学术交流、出版与会议，推动水科学的教育、研究与职业发展。" },
     rights:     { en: "© 2026 CYWater. All rights reserved.", zh: "© 2026 CYWater. 保留所有权利。" },
     privacy:    { en: "Privacy",   zh: "隐私" },
     terms:      { en: "Terms",     zh: "条款" },
@@ -113,7 +113,7 @@ const I18N = {
   /* ---------- home ---------- */
   home: {
     heroEyebrow: { en: "Contemporary Young Scholars · Water Sciences", zh: "青年学者 · 水科学" },
-    heroTitle:   { en: "<span class=\"hero-title-line\">Advancing water sciences,</span><span class=\"hero-title-line\">empowering young scholars.</span>", zh: "推动水科学发展，赋能青年学者。" },
+    heroTitle:   { en: "Advancing water sciences,<br>empowering young scholars.", zh: "推动水科学发展，<br>赋能青年学者。" },
     heroLead:    { en: "An international, non-profit association advancing water sciences education, research, and professional development — through scientific exchange, publications, and conferences.",
                     zh: "一个国际性、非营利协会，通过学术交流、出版与会议，推动水科学教育、研究与职业发展。" },
     heroCta1:    { en: "Join CYWater", zh: "加入 CYWater" },

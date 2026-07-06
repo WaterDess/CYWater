@@ -34,7 +34,7 @@
     <a href="${r}about/bylaws.html" data-i18n="nav.bylaws"></a>`;
   const headerHTML = `
   <header class="site-header">
-    <div class="container header-inner">
+    <div class="header-inner">
       <a class="brand" href="${r}index.html" aria-label="CYWater home">
         <img class="brand-logo" src="${r}assets/img/logo.png" alt="CYWater" width="41" height="50">
       </a>
