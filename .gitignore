@@ -3,3 +3,6 @@ _qa_*.png
 .DS_Store
 Thumbs.db
 
+# Teacher-provided local archive (2.4 GB tar) — not versioned
+local/
+
