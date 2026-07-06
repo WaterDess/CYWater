@@ -131,4 +131,31 @@ npx serve .
 
 ---
 
+## 🏷️ 版本与快照
+
+当前 GitHub Pages（`gh-pages` 分支）展示的是 **原型阶段**，所有功能均为前端 mock。
+
+原型阶段的最后稳定版本已打 tag：
+
+```text
+v0.1-prototype  →  commit e4b5a01
+```
+
+之后的提交进入**实装阶段**：移除占位内容（如 journal 改为 Coming soon）、用 CYWater 协会真实素材替换 mock 文案。
+
+### 如何回到原型版本
+
+```bash
+# 只读查看（看完用 git checkout main 回来）
+git checkout v0.1-prototype
+
+# 在 GitHub 网页直接浏览该版本
+# https://github.com/WaterDess/CYWater/tree/v0.1-prototype
+
+# 对比原型与当前的差异
+git diff v0.1-prototype main
+```
+
+---
+
 *原型构建日期：2026-06-28 · 设计与开发：CYWater 原型小组*
