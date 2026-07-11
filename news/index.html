@@ -29,100 +29,11 @@
     <section class="section">
       <div class="container">
         <div class="news-layout">
-          <!-- main column -->
-          <div>
-            <!-- featured -->
-            <article class="news-feature" data-reveal>
-              <a href="./article.html?id=13th-annual-3rd" class="card-media"><img src="../assets/img/photos/water-aerial.jpg" alt="" loading="lazy"></a>
-              <div class="card-body">
-                <div class="card-meta"><span class="card-tag" data-i18n="common.tagConference"></span><span>· 2025-10-29</span></div>
-                <h3 class="card-title"><a href="./article.html?id=13th-annual-3rd"><span data-i18n="news.n1Title"></span></a></h3>
-                <p class="card-excerpt" data-i18n="news.n1Excerpt"></p>
-                <a class="link" href="./article.html?id=13th-annual-3rd" data-i18n="news.artReadOriginal"></a>
-              </div>
-            </article>
+          <!-- main column (rendered by JS) -->
+          <div id="news-main"></div>
 
-            <!-- list -->
-            <div class="news-list">
-              <article class="news-item" data-reveal>
-                <a href="./article.html?id=bpa-2025-result" class="card-media"><img src="../assets/img/photos/audience-talk.jpg" alt="" loading="lazy"></a>
-                <div>
-                  <div class="card-meta"><span class="card-tag" data-i18n="common.tagAward"></span><span>· 2025-12-14</span></div>
-                  <h3><a href="./article.html?id=bpa-2025-result"><span data-i18n="news.n2Title"></span></a></h3>
-                  <p data-i18n="news.n2Excerpt"></p>
-                </div>
-              </article>
-
-              <article class="news-item" data-reveal>
-                <a href="./article.html?id=12th-summer-xian" class="card-media"><img src="../assets/img/photos/underwater-blue.jpg" alt="" loading="lazy"></a>
-                <div>
-                  <div class="card-meta"><span class="card-tag" data-i18n="common.tagConference"></span><span>· 2024-12-08</span></div>
-                  <h3><a href="./article.html?id=12th-summer-xian"><span data-i18n="news.n3Title"></span></a></h3>
-                  <p data-i18n="news.n3Excerpt"></p>
-                </div>
-              </article>
-
-              <article class="news-item" data-reveal>
-                <a href="./article.html?id=bpa-2025-call" class="card-media"><img src="../assets/img/photos/meeting-office.jpg" alt="" loading="lazy"></a>
-                <div>
-                  <div class="card-meta"><span class="card-tag" data-i18n="common.tagAward"></span><span>· 2025-10-16</span></div>
-                  <h3><a href="./article.html?id=bpa-2025-call"><span data-i18n="news.n4Title"></span></a></h3>
-                  <p data-i18n="news.n4Excerpt"></p>
-                </div>
-              </article>
-
-              <article class="news-item" data-reveal>
-                <a href="./article.html?id=10th-summer-2022" class="card-media"><img src="../assets/img/photos/books-library.jpg" alt="" loading="lazy"></a>
-                <div>
-                  <div class="card-meta"><span class="card-tag" data-i18n="common.tagConference"></span><span>· 2022-08-21</span></div>
-                  <h3><a href="./article.html?id=10th-summer-2022"><span data-i18n="news.n5Title"></span></a></h3>
-                  <p data-i18n="news.n5Excerpt"></p>
-                </div>
-              </article>
-
-              <article class="news-item" data-reveal>
-                <a href="./article.html?id=8th-summer-2020" class="card-media"><img src="../assets/img/photos/water-mountain.jpg" alt="" loading="lazy"></a>
-                <div>
-                  <div class="card-meta"><span class="card-tag" data-i18n="common.tagConference"></span><span>· 2020-08-19</span></div>
-                  <h3><a href="./article.html?id=8th-summer-2020"><span data-i18n="news.n6Title"></span></a></h3>
-                  <p data-i18n="news.n6Excerpt"></p>
-                </div>
-              </article>
-            </div>
-          </div>
-
-          <!-- sidebar -->
-          <aside class="news-sidebar" data-reveal>
-            <h4 data-i18n="news.popular"></h4>
-            <div class="popular-item">
-              <span class="popular-num">01</span>
-              <div><h5><a href="./article.html?id=13th-annual-3rd"><span data-i18n="news.n1Title"></span></a></h5><div class="meta">2025-10-29</div></div>
-            </div>
-            <div class="popular-item">
-              <span class="popular-num">02</span>
-              <div><h5><a href="./article.html?id=bpa-2025-result"><span data-i18n="news.n2Title"></span></a></h5><div class="meta">2025-12-14</div></div>
-            </div>
-            <div class="popular-item">
-              <span class="popular-num">03</span>
-              <div><h5><a href="./article.html?id=bpa-2025-call"><span data-i18n="news.n4Title"></span></a></h5><div class="meta">2025-10-16</div></div>
-            </div>
-            <div class="popular-item">
-              <span class="popular-num">04</span>
-              <div><h5><a href="./article.html?id=10th-summer-2022"><span data-i18n="news.n5Title"></span></a></h5><div class="meta">2026-05-15</div></div>
-            </div>
-
-            <hr class="divider-soft" style="margin:var(--sp-5) 0">
-
-            <h4 data-i18n="news.categories"></h4>
-            <div class="tag-list">
-              <span class="badge badge-teal" data-i18n="common.tagResearch"></span>
-              <span class="badge badge-teal" data-i18n="common.tagEvent"></span>
-              <span class="badge badge-teal" data-i18n="common.tagCommunity"></span>
-              <span class="badge badge-teal" data-i18n="common.tagAward"></span>
-              <span class="badge badge-teal" data-i18n="common.tagJournal"></span>
-              <span class="badge badge-teal" data-i18n="common.tagOpportunity"></span>
-            </div>
-          </aside>
+          <!-- sidebar (rendered by JS) -->
+          <aside class="news-sidebar" data-reveal id="news-sidebar"></aside>
         </div>
       </div>
     </section>
@@ -131,7 +42,90 @@
   <div id="site-footer"></div>
 
   <script src="../assets/js/i18n.js"></script>
+  <script src="../assets/js/content.js"></script>
   <script src="../assets/js/layout.js"></script>
   <script src="../assets/js/main.js"></script>
+  <script>
+  (function () {
+    "use strict";
+    var A = window.CYWaterContent?.ARTICLES || {};
+    var NL = window.CYWaterContent?.NEWS_LIST || [];
+    var main = document.getElementById("news-main");
+    var sidebar = document.getElementById("news-sidebar");
+    if (!main || !NL.length) return;
+
+    var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]; }); };
+
+    var html = "";
+    NL.forEach(function (item, i) {
+      var a = A[item.id];
+      if (!a) return;
+      var href = "./article.html?id=" + item.id;
+      var img = "../assets/img/" + item.img;
+      if (i === 0) {
+        // featured
+        html += '<article class="news-feature" data-reveal>' +
+          '<a href="' + href + '" class="card-media"><img src="' + img + '" alt="" loading="lazy"></a>' +
+          '<div class="card-body">' +
+            '<div class="card-meta"><span class="card-tag">' + esc(a.tag) + '</span><span>· ' + esc(a.date) + '</span></div>' +
+            '<h3 class="card-title"><a href="' + href + '">' + esc(a.title) + '</a></h3>' +
+            '<p class="card-excerpt">' + esc(a.lead) + '</p>' +
+            '<a class="link" href="' + href + '">Read more</a>' +
+          '</div>' +
+        '</article>';
+      } else {
+        // list item
+        html += '<article class="news-item" data-reveal>' +
+          '<a href="' + href + '" class="card-media"><img src="' + img + '" alt="" loading="lazy"></a>' +
+          '<div>' +
+            '<div class="card-meta"><span class="card-tag">' + esc(a.tag) + '</span><span>· ' + esc(a.date) + '</span></div>' +
+            '<h3><a href="' + href + '">' + esc(a.title) + '</a></h3>' +
+            '<p>' + esc(a.lead) + '</p>' +
+          '</div>' +
+        '</article>';
+      }
+    });
+
+    // wrap list items (everything after the first) in a .news-list
+    html = html.replace(/(<\/article>)(<article class="news-item")/, '$1</div><div class="news-list" data-reveal>$2');
+    // close the news-list after the last article — append closing div before end
+    if (html.indexOf('news-list') > -1) {
+      html = html.replace(/(<\/article>)\s*$/, '$1</div>');
+    }
+    // add an opening wrapper div around featured + list
+    html = '<div>' + html + '</div>';
+
+    main.innerHTML = html;
+
+    // sidebar
+    var popHtml = '<h4>Most recent</h4>';
+    NL.slice(0, 5).forEach(function (item, i) {
+      var a = A[item.id];
+      if (!a) return;
+      var href = "./article.html?id=" + item.id;
+      popHtml += '<div class="popular-item">' +
+        '<span class="popular-num">' + String(i + 1).padStart(2, "0") + '</span>' +
+        '<div><h5><a href="' + href + '">' + esc(a.title) + '</a></h5><div class="meta">' + esc(a.date) + '</div></div>' +
+      '</div>';
+    });
+    popHtml += '<hr class="divider-soft" style="margin:var(--sp-5) 0"><h4>Categories</h4><div class="tag-list">' +
+      '<span class="badge badge-teal">Award</span>' +
+      '<span class="badge badge-teal">Conference</span>' +
+      '<span class="badge badge-teal">Community</span>' +
+      '</div>';
+    sidebar.innerHTML = popHtml;
+
+    // re-trigger reveal
+    document.querySelectorAll("[data-reveal]").forEach(function (el) {
+      if ("IntersectionObserver" in window) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("is-visible"); io.unobserve(e.target); } });
+        }, { threshold: 0.12, rootMargin: "0px 0px -40px 0px" });
+        io.observe(el);
+      } else { el.classList.add("is-visible"); }
+    });
+    if (window.CYWaterI18N) window.CYWaterI18N.applyTranslations();
+  })();
+  </script>
 </body>
 </html>

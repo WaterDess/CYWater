@@ -29,77 +29,8 @@
     <section class="section">
       <div class="container">
         <div class="events-layout">
-
-          <!-- list -->
-          <div>
-            <h2 style="margin-bottom:var(--sp-4)" data-i18n="events.upcoming"></h2>
-
-            <a class="event-row" href="./detail.html?id=13th-annual" data-reveal style="text-decoration:none">
-              <div class="event-date"><div class="day">2025</div><div class="mon" style="font-size:var(--fs-xs); letter-spacing:.1em">Q4</div></div>
-              <div class="event-info">
-                <span class="badge badge-teal" data-i18n="common.tagConference"></span>
-                <h3 data-i18n="events.e1Title"></h3>
-                <div class="meta">
-                  <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg><span data-i18n="events.e1City"></span></span>
-                  <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span data-i18n="events.e1Dur"></span></span>
-                  <span><span class="badge badge-live" style="margin-left:.3rem" data-i18n="events.tagJoint"></span></span>
-                </div>
-              </div>
-              <span class="btn btn-outline" data-i18n="common.learnMore"></span>
-            </a>
-
-            <a class="event-row" href="./detail.html?id=bpa-2025" data-reveal style="text-decoration:none">
-              <div class="event-date"><div class="day">2025</div><div class="mon" style="font-size:var(--fs-xs); letter-spacing:.1em">Q4</div></div>
-              <div class="event-info">
-                <span class="badge badge-teal" data-i18n="common.tagAward"></span>
-                <h3 data-i18n="events.e2Title"></h3>
-                <div class="meta">
-                  <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span data-i18n="events.e2Time"></span></span>
-                  <span><span class="badge badge-live" style="margin-left:.3rem" data-i18n="events.tagAnnual"></span></span>
-                </div>
-              </div>
-              <span class="btn btn-outline" data-i18n="common.learnMore"></span>
-            </a>
-
-            <a class="event-row" href="./detail.html?id=12th-summer" data-reveal style="text-decoration:none">
-              <div class="event-date"><div class="day">2024</div><div class="mon" style="font-size:var(--fs-xs); letter-spacing:.1em">AUG</div></div>
-              <div class="event-info">
-                <span class="badge badge-teal" data-i18n="common.tagConference"></span>
-                <h3 data-i18n="events.e3Title"></h3>
-                <div class="meta">
-                  <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg><span data-i18n="events.e3Loc"></span></span>
-                  <span data-i18n="events.e3Meta"></span>
-                </div>
-              </div>
-              <span class="btn btn-outline" data-i18n="common.learnMore"></span>
-            </a>
-
-            <a class="event-row" href="./detail.html?id=10th-summer" data-reveal style="text-decoration:none">
-              <div class="event-date"><div class="day">2022</div><div class="mon" style="font-size:var(--fs-xs); letter-spacing:.1em">AUG</div></div>
-              <div class="event-info">
-                <span class="badge badge-teal" data-i18n="common.tagConference"></span>
-                <h3 data-i18n="events.e4Title"></h3>
-                <div class="meta">
-                  <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg><span data-i18n="events.e4Loc"></span></span>
-                  <span><span class="badge badge-live" style="margin-left:.3rem" data-i18n="common.online"></span></span>
-                </div>
-              </div>
-              <span class="btn btn-outline" data-i18n="common.learnMore"></span>
-            </a>
-
-            <!-- past -->
-            <h2 style="margin-top:var(--sp-9); margin-bottom:var(--sp-4)" data-i18n="events.past"></h2>
-
-            <a class="event-row" href="./detail.html?id=8th-summer" data-reveal style="text-decoration:none; opacity:.85">
-              <div class="event-date"><div class="day">2020</div><div class="mon" style="font-size:var(--fs-xs); letter-spacing:.1em">AUG</div></div>
-              <div class="event-info">
-                <span class="badge badge-mute" data-i18n="common.tagConference"></span>
-                <h3 data-i18n="events.e5Title"></h3>
-                <div class="meta"><span data-i18n="events.e5Meta"></span></div>
-              </div>
-              <span class="link" data-i18n="common.readMore"></span>
-            </a>
-          </div>
+          <!-- list (rendered by JS) -->
+          <div id="events-main"></div>
 
           <!-- filters -->
           <aside class="events-filters" data-reveal>
@@ -108,10 +39,8 @@
               <div class="label" style="font-size:var(--fs-sm); font-weight:600; margin-bottom:.5rem" data-i18n="events.fType"></div>
               <div class="filter-options">
                 <label><input type="checkbox" checked> <span data-i18n="events.fAll"></span></label>
-                <label><input type="checkbox"> <span data-i18n="events.fWebinar"></span></label>
-                <label><input type="checkbox"> <span data-i18n="events.fWorkshop"></span></label>
                 <label><input type="checkbox"> <span data-i18n="events.fConference"></span></label>
-                <label><input type="checkbox"> <span data-i18n="events.fSocial"></span></label>
+                <label><input type="checkbox"> <span>Award</span></label>
               </div>
             </div>
             <div class="filter-group">
@@ -133,7 +62,80 @@
   <div id="site-footer"></div>
 
   <script src="../assets/js/i18n.js"></script>
+  <script src="../assets/js/content.js"></script>
   <script src="../assets/js/layout.js"></script>
   <script src="../assets/js/main.js"></script>
+  <script>
+  (function () {
+    "use strict";
+    var E = window.CYWaterContent?.EVENTS || {};
+    var EL = window.CYWaterContent?.EVENT_LIST || [];
+    var main = document.getElementById("events-main");
+    if (!main || !EL.length) return;
+
+    var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]; }); };
+    // extract a short year from date string like "Aug 11–14, 2020" or "2025"
+    var yearOf = function (d) { var m = /(\d{4})/.exec(d); return m ? m[1] : d; };
+
+    var upcoming = EL.filter(function (it) { return it.status === "upcoming"; });
+    var past = EL.filter(function (it) { return it.status === "past"; });
+
+    var html = "";
+
+    if (upcoming.length) {
+      html += '<h2 style="margin-bottom:var(--sp-4)">Recent &amp; upcoming</h2>';
+      upcoming.forEach(function (item) {
+        var e = E[item.id]; if (!e) return;
+        var href = "./detail.html?id=" + item.id;
+        var badge = e.format && e.format.indexOf("Award") >= 0 ? "Award" : "Conference";
+        html += '<a class="event-row" href="' + href + '" data-reveal style="text-decoration:none">' +
+          '<div class="event-date"><div class="day">' + esc(yearOf(e.date)) + '</div></div>' +
+          '<div class="event-info">' +
+            '<span class="badge badge-teal">' + esc(badge) + '</span>' +
+            '<h3>' + esc(e.title) + '</h3>' +
+            '<div class="meta">' +
+              '<span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>' + esc(e.location) + '</span>' +
+              '<span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>' + esc(e.date) + '</span>' +
+            '</div>' +
+          '</div>' +
+          '<span class="btn btn-outline">Learn more</span>' +
+        '</a>';
+      });
+    }
+
+    if (past.length) {
+      html += '<h2 style="margin-top:var(--sp-9); margin-bottom:var(--sp-4)">Past meetings</h2>';
+      past.forEach(function (item) {
+        var e = E[item.id]; if (!e) return;
+        var href = "./detail.html?id=" + item.id;
+        var badge = e.format && e.format.indexOf("Award") >= 0 ? "Award" : "Conference";
+        html += '<a class="event-row" href="' + href + '" data-reveal style="text-decoration:none; opacity:.92">' +
+          '<div class="event-date"><div class="day">' + esc(yearOf(e.date)) + '</div></div>' +
+          '<div class="event-info">' +
+            '<span class="badge badge-mute">' + esc(badge) + '</span>' +
+            '<h3>' + esc(e.title) + '</h3>' +
+            '<div class="meta">' +
+              '<span>' + esc(e.location) + '</span>' +
+              '<span>· ' + esc(e.date) + '</span>' +
+            '</div>' +
+          '</div>' +
+          '<span class="link">Read more</span>' +
+        '</a>';
+      });
+    }
+
+    main.innerHTML = html;
+
+    document.querySelectorAll("[data-reveal]").forEach(function (el) {
+      if ("IntersectionObserver" in window) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("is-visible"); io.unobserve(e.target); } });
+        }, { threshold: 0.12, rootMargin: "0px 0px -40px 0px" });
+        io.observe(el);
+      } else { el.classList.add("is-visible"); }
+    });
+    if (window.CYWaterI18N) window.CYWaterI18N.applyTranslations();
+  })();
+  </script>
 </body>
 </html>
