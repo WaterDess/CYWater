@@ -483,7 +483,7 @@
 .event-meta-row span { display: inline-flex; align-items: center; gap: 0.5rem; }
 .event-meta-row svg { width: 16px; height: 16px; color: var(--teal-soft); }
 
-.event-body { display: grid; grid-template-columns: 1fr 340px; gap: var(--sp-8); align-items: start; }
+.event-body { display: grid; grid-template-columns: 1fr; max-width: 760px; margin-inline: auto; align-items: start; }
 .event-side-card {
   background: var(--white);
   border: 1px solid var(--line);
@@ -788,7 +788,7 @@
   .footer-grid { grid-template-columns: 1fr 1fr; }
   .board-grid { grid-template-columns: repeat(3, 1fr); }
   .speaker-grid { grid-template-columns: repeat(3, 1fr); }
-  .events-layout, .news-layout, .event-body, .contact-layout, .about-intro-grid, .mission-grid {
+  .events-layout, .news-layout, .contact-layout, .about-intro-grid, .mission-grid {
     grid-template-columns: 1fr;
   }
   .events-filters, .news-sidebar, .event-side-card, .about-intro-grid .media-frame { position: static; }
