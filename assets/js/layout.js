@@ -12,7 +12,6 @@
   const r = ROOT;
 
   const ICONS = {
-    globe: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>',
     chevron: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="m6 9 6 6 6-6"/></svg>',
     mail: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
   };
@@ -49,9 +48,6 @@
         </ul>
       </nav>
       <div class="header-actions">
-        <button class="lang-toggle" data-lang-toggle aria-label="Switch language">
-          ${ICONS.globe}<span class="lang-current">EN</span>
-        </button>
         <a class="btn btn-ghost" href="${r}membership/dashboard.html" data-i18n="nav.signIn"></a>
         <a class="btn btn-primary" href="${r}membership/index.html" data-i18n="nav.join"></a>
         <button class="nav-toggle" aria-label="Menu" aria-expanded="false"><span></span></button>
@@ -152,7 +148,7 @@
 
     // re-run i18n on freshly injected nodes
     if (window.CYWaterI18N) {
-      window.CYWaterI18N.applyTranslations(window.CYWaterI18N.getLang());
+      window.CYWaterI18N.applyTranslations();
     }
   }
 

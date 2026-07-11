@@ -71,7 +71,7 @@
       <div class="summary-row"><span data-i18n="reg.org"></span><strong>${escapeHtml(formData.org || "—")}</strong></div>
       <div class="summary-row"><span data-i18n="reg.ticket"></span><strong>${escapeHtml(ticketLabel)}</strong></div>
     `;
-    if (window.CYWaterI18N) window.CYWaterI18N.applyTranslations(window.CYWaterI18N.getLang());
+    if (window.CYWaterI18N) window.CYWaterI18N.applyTranslations();
   }
 
   function escapeHtml(s) {

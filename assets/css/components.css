@@ -137,21 +137,6 @@
   gap: var(--sp-3);
   justify-self: end;
 }
-.lang-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  font-size: var(--fs-xs);
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  color: var(--ink-soft);
-  border: 1px solid var(--line);
-  padding: 0.4rem 0.65rem;
-  border-radius: 100px;
-  transition: all var(--dur) var(--ease);
-}
-.lang-toggle:hover { border-color: var(--teal); color: var(--teal); }
-.lang-toggle svg { width: 14px; height: 14px; }
 
 /* mobile toggle */
 .nav-toggle {

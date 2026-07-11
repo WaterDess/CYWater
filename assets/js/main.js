@@ -95,15 +95,6 @@
     toast(msg);
   });
 
-  /* ---------- Language toggle ---------- */
-  document.addEventListener("click", (e) => {
-    const trigger = e.target.closest("[data-lang-toggle]");
-    if (trigger) {
-      e.preventDefault();
-      window.CYWaterI18N?.toggleLang();
-    }
-  });
-
   /* ---------- FAQ accordion ---------- */
   document.querySelectorAll(".faq-item").forEach((item) => {
     const q = item.querySelector(".faq-q");

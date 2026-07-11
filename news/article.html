@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mapping seasonal groundwater depletion — CYWater</title>
-  <meta name="description" content="New satellite-derived storage estimates reveal a sharper groundwater decline across the North China Plain.">
+  <title>Article — CYWater</title>
+  <meta name="description" content="CYWater news and announcements.">
   <link rel="icon" type="image/png" href="../assets/img/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/base.css">
   <link rel="stylesheet" href="../assets/css/components.css">
   <link rel="stylesheet" href="../assets/css/pages.css">
@@ -17,75 +17,110 @@
 
   <div id="site-header"></div>
 
-  <main>
-    <!-- article hero -->
-    <section class="article-hero">
-      <div class="container container-narrow">
-        <div class="crumbs">
-          <a href="../index.html" data-i18n="nav.home"></a><span>/</span>
-          <a href="./index.html" data-i18n="nav.news"></a>
-        </div>
-        <div class="meta">
-          <span class="badge badge-teal" data-i18n="common.tagConference"></span>
-          <span>2025-10-29</span>
-        </div>
-        <h1 data-i18n="news.n1Title"></h1>
-        <p class="lead" style="margin-top:var(--sp-4)" data-i18n="news.artLead"></p>
-      </div>
-    </section>
-
-    <!-- body -->
-    <section class="section">
-      <div class="container container-narrow">
-        <div class="article-body">
-
-          <div class="article-share">
-            <span data-i18n="events.detailShare"></span>
-            <a href="#" class="footer-social" style="display:inline-flex; border:1px solid var(--line); width:34px;height:34px;border-radius:50%;align-items:center;justify-content:center" aria-label="Share"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.5 13.5 7 4M15.5 6.5l-7 4"/></svg></a>
-          </div>
-
-          <div class="media-frame" style="aspect-ratio:16/8; margin-bottom:var(--sp-6)" data-reveal>
-            <img src="../assets/img/photos/water-aerial.jpg" alt="" loading="lazy">
-          </div>
-
-          <div style="margin-bottom:var(--sp-6); padding:var(--sp-4) var(--sp-5); background:var(--paper-warm); border-left:3px solid var(--rust)" data-reveal>
-            <p style="color:var(--rust); margin:0"><strong data-i18n="news.artMockBadge"></strong></p>
-          </div>
-
-          <div class="prose" data-reveal>
-            <p data-i18n="news.artP1"></p>
-          </div>
-
-          <div style="margin-top:var(--sp-6); text-align:center" data-reveal>
-            <a class="btn btn-accent btn-lg" href="https://mp.weixin.qq.com/s/as1-T-vfeAywEoYh-AQ2pA" target="_blank" rel="noopener" data-i18n="news.artReadOriginal"></a>
-          </div>
-
-          <!-- author -->
-          <div class="article-author" data-reveal>
-            <div class="avatar"><div class="avatar-initials">CW</div></div>
-            <div>
-              <div style="font-size:var(--fs-xs); color:var(--ink-mute)" data-i18n="news.by"></div>
-              <div style="font-family:var(--font-display); font-weight:500">CYWater</div>
-              <div style="font-size:var(--fs-sm); color:var(--ink-mute)" data-i18n="news.artAuthorAffil"></div>
-            </div>
-          </div>
-
-          <hr class="divider" style="margin:var(--sp-7) 0">
-
-          <div style="text-align:center">
-            <a class="btn btn-outline" href="./index.html">
-              <span data-i18n="common.back"></span> · <span data-i18n="nav.news"></span>
-            </a>
-          </div>
-        </div>
-      </div>
-    </section>
+  <main id="article-main">
+    <!-- article-hero and body are injected by renderArticle() -->
   </main>
 
   <div id="site-footer"></div>
 
   <script src="../assets/js/i18n.js"></script>
+  <script src="../assets/js/content.js"></script>
   <script src="../assets/js/layout.js"></script>
   <script src="../assets/js/main.js"></script>
+  <script>
+  /* ---------- Render an article from ?id= ---------- */
+  (function () {
+    "use strict";
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+    const A = window.CYWaterContent?.ARTICLES || {};
+    const data = A[id];
+
+    const main = document.getElementById("article-main");
+
+    // Missing or unknown id → redirect to news list
+    if (!data) {
+      window.location.replace("./index.html");
+      return;
+    }
+
+    // Update document title
+    document.title = data.title + " — CYWater";
+
+    // Tag label lookup (badge text)
+    const tagKey = "common.tag" + ({
+      Award: "Award", Conference: "Conference", Event: "Event",
+      Research: "Research", Community: "Community"
+    })[data.tag] || data.tag;
+
+    // Escape helper
+    function esc(s) {
+      return String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+    }
+
+    // Render a block to HTML
+    function renderBlock(b) {
+      switch (b.type) {
+        case "p":      return '<p>' + b.text + '</p>';
+        case "h2":     return '<h2>' + b.text + '</h2>';
+        case "h3":     return '<h3>' + b.text + '</h3>';
+        case "quote":  return '<blockquote>' + b.text + '</blockquote>';
+        case "list":   return '<ul>' + b.items.map((i) => '<li>' + i + '</li>').join('') + '</ul>';
+        case "figure": return '<figure><img src="../assets/img/' + b.src + '" alt="' + esc(b.caption || '') + '" loading="lazy">' + (b.caption ? '<figcaption>' + b.caption + '</figcaption>' : '') + '</figure>';
+        case "gallery": return '<div class="article-gallery">' + b.items.map((it) => '<figure><img src="../assets/img/' + it.src + '" alt="' + esc(it.caption || '') + '" loading="lazy">' + (it.caption ? '<figcaption>' + it.caption + '</figcaption>' : '') + '</figure>').join('') + '</div>';
+        default:       return '';
+      }
+    }
+
+    // Compose the page
+    const sourceHtml = data.source
+      ? '<a class="btn btn-outline btn-lg" href="' + data.source + '" target="_blank" rel="noopener">View original on WeChat</a>'
+      : '';
+
+    main.innerHTML =
+      '<section class="article-hero">' +
+        '<div class="container container-narrow">' +
+          '<div class="crumbs">' +
+            '<a href="../index.html">Home</a><span>/</span>' +
+            '<a href="./index.html">News</a>' +
+          '</div>' +
+          '<div class="meta">' +
+            '<span class="badge badge-teal">' + esc(data.tag) + '</span>' +
+            '<span>' + esc(data.date) + '</span>' +
+          '</div>' +
+          '<h1>' + esc(data.title) + '</h1>' +
+          '<p class="lead" style="margin-top:var(--sp-4)">' + data.lead + '</p>' +
+        '</div>' +
+      '</section>' +
+      '<section class="section">' +
+        '<div class="container container-narrow">' +
+          '<div class="article-body">' +
+            '<div class="prose" data-reveal>' +
+              data.blocks.map(renderBlock).join('') +
+            '</div>' +
+            (sourceHtml ? '<hr class="divider" style="margin:var(--sp-7) 0"><div style="text-align:center">' + sourceHtml + '</div>' : '') +
+            '<div style="text-align:center; margin-top:var(--sp-6)">' +
+              '<a class="link" href="./index.html">Back to News</a>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</section>';
+
+    // Re-trigger reveal observer for new content, then apply translations
+    if (window.CYWaterI18N) window.CYWaterI18N.applyTranslations();
+    document.querySelectorAll('[data-reveal]').forEach((el) => {
+      if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target); }
+          });
+        }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+        io.observe(el);
+      } else {
+        el.classList.add('is-visible');
+      }
+    });
+  })();
+  </script>
 </body>
 </html>
