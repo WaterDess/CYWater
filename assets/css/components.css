@@ -23,7 +23,7 @@
   display: grid;
   grid-template-columns: minmax(260px, 1fr) auto minmax(260px, 1fr);
   align-items: center;
-  justify-content: space-between;  /* brand 左、actions 右、nav 居中：文本长度变化时对称伸缩，不漂移 */
+  justify-content: space-between;
   gap: var(--sp-5);
   height: 72px;
 }
@@ -40,7 +40,7 @@
   letter-spacing: -0.01em;
   color: var(--ink);
 }
-/* 品牌标志：透明背景 PNG（水滴环，内部镂空） */
+/* Transparent PNG brand mark. */
 .brand-logo {
   width: auto;
   height: 40px;
@@ -48,7 +48,7 @@
 }
 .brand { line-height: 1; }
 
-/* 页脚深色背景：把深色水滴环调亮为白色，镂空内部透出深底 */
+/* Render the brand mark in white against the dark footer. */
 .brand-logo--footer {
   height: 46px;
   filter: brightness(0) invert(1);
@@ -65,8 +65,7 @@
   margin-top: 3px;
 }
 
-/* primary nav */
-/* primary nav — 居中于 brand 与 actions 之间，不再用 margin-left:auto（那是漂移的根因） */
+/* Keep primary navigation centered between balanced outer columns. */
 .nav { justify-self: center; }
 .nav-list {
   display: flex;
@@ -440,8 +439,8 @@ body.nav-open .nav-toggle span::after { transform: translateY(-6px) rotate(-45de
 .hero-inner { position: relative; z-index: 2; max-width: 60ch; }
 .hero h1 {
   font-size: clamp(2.25rem, 5vw, 3.75rem);
-  max-width: 16ch;            /* 限制宽度，让中英文都自然换行成 2-3 句，视觉一致 */
-  text-wrap: balance;         /* 换行更均衡（支持现代浏览器） */
+  max-width: 16ch;
+  text-wrap: balance;
   line-height: 1.2;
   margin-bottom: var(--sp-6);
 }

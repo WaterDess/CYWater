@@ -66,7 +66,7 @@ const ARTICLES = {
         "Danghan Xie — “Mangrove removal exacerbates estuarine infilling through landscape-scale bio-morphodynamic feedbacks,” Nature Communications."
       ]},
       { type: "h2", text: "Award ceremony & community dinner" },
-      { type: "p", text: "The ceremony took place during the AGU Fall Meeting in Washington, DC: December 9 (Monday), 17:30–18:10 at Salon B (Convention Center). A community dinner followed at 18:30 at Sichuan Pavilion (重庆楼), 1814 K St NW, Washington, DC 20006." },
+      { type: "p", text: "The ceremony took place during the AGU Fall Meeting in Washington, DC: December 9 (Monday), 17:30–18:10 at Salon B (Convention Center). A community dinner followed at 18:30 at Sichuan Pavilion, 1814 K St NW, Washington, DC 20006." },
       { type: "h2", text: "Award Selection Committee" },
       { type: "list", items: [
         "Ximing Cai — University of Illinois, Urbana-Champaign (Chair)",
@@ -214,7 +214,7 @@ const ARTICLES = {
     blocks: [
       { type: "p", text: "The 13th CYWater Annual Meeting was held jointly with the 2nd Annual Meeting of the Youth Working Committee of the Yangtze River Technology and Economy Society (CTES-YWC). The meeting took place on November 1–2, 2025 (registration October 31) at the Wuhan Chutian Yuehai International Hotel, 181 East Lake Road, Wuchang, with no registration fee." },
       { type: "p", text: "This partnership was a milestone: CTES-YWC, established in December 2021, is a secondary branch of CTES with over 150 members, hosted at the School of Water Resources and Hydropower Engineering of Wuhan University. Co-hosting the meeting broadened CYWater's dialogue into integrated Yangtze basin water, technology and economy questions." },
-      { type: "quote", text: "数智赋能水科学创新与水安全保障 — Digital intelligence empowering water science innovation and water security." },
+      { type: "quote", text: "Digital intelligence empowering water science innovation and water security." },
       { type: "h2", text: "Eight themed sessions" },
       { type: "p", text: "The 2025 edition expanded the programme to eight tracks — the largest scope in the meeting's history — reflecting the rapid integration of AI and digital-twin methods into water science:" },
       { type: "list", items: [
@@ -240,8 +240,8 @@ const ARTICLES = {
     tag: "Conference",
     lead: "Hosted by Xi'an University of Technology under the theme \"Gathering strength for new quality productive forces in water,\" with a new AI-for-water track.",
     blocks: [
-      { type: "p", text: "The 12th CYWater Summer Meeting was held on August 17–18, 2024 in Xi'an, in a fully in-person format with no registration fee. Registration exceeded expectations, prompting the organizers to move the venue from the originally announced hotel to the Xi'an Empress Hotel (西安皇后大酒店), 45 Xingqing Road, Beilin District." },
-      { type: "quote", text: "凝'新'聚'力'，推动水利新质生产力发展 — Gathering the 'new' and concentrating 'force' to advance new quality productive forces in water." },
+      { type: "p", text: "The 12th CYWater Summer Meeting was held on August 17–18, 2024 in Xi'an, in a fully in-person format with no registration fee. Registration exceeded expectations, prompting the organizers to move the venue from the originally announced hotel to the Xi'an Empress Hotel, 45 Xingqing Road, Beilin District." },
+      { type: "quote", text: "Gathering strength to advance new quality productive forces in water." },
       { type: "p", text: "Hosted by the School of Water Resources and Hydroelectric Engineering of Xi'an University of Technology, in collaboration with CYWater, IGSNRR (CAS), the State Key Laboratory of Eco-hydraulics in Northwest Arid Region, and the Key Laboratory of Northwest Water Resources and Environmental Ecology (Ministry of Education)." },
       { type: "h2", text: "Five themed sessions" },
       { type: "list", items: [
@@ -265,7 +265,7 @@ const ARTICLES = {
       { type: "p", text: "The 11th CYWater Summer Meeting was held on August 5–6, 2023 in Beijing, in a hybrid format (in person with online livestream via Tencent Meeting), with no registration fee. The venue was the Ziyu Yuli Hotel, 55 Zengguang Road, Haidian District, with registration on August 4." },
       { type: "p", text: "Hosted by Capital Normal University (School of Resource Environment and Tourism) and IGSNRR (CAS), the meeting continued CYWater's annual rhythm: a domestic summer meeting each year since 2013, paired with an overseas gathering during the AGU Fall Meeting." },
       { type: "h2", text: "Theme" },
-      { type: "quote", text: "加速变革助力水资源可持续发展 — Accelerating change for sustainable water resources." },
+      { type: "quote", text: "Accelerating change for sustainable water resources." },
       { type: "h2", text: "Four sessions" },
       { type: "list", items: [
         "Hydroclimate & global change",
@@ -318,7 +318,7 @@ const ARTICLES = {
     blocks: [
       { type: "p", text: "The 9th CYWater Summer Meeting was held from July 31 to August 1, 2021, in a hybrid format (in person + online), hosted by Nanjing University of Information Science and Technology (NUIST) and the Institute of Atmospheric Physics (CAS). The meeting had no registration fee." },
       { type: "h2", text: "Theme" },
-      { type: "quote", text: "国际水科学前沿 — Frontiers of international water science." },
+      { type: "quote", text: "Frontiers of international water science." },
       { type: "h2", text: "Five frontier topics" },
       { type: "list", items: [
         "Hydroclimate & global change",
@@ -440,184 +440,282 @@ const ARTICLES = {
 };
 
 const EVENTS = {
+  "annual-2026": {
+    title: "CYWater Annual Meeting 2026",
+    date: "Oct 16–18, 2026",
+    location: "Nanjing, China",
+    format: "In person",
+    attendees: "Registration opens in August",
+    lead: "The International Association of Contemporary Young Scholars in Water Sciences Annual Meeting 2026 will take place in Nanjing, China, from 16 to 18 October.",
+    blocks: [
+      { type: "p", text: "Registration will open in August. Program, venue, abstract submission, and registration details will be published after confirmation." },
+      { type: "p", text: "This preview does not accept registrations or payments." }
+    ],
+    upcoming: true,
+    category: "meeting"
+  },
+
   "13th-annual": {
     title: "13th Annual Meeting — Wuhan 2025",
     date: "Nov 1–2, 2025",
     location: "Wuhan, China",
-    format: "Co-hosted with CTES Youth Committee",
-    attendees: "150+ CTES-YWC members · 8 sessions · no fee",
-    lead: "Jointly held with the Yangtze Technology & Economy Society Youth Working Committee in Wuhan; eight themed sessions on digital intelligence and water security.",
+    format: "In person",
+    attendees: "Eight themed sessions",
+    image: "events/meeting-2025.jpg",
+    imageAlt: "Participants at the 13th CYWater Annual Meeting in Wuhan",
+    lead: "The 13th CYWater Annual Meeting was held jointly with the Youth Working Committee of the Yangtze River Technology and Economy Society.",
     blocks: [
-      { type: "p", text: "The 13th CYWater Annual Meeting was held jointly with the 2nd Annual Meeting of the Youth Working Committee of the Yangtze River Technology and Economy Society (CTES-YWC), at the Wuhan Chutian Yuehai International Hotel, November 1–2, 2025 (registration October 31), with no registration fee." },
-      { type: "p", text: "CTES-YWC, established in December 2021 with over 150 members hosted at Wuhan University, co-organized the meeting — broadening CYWater's dialogue into integrated Yangtze basin water, technology and economy questions." },
-      { type: "quote", text: "数智赋能水科学创新与水安全保障 — Digital intelligence empowering water science innovation and water security." },
+      { type: "p", text: "The meeting took place in Wuhan on November 1–2, 2025, with registration on October 31." },
+      { type: "quote", text: "Digital intelligence empowering water science innovation and water security." },
       { type: "h2", text: "Eight themed sessions" },
       { type: "list", items: [
         "Water cycle evolution under changing environments",
-        "Hydrometeorological forecasting & water disasters",
-        "Ecohydrology & green watersheds",
-        "River ecosystem evolution & regulation",
-        "Multi-dimensional water balance & coordinated dispatch",
-        "AI + water science",
-        "Digital-twin basins & smart decision-making",
-        "Safe, resilient water-network construction & control"
-      ]}
-    ],
-    upcoming: true,
-    source: "https://mp.weixin.qq.com/s/zCKWquUgUmreV3fzPFtsxQ"
-  },
-
-  "bpa-2025": {
-    title: "Young Scientist Best Paper Award 2025",
-    date: "Dec 2025",
-    location: "AGU Fall Meeting, New Orleans",
-    format: "Award ceremony",
-    attendees: "~30 applicants",
-    lead: "Annual award recognising outstanding contributions to water sciences by first authors under 35.",
-    blocks: [
-      { type: "p", text: "The CYWater Young Scientist Best Paper Award 2025 goes to Jiaojiao Gou for her PNAS paper on river flow connectivity in China, with two Outstanding Paper awards to Bo Xu/Zhanwei Liu (Nature Sustainability) and Yuanlin Qiu (Nature Communications)." },
-      { type: "h2", text: "Award Selection Committee" },
-      { type: "list", items: [
-        "Deliang Chen — Tsinghua University (Chair)",
-        "Lifeng Luo — Michigan State University",
-        "Kaicun Wang — Peking University",
-        "Aihui Wang — Institute of Atmospheric Physics, CAS",
-        "Chaopeng Shen — Pennsylvania State University",
-        "Jian Peng — Helmholtz Centre for Environmental Research",
-        "Yuting Yang — Tsinghua University"
+        "Hydrometeorological forecasting and water disasters",
+        "Ecohydrology and green watersheds",
+        "River ecosystem evolution and regulation",
+        "Multi-dimensional water balance and coordinated dispatch",
+        "AI and water science",
+        "Digital-twin basins and smart decision-making",
+        "Safe and resilient water-network construction"
       ]}
     ],
     upcoming: false,
-    source: "http://mp.weixin.qq.com/s?__biz=MzI2NDUwODk0Ng==&mid=2247484260"
+    category: "meeting"
   },
 
   "12th-summer": {
-    title: "12th Summer Meeting — Xi'an 2024",
+    title: "12th Annual Meeting — Xi'an 2024",
     date: "Aug 17–18, 2024",
     location: "Xi'an, China",
-    format: "In person · no registration fee",
-    attendees: "5 sessions · new AI-for-water track",
-    lead: "Hosted by Xi'an University of Technology; new AI-for-water theme added; venue moved due to over-registration.",
+    format: "In person",
+    attendees: "Five sessions",
+    image: "events/meeting-2024.jpg",
+    imageAlt: "Participants at the 12th CYWater Annual Meeting in Xi'an",
+    lead: "Hosted by Xi'an University of Technology, the meeting introduced a dedicated AI for water science theme.",
     blocks: [
-      { type: "p", text: "Hosted by the School of Water Resources and Hydroelectric Engineering, Xi'an University of Technology, with IGSNRR (CAS), the State Key Laboratory of Eco-hydraulics in Northwest Arid Region, and the Key Laboratory of Northwest Water Resources and Environmental Ecology (MOE)." },
-      { type: "p", text: "Registration exceeded expectations, prompting the organizers to move the venue to the Xi'an Empress Hotel (皇后大酒店), 45 Xingqing Road, Beilin District." },
-      { type: "quote", text: "凝'新'聚'力'，推动水利新质生产力发展 — Gathering new strength to advance new quality productive forces in water." },
+      { type: "p", text: "The meeting was hosted by the School of Water Resources and Hydroelectric Engineering at Xi'an University of Technology." },
+      { type: "quote", text: "Gathering new strength to advance innovation in water sciences." },
       { type: "h2", text: "Five themed sessions" },
       { type: "list", items: [
-        "Hydroclimate & global change",
-        "Hydrological forecasting & flood/drought disasters",
-        "Ecohydrology & sediment processes",
-        "Water resources evolution & regulation",
-        "AI for water science (new in 2024)"
+        "Hydroclimate and global change",
+        "Hydrological forecasting and flood and drought disasters",
+        "Ecohydrology and sediment processes",
+        "Water resources evolution and regulation",
+        "AI for water science"
       ]}
     ],
     upcoming: false,
-    source: "https://mp.weixin.qq.com/s/as1-T-vfeAywEoYh-AQ2pA"
+    category: "meeting"
   },
 
   "11th-summer": {
-    title: "11th Summer Meeting — Beijing 2023",
+    title: "11th Annual Meeting — Beijing 2023",
     date: "Aug 5–6, 2023",
     location: "Beijing, China",
-    format: "Hybrid (in person + online)",
-    attendees: "No registration fee",
-    lead: "Hosted by Capital Normal University and IGSNRR (CAS). Theme: accelerating change for sustainable water resources.",
+    format: "Hybrid",
+    attendees: "Four sessions",
+    image: "events/meeting-2023.jpg",
+    imageAlt: "Participants at the 11th CYWater Annual Meeting in Beijing",
+    lead: "Hosted by Capital Normal University and IGSNRR, the meeting focused on sustainable water resources under accelerating change.",
     blocks: [
-      { type: "p", text: "Held at Ziyu Yuli Hotel, Beijing, in a hybrid format with free registration." },
+      { type: "p", text: "The meeting was held in Beijing in a hybrid format." },
       { type: "h2", text: "Four sessions" },
       { type: "list", items: [
-        "Hydroclimate & global change",
-        "Ecohydrology & water environment",
-        "Novel hydrological observation & modelling methods",
-        "Water resources & water disasters"
+        "Hydroclimate and global change",
+        "Ecohydrology and water environment",
+        "Novel hydrological observation and modelling methods",
+        "Water resources and water disasters"
       ]}
     ],
     upcoming: false,
-    source: "https://mp.weixin.qq.com/s/RJ4docc3w9XTYktIYB1cGg"
+    category: "meeting"
   },
 
   "10th-summer": {
-    title: "10th Summer Meeting — Online 2022",
+    title: "10th Annual Meeting — Online 2022",
     date: "Aug 24–28, 2022",
     location: "Online",
-    format: "Online (Zoom webinars)",
-    attendees: "630 peak · 6 continents · 106 institutions",
-    lead: "Co-hosted by IGSNRR (CAS) and Michigan State University; five keynote lectures, 340+ contributed presentations.",
+    format: "Online",
+    attendees: "Participants from 106 institutions",
+    image: "events/meeting-2022.png",
+    imageAlt: "Online participants at the 10th CYWater Annual Meeting",
+    lead: "The online meeting brought together participants across six continents for five keynote lectures and more than 340 contributed presentations.",
     blocks: [
-      { type: "p", text: "Co-chaired by Lifeng Luo (MSU) and Qiuhong Tang (IGSNRR), the 10th edition was the largest to date, themed “Frontiers of International Hydrological Sciences.” Participants came from 106 institutions across six continents, with 31 overseas (about 30%), peaking at 630 concurrent attendees." },
+      { type: "p", text: "The meeting was organized online and connected participants from 106 institutions across six continents." },
       { type: "h2", text: "Five themed sessions" },
       { type: "list", items: [
-        "Session 1: Hydroclimate & global change",
-        "Session 2: Hydrometeorological hazards & early warning",
-        "Session 3: Ecohydrology & fluvial geomorphology",
-        "Session 4: Novel observation & modelling methods",
-        "Session 5: Surface & groundwater resources"
-      ]},
-      { type: "h2", text: "Presentation formats" },
-      { type: "list", items: [
-        "Keynote lecture — 60 min (50 + 10 Q&A)",
-        "Invited talk — 15 min (12 + 3 Q&A)",
-        "Contributed talk — 10 min (8 + 2 Q&A)",
-        "Flash talk — 2 min, 2–3 slides"
+        "Hydroclimate and global change",
+        "Hydrometeorological hazards and early warning",
+        "Ecohydrology and fluvial geomorphology",
+        "Novel observation and modelling methods",
+        "Surface and groundwater resources"
       ]}
     ],
     upcoming: false,
-    source: "https://mp.weixin.qq.com/s/RJ4docc3w9XTYktIYB1cGg"
+    category: "meeting"
   },
 
   "9th-summer": {
-    title: "9th Summer Meeting — Nanjing 2021",
-    date: "Jul 31 – Aug 1, 2021",
-    location: "Nanjing, China (hybrid)",
-    format: "Hybrid (in person + online)",
-    attendees: "No registration fee",
-    lead: "Hosted by NUIST and IGSNRR (CAS). Theme: frontiers of international water science.",
+    title: "9th Annual Meeting — Online 2021",
+    date: "Jul 31–Aug 1, 2021",
+    location: "Online",
+    format: "Online",
+    attendees: "Five frontier topics",
+    image: "events/meeting-2021.jpg",
+    imageAlt: "Online participants at the 9th CYWater Annual Meeting",
+    lead: "Organized with Nanjing University of Information Science and Technology, the meeting focused on frontiers of international water science.",
     blocks: [
-      { type: "p", text: "Hosted by Nanjing University of Information Science and Technology (NUIST) and the Institute of Atmospheric Physics (CAS)." },
+      { type: "p", text: "The meeting was organized online during the COVID-19 pandemic." },
       { type: "h2", text: "Five frontier topics" },
       { type: "list", items: [
-        "Hydroclimate & global change",
-        "Hydrometeorology & disaster early warning",
-        "Ecohydrology & fluvial geomorphology",
-        "Novel hydrological observation & modelling methods",
-        "Surface & groundwater resources"
+        "Hydroclimate and global change",
+        "Hydrometeorology and disaster early warning",
+        "Ecohydrology and fluvial geomorphology",
+        "Novel hydrological observation and modelling methods",
+        "Surface and groundwater resources"
       ]}
     ],
     upcoming: false,
-    source: "https://mp.weixin.qq.com/s/VIPzHbb3Qn-Rpum05C10WA"
+    category: "meeting"
   },
 
   "8th-summer": {
-    title: "8th Summer Meeting — Online 2020",
+    title: "8th Annual Meeting — Online 2020",
     date: "Aug 11–14, 2020",
     location: "Online",
     format: "Online",
-    attendees: "630 peak · 106 institutions · 5 continents",
-    lead: "Hosted by IGSNRR (CAS) and Michigan State University; 76 oral presentations across four sessions.",
+    attendees: "76 oral presentations",
+    image: "events/meeting-2020.jpg",
+    imageAlt: "Online participants at the 8th CYWater Annual Meeting",
+    lead: "The four-day online meeting connected 106 institutions and featured 76 oral presentations across four sessions.",
     blocks: [
-      { type: "p", text: "Despite the pandemic, the 8th edition drew 630 peak attendees from 106 institutions across five continents — including 31 overseas institutions (about 30%). The four-day programme featured 76 oral presentations spanning hydrology, global change, ecology, geomorphology, AI, engineering and socio-economics." },
+      { type: "p", text: "The 2020 meeting moved online during the COVID-19 pandemic and connected participants across multiple continents." },
       { type: "h2", text: "Invited keynote speakers" },
       { type: "list", items: [
         "Aiguo Dai — University at Albany, SUNY",
         "Kevin Trenberth — NCAR",
         "Kun Yang — Tsinghua University",
         "Ge Sun — USDA Forest Service"
-      ]},
-      { type: "figure", src: "article/summer-2020-trenberth.jpg", caption: "Invited keynote speaker Prof. Kevin Trenberth (NCAR) presenting." },
-      { type: "h2", text: "Post-meeting commentary" },
-      { type: "p", text: "Academician Deliang Chen and Prof. Zong-Liang Yang praised the conference for providing scholars worldwide with exchange and collaboration opportunities, advancing consensus on water-science frontiers, and stimulating young researchers' enthusiasm." }
+      ]}
     ],
     upcoming: false,
-    source: "https://mp.weixin.qq.com/s/vaTPoxDd-wVdoM9O0IqvJw"
+    category: "meeting"
+  },
+
+  "7th-summer": {
+    title: "7th Annual Meeting — Zhuhai 2019",
+    date: "Jul 14–16, 2019",
+    location: "Zhuhai, China",
+    format: "In person",
+    image: "events/meeting-2019.jpg",
+    imageAlt: "Participants at the 7th CYWater Annual Meeting in Zhuhai",
+    lead: "Hosted by the School of Atmospheric Sciences at Sun Yat-sen University, the meeting examined challenges and opportunities in interdisciplinary hydrological science.",
+    blocks: [{ type: "p", text: "The 7th Annual Meeting was held in Zhuhai and hosted by Sun Yat-sen University." }],
+    upcoming: false,
+    category: "meeting"
+  },
+
+  "6th-summer": {
+    title: "6th Annual Meeting — Beijing 2018",
+    date: "Jul 31–Aug 2, 2018",
+    location: "Beijing, China",
+    format: "In person",
+    image: "events/meeting-2018.jpg",
+    imageAlt: "Participants at the 6th CYWater Annual Meeting in Beijing",
+    lead: "The 6th CYWater Annual Meeting was held in Beijing.",
+    blocks: [{ type: "p", text: "The meeting continued CYWater's annual scientific exchange program for early-career water scholars." }],
+    upcoming: false,
+    category: "meeting"
+  },
+
+  "5th-summer": {
+    title: "5th Annual Meeting — Beijing 2017",
+    date: "Aug 13, 2017",
+    location: "Beijing, China",
+    format: "In person",
+    image: "events/meeting-2017.jpg",
+    imageAlt: "Participants at the 5th CYWater Annual Meeting in Beijing",
+    lead: "The 5th CYWater Annual Meeting was held in Beijing.",
+    blocks: [{ type: "p", text: "The meeting continued the Association's annual program of scientific exchange." }],
+    upcoming: false,
+    category: "meeting"
+  },
+
+  "4th-summer": {
+    title: "4th Annual Meeting — Beijing 2016",
+    date: "Aug 6, 2016",
+    location: "Beijing, China",
+    format: "In person",
+    image: "events/meeting-2016.jpg",
+    imageAlt: "Participants at the 4th CYWater Annual Meeting in Beijing",
+    lead: "The 4th CYWater Annual Meeting was held in Beijing.",
+    blocks: [{ type: "p", text: "The meeting brought together water-science researchers for presentations and community exchange." }],
+    upcoming: false,
+    category: "meeting"
+  },
+
+  "3rd-summer": {
+    title: "3rd Annual Meeting — Beijing 2015",
+    date: "Jul 11, 2015",
+    location: "Beijing, China",
+    format: "In person",
+    image: "events/meeting-2015.jpg",
+    imageAlt: "Participants at the 3rd CYWater Annual Meeting in Beijing",
+    lead: "The 3rd CYWater Annual Meeting was held in Beijing.",
+    blocks: [{ type: "p", text: "The meeting continued the Association's annual program of research presentations and professional exchange." }],
+    upcoming: false,
+    category: "meeting"
+  },
+
+  "2nd-summer": {
+    title: "2nd Annual Meeting — Beijing 2014",
+    date: "Jul 12, 2014",
+    location: "Beijing, China",
+    format: "In person",
+    image: "events/meeting-2014.jpg",
+    imageAlt: "Participants at the 2nd CYWater Annual Meeting in Beijing",
+    lead: "The 2nd CYWater Annual Meeting was held in Beijing.",
+    blocks: [{ type: "p", text: "The meeting built on the first annual gathering and expanded scientific exchange within the CYWater community." }],
+    upcoming: false,
+    category: "meeting"
+  },
+
+  "1st-summer": {
+    title: "1st Annual Meeting — Beijing 2013",
+    date: "Aug 3, 2013",
+    location: "Beijing, China",
+    format: "In person",
+    image: "events/meeting-2013.jpg",
+    imageAlt: "Participants at the 1st CYWater Annual Meeting in Beijing",
+    lead: "The first CYWater Annual Meeting established a continuing forum for scientific exchange in water sciences.",
+    blocks: [{ type: "p", text: "The first Annual Meeting was held in Beijing on August 3, 2013." }],
+    upcoming: false,
+    category: "meeting"
+  },
+
+  "annual-gathering-2013": {
+    title: "CYWater Annual Gathering — San Francisco 2013",
+    date: "Dec 12, 2013",
+    location: "San Francisco, USA",
+    format: "Community gathering during the AGU Fall Meeting",
+    image: "article/agu-2013-dinner.jpg",
+    imageAlt: "CYWater annual gathering in San Francisco on December 12, 2013",
+    lead: "CYWater members gathered in San Francisco during the 2013 AGU Fall Meeting for community exchange and the Best Paper Award presentation.",
+    blocks: [
+      { type: "p", text: "The gathering took place on December 12, 2013, in San Francisco." },
+      { type: "figure", src: "article/agu-2013-bpa.jpg", caption: "Laifang Li receives the CYWater Best Paper Award during the 2013 gathering." }
+    ],
+    upcoming: false,
+    category: "gathering"
   }
 };
 
 /* Award yearbook — winners by year for the awards page */
 const AWARDS = [
-  { year: "2025", bestPaper: { author: "Jiaojiao Gou", title: "Warming climate and water withdrawals threaten river flow connectivity in China", journal: "PNAS" },
+  { year: "2025", bestPaper: { author: "Jiaojiao Gou", title: "Warming climate and water withdrawals threaten river flow connectivity in China", journal: "PNAS", doi: "10.1073/pnas.2421046122" },
     outstanding: [
-      { author: "Bo Xu & Zhanwei Liu", title: "Strategizing Renewable Energy Transitions to Preserve Sediment Transport Integrity", journal: "Nature Sustainability" },
-      { author: "Yuanlin Qiu", title: "Enhanced heating effect of lakes under global warming", journal: "Nature Communications" }
+      { author: "Bo Xu & Zhanwei Liu", title: "Strategizing Renewable Energy Transitions to Preserve Sediment Transport Integrity", journal: "Nature Sustainability", doi: "10.1038/s41893-025-01626-5" },
+      { author: "Yuanlin Qiu", title: "Enhanced heating effect of lakes under global warming", journal: "Nature Communications", doi: "10.1038/s41467-025-59291-3" }
     ], applications: 30, chair: "Deliang Chen (Tsinghua University)", articleId: "bpa-2025-result" },
   { year: "2024", bestPaper: { author: "Juntai Han & Ziwei Liu", title: "Streamflow seasonality in a snow-dwindling world", journal: "Nature" },
     outstanding: [
@@ -644,7 +742,23 @@ const AWARDS = [
       { author: "Sha Zhou", title: "Soil moisture–atmosphere feedbacks mitigate declining water availability in drylands", journal: "Nature Climate Change" },
       { author: "Chong Zhang", title: "The Effectiveness of the South-to-North Water Diversion Middle Route Project on Water Delivery and Groundwater Recovery", journal: "Water Resources Research" },
       { author: "Qi Huang", title: "Using Remote Sensing Data-Based Hydrological Model Calibrations for Predicting Runoff in Ungauged Catchments", journal: "Water Resources Research" }
-    ], applications: 17, chair: "Ming Pan (Princeton University)", articleId: "bpa-2020-result" }
+    ], applications: 17, chair: "Ming Pan (Princeton University)", articleId: "bpa-2020-result" },
+  { year: "2019", bestPaper: { author: "Hongbo Ma", title: "Universal relation with regime transition for sediment transport in fine-grained rivers", journal: "Proceedings of the National Academy of Sciences" },
+    outstanding: [
+      { author: "Xiaogang He", title: "Solar and wind energy enhances drought resilience and groundwater sustainability", journal: "Nature Communications" },
+      { author: "Mengfei Mu", title: "A water-electricity nexus model to analyze thermoelectricity supply reliability under environmental regulations and economic penalties during drought events", journal: "Environmental Modelling & Software" }
+    ] },
+  { year: "2018", bestPaper: { author: "Qi Huang", title: "Discharge estimation in high-mountain regions with improved methods using multisource remote sensing: A case study of the Upper Brahmaputra River", journal: "Remote Sensing of Environment" },
+    outstanding: [
+      { author: "Hongxiang Yan", title: "Next-Generation Intensity-Duration-Frequency Curves for Hydrologic Design in Snow-Dominated Environments", journal: "Water Resources Research" },
+      { author: "Qiaohong Sun", title: "A review of global precipitation datasets: data sources, estimation, and intercomparisons", journal: "Reviews of Geophysics" }
+    ] },
+  { year: "2017", bestPaper: null, outstanding: [], note: "The 2017 award citation is pending confirmation in the supplied records." },
+  { year: "2016", bestPaper: { author: "Yujin Zeng, Zhenghui Xie & Jing Zhou", title: "Hydrologic and Climatic Responses to Global Anthropogenic Groundwater Extraction", journal: "" }, outstanding: [] },
+  { year: "2015", bestPaper: { author: "Dongqin Yin, Michael L. Roderick, Guy Leech, Fubao Sun & Yuefei Huang", title: "The contribution of reduction in evaporative cooling to higher surface air temperatures during drought", journal: "" }, outstanding: [] },
+  { year: "2014", bestPaper: { author: "Lishan Ran, X. X. Lu & Z. Xin", title: "Erosion-induced massive organic carbon burial and carbon emission in the Yellow River basin, China", journal: "" }, outstanding: [] },
+  { year: "2013", bestPaper: { author: "Laifang Li, Wenhong Li & Yochanan Kushnir", title: "Variation of the North Atlantic subtropical high western ridge and its implication to Southeastern US summer precipitation", journal: "" }, outstanding: [] },
+  { year: "2012", bestPaper: { author: "Huimin Lei, Dawen Yang, Jianfeng Cai & Fengjiao Wang", title: "Long-term variability of the carbon balance in a large irrigated area along the lower Yellow River from 1984 to 2006", journal: "" }, outstanding: [] }
 ];
 
 window.CYWaterContent = { ARTICLES, EVENTS, AWARDS };
@@ -654,15 +768,15 @@ window.CYWaterContent = { ARTICLES, EVENTS, AWARDS };
    (image, which may differ from the article's own hero). */
 const NEWS_LIST = [
   { id: "bpa-2025-result", img: "photos/audience-talk.jpg" },
-  { id: "13th-annual-3rd", img: "photos/water-aerial.jpg" },
-  { id: "12th-summer-xian", img: "photos/underwater-blue.jpg" },
+  { id: "13th-annual-3rd", img: "events/meeting-2025.jpg" },
+  { id: "12th-summer-xian", img: "events/meeting-2024.jpg" },
   { id: "bpa-2025-call",   img: "photos/meeting-office.jpg" },
-  { id: "11th-summer-beijing", img: "photos/books-library.jpg" },
-  { id: "10th-summer-2022",    img: "photos/conference-audience.jpg" },
-  { id: "9th-summer-2021",     img: "photos/water-river.jpg" },
-  { id: "8th-summer-2020",     img: "photos/water-mountain.jpg" },
+  { id: "11th-summer-beijing", img: "events/meeting-2023.jpg" },
+  { id: "10th-summer-2022",    img: "events/meeting-2022.png" },
+  { id: "9th-summer-2021",     img: "events/meeting-2021.jpg" },
+  { id: "8th-summer-2020",     img: "events/meeting-2020.jpg" },
   { id: "cop27-2022",          img: "photos/water-dusk.jpg" },
-  { id: "founding-story",      img: "photos/forest-light.jpg" },
+  { id: "founding-story",      img: "article/founding-2011.jpg" },
   { id: "bpa-2024-result", img: "photos/meeting-office.jpg" },
   { id: "bpa-2023-result", img: "photos/water-dusk.jpg" },
   { id: "bpa-2022-result", img: "photos/water-aerial.jpg" },
@@ -671,13 +785,21 @@ const NEWS_LIST = [
 ];
 
 const EVENT_LIST = [
-  { id: "13th-annual",  status: "upcoming" },
-  { id: "bpa-2025",     status: "upcoming" },
-  { id: "12th-summer",  status: "past" },
-  { id: "11th-summer",  status: "past" },
-  { id: "10th-summer",  status: "past" },
-  { id: "9th-summer",   status: "past" },
-  { id: "8th-summer",   status: "past" }
+  { id: "annual-2026", status: "upcoming", category: "meeting" },
+  { id: "13th-annual", status: "past", category: "meeting" },
+  { id: "12th-summer", status: "past", category: "meeting" },
+  { id: "11th-summer", status: "past", category: "meeting" },
+  { id: "10th-summer", status: "past", category: "meeting" },
+  { id: "9th-summer", status: "past", category: "meeting" },
+  { id: "8th-summer", status: "past", category: "meeting" },
+  { id: "7th-summer", status: "past", category: "meeting" },
+  { id: "6th-summer", status: "past", category: "meeting" },
+  { id: "5th-summer", status: "past", category: "meeting" },
+  { id: "4th-summer", status: "past", category: "meeting" },
+  { id: "3rd-summer", status: "past", category: "meeting" },
+  { id: "2nd-summer", status: "past", category: "meeting" },
+  { id: "1st-summer", status: "past", category: "meeting" },
+  { id: "annual-gathering-2013", status: "past", category: "gathering" }
 ];
 
 window.CYWaterContent.NEWS_LIST = NEWS_LIST;

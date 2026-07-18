@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
   <title>Article — CYWater</title>
   <meta name="description" content="CYWater news and announcements.">
   <link rel="icon" type="image/png" href="../assets/img/logo.png">
@@ -22,8 +23,6 @@
   </main>
 
   <div id="site-footer"></div>
-
-  <script src="../assets/js/i18n.js"></script>
   <script src="../assets/js/content.js"></script>
   <script src="../assets/js/layout.js"></script>
   <script src="../assets/js/main.js"></script>
@@ -47,12 +46,6 @@
     // Update document title
     document.title = data.title + " — CYWater";
 
-    // Tag label lookup (badge text)
-    const tagKey = "common.tag" + ({
-      Award: "Award", Conference: "Conference", Event: "Event",
-      Research: "Research", Community: "Community"
-    })[data.tag] || data.tag;
-
     // Escape helper
     function esc(s) {
       return String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -74,7 +67,7 @@
 
     // Compose the page
     const sourceHtml = data.source
-      ? '<a class="btn btn-outline btn-lg" href="' + data.source + '" target="_blank" rel="noopener">View original on WeChat</a>'
+      ? '<a class="btn btn-outline btn-lg" href="' + esc(data.source) + '" target="_blank" rel="noopener">View source announcement</a>'
       : '';
 
     main.innerHTML =
@@ -106,20 +99,7 @@
         '</div>' +
       '</section>';
 
-    // Re-trigger reveal observer for new content, then apply translations
-    if (window.CYWaterI18N) window.CYWaterI18N.applyTranslations();
-    document.querySelectorAll('[data-reveal]').forEach((el) => {
-      if ('IntersectionObserver' in window) {
-        const io = new IntersectionObserver((entries) => {
-          entries.forEach((e) => {
-            if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target); }
-          });
-        }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
-        io.observe(el);
-      } else {
-        el.classList.add('is-visible');
-      }
-    });
+    window.CYWaterReveal?.refresh(main);
   })();
   </script>
 </body>

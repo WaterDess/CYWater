@@ -1,41 +1,57 @@
-# CYWater Claude Code Handoff
+# CYWater Project Knowledgebase
 
-This file gives Claude Code project context after a system reinstall or disk
-migration. It intentionally mirrors `AGENT.md`; keep both files aligned when
-the project direction changes.
+Keep `AGENT.md`, `AGENTS.md`, and `claude.md` identical whenever project
+direction changes.
 
-## What This Project Is
+## Remote SSH Context
 
-CYWater is a static bilingual website prototype for an international association
-of contemporary young scholars in water sciences. It is a polished front-end
-prototype, not a production backend system.
+- "联想笔记本", "Lenovo laptop", or "本机" in contrast to the Tsinghua server
+  means the Windows laptop reached through SSH alias `lenovo-laptop`.
+- Compatible aliases are `laptop-fadk2rhp` and `laptop-tailscale`.
+- The Tailscale endpoint is `Lenovo@100.97.75.3:22`; expected host name is
+  `LAPTOP-FADK2RHP`.
+- Expected ED25519 host key fingerprint:
+  `SHA256:X8AVCx8SYtOh8g5aeZvtUO99ZGaGeOFKiXvE0jxizQg`.
+- Non-interactive ED25519 authentication is configured. From the Tsinghua
+  server, use `ssh lenovo-laptop <command>` for unattended commands.
+- For transfers back to the Lenovo laptop, use `scp`, `sftp`, or an SSH data
+  stream. If no destination is given, discover the real Desktop with
+  `[Environment]::GetFolderPath('Desktop')` and create a clearly named folder.
+- Read-only check source and destination before transfer. Afterwards verify file
+  count and total bytes; compare SHA-256 for important deliverables. Do not
+  overwrite same-name files without explicit permission.
+- Never put passwords, private keys, tokens, or other secrets in commands,
+  logs, documentation, or project files.
 
-Live site:
+## Project Identity
 
-- https://waterdess.github.io/CYWater/
+CYWater is a static website preview for the International Association of
+Contemporary Young Scholars in Water Sciences. It began as a bilingual visual
+prototype and is now an English-only, source-backed public preview.
 
-Repository:
+- Live site: https://waterdess.github.io/CYWater/
+- Repository: https://github.com/WaterDess/CYWater
+- `main` is the working branch.
+- GitHub Pages serves `gh-pages`.
+- The original prototype is preserved at `v0.1-prototype` (`e4b5a01`). Never
+  move, replace, or publish over this tag.
 
-- https://github.com/WaterDess/CYWater
-
-Deployment:
-
-- GitHub Pages serves the `gh-pages` branch.
-- Normal workflow is to commit on `main`, push `main`, then push `main` to
-  `gh-pages`.
+Publish after local verification:
 
 ```powershell
 git push origin main
 git push origin main:gh-pages
 ```
 
-## Tech Stack
+Never force-push unless the user explicitly requests it.
 
-- Plain static HTML
-- Plain CSS
-- Plain JavaScript
-- No bundler
-- No npm dependency required
+## Technical Shape
+
+- Plain static HTML, CSS, and JavaScript
+- No bundler, framework, or npm dependency
+- Shared header/footer in `assets/js/layout.js`
+- Shared interaction and reveal behavior in `assets/js/main.js`
+- Structured articles, events, and awards in `assets/js/content.js`
 - GitHub Pages hosting
 
 Local preview:
@@ -44,178 +60,96 @@ Local preview:
 python -m http.server 8000
 ```
 
-Then open:
+Open `http://127.0.0.1:8000/`.
 
-```text
-http://127.0.0.1:8000/
-```
+## Current Site Structure
 
-## Important Files
+- `index.html` - home
+- `about/index.html` - association purpose and history
+- `about/board.html` - governance roles; names remain unconfirmed
+- `about/bylaws.html` - full nine-article Bylaws and document download
+- `membership/index.html` - eligibility, dues, partnerships, and conference fees
+- `membership/dashboard.html` - explicitly non-functional member mockup
+- `events/index.html` - Annual Meetings and Annual Gathering
+- `events/detail.html` - event renderer using `?id=...`
+- `awards/index.html` - Young Scientist Best Paper Award yearbook
+- `news/index.html` - Opportunities and Spotlights
+- `news/article.html` - article renderer using `?id=...`
+- `contact/index.html` - verified mailing address; email pending confirmation
+- `assets/img/events/` - supplied Annual Meeting group photographs
+- `assets/docs/CYWater-Bylaws.docx` - supplied Bylaws source document
+- `local/` - ignored research archive; never publish unless explicitly requested
 
-- `index.html` - home page
-- `assets/css/base.css` - tokens, reset, typography, helpers
-- `assets/css/components.css` - header, footer, hero, cards, buttons, forms
-- `assets/css/pages.css` - page layouts and responsive behavior
-- `assets/js/i18n.js` - bilingual dictionary and language switching
-- `assets/js/layout.js` - shared header/footer/mobile navigation injection
-- `assets/js/main.js` - global interactions
-- `assets/js/register.js` - event registration prototype flow
-- `assets/img/photos/` - real local JPG assets used on the site
-- `_dl_photos.py` - helper for restoring photo assets
+The former Journal page and all translation dictionaries, Chinese UI copy,
+language controls, and language-state logic have been removed from the current
+site. Do not reintroduce them unless the user changes direction.
 
-## Product Intent
+## Source Authority
 
-The website should feel like a serious international scientific association:
-clean, restrained, bilingual, readable, and easy to maintain. Avoid flashy
-marketing-style redesigns.
+Current content is governed by the supplied `CYWaterWebsite0716.docx` and
+`CYWater Bylaws.docx`, supplemented by verified material in `local/` and
+official CYWater records.
 
-The current prototype includes:
+Key requirements:
 
-- home page
-- about page
-- board page
-- bylaws page
-- membership page
-- mock dashboard
-- events list
-- event detail and mock registration
-- news list
-- article page
-- journal page
-- contact page
+- Mission and governance language should follow the supplied Bylaws.
+- Board names are not confirmed; publish roles and status only.
+- The 2026 Annual Meeting is in Nanjing, China, October 16-18; registration is
+  expected to open in August.
+- Events are separated into Annual Meetings and the Annual Gathering.
+- Awards replace Journal in navigation and cover records from 2012 onward.
+- News is separated into Opportunities and Spotlights.
+- Membership uses calendar-year terms and the supplied dues/fee schedules.
+- Mailing address: `202 E. Green St. Suite 2, Champaign, IL 61820, USA`.
+- Contact email is pending confirmation; never invent an address.
 
-Mock-only features:
+## Product Boundaries
 
-- payments
-- accounts
-- joining
-- registration
-- contact/newsletter submission
+The site should feel like a serious international scientific association:
+quiet, restrained, readable, historically grounded, and easy to maintain.
+Preserve the ink/teal/paper design system, full-width header, centered primary
+navigation, constrained page content, local real photography, deliberate type
+scale, reveal-on-scroll behavior, and responsive mobile drawer.
 
-Do not represent these as production features.
+GitHub Pages is public. `noindex, nofollow` and `robots.txt` reduce crawler
+discovery but do not provide authentication. Never describe this preview as
+private or access-controlled.
 
-## Current UI Decisions To Preserve
+Payments, membership accounts, sign-in, registrations, receipts, and dashboard
+data are mock-only. Keep that status explicit and do not suggest submissions or
+transactions are processed.
 
-- Header spans full width.
-- Logo sits near the left edge.
-- Language/sign-in/join actions sit near the right edge.
-- Primary navigation is centered.
-- Main page content still uses the constrained `.container`.
-- `About` has a dropdown for `Board` and `Bylaws`.
-- `Events` is a simple direct link; do not put `News` or `Journal` under it.
-- English home hero title must stay two lines:
+## Editing Guidance
 
-```text
-Advancing water sciences,
-empowering young scholars.
-```
-
-- Chinese hero should remain balanced and readable.
-- Hero paragraph spacing should be comfortable in both languages.
-- Use local real photos. Do not revert active content to placeholder SVGs.
-
-## Internationalization
-
-The bilingual source of truth is `assets/js/i18n.js`.
-
-Use `data-i18n="group.key"` for translatable text.
-
-Use `data-i18n-attr="placeholder: group.key"` for translated attributes.
-
-When adding text:
-
-1. Add the key to the correct group in `assets/js/i18n.js`.
-2. Reference it from HTML with `data-i18n`.
-3. Check English and Chinese layouts.
-
-## CSS Guidance
-
-- Global tokens: `assets/css/base.css`.
-- Reusable components: `assets/css/components.css`.
-- Page-specific and responsive rules: `assets/css/pages.css`.
-- Keep responsive behavior explicit.
-- Avoid broad refactors unless the user asks.
-- Preserve the current quiet palette.
-- Be careful with hero line-height, spacing, and mobile overflow.
-
-## Image Guidance
-
-Images should render reliably after deployment and in China-facing demos.
-
-Use:
-
-```text
-assets/img/photos/
-```
-
-Avoid:
-
-- remote Unsplash image URLs in page HTML
-- broken image URLs
-- abstract placeholder SVGs for active content
-
-The historical placeholder SVGs under `assets/img/placeholders/` can stay, but
-should not be used for active page imagery unless explicitly requested.
-
-## Git / Publish Notes
-
-The repository is already initialized.
-
-Expected clean status:
-
-```powershell
-git status -sb
-```
-
-Remote:
-
-```text
-origin https://github.com/WaterDess/CYWater.git
-```
-
-Publishing to GitHub Pages:
-
-```powershell
-git add <changed-files>
-git commit -m "<short message>"
-git push origin main
-git push origin main:gh-pages
-```
-
-Do not force-push unless explicitly requested.
+- Keep content IDs and query-string links in sync with `assets/js/content.js`.
+- Put global tokens in `assets/css/base.css`, reusable components in
+  `assets/css/components.css`, and page/responsive rules in
+  `assets/css/pages.css`.
+- Use local deployment-safe images under `assets/img/`; do not add remote image
+  dependencies or restore active placeholders.
+- Avoid broad rewrites unless the user asks. Preserve the existing visual and
+  interaction language.
+- Do not publish ignored `local/` archives.
 
 ## QA Checklist
 
-Before finishing changes:
+- Run `node --check` on every changed JavaScript file.
+- Check all local links, scripts, stylesheets, images, and query IDs.
+- Confirm there are no i18n hooks, Chinese UI strings, Journal links, or active
+  placeholder images.
+- Inspect desktop and mobile layouts, horizontal overflow, image rendering,
+  navigation state, and scroll reveals in a real browser when available.
+- Run `git diff --check` and confirm the prototype tag still resolves to
+  `e4b5a01ff40abc7938fde11bfe8e6084f60844a3` before publishing.
 
-- check English and Chinese
-- check desktop and mobile
-- check no horizontal overflow
-- check header alignment
-- check language toggle
-- check images load
-- run JS syntax checks when JS changes
+## Do Not Do Without Approval
 
-Useful commands:
-
-```powershell
-node --check assets/js/i18n.js
-node --check assets/js/layout.js
-node --check assets/js/main.js
-rg -n "assets/img/placeholders|localhost|127\.0\.0\.1" .
-```
-
-If browser automation is available, use Chrome/Playwright to inspect actual
-layout instead of guessing from CSS.
-
-## Do Not Do Without User Approval
-
-- migrate to React/Vue/Next/etc.
-- add a backend
-- add package/build tooling
-- replace the visual system wholesale
-- remove bilingual support
-- remove `.nojekyll`
-- rewrite page structure unnecessarily
-- delete user-created documents or research files
-
+- Migrate to React, Vue, Next, or another framework
+- Add a backend or build tooling
+- Replace the visual system wholesale
+- Reintroduce bilingual support
+- Publish Board names or an unverified contact email
+- Remove `.nojekyll`
+- Delete user-created research/source files
+- Move the `v0.1-prototype` tag
+- Force-push

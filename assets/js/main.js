@@ -1,7 +1,6 @@
 /* ==========================================================================
    CYWater · main.js
-   Header behaviour, mobile nav, reveal-on-scroll, toast, scroll-spy,
-   and shared prototype interactions.
+   Header behaviour, mobile nav, reveal-on-scroll, toast, FAQ, and scroll-spy.
    ========================================================================== */
 
 (function () {
@@ -36,23 +35,28 @@
   }
 
   /* ---------- Reveal on scroll ---------- */
-  const revealEls = document.querySelectorAll("[data-reveal]");
-  if ("IntersectionObserver" in window && revealEls.length) {
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            e.target.classList.add("is-visible");
-            io.unobserve(e.target);
-          }
-        });
-      },
-      { threshold: 0.12, rootMargin: "0px 0px -40px 0px" }
-    );
-    revealEls.forEach((el) => io.observe(el));
-  } else {
-    revealEls.forEach((el) => el.classList.add("is-visible"));
+  const revealObserver = "IntersectionObserver" in window
+    ? new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add("is-visible");
+            revealObserver.unobserve(entry.target);
+          });
+        },
+        { threshold: 0.12, rootMargin: "0px 0px -40px 0px" }
+      )
+    : null;
+
+  function refreshReveals(root = document) {
+    root.querySelectorAll("[data-reveal]:not(.is-visible)").forEach((el) => {
+      if (revealObserver) revealObserver.observe(el);
+      else el.classList.add("is-visible");
+    });
   }
+
+  window.CYWaterReveal = { refresh: refreshReveals };
+  refreshReveals();
 
   /* ---------- Toast helper ---------- */
   function toast(message) {
@@ -70,30 +74,6 @@
     el._t = setTimeout(() => el.classList.remove("is-visible"), 3200);
   }
   window.CYWaterToast = toast;
-
-  /* ---------- Newsletter / contact / generic prototype forms ---------- */
-  document.addEventListener("submit", (e) => {
-    const form = e.target;
-    if (!form.matches("[data-proto-form]")) return;
-    e.preventDefault();
-
-    const type = form.getAttribute("data-proto-form");
-
-    // special: multistep registration handled separately
-    if (type === "register") return;
-
-    const msgMap = {
-      newsletter: () => window.CYWaterI18N?.t("common.subscribed") || "Subscribed!",
-      contact:    () => window.CYWaterI18N?.t("common.sent") || "Message sent.",
-      join:       () => window.CYWaterI18N?.t("common.joined") || "Welcome!",
-      profile:    () => window.CYWaterI18N?.t("common.saved") || "Saved.",
-      default:    () => "Done.",
-    };
-    const msg = (msgMap[type] || msgMap.default)();
-
-    form.reset();
-    toast(msg);
-  });
 
   /* ---------- FAQ accordion ---------- */
   document.querySelectorAll(".faq-item").forEach((item) => {
@@ -136,55 +116,4 @@
     headings.forEach((h) => spy.observe(h));
   }
 
-  /* ---------- Modal: open / close ---------- */
-  document.addEventListener("click", (e) => {
-    const opener = e.target.closest("[data-modal-open]");
-    if (opener) {
-      e.preventDefault();
-      const id = opener.getAttribute("data-modal-open");
-      const modal = document.getElementById(id);
-      if (modal) {
-        modal.classList.add("is-open");
-        document.body.style.overflow = "hidden";
-      }
-      return;
-    }
-    const closer = e.target.closest("[data-modal-close]");
-    if (closer) {
-      const modal = closer.closest(".modal-overlay");
-      if (modal) {
-        modal.classList.remove("is-open");
-        document.body.style.overflow = "";
-      }
-      return;
-    }
-    // click on backdrop
-    if (e.target.classList.contains("modal-overlay")) {
-      e.target.classList.remove("is-open");
-      document.body.style.overflow = "";
-    }
-  });
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-      document.querySelectorAll(".modal-overlay.is-open").forEach((m) => {
-        m.classList.remove("is-open");
-        document.body.style.overflow = "";
-      });
-    }
-  });
-
-  /* ---------- Schedule tabs ---------- */
-  document.querySelectorAll("[data-tabs]").forEach((group) => {
-    const tabs = group.querySelectorAll(".schedule-tab");
-    const panels = group.querySelectorAll("[data-panel]");
-    tabs.forEach((tab) => {
-      tab.addEventListener("click", () => {
-        const target = tab.getAttribute("data-tab");
-        tabs.forEach((t) => t.classList.toggle("is-active", t === tab));
-        panels.forEach((p) =>
-          p.classList.toggle("is-active", p.getAttribute("data-panel") === target)
-        );
-      });
-    });
-  });
 })();

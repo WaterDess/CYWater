@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
   <title>Contact — CYWater</title>
   <meta name="description" content="Get in touch with CYWater — questions about membership, events or partnerships.">
   <link rel="icon" type="image/png" href="../assets/img/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/base.css">
   <link rel="stylesheet" href="../assets/css/components.css">
   <link rel="stylesheet" href="../assets/css/pages.css">
@@ -20,9 +21,9 @@
   <main>
     <section class="page-hero">
       <div class="container">
-        <span class="eyebrow" style="color:var(--teal-soft)" data-i18n="contact.heroEyebrow"></span>
-        <h1 data-i18n="contact.heroTitle"></h1>
-        <p class="lead" data-i18n="contact.heroLead"></p>
+        <span class="eyebrow" style="color:var(--teal-soft)">Contact</span>
+        <h1>Get in touch.</h1>
+        <p class="lead">CYWater's official contact email is being confirmed. The mailing address below may be used for formal correspondence.</p>
       </div>
     </section>
 
@@ -30,27 +31,26 @@
       <div class="container">
         <div class="contact-layout">
 
-          <!-- info -->
           <div data-reveal>
             <div class="contact-info-item">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
               <div>
-                <div class="label" data-i18n="contact.emailLabel"></div>
-                <div class="val"><a href="mailto:info@cywater.org" data-i18n="contact.emailVal"></a></div>
+                <div class="label">Email</div>
+                <div class="val">To be confirmed</div>
               </div>
             </div>
             <div class="contact-info-item">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>
               <div>
-                <div class="label" data-i18n="contact.addressLabel"></div>
-                <div class="val" data-i18n="contact.addressVal"></div>
+                <div class="label">Mailing address</div>
+                <div class="val">202 E. Green St. Suite 2<br>Champaign, IL 61820, USA</div>
               </div>
             </div>
             <div class="contact-info-item">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
               <div>
-                <div class="label" data-i18n="contact.responseLabel"></div>
-                <div class="val" data-i18n="contact.responseVal"></div>
+                <div class="label">Response time</div>
+                <div class="val">Published after contact details are confirmed</div>
               </div>
             </div>
 
@@ -61,35 +61,11 @@
             </div>
           </div>
 
-          <!-- form -->
-          <div data-reveal>
-            <h2 style="margin-bottom:var(--sp-5)" data-i18n="contact.formTitle"></h2>
-            <form data-proto-form="contact" class="card" style="padding:var(--sp-6)">
-              <div class="field-row">
-                <div class="field">
-                  <label class="field-label" data-i18n="contact.fName"></label>
-                  <input class="input" name="name" required>
-                </div>
-                <div class="field">
-                  <label class="field-label" data-i18n="contact.fEmail"></label>
-                  <input class="input" type="email" name="email" required>
-                </div>
-              </div>
-              <div class="field">
-                <label class="field-label" data-i18n="contact.fSubject"></label>
-                <select class="select" name="subject" required>
-                  <option value="membership" data-i18n="contact.fMembership"></option>
-                  <option value="events" data-i18n="contact.fEvents"></option>
-                  <option value="partnership" data-i18n="contact.fPartnership"></option>
-                  <option value="other" data-i18n="contact.fOther"></option>
-                </select>
-              </div>
-              <div class="field">
-                <label class="field-label" data-i18n="contact.fMessage"></label>
-                <textarea class="textarea" name="message" required></textarea>
-              </div>
-              <button class="btn btn-accent btn-lg btn-block" type="submit" data-i18n="contact.send"></button>
-            </form>
+          <div class="contact-note" data-reveal>
+            <span class="eyebrow">Contact status</span>
+            <h2 style="margin-top:var(--sp-3)">Official channels are being verified.</h2>
+            <p class="lead" style="margin-top:var(--sp-4)">To avoid publishing an unconfirmed email address or a non-functional form, direct online messaging is temporarily unavailable on this preview.</p>
+            <p style="margin-top:var(--sp-4)">Membership, event, partnership, and media inquiries will be accepted once the official contact channel is confirmed.</p>
           </div>
 
         </div>
@@ -98,8 +74,6 @@
   </main>
 
   <div id="site-footer"></div>
-
-  <script src="../assets/js/i18n.js"></script>
   <script src="../assets/js/layout.js"></script>
   <script src="../assets/js/main.js"></script>
 </body>

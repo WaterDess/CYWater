@@ -11,26 +11,22 @@
   const ROOT = document.documentElement.getAttribute("data-root") || "./";
   const r = ROOT;
 
-  const ICONS = {
-    chevron: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="m6 9 6 6 6-6"/></svg>',
-    mail: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
-  };
+  const CHEVRON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="m6 9 6 6 6-6"/></svg>';
 
-  function navItem(key, href, children) {
-    const label = `<span data-i18n="nav.${key}"></span>`;
+  function navItem(page, label, href, children = "") {
     if (children) {
       return `<li class="has-dropdown">
-        <a class="nav-link" href="${href}" data-nav="${key}">${label}${ICONS.chevron}</a>
+        <a class="nav-link" href="${href}" data-nav="${page}"><span>${label}</span>${CHEVRON}</a>
         <div class="dropdown">${children}</div>
       </li>`;
     }
-    return `<li><a class="nav-link" href="${href}" data-nav="${key}">${label}</a></li>`;
+    return `<li><a class="nav-link" href="${href}" data-nav="${page}"><span>${label}</span></a></li>`;
   }
 
   const aboutChildren = `
-    <a href="${r}about/index.html" data-i18n="nav.about"></a>
-    <a href="${r}about/board.html" data-i18n="nav.board"></a>
-    <a href="${r}about/bylaws.html" data-i18n="nav.bylaws"></a>`;
+    <a href="${r}about/index.html">About CYWater</a>
+    <a href="${r}about/board.html">Board</a>
+    <a href="${r}about/bylaws.html">Bylaws</a>`;
   const headerHTML = `
   <header class="site-header">
     <div class="header-inner">
@@ -39,51 +35,51 @@
       </a>
       <nav class="nav" aria-label="Primary">
         <ul class="nav-list">
-          ${navItem("about", `${r}about/index.html`, aboutChildren)}
-          ${navItem("membership", `${r}membership/index.html`)}
-          ${navItem("events", `${r}events/index.html`)}
-          ${navItem("news", `${r}news/index.html`)}
-          ${navItem("journal", `${r}journal/index.html`)}
-          ${navItem("contact", `${r}contact/index.html`)}
+          ${navItem("about", "About", `${r}about/index.html`, aboutChildren)}
+          ${navItem("membership", "Membership", `${r}membership/index.html`)}
+          ${navItem("events", "Events", `${r}events/index.html`)}
+          ${navItem("news", "News", `${r}news/index.html`)}
+          ${navItem("awards", "Awards", `${r}awards/index.html`)}
+          ${navItem("contact", "Contact", `${r}contact/index.html`)}
         </ul>
       </nav>
       <div class="header-actions">
-        <a class="btn btn-ghost" href="${r}membership/dashboard.html" data-i18n="nav.signIn"></a>
-        <a class="btn btn-primary" href="${r}membership/index.html" data-i18n="nav.join"></a>
+        <a class="btn btn-ghost" href="${r}membership/dashboard.html">Sign in</a>
+        <a class="btn btn-primary" href="${r}membership/index.html">Join CYWater</a>
         <button class="nav-toggle" aria-label="Menu" aria-expanded="false"><span></span></button>
       </div>
     </div>
   </header>
   <nav class="nav-mobile" aria-label="Mobile">
-    <a href="${r}about/index.html" data-i18n="nav.about"></a>
-    <a href="${r}about/board.html" class="sub-link" data-i18n="nav.board"></a>
-    <a href="${r}about/bylaws.html" class="sub-link" data-i18n="nav.bylaws"></a>
-    <a href="${r}membership/index.html" data-i18n="nav.membership"></a>
-    <a href="${r}events/index.html" data-i18n="nav.events"></a>
-    <a href="${r}news/index.html" data-i18n="nav.news"></a>
-    <a href="${r}journal/index.html" data-i18n="nav.journal"></a>
-    <a href="${r}contact/index.html" data-i18n="nav.contact"></a>
-    <a class="btn btn-primary btn-block" href="${r}membership/index.html" data-i18n="nav.join"></a>
+    <a href="${r}about/index.html">About</a>
+    <a href="${r}about/board.html" class="sub-link">Board</a>
+    <a href="${r}about/bylaws.html" class="sub-link">Bylaws</a>
+    <a href="${r}membership/index.html">Membership</a>
+    <a href="${r}events/index.html">Events</a>
+    <a href="${r}news/index.html">News</a>
+    <a href="${r}awards/index.html">Awards</a>
+    <a href="${r}contact/index.html">Contact</a>
+    <a class="btn btn-primary btn-block" href="${r}membership/index.html">Join CYWater</a>
   </nav>`;
 
   function buildFooter() {
     const cols = [
       {
-        head: "footer.explore",
+        head: "Explore",
         links: [
-          ["nav.about", `${r}about/index.html`],
-          ["nav.membership", `${r}membership/index.html`],
-          ["nav.events", `${r}events/index.html`],
-          ["nav.journal", `${r}journal/index.html`],
+          ["About", `${r}about/index.html`],
+          ["Membership", `${r}membership/index.html`],
+          ["Events", `${r}events/index.html`],
+          ["Awards", `${r}awards/index.html`],
         ],
       },
       {
-        head: "footer.association",
+        head: "Association",
         links: [
-          ["nav.board", `${r}about/board.html`],
-          ["nav.bylaws", `${r}about/bylaws.html`],
-          ["nav.news", `${r}news/index.html`],
-          ["nav.contact", `${r}contact/index.html`],
+          ["Board", `${r}about/board.html`],
+          ["Bylaws", `${r}about/bylaws.html`],
+          ["News", `${r}news/index.html`],
+          ["Contact", `${r}contact/index.html`],
         ],
       },
     ];
@@ -91,9 +87,9 @@
     const colsHTML = cols
       .map((c) => {
         const links = c.links
-          .map(([k, h]) => `<li><a href="${h}" data-i18n="${k}"></a></li>`)
+          .map(([label, href]) => `<li><a href="${href}">${label}</a></li>`)
           .join("");
-        return `<div class="footer-col"><h4 data-i18n="${c.head}"></h4><ul>${links}</ul></div>`;
+        return `<div class="footer-col"><h4>${c.head}</h4><ul>${links}</ul></div>`;
       })
       .join("");
 
@@ -105,30 +101,18 @@
             <a class="brand" href="${r}index.html">
               <img class="brand-logo brand-logo--footer" src="${r}assets/img/logo.png" alt="CYWater" width="41" height="50">
             </a>
-            <p class="footer-tag" data-i18n="footer.tagline"></p>
-            <div class="footer-social" style="margin-top:1rem">
-              <a href="#" aria-label="LinkedIn">${ICONS.mail}</a>
-              <a href="#" aria-label="WeChat">${ICONS.mail}</a>
-              <a href="mailto:info@cywater.org" aria-label="Email">${ICONS.mail}</a>
-            </div>
+            <p class="footer-tag">A non-profit international association advancing water sciences education, research, and professional development. Founded in 2011.</p>
           </div>
           ${colsHTML}
           <div class="footer-col">
-            <h4 data-i18n="footer.newsletter"></h4>
-            <p class="footer-tag" data-i18n="footer.newsletterHint" style="margin-bottom:.75rem"></p>
-            <form class="footer-newsletter" data-proto-form="newsletter">
-              <input type="email" required data-i18n-attr="placeholder: footer.emailPlaceholder" aria-label="Email">
-              <button class="btn btn-accent" type="submit" data-i18n="footer.subscribe"></button>
-            </form>
+            <h4>Mailing address</h4>
+            <p class="footer-tag">202 E. Green St. Suite 2<br>Champaign, IL 61820, USA</p>
+            <a class="link footer-contact-link" href="${r}contact/index.html">Contact CYWater</a>
           </div>
         </div>
         <div class="footer-bottom">
-          <span data-i18n="footer.rights"></span>
-          <div style="display:flex;gap:1.2rem">
-            <a href="#" data-i18n="footer.privacy"></a>
-            <a href="#" data-i18n="footer.terms"></a>
-            <a href="${r}about/bylaws.html" data-i18n="footer.bylaws"></a>
-          </div>
+          <span>&copy; 2011–2026 CYWater. All rights reserved.</span>
+          <a href="${r}about/bylaws.html">Bylaws</a>
         </div>
       </div>
     </footer>`;
@@ -142,19 +126,12 @@
 
     // active nav highlighting
     const here = document.body.getAttribute("data-page") || "";
+    const activePage = { board: "about", bylaws: "about", dashboard: "membership" }[here] || here;
     document.querySelectorAll("[data-nav]").forEach((a) => {
-      if (a.getAttribute("data-nav") === here) a.setAttribute("aria-current", "true");
+      if (a.getAttribute("data-nav") === activePage) a.setAttribute("aria-current", "true");
     });
 
-    // re-run i18n on freshly injected nodes
-    if (window.CYWaterI18N) {
-      window.CYWaterI18N.applyTranslations();
-    }
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", inject);
-  } else {
-    inject();
-  }
+  inject();
 })();

@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
   <title>News — CYWater</title>
-  <meta name="description" content="Announcements, member stories and field reports from the CYWater community.">
+  <meta name="description" content="CYWater opportunities, research spotlights, and association announcements.">
   <link rel="icon" type="image/png" href="../assets/img/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/base.css">
   <link rel="stylesheet" href="../assets/css/components.css">
   <link rel="stylesheet" href="../assets/css/pages.css">
@@ -20,111 +21,66 @@
   <main>
     <section class="page-hero">
       <div class="container">
-        <span class="eyebrow" style="color:var(--teal-soft)" data-i18n="news.heroEyebrow"></span>
-        <h1 data-i18n="news.heroTitle"></h1>
-        <p class="lead" data-i18n="news.heroLead"></p>
+        <span class="eyebrow" style="color:var(--teal-soft)">News</span>
+        <h1>Opportunities and spotlights.</h1>
+        <p class="lead">Verified opportunities for the water-science community, together with research, event, and award spotlights from CYWater.</p>
       </div>
     </section>
 
     <section class="section">
-      <div class="container">
-        <div class="news-layout">
-          <!-- main column (rendered by JS) -->
-          <div id="news-main"></div>
-
-          <!-- sidebar (rendered by JS) -->
-          <aside class="news-sidebar" data-reveal id="news-sidebar"></aside>
-        </div>
+      <div class="container container-narrow">
+        <div id="news-main"></div>
       </div>
     </section>
   </main>
 
   <div id="site-footer"></div>
-
-  <script src="../assets/js/i18n.js"></script>
   <script src="../assets/js/content.js"></script>
   <script src="../assets/js/layout.js"></script>
   <script src="../assets/js/main.js"></script>
   <script>
   (function () {
     "use strict";
-    var A = window.CYWaterContent?.ARTICLES || {};
-    var NL = window.CYWaterContent?.NEWS_LIST || [];
-    var main = document.getElementById("news-main");
-    var sidebar = document.getElementById("news-sidebar");
+    const A = window.CYWaterContent?.ARTICLES || {};
+    const NL = window.CYWaterContent?.NEWS_LIST || [];
+    const main = document.getElementById("news-main");
     if (!main || !NL.length) return;
 
-    var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]; }); };
+    const esc = (value) => String(value || "").replace(/[&<>"]/g, (char) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"
+    })[char]);
 
-    var html = "";
-    NL.forEach(function (item, i) {
-      var a = A[item.id];
-      if (!a) return;
-      var href = "./article.html?id=" + item.id;
-      var img = "../assets/img/" + item.img;
-      if (i === 0) {
-        // featured
-        html += '<article class="news-feature" data-reveal>' +
-          '<a href="' + href + '" class="card-media"><img src="' + img + '" alt="" loading="lazy"></a>' +
-          '<div class="card-body">' +
-            '<div class="card-meta"><span class="card-tag">' + esc(a.tag) + '</span><span>· ' + esc(a.date) + '</span></div>' +
-            '<h3 class="card-title"><a href="' + href + '">' + esc(a.title) + '</a></h3>' +
-            '<p class="card-excerpt">' + esc(a.lead) + '</p>' +
-            '<a class="link" href="' + href + '">Read more</a>' +
-          '</div>' +
-        '</article>';
-      } else {
-        // list item
-        html += '<article class="news-item" data-reveal>' +
-          '<a href="' + href + '" class="card-media"><img src="' + img + '" alt="" loading="lazy"></a>' +
-          '<div>' +
-            '<div class="card-meta"><span class="card-tag">' + esc(a.tag) + '</span><span>· ' + esc(a.date) + '</span></div>' +
-            '<h3><a href="' + href + '">' + esc(a.title) + '</a></h3>' +
-            '<p>' + esc(a.lead) + '</p>' +
-          '</div>' +
-        '</article>';
+    const spotlights = NL.slice(0, 10).map((item, index) => {
+      const article = A[item.id];
+      if (!article) return "";
+      const href = `./article.html?id=${encodeURIComponent(item.id)}`;
+      const image = `../assets/img/${esc(item.img)}`;
+      if (index === 0) {
+        return `<article class="news-feature" data-reveal>` +
+          `<a href="${href}" class="card-media"><img src="${image}" alt="" loading="lazy"></a>` +
+          `<div class="card-body"><div class="card-meta"><span class="card-tag">${esc(article.tag)}</span><span>${esc(article.date)}</span></div>` +
+          `<h3 class="card-title"><a href="${href}">${esc(article.title)}</a></h3><p class="card-excerpt">${esc(article.lead)}</p>` +
+          `<a class="link" href="${href}">Read spotlight</a></div></article>`;
       }
+      return `<article class="news-item" data-reveal><a href="${href}" class="card-media"><img src="${image}" alt="" loading="lazy"></a>` +
+        `<div><div class="card-meta"><span class="card-tag">${esc(article.tag)}</span><span>${esc(article.date)}</span></div>` +
+        `<h3><a href="${href}">${esc(article.title)}</a></h3><p>${esc(article.lead)}</p></div></article>`;
     });
+    const featured = spotlights[0] || "";
+    const remaining = spotlights.slice(1).join("");
 
-    // wrap list items (everything after the first) in a .news-list
-    html = html.replace(/(<\/article>)(<article class="news-item")/, '$1</div><div class="news-list" data-reveal>$2');
-    // close the news-list after the last article — append closing div before end
-    if (html.indexOf('news-list') > -1) {
-      html = html.replace(/(<\/article>)\s*$/, '$1</div>');
-    }
-    // add an opening wrapper div around featured + list
-    html = '<div>' + html + '</div>';
+    main.innerHTML =
+      `<section id="opportunities" aria-labelledby="opportunities-title">` +
+        `<div class="section-head"><span class="eyebrow">Open calls and positions</span><h2 id="opportunities-title">Opportunities</h2></div>` +
+        `<div class="opportunities-empty" data-reveal><strong>No verified opportunities are currently published.</strong>` +
+        `<p>Historical listings are being reviewed before republication so that closed or outdated positions are not presented as active.</p></div>` +
+      `</section>` +
+      `<section id="spotlights" class="news-section-block" aria-labelledby="spotlights-title">` +
+        `<div class="section-head"><span class="eyebrow">Research and community</span><h2 id="spotlights-title">Spotlights</h2></div>` +
+        `<div>${featured}<div class="news-list">${remaining}</div></div>` +
+      `</section>`;
 
-    main.innerHTML = html;
-
-    // sidebar
-    var popHtml = '<h4>Most recent</h4>';
-    NL.slice(0, 5).forEach(function (item, i) {
-      var a = A[item.id];
-      if (!a) return;
-      var href = "./article.html?id=" + item.id;
-      popHtml += '<div class="popular-item">' +
-        '<span class="popular-num">' + String(i + 1).padStart(2, "0") + '</span>' +
-        '<div><h5><a href="' + href + '">' + esc(a.title) + '</a></h5><div class="meta">' + esc(a.date) + '</div></div>' +
-      '</div>';
-    });
-    popHtml += '<hr class="divider-soft" style="margin:var(--sp-5) 0"><h4>Categories</h4><div class="tag-list">' +
-      '<span class="badge badge-teal">Award</span>' +
-      '<span class="badge badge-teal">Conference</span>' +
-      '<span class="badge badge-teal">Community</span>' +
-      '</div>';
-    sidebar.innerHTML = popHtml;
-
-    // re-trigger reveal
-    document.querySelectorAll("[data-reveal]").forEach(function (el) {
-      if ("IntersectionObserver" in window) {
-        var io = new IntersectionObserver(function (entries) {
-          entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("is-visible"); io.unobserve(e.target); } });
-        }, { threshold: 0.12, rootMargin: "0px 0px -40px 0px" });
-        io.observe(el);
-      } else { el.classList.add("is-visible"); }
-    });
-    if (window.CYWaterI18N) window.CYWaterI18N.applyTranslations();
+    window.CYWaterReveal?.refresh(main);
   })();
   </script>
 </body>
