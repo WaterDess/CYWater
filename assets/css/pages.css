@@ -319,6 +319,16 @@
   color: var(--white);
 }
 .fee-table { min-width: 720px; }
+.fee-table thead th {
+  background: var(--teal-tint);
+  color: var(--teal-deep);
+  font-family: var(--font-display);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  line-height: 1.35;
+  text-transform: none;
+  letter-spacing: 0;
+}
 .fee-table tbody th { color: var(--ink); font-weight: 600; }
 .fee-table tbody td { font-variant-numeric: tabular-nums; }
 
