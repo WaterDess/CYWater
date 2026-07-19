@@ -120,6 +120,23 @@ Homepage photography should favor real CYWater images with clear subjects and
 reliable landscape crops. Wider documentary sets may be used in detail-page
 galleries even when they are not suitable as homepage cards.
 
+People shown in active site photography must come from verified CYWater source
+material and must correspond to the event or story where they appear. When no
+matching photo exists, use the title-based `news-visual` treatment instead of a
+stock photograph of unidentified people. The visual should not label itself as
+a placeholder.
+
+The News index currently uses verified CYWater photography for Annual Meetings
+2020-2025, the 2011 founding story, and the 2020 virtual Best Paper Award. Other
+award/COP27 entries use title-based visuals until matching source photos are
+available. Events use the supplied year-matched Annual Meeting and Annual
+Gathering archives.
+
+Membership dues are presented with the four-card visual structure adapted from
+the original prototype. Preserve the current confirmed categories and prices:
+Professional `$70/year`, Student `$20/year`, Lifetime `$700`, and Partner
+`$1,000/year`. Do not revert to the prototype's old categories or amounts.
+
 ## Product Boundaries
 
 The site should feel like a serious international scientific association:

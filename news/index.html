@@ -50,19 +50,32 @@
       "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"
     })[char]);
 
-    const spotlights = NL.slice(0, 10).map((item, index) => {
+    function renderMedia(item, article) {
+      if (item.img) {
+        return `<img src="../assets/img/${esc(item.img)}" alt="${esc(item.alt || article.title)}" loading="lazy">`;
+      }
+      const visual = item.visual || {};
+      const tones = ["award", "conference", "community"];
+      const tone = tones.includes(visual.tone) ? visual.tone : "community";
+      return `<span class="news-visual news-visual--${tone}" role="img" aria-label="${esc(article.title)}">` +
+        `<span class="news-visual-mark">CYWater</span>` +
+        `<strong>${esc(visual.title || article.tag)}</strong>` +
+        `<span>${esc(visual.detail || article.date)}</span></span>`;
+    }
+
+    const spotlights = NL.map((item, index) => {
       const article = A[item.id];
       if (!article) return "";
       const href = `./article.html?id=${encodeURIComponent(item.id)}`;
-      const image = `../assets/img/${esc(item.img)}`;
+      const media = renderMedia(item, article);
       if (index === 0) {
         return `<article class="news-feature" data-reveal>` +
-          `<a href="${href}" class="card-media"><img src="${image}" alt="" loading="lazy"></a>` +
+          `<a href="${href}" class="card-media">${media}</a>` +
           `<div class="card-body"><div class="card-meta"><span class="card-tag">${esc(article.tag)}</span><span>${esc(article.date)}</span></div>` +
           `<h3 class="card-title"><a href="${href}">${esc(article.title)}</a></h3><p class="card-excerpt">${esc(article.lead)}</p>` +
           `<a class="link" href="${href}">Read spotlight</a></div></article>`;
       }
-      return `<article class="news-item" data-reveal><a href="${href}" class="card-media"><img src="${image}" alt="" loading="lazy"></a>` +
+      return `<article class="news-item" data-reveal><a href="${href}" class="card-media">${media}</a>` +
         `<div><div class="card-meta"><span class="card-tag">${esc(article.tag)}</span><span>${esc(article.date)}</span></div>` +
         `<h3><a href="${href}">${esc(article.title)}</a></h3><p>${esc(article.lead)}</p></div></article>`;
     });
