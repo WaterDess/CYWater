@@ -135,7 +135,11 @@ Gathering archives.
 Membership dues are presented with the four-card visual structure adapted from
 the original prototype. Preserve the current confirmed categories and prices:
 Professional `$70/year`, Student `$20/year`, Lifetime `$700`, and Partner
-`$1,000/year`. Do not revert to the prototype's old categories or amounts.
+`$1,000/year`. Display them in ascending-price order, with Professional marked
+as the Standard option in the second position. The cards form an accessible
+single-choice control with a shared Join action; submitting only shows the
+preview limitation and must not imply that an application or payment was
+processed. Do not revert to the prototype's old categories or amounts.
 
 ## Product Boundaries
 

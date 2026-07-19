@@ -44,7 +44,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
           <div>
             <strong>Applications are not yet available online.</strong>
-            <span style="display:block; margin-top:.2rem">The membership and fee information below reflects the supplied CYWater website requirements. This preview does not accept applications, create accounts, or process payments.</span>
+            <span id="membership-preview-note" style="display:block; margin-top:.2rem">The membership and fee information below reflects the supplied CYWater website requirements. This preview does not accept applications, create accounts, or process payments.</span>
           </div>
         </div>
       </div>
@@ -93,61 +93,80 @@
     </section>
 
     <!-- Membership dues -->
-    <section class="section section-tint">
+    <section class="section section-tint membership-dues">
       <div class="container">
         <div class="section-head center" data-reveal>
           <span class="eyebrow center">Calendar-year membership</span>
           <h2>Membership types and dues.</h2>
-          <p class="lead">Student membership is open to full-time undergraduate, graduate, and Ph.D. students.</p>
+          <p class="lead">Select a membership type to compare dues and continue with the option that fits you.</p>
         </div>
-        <div class="tiers">
-          <article class="tier tier-featured" data-reveal>
-            <span class="badge badge-teal tier-badge">Standard</span>
-            <h3>Professional</h3>
-            <p class="tier-tag">For researchers, practitioners, and other water-science professionals.</p>
-            <div class="tier-price">$70 <small>/ year</small></div>
-            <p class="tier-cycle">Calendar-year membership</p>
-            <ul class="tier-features">
-              <li>Individual annual membership</li>
-              <li>Professional member conference rates</li>
-              <li>CYWater community participation</li>
-            </ul>
-          </article>
-          <article class="tier" data-reveal>
-            <h3>Student</h3>
-            <p class="tier-tag">For full-time undergraduate, graduate, and Ph.D. students.</p>
-            <div class="tier-price">$20 <small>/ year</small></div>
-            <p class="tier-cycle">Calendar-year membership</p>
-            <ul class="tier-features">
-              <li>Individual annual membership</li>
-              <li>Student member conference rates</li>
-              <li>Student eligibility required</li>
-            </ul>
-          </article>
-          <article class="tier" data-reveal>
-            <h3>Lifetime</h3>
-            <p class="tier-tag">A one-time individual membership option.</p>
-            <div class="tier-price">$700 <small>one time</small></div>
-            <p class="tier-cycle">Lifetime membership</p>
-            <ul class="tier-features">
-              <li>Individual lifetime membership</li>
-              <li>No annual dues renewal</li>
-              <li>CYWater community participation</li>
-            </ul>
-          </article>
-          <article class="tier tier-partner" data-reveal>
-            <span class="badge badge-gold tier-badge">Organization</span>
-            <h3>Partner</h3>
-            <p class="tier-tag">For institutions and organizations that support CYWater's mission.</p>
-            <div class="tier-price">$1,000 <small>/ year</small></div>
-            <p class="tier-cycle">Annual partnership</p>
-            <ul class="tier-features">
-              <li>Institutional or organizational partnership</li>
-              <li>Support for early-career programs</li>
-              <li>Connection with the CYWater community</li>
-            </ul>
-          </article>
-        </div>
+        <form id="membership-plan-selector">
+          <fieldset class="membership-plan-fieldset">
+            <legend class="visually-hidden">Choose a membership type</legend>
+            <div class="tiers">
+              <label class="tier" data-reveal>
+                <input class="tier-input" type="radio" name="membership-plan" value="Student" data-price="$20 / year">
+                <span class="tier-heading"><span class="tier-title">Student</span></span>
+                <span class="tier-tag">For full-time students in water-related fields.</span>
+                <span class="tier-price">$20 <small>/ year</small></span>
+                <span class="tier-cycle">Calendar-year membership</span>
+                <span class="tier-features">
+                  <span>Individual annual membership</span>
+                  <span>Student member conference rates</span>
+                  <span>Undergraduate, graduate, or Ph.D. eligibility</span>
+                </span>
+                <span class="tier-choice"><span class="tier-choice-dot" aria-hidden="true"></span><span class="tier-choice-label">Choose Student</span></span>
+              </label>
+              <label class="tier tier-featured is-selected" data-reveal>
+                <input class="tier-input" type="radio" name="membership-plan" value="Professional" data-price="$70 / year" checked>
+                <span class="tier-heading"><span class="tier-title">Professional</span><span class="badge badge-teal">Standard</span></span>
+                <span class="tier-tag">For researchers and practitioners in water sciences.</span>
+                <span class="tier-price">$70 <small>/ year</small></span>
+                <span class="tier-cycle">Calendar-year membership</span>
+                <span class="tier-features">
+                  <span>Individual annual membership</span>
+                  <span>Professional member conference rates</span>
+                  <span>CYWater community participation</span>
+                </span>
+                <span class="tier-choice"><span class="tier-choice-dot" aria-hidden="true"></span><span class="tier-choice-label">Selected</span></span>
+              </label>
+              <label class="tier" data-reveal>
+                <input class="tier-input" type="radio" name="membership-plan" value="Lifetime" data-price="$700 one time">
+                <span class="tier-heading"><span class="tier-title">Lifetime</span></span>
+                <span class="tier-tag">For long-term individual participation in CYWater.</span>
+                <span class="tier-price">$700 <small>one time</small></span>
+                <span class="tier-cycle">Lifetime membership</span>
+                <span class="tier-features">
+                  <span>Individual lifetime membership</span>
+                  <span>No annual dues renewal</span>
+                  <span>CYWater community participation</span>
+                </span>
+                <span class="tier-choice"><span class="tier-choice-dot" aria-hidden="true"></span><span class="tier-choice-label">Choose Lifetime</span></span>
+              </label>
+              <label class="tier tier-partner" data-reveal>
+                <input class="tier-input" type="radio" name="membership-plan" value="Partner" data-price="$1,000 / year">
+                <span class="tier-heading"><span class="tier-title">Partner</span><span class="badge badge-gold">Organization</span></span>
+                <span class="tier-tag">For institutions supporting CYWater's programs.</span>
+                <span class="tier-price">$1,000 <small>/ year</small></span>
+                <span class="tier-cycle">Annual partnership</span>
+                <span class="tier-features">
+                  <span>Institutional or organizational partnership</span>
+                  <span>Support for early-career programs</span>
+                  <span>Connection with the CYWater community</span>
+                </span>
+                <span class="tier-choice"><span class="tier-choice-dot" aria-hidden="true"></span><span class="tier-choice-label">Choose Partner</span></span>
+              </label>
+            </div>
+            <div class="membership-selection" data-reveal aria-live="polite">
+              <div class="membership-selection-copy">
+                <span class="eyebrow">Your selection</span>
+                <strong data-selected-plan>Professional</strong>
+                <span data-selected-price>$70 / year</span>
+              </div>
+              <button class="btn btn-primary btn-lg" type="submit" aria-describedby="membership-preview-note">Join CYWater</button>
+            </div>
+          </fieldset>
+        </form>
       </div>
     </section>
 
@@ -218,5 +237,41 @@
   <div id="site-footer"></div>
   <script src="../assets/js/layout.js"></script>
   <script src="../assets/js/main.js"></script>
+  <script>
+  (function () {
+    "use strict";
+    const form = document.getElementById("membership-plan-selector");
+    if (!form) return;
+
+    const inputs = Array.from(form.querySelectorAll(".tier-input"));
+    const selectedPlan = form.querySelector("[data-selected-plan]");
+    const selectedPrice = form.querySelector("[data-selected-price]");
+
+    function syncSelection() {
+      const selected = inputs.find((input) => input.checked);
+      if (!selected) return;
+
+      inputs.forEach((input) => {
+        const tier = input.closest(".tier");
+        const choice = tier.querySelector(".tier-choice-label");
+        const active = input === selected;
+        tier.classList.toggle("is-selected", active);
+        choice.textContent = active ? "Selected" : `Choose ${input.value}`;
+      });
+
+      selectedPlan.textContent = selected.value;
+      selectedPrice.textContent = selected.dataset.price;
+    }
+
+    form.addEventListener("change", syncSelection);
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const selected = inputs.find((input) => input.checked);
+      window.CYWaterToast?.(`${selected.value} selected. Online membership applications are not yet available.`);
+    });
+
+    syncSelection();
+  })();
+  </script>
 </body>
 </html>
