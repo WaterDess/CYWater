@@ -145,9 +145,44 @@ plans use restrained outline actions that turn teal on hover or activation.
 Do not revert to the prototype's old categories or amounts.
 
 Conference fees use a four-column matrix with separate Abstract, Early, and
-Standard fee columns. Keep the rows compact, the header softly teal, and the
-Student rate subtly highlighted; do not collapse Early and Standard prices
-into one unstructured cell.
+Standard fee columns. Build it from the established `.table-wrap` and `.table`
+components and keep one value per cell. Do not collapse Early and Standard
+prices into one unstructured cell or introduce a separate table typography.
+
+## Visual Consistency Contract
+
+Visual consistency is a release requirement, not a discretionary polish pass.
+New or revised UI must look native to the surrounding page and to the site as a
+whole.
+
+- Reuse existing layout and component classes before adding page-specific CSS.
+  A new visual treatment is justified only when the current system cannot
+  express the content or interaction correctly.
+- Use `var(--font-display)` only for established display roles such as page and
+  section headings. Body copy, navigation, buttons, labels, tables, prices in
+  data grids, and supporting text use `var(--font-body)` through existing
+  component rules.
+- Use the shared `--fs-*`, `--sp-*`, line-height, color, border, radius, shadow,
+  and container tokens. Do not introduce arbitrary font sizes, line spacing,
+  padding, widths, or one-off colors to make one section look independently
+  designed.
+- Match adjacent sections' container width, section padding, heading spacing,
+  text measure, and alignment unless the content has a documented functional
+  reason to differ.
+- Data tables use `.table-wrap` and `.table`, semantic row/column headers, one
+  value per cell, and the site's body typography. Do not apply display fonts,
+  marketing-card styling, or compressed inline labels inside data grids.
+- Before publishing, compare the changed section with the sections immediately
+  before and after it at desktop and mobile widths. Check typeface, type scale,
+  line height, wrapping, spacing rhythm, borders, alignment, and overflow.
+- When deployed HTML depends on changed CSS or JavaScript, bump the affected
+  page's asset-version query in the same commit. Verify the live HTML and live
+  asset both contain the new version; a successful Git push alone is not visual
+  QA.
+- If real-browser visual QA is unavailable, stay within established components
+  and tokens, perform structural and live-asset checks, and explicitly report
+  the missing screenshot-level verification. Do not compensate by inventing a
+  new visual language.
 
 ## Product Boundaries
 
