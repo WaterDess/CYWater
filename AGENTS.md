@@ -144,6 +144,11 @@ or payment was processed. Professional uses the teal accent action; the other
 plans use restrained outline actions that turn teal on hover or activation.
 Do not revert to the prototype's old categories or amounts.
 
+Conference fees use a four-column matrix with separate Abstract, Early, and
+Standard fee columns. Keep the rows compact, the header softly teal, and the
+Student rate subtly highlighted; do not collapse Early and Standard prices
+into one unstructured cell.
+
 ## Product Boundaries
 
 The site should feel like a serious international scientific association:

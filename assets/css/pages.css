@@ -318,6 +318,46 @@
   background: var(--teal-deep);
   color: var(--white);
 }
+.conference-fees { padding-block: clamp(3.5rem, 6vw, 5rem); }
+.conference-fees .section-head { margin-bottom: var(--sp-6); }
+.conference-fees .section-head .lead { max-width: 64ch; }
+.fee-table-wrap {
+  border-color: rgba(17,122,111,0.18);
+  border-radius: var(--radius);
+  background: var(--white);
+  box-shadow: var(--shadow-sm);
+}
+.fee-table { min-width: 760px; background: var(--white); }
+.fee-table th,
+.fee-table td {
+  padding: 1.15rem 1.35rem;
+  border-bottom: 1px solid var(--line-soft);
+  text-align: left;
+  vertical-align: middle;
+}
+.fee-table thead th {
+  background: var(--teal-tint);
+  color: var(--teal-deep);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+.fee-table thead th:first-child { width: 34%; }
+.fee-table tbody th { font-weight: 400; }
+.fee-table tbody strong {
+  display: block;
+  color: var(--ink);
+  font-size: var(--fs-base);
+  font-weight: 600;
+}
+.fee-table tbody th strong { font-family: var(--font-display); font-size: var(--fs-md); font-weight: 500; }
+.fee-table tbody span { display: block; margin-top: 0.1rem; color: var(--ink-mute); font-size: var(--fs-xs); }
+.fee-table tbody tr:last-child th,
+.fee-table tbody tr:last-child td { border-bottom: 0; }
+.fee-table tbody tr:hover { background: var(--paper); }
+.fee-table .fee-table-student { background: rgba(17,122,111,0.035); }
 
 .benefits-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-5); }
 .membership-partner-grid {
