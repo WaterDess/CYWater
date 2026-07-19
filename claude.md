@@ -147,9 +147,9 @@ Do not revert to the prototype's old categories or amounts.
 Conference fees use a four-column matrix with separate Abstract, Early, and
 Standard fee columns. Build it from the established `.table-wrap` and `.table`
 components and keep one value per cell. Its column header uses the established
-Fraunces display face on a light teal surface; all body labels and values remain
-in the Inter body face. Do not collapse Early and Standard prices into one
-unstructured cell.
+Fraunces display face on a light teal surface; the registration-type row labels
+use the same display face, while all fee values remain in the Inter body face.
+Do not collapse Early and Standard prices into one unstructured cell.
 
 ## Visual Consistency Contract
 
@@ -161,9 +161,9 @@ whole.
   A new visual treatment is justified only when the current system cannot
   express the content or interaction correctly.
 - Use `var(--font-display)` only for established display roles such as page and
-  section headings and approved data-table column headers. Body copy,
-  navigation, buttons, row labels, data values, and supporting text use
-  `var(--font-body)` through existing component rules.
+  section headings and approved data-table column or row headers. Body copy,
+  navigation, buttons, data values, and supporting text use `var(--font-body)`
+  through existing component rules.
 - Use the shared `--fs-*`, `--sp-*`, line-height, color, border, radius, shadow,
   and container tokens. Do not introduce arbitrary font sizes, line spacing,
   padding, widths, or one-off colors to make one section look independently
@@ -172,10 +172,10 @@ whole.
   text measure, and alignment unless the content has a documented functional
   reason to differ.
 - Data tables use `.table-wrap` and `.table`, semantic row/column headers, and
-  one value per cell. Table bodies always use the body typography. A display
-  face may be used for the column-header row only when it is the site's existing
-  display family and the treatment is consistent across every column. Do not
-  apply marketing-card styling or compressed inline labels inside data grids.
+  one value per cell. Data values always use the body typography. The site's
+  display family may be used for a complete column-header row and its associated
+  row-header labels when that hierarchy is applied consistently. Do not apply
+  marketing-card styling or compressed inline labels inside data grids.
 - Before publishing, compare the changed section with the sections immediately
   before and after it at desktop and mobile widths. Check typeface, type scale,
   line height, wrapping, spacing rhythm, borders, alignment, and overflow.
