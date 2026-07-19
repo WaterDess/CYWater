@@ -312,7 +312,12 @@
   flex-shrink: 0;
 }
 .tier-action { align-self: end; }
-.tier.is-selected .tier-action { background: var(--teal-deep); }
+.tier-action.btn-outline:hover,
+.tier.is-selected .tier-action {
+  border-color: var(--teal-deep);
+  background: var(--teal-deep);
+  color: var(--white);
+}
 
 .benefits-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-5); }
 .membership-partner-grid {

@@ -140,8 +140,9 @@ as the Standard option in the second position. Each card has its own direct
 Join action; there is no separate selection-summary step. No card is selected
 on initial load. Activating a Join action moves the teal selection accent to
 that card and shows the preview limitation without implying that an application
-or payment was processed. Do not revert to the prototype's old categories or
-amounts.
+or payment was processed. Professional uses the teal accent action; the other
+plans use restrained outline actions that turn teal on hover or activation.
+Do not revert to the prototype's old categories or amounts.
 
 ## Product Boundaries
 
