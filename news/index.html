@@ -10,9 +10,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/base.css">
-  <link rel="stylesheet" href="../assets/css/components.css">
-  <link rel="stylesheet" href="../assets/css/pages.css">
+  <link rel="stylesheet" href="../assets/css/base.css?v=20260719-8">
+  <link rel="stylesheet" href="../assets/css/components.css?v=20260719-8">
+  <link rel="stylesheet" href="../assets/css/pages.css?v=20260719-8">
 </head>
 <body data-page="news">
 
@@ -35,7 +35,7 @@
   </main>
 
   <div id="site-footer"></div>
-  <script src="../assets/js/content.js"></script>
+  <script src="../assets/js/content.js?v=20260719-8"></script>
   <script src="../assets/js/layout.js"></script>
   <script src="../assets/js/main.js"></script>
   <script>
@@ -55,12 +55,9 @@
         return `<img src="../assets/img/${esc(item.img)}" alt="${esc(item.alt || article.title)}" loading="lazy">`;
       }
       const visual = item.visual || {};
-      const tones = ["award", "conference", "community"];
-      const tone = tones.includes(visual.tone) ? visual.tone : "community";
-      return `<span class="news-visual news-visual--${tone}" role="img" aria-label="${esc(article.title)}">` +
-        `<span class="news-visual-mark">CYWater</span>` +
+      return `<span class="news-visual" role="img" aria-label="${esc(article.title)}">` +
         `<strong>${esc(visual.title || article.tag)}</strong>` +
-        `<span>${esc(visual.detail || article.date)}</span></span>`;
+        `<span class="news-visual-year">${esc(visual.year || article.date.slice(0, 4))}</span></span>`;
     }
 
     const spotlights = NL.map((item, index) => {

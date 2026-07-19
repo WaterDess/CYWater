@@ -843,20 +843,20 @@ window.CYWaterContent = { ARTICLES, EVENTS, AWARDS };
    Each item references an id in ARTICLES/EVENTS and supplies display metadata
    (image, which may differ from the article's own hero). */
 const NEWS_LIST = [
-  { id: "bpa-2025-result", visual: { title: "Best Paper Award", detail: "2025 Result", tone: "award" } },
+  { id: "bpa-2025-result", visual: { title: "Best Paper Award", year: "2025" } },
   { id: "13th-annual-3rd", img: "events/meeting-2025.jpg", alt: "Participants at the 13th CYWater Annual Meeting in 2025" },
   { id: "12th-summer-xian", img: "events/meeting-2024.jpg", alt: "Participants at the 12th CYWater Annual Meeting in Xi'an" },
-  { id: "bpa-2025-call", visual: { title: "Best Paper Award", detail: "2025 Call", tone: "award" } },
+  { id: "bpa-2025-call", visual: { title: "Best Paper Award", year: "2025" } },
   { id: "11th-summer-beijing", img: "events/meeting-2023.jpg", alt: "Participants at the 11th CYWater Annual Meeting in Beijing" },
   { id: "10th-summer-2022", img: "events/meeting-2022.png", alt: "Online participants at the 10th CYWater Annual Meeting" },
   { id: "9th-summer-2021", img: "events/meeting-2021.jpg", alt: "Online participants at the 9th CYWater Annual Meeting" },
   { id: "8th-summer-2020", img: "events/meeting-2020.jpg", alt: "Online participants at the 8th CYWater Annual Meeting" },
-  { id: "cop27-2022", visual: { title: "China Corner", detail: "COP27 / 2022", tone: "conference" } },
+  { id: "cop27-2022", visual: { title: "China Corner", year: "2022" } },
   { id: "founding-story", img: "article/founding-2011.jpg", alt: "CYWater founding gathering in 2011" },
-  { id: "bpa-2024-result", visual: { title: "Best Paper Award", detail: "2024 Result", tone: "award" } },
-  { id: "bpa-2023-result", visual: { title: "Best Paper Award", detail: "2023 Result", tone: "award" } },
-  { id: "bpa-2022-result", visual: { title: "Best Paper Award", detail: "2022 Result", tone: "award" } },
-  { id: "bpa-2021-result", visual: { title: "Best Paper Award", detail: "2021 Result", tone: "award" } },
+  { id: "bpa-2024-result", visual: { title: "Best Paper Award", year: "2024" } },
+  { id: "bpa-2023-result", visual: { title: "Best Paper Award", year: "2023" } },
+  { id: "bpa-2022-result", visual: { title: "Best Paper Award", year: "2022" } },
+  { id: "bpa-2021-result", visual: { title: "Best Paper Award", year: "2021" } },
   { id: "bpa-2020-result", img: "gatherings/2020-cover.jpg", alt: "Participants in the online 2020 CYWater Best Paper Award gathering" }
 ];
 

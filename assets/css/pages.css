@@ -540,41 +540,34 @@
 .news-item h3 { font-size: var(--fs-base); margin-bottom: 0.3rem; }
 .news-item p { font-size: var(--fs-sm); }
 .news-visual {
-  position: relative;
-  display: flex;
+  display: grid;
   width: 100%;
   height: 100%;
-  flex-direction: column;
-  justify-content: flex-end;
-  gap: 0.25rem;
+  place-content: center;
+  place-items: center;
+  gap: var(--sp-2);
   padding: var(--sp-4);
   overflow: hidden;
-  color: var(--white);
-  background: var(--ink);
+  color: var(--teal);
+  background: var(--paper-warm);
+  text-align: center;
 }
-.news-visual::before,
-.news-visual::after {
-  content: "";
-  position: absolute;
-  pointer-events: none;
-  opacity: 0.22;
+.news-visual strong {
+  max-width: 14ch;
+  font-family: var(--font-display);
+  font-size: var(--fs-base);
+  font-weight: 500;
+  line-height: 1.18;
 }
-.news-visual::before { inset: var(--sp-3); border: 1px solid currentColor; }
-.news-visual::after { top: 0; bottom: 0; left: 72%; border-left: 1px solid currentColor; }
-.news-visual > * { position: relative; z-index: 1; }
-.news-visual-mark {
-  font-size: var(--fs-xs);
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--teal-soft);
+.news-visual-year {
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: 500;
+  line-height: 1;
 }
-.news-visual strong { max-width: 12ch; font-family: var(--font-display); font-size: var(--fs-base); line-height: 1.08; }
-.news-visual > span:last-child { font-size: var(--fs-xs); color: rgba(255,255,255,0.72); }
-.news-visual--conference { background: var(--teal-deep); }
-.news-visual--conference .news-visual-mark { color: var(--paper); }
-.news-visual--award { background: var(--ink); }
 .news-feature .news-visual { padding: var(--sp-6); }
 .news-feature .news-visual strong { font-size: var(--fs-xl); }
+.news-feature .news-visual-year { font-size: var(--fs-4xl); }
 .news-section-block { margin-top: var(--sp-9); }
 .opportunities-empty {
   padding: var(--sp-5) 0;
@@ -770,6 +763,8 @@
   .dash-layout, .dash-cards { grid-template-columns: 1fr; }
   .news-feature { grid-template-columns: 1fr; }
   .news-item { grid-template-columns: 1fr; }
+  .news-item .news-visual strong { font-size: var(--fs-md); }
+  .news-item .news-visual-year { font-size: var(--fs-3xl); }
   .field-row { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr; }
   .footer-bottom { flex-direction: column; align-items: flex-start; }

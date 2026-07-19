@@ -124,7 +124,10 @@ People shown in active site photography must come from verified CYWater source
 material and must correspond to the event or story where they appear. When no
 matching photo exists, use the title-based `news-visual` treatment instead of a
 stock photograph of unidentified people. The visual should not label itself as
-a placeholder.
+a placeholder. Title-based visuals follow the Annual Meeting year-tile language:
+use the warm paper surface, centered teal Fraunces text, and only the concise
+story label plus year. Do not introduce dark pseudo-covers, decorative frames,
+tech-style linework, or redundant CYWater branding inside the tile.
 
 The News index currently uses verified CYWater photography for Annual Meetings
 2020-2025, the 2011 founding story, and the 2020 virtual Best Paper Award. Other
