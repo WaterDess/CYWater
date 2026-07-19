@@ -693,6 +693,81 @@ const EVENTS = {
     category: "meeting"
   },
 
+  "annual-gathering-2024": {
+    title: "CYWater Annual Gathering — Washington, DC 2024",
+    date: "Dec 10, 2024",
+    location: "Washington, DC, USA",
+    format: "Community gathering during AGU24",
+    image: "gatherings/2024-cover.jpg",
+    imageAlt: "CYWater members sharing dinner during the 2024 Annual Gathering in Washington, DC",
+    lead: "CYWater members gathered during AGU24 for an evening of community exchange, conversation, and professional connection.",
+    blocks: [
+      { type: "p", text: "The 2024 Annual Gathering took place in Washington, DC, on December 10 during the AGU Fall Meeting. The dinner brought together water-science scholars across career stages in an informal setting for conversation and community exchange." },
+      { type: "gallery", items: [
+        { src: "gatherings/2024-panorama.jpg", caption: "Members gathered for dinner and conversation during AGU24.", wide: true },
+        { src: "gatherings/2024-community.jpg", caption: "A community address during the 2024 gathering." },
+        { src: "gatherings/2024-address.jpg", caption: "Remarks shared with members during the dinner." },
+        { src: "gatherings/2024-conversation.jpg", caption: "Early-career scholars and colleagues at the Annual Gathering." },
+        { src: "gatherings/2024-dinner.jpg", caption: "Community exchange around the dinner table." }
+      ]}
+    ],
+    upcoming: false,
+    category: "gathering"
+  },
+
+  "annual-gathering-2022": {
+    title: "CYWater Annual Gathering — Chicago 2022",
+    date: "Dec 14, 2022",
+    location: "Chicago, USA",
+    format: "Community gathering during AGU22",
+    image: "gatherings/2022-cover.jpg",
+    imageAlt: "CYWater members at the 2022 Annual Gathering in Chicago",
+    lead: "CYWater members reunited in person during AGU22 for a community dinner and group gathering in Chicago.",
+    blocks: [
+      { type: "p", text: "The 2022 Annual Gathering was held in Chicago on December 14 during the AGU Fall Meeting, renewing the Association's in-person community tradition after the pandemic years." },
+      { type: "gallery", items: [
+        { src: "gatherings/2022-panorama.jpg", caption: "Members assemble for the 2022 CYWater group photograph.", wide: true },
+        { src: "gatherings/2022-group.jpg", caption: "CYWater members at the Annual Gathering in Chicago." }
+      ]}
+    ],
+    upcoming: false,
+    category: "gathering"
+  },
+
+  "annual-gathering-2020": {
+    title: "CYWater Best Paper Award Gathering — Online 2020",
+    date: "Dec 18, 2020",
+    location: "Online",
+    format: "Virtual award gathering",
+    image: "gatherings/2020-cover.jpg",
+    imageAlt: "Participants in the online 2020 CYWater Best Paper Award gathering",
+    lead: "During the COVID-19 pandemic, CYWater continued its annual Best Paper Award tradition through an online gathering.",
+    blocks: [
+      { type: "p", text: "The 2020 Best Paper Award gathering was held online on December 18. The virtual format allowed members and award participants to convene safely while maintaining the Association's annual recognition program." },
+      { type: "gallery", items: [
+        { src: "gatherings/2020-participants.jpg", caption: "Participants in the virtual 2020 award gathering." },
+        { src: "gatherings/2020-gallery.jpg", caption: "The online community assembled for the 2020 Best Paper Award." }
+      ]}
+    ],
+    upcoming: false,
+    category: "gathering"
+  },
+
+  "annual-gathering-2017": {
+    title: "CYWater Annual Gathering — New Orleans 2017",
+    date: "December 2017",
+    location: "New Orleans, USA",
+    format: "Community gathering during the AGU Fall Meeting",
+    image: "gatherings/2017-dinner.png",
+    imageAlt: "CYWater members sharing dinner during the 2017 Annual Gathering in New Orleans",
+    lead: "CYWater members met for an Annual Gathering and community dinner during the 2017 AGU Fall Meeting.",
+    blocks: [
+      { type: "p", text: "This gathering continued CYWater's tradition of bringing members together during the AGU Fall Meeting for informal exchange and community connection." }
+    ],
+    upcoming: false,
+    category: "gathering"
+  },
+
   "annual-gathering-2013": {
     title: "CYWater Annual Gathering — San Francisco 2013",
     date: "Dec 12, 2013",
@@ -777,11 +852,11 @@ const NEWS_LIST = [
   { id: "8th-summer-2020",     img: "events/meeting-2020.jpg" },
   { id: "cop27-2022",          img: "photos/water-dusk.jpg" },
   { id: "founding-story",      img: "article/founding-2011.jpg" },
-  { id: "bpa-2024-result", img: "photos/meeting-office.jpg" },
+  { id: "bpa-2024-result", img: "gatherings/2024-cover.jpg" },
   { id: "bpa-2023-result", img: "photos/water-dusk.jpg" },
-  { id: "bpa-2022-result", img: "photos/water-aerial.jpg" },
+  { id: "bpa-2022-result", img: "gatherings/2022-cover.jpg" },
   { id: "bpa-2021-result", img: "photos/underwater-blue.jpg" },
-  { id: "bpa-2020-result", img: "photos/conference-room.jpg" }
+  { id: "bpa-2020-result", img: "gatherings/2020-cover.jpg" }
 ];
 
 const EVENT_LIST = [
@@ -799,6 +874,10 @@ const EVENT_LIST = [
   { id: "3rd-summer", status: "past", category: "meeting" },
   { id: "2nd-summer", status: "past", category: "meeting" },
   { id: "1st-summer", status: "past", category: "meeting" },
+  { id: "annual-gathering-2024", status: "past", category: "gathering" },
+  { id: "annual-gathering-2022", status: "past", category: "gathering" },
+  { id: "annual-gathering-2020", status: "past", category: "gathering" },
+  { id: "annual-gathering-2017", status: "past", category: "gathering" },
   { id: "annual-gathering-2013", status: "past", category: "gathering" }
 ];
 

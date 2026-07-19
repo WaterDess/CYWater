@@ -35,6 +35,7 @@ Then open `http://127.0.0.1:8000/`.
 - `assets/js/main.js` - shared interface behavior
 - `assets/css/` - design tokens, components, and responsive page styles
 - `assets/img/events/` - supplied Annual Meeting group photographs
+- `assets/img/gatherings/` - selected Annual Gathering and virtual award photos
 - `assets/docs/CYWater-Bylaws.docx` - supplied Bylaws document
 
 ## Content Rules

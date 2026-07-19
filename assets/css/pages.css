@@ -245,6 +245,7 @@
   margin: var(--sp-6) 0;
 }
 .article-gallery figure { margin: 0; }
+.article-gallery figure.is-wide { grid-column: 1 / -1; }
 .article-gallery figcaption { font-size: var(--fs-xs); }
 @media (max-width: 720px) {
   .article-gallery { grid-template-columns: 1fr; }

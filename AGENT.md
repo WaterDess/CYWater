@@ -77,6 +77,7 @@ Open `http://127.0.0.1:8000/`.
 - `news/article.html` - article renderer using `?id=...`
 - `contact/index.html` - verified mailing address; email pending confirmation
 - `assets/img/events/` - supplied Annual Meeting group photographs
+- `assets/img/gatherings/` - selected Annual Gathering and virtual award photos
 - `assets/docs/CYWater-Bylaws.docx` - supplied Bylaws source document
 - `local/` - ignored research archive; never publish unless explicitly requested
 
@@ -97,11 +98,27 @@ Key requirements:
 - The 2026 Annual Meeting is in Nanjing, China, October 16-18; registration is
   expected to open in August.
 - Events are separated into Annual Meetings and the Annual Gathering.
+- Annual Gathering records currently include 2013, 2017, 2020, 2022, and 2024.
 - Awards replace Journal in navigation and cover records from 2012 onward.
 - News is separated into Opportunities and Spotlights.
 - Membership uses calendar-year terms and the supplied dues/fee schedules.
 - Mailing address: `202 E. Green St. Suite 2, Champaign, IL 61820, USA`.
 - Contact email is pending confirmation; never invent an address.
+
+Annual Gathering photo sources supplied by a CYWater teacher:
+
+- 2024, Washington, DC, December 10:
+  `https://photos.app.goo.gl/gnubxgdkfTdNHvGK7`
+- 2022, Chicago, December 14:
+  `https://photos.app.goo.gl/MNr5KDLTTJk17d8H8`
+- 2020 virtual Best Paper Award gathering, December 18:
+  `https://photos.app.goo.gl/ypBGHyJY6tbPfUYz8`
+- The 2017 New Orleans dinner photograph is stored as
+  `assets/img/gatherings/2017-dinner.png`.
+
+Homepage photography should favor real CYWater images with clear subjects and
+reliable landscape crops. Wider documentary sets may be used in detail-page
+galleries even when they are not suitable as homepage cards.
 
 ## Product Boundaries
 

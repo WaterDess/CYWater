@@ -60,7 +60,7 @@
         case "quote":  return '<blockquote>' + b.text + '</blockquote>';
         case "list":   return '<ul>' + b.items.map((i) => '<li>' + i + '</li>').join('') + '</ul>';
         case "figure": return '<figure><img src="../assets/img/' + b.src + '" alt="' + esc(b.caption || '') + '" loading="lazy">' + (b.caption ? '<figcaption>' + b.caption + '</figcaption>' : '') + '</figure>';
-        case "gallery": return '<div class="article-gallery">' + b.items.map((it) => '<figure><img src="../assets/img/' + it.src + '" alt="' + esc(it.caption || '') + '" loading="lazy">' + (it.caption ? '<figcaption>' + it.caption + '</figcaption>' : '') + '</figure>').join('') + '</div>';
+        case "gallery": return '<div class="article-gallery">' + b.items.map((it) => '<figure' + (it.wide ? ' class="is-wide"' : '') + '><img src="../assets/img/' + it.src + '" alt="' + esc(it.caption || '') + '" loading="lazy">' + (it.caption ? '<figcaption>' + it.caption + '</figcaption>' : '') + '</figure>').join('') + '</div>';
         default:       return '';
       }
     }
