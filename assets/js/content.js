@@ -759,6 +759,7 @@ const EVENTS = {
     location: "New Orleans, USA",
     format: "Community gathering during the AGU Fall Meeting",
     image: "gatherings/2017-dinner.png",
+    archiveImageFocus: "lower",
     imageAlt: "CYWater members sharing dinner during the 2017 Annual Gathering in New Orleans",
     lead: "CYWater members met for an Annual Gathering and community dinner during the 2017 AGU Fall Meeting.",
     blocks: [
