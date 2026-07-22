@@ -1,0 +1,56 @@
+name: WordPress integration CI
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/wordpress-ci.yml"
+      - ".wp-env.json"
+      - "package.json"
+      - "package-lock.json"
+      - "scripts/**"
+      - "wordpress/**"
+  push:
+    branches:
+      - wordpress-integration
+    paths:
+      - ".github/workflows/wordpress-ci.yml"
+      - ".wp-env.json"
+      - "package.json"
+      - "package-lock.json"
+      - "scripts/**"
+      - "wordpress/**"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          coverage: none
+      - run: npm ci --ignore-scripts
+      - run: npm audit --audit-level=high
+      - run: npm run prepare
+      - run: npm run validate
+      - name: Check JavaScript syntax
+        run: find assets/js scripts -name '*.js' -o -name '*.mjs' | xargs -n1 node --check
+      - name: Check PHP syntax
+        run: find wordpress/wp-content -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: Build review artifact
+        run: |
+          npm run vendor:prepare
+          zip -qr cywater-wordpress-${{ github.sha }}.zip wordpress .wp-env.json package.json package-lock.json .env.example
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cywater-wordpress-${{ github.sha }}
+          path: cywater-wordpress-${{ github.sha }}.zip
+          if-no-files-found: error
+          retention-days: 14

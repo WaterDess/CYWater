@@ -78,6 +78,8 @@ starts at `local/hosting/README.md`; that index links to the following notes:
   secrets, deployment, and rollback
 - `05-launch-operations-handover.md` - launch QA, backup restore, operations,
   account ownership, and handover
+- `06-local-tooling.md` - ignored local runtime inventory, versions, checksums,
+  and workstation capability limits
 - `official-sources.md` - official links whose pricing and capabilities must be
   reverified before purchase or implementation
 
@@ -85,6 +87,31 @@ These documents are planning records, not the current implementation. Before
 work involving hosting, WordPress, membership, payment, DNS, SMTP, deployment,
 or handover, read the index and relevant note first. Keep the current static
 site as the source of truth until a WordPress replacement passes acceptance.
+
+## WordPress Integration Track
+
+Production preparation lives on the separate `wordpress-integration` branch.
+The root static site remains the source for GitHub Pages; do not publish the
+WordPress branch to `main` or `gh-pages` before staging acceptance.
+
+- Start with `wordpress/docs/README.md` for runtime and document links.
+- `themes/cywater` owns presentation only.
+- `plugins/cywater-core` owns public content models and initial import.
+- `plugins/cywater-membership` owns PMPro levels, profile fields, privacy, and
+  the opt-in directory.
+- `plugins/cywater-environment` owns runtime configuration, local mail routing,
+  readiness checks, and payment safety gates.
+- Paid Memberships Pro owns accounts, orders, membership state, and Stripe
+  gateway/webhook behavior. Do not implement a parallel transaction engine.
+- Playground on port `8890` is a disposable content/theme review environment;
+  it does not activate PMPro because PMPro 3.8.2 has MySQL-specific queries that
+  are incompatible with Playground SQLite. `wp-env` on port `8888`, MySQL,
+  Mailpit, and an HTTPS Stripe Sandbox callback are required for complete
+  integration acceptance.
+- Normal setup runs preserve imported WordPress posts and metadata. Force import
+  is destructive and requires a database backup plus explicit approval.
+- No live payment, personal bank account, hosting purchase, or production SMTP
+  is authorized at this stage. All credentials remain outside Git.
 
 ## Current Site Structure
 
@@ -227,9 +254,10 @@ GitHub Pages is public. `noindex, nofollow` and `robots.txt` reduce crawler
 discovery but do not provide authentication. Never describe this preview as
 private or access-controlled.
 
-Payments, membership accounts, sign-in, registrations, receipts, and dashboard
-data are mock-only. Keep that status explicit and do not suggest submissions or
-transactions are processed.
+On the public GitHub Pages preview, payments, membership accounts, sign-in,
+registrations, receipts, and dashboard data are mock-only. The WordPress track
+may process isolated test data in local/staging environments, but must never
+describe sandbox activity as a real transaction.
 
 ## Editing Guidance
 
@@ -257,7 +285,7 @@ transactions are processed.
 ## Do Not Do Without Approval
 
 - Migrate to React, Vue, Next, or another framework
-- Add a backend or build tooling
+- Add a backend or build tooling to `main`/`gh-pages`
 - Replace the visual system wholesale
 - Reintroduce bilingual support
 - Publish Board names or an unverified contact email

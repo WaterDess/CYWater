@@ -1,0 +1,32 @@
+{
+  "name": "cywater-wordpress",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local WordPress integration tooling for CYWater.",
+  "scripts": {
+    "assets:sync": "node scripts/sync-wordpress-assets.mjs",
+    "content:export": "node scripts/export-wordpress-content.mjs",
+    "vendor:prepare": "node scripts/prepare-wordpress-vendor.mjs",
+    "validate": "node scripts/validate-wordpress-structure.mjs",
+    "wp:config": "node scripts/build-wp-env-config.mjs",
+    "wp:start": "npm run vendor:prepare && npm run wp:config && wp-env --config wordpress/runtime/wp-env.local.json start --update",
+    "wp:stop": "npm run wp:config && wp-env --config wordpress/runtime/wp-env.local.json stop",
+    "wp:destroy": "npm run wp:config && wp-env --config wordpress/runtime/wp-env.local.json destroy",
+    "wp:cli": "npm run wp:config && wp-env --config wordpress/runtime/wp-env.local.json run cli wp",
+    "playground:start": "node scripts/start-playground.mjs",
+    "test:playground": "npm run vendor:prepare && node scripts/test-playground.mjs",
+    "prepare": "npm run assets:sync && npm run content:export"
+  },
+  "devDependencies": {
+    "@wordpress/env": "11.11.0",
+    "@wp-playground/cli": "3.1.46",
+    "adm-zip": "0.6.0",
+    "cheerio": "^1.1.2"
+  },
+  "overrides": {
+    "adm-zip": "0.6.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

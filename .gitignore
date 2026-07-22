@@ -6,3 +6,12 @@ Thumbs.db
 # Teacher-provided local archive (2.4 GB tar) — not versioned
 local/
 
+# WordPress development runtime and secrets
+node_modules/
+.wp-env/
+.env
+.env.*
+!.env.example
+wordpress/.env
+wordpress/runtime/
+wordpress/artifacts/

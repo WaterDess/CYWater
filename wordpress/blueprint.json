@@ -1,0 +1,60 @@
+{
+  "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+  "meta": {
+    "title": "CYWater local WordPress preview",
+    "description": "Disposable review environment for the CYWater theme, content model, and membership workflow. Payments remain in test mode.",
+    "author": "CYWater"
+  },
+  "preferredVersions": {
+    "php": "8.3",
+    "wp": "7.0.2"
+  },
+  "features": {
+    "networking": true
+  },
+  "extraLibraries": [
+    "wp-cli"
+  ],
+  "landingPage": "/",
+  "steps": [
+    {
+      "step": "mkdir",
+      "path": "/home/web_user"
+    },
+    {
+      "step": "defineWpConfigConsts",
+      "consts": {
+        "WP_DEBUG": true,
+        "WP_DEBUG_LOG": true,
+        "WP_DEBUG_DISPLAY": false,
+        "WP_DISABLE_FATAL_ERROR_HANDLER": true,
+        "WP_ENVIRONMENT_TYPE": "local",
+        "DISALLOW_FILE_EDIT": true,
+        "CYWATER_PAYMENT_MODE": "test",
+        "CYWATER_ALLOW_LIVE_PAYMENTS": false,
+        "CYWATER_MAIL_TRANSPORT": "disabled",
+        "CYWATER_ENABLE_CALENDAR_YEAR_END": true
+      }
+    },
+    {
+      "step": "activatePlugin",
+      "pluginPath": "cywater-core/cywater-core.php"
+    },
+    {
+      "step": "activatePlugin",
+      "pluginPath": "cywater-membership/cywater-membership.php"
+    },
+    {
+      "step": "activatePlugin",
+      "pluginPath": "cywater-environment/cywater-environment.php"
+    },
+    {
+      "step": "activateTheme",
+      "themeFolderName": "cywater"
+    },
+    {
+      "step": "wp-cli",
+      "command": "wp cywater setup"
+    }
+  ]
+}
