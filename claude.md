@@ -30,6 +30,9 @@ Contemporary Young Scholars in Water Sciences. It began as a bilingual visual
 prototype and is now an English-only, source-backed public preview.
 
 - Live site: https://waterdess.github.io/CYWater/
+- Official organization domain: `cywater.org`. Registrar access, legal
+  ownership records, renewal responsibility, and DNS handover remain to be
+  verified before migration.
 - Repository: https://github.com/WaterDess/CYWater
 - `main` is the working branch.
 - GitHub Pages serves `gh-pages`.
@@ -137,7 +140,8 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
 - Do not make one person's private Gmail address or phone the sole owner or
   recovery path for the domain, hosting, DNS, WordPress, payment, or mail
   services.
-- The organization-owned domain is the root identity. Prefer Google Workspace
+- The confirmed organization domain is `cywater.org` and is the root identity.
+  Prefer Google Workspace
   for Nonprofits if CYWater's US `501(c)(3)` eligibility is formally confirmed;
   otherwise use a paid organization workspace after billing authority exists.
 - Give administrators named organization accounts and individual MFA. Use
