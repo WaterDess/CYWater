@@ -80,6 +80,8 @@ starts at `local/hosting/README.md`; that index links to the following notes:
   account ownership, and handover
 - `06-local-tooling.md` - ignored local runtime inventory, versions, checksums,
   and workstation capability limits
+- `07-organization-email.md` - official mailbox, domain identity, role addresses,
+  recovery governance, and WordPress/SMTP separation
 - `official-sources.md` - official links whose pricing and capabilities must be
   reverified before purchase or implementation
 
@@ -112,6 +114,41 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   is destructive and requires a database backup plus explicit approval.
 - No live payment, personal bank account, hosting purchase, or production SMTP
   is authorized at this stage. All credentials remain outside Git.
+
+### Temporary Integration Snapshot (2026-07-23)
+
+- The production-preparation snapshot is commit `fda08d5` on
+  `wordpress-integration`; CI passed and produced a review artifact.
+- This is not a GitHub Pages frontend release. `main` and `gh-pages` remain the
+  static public preview, and `v0.1-prototype` remains unchanged.
+- The snapshot contains the custom WordPress theme plus separate
+  `cywater-core`, `cywater-membership`, and `cywater-environment` plugins.
+- Content import, editable public records, PMPro level/profile/privacy policy,
+  Stripe Sandbox safety gates, Mailpit routing, CI, and handover documents are
+  prepared. Real PMPro/MySQL, Stripe webhook, SMTP, backup, and visual-browser
+  acceptance still require staging services and organization-owned accounts.
+- Playground on the Tsinghua server is reachable only from that host unless a
+  deliberate secure remote-access route is configured. Do not present its
+  `127.0.0.1` URL as a Lenovo-laptop preview. No Playground service is expected
+  to remain running after the review task.
+
+### Organization Email Identity
+
+- Do not make one person's private Gmail address or phone the sole owner or
+  recovery path for the domain, hosting, DNS, WordPress, payment, or mail
+  services.
+- The organization-owned domain is the root identity. Prefer Google Workspace
+  for Nonprofits if CYWater's US `501(c)(3)` eligibility is formally confirmed;
+  otherwise use a paid organization workspace after billing authority exists.
+- Give administrators named organization accounts and individual MFA. Use
+  role addresses such as `admin@`, `billing@`, `web@`, and `contact@` as groups
+  or shared inboxes with at least two authorized recipients; do not share one
+  password among multiple people.
+- WordPress Administration Email is a notification destination, not a mailbox
+  service. Human mailboxes, transactional SMTP, and DNS records are separate
+  systems. Mailpit is local test capture only and never an official mailbox.
+- Maintain at least two organization-authorized administrators, hardware-key
+  or app-based MFA, documented recovery, and Board-approved account ownership.
 
 ## Current Site Structure
 

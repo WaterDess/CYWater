@@ -8,6 +8,7 @@ The Board should appoint an owner and at least one recovery administrator.
 | GitHub organization/repository | Yes | Board-controlled owners, 2FA, recovery codes | Existing repository; access review pending |
 | Hostinger managed WordPress | Before staging | Organization billing authority and payment method | Blocked by payment authority |
 | Domain registrar | Before DNS cutover | Confirm legal owner and renewal contacts | Access/ownership to confirm |
+| Organization email / Google Workspace | Before purchasing connected services | Confirm US 501(c)(3) evidence, domain, two administrators, MFA, and recovery owners | Eligibility and domain are unconfirmed |
 | Cloudflare | Before staging | Board-controlled account, two admins, API token | Not configured |
 | Stripe Sandbox | For payment acceptance | Organization account owner; developer may receive Sandbox role | Credentials not supplied |
 | Stripe live account | Before live payments | Legal entity, operating country, identity verification, bank account | Deliberately blocked |
