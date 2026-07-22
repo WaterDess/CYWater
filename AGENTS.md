@@ -62,6 +62,30 @@ python -m http.server 8000
 
 Open `http://127.0.0.1:8000/`.
 
+## Local Planning Library
+
+`local/` is an ignored, workstation-only research and planning archive. Never
+publish it or store credentials in it. Hosting and WordPress migration planning
+starts at `local/hosting/README.md`; that index links to the following notes:
+
+- `01-decision-and-cost.md` - hosting choice, capability gates, budget, and open
+  decisions
+- `02-wordpress-architecture.md` - theme/plugin boundaries, content models, and
+  migration approach
+- `03-membership-payments.md` - PMPro, Stripe, membership terms, refunds, and
+  transactional email
+- `04-environments-deployment.md` - development/staging/production, Cloudflare,
+  secrets, deployment, and rollback
+- `05-launch-operations-handover.md` - launch QA, backup restore, operations,
+  account ownership, and handover
+- `official-sources.md` - official links whose pricing and capabilities must be
+  reverified before purchase or implementation
+
+These documents are planning records, not the current implementation. Before
+work involving hosting, WordPress, membership, payment, DNS, SMTP, deployment,
+or handover, read the index and relevant note first. Keep the current static
+site as the source of truth until a WordPress replacement passes acceptance.
+
 ## Current Site Structure
 
 - `index.html` - home
