@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { runCLI } from "@wp-playground/cli";
 
 const mounts = [
@@ -31,7 +32,29 @@ try {
       assert.match(html, /id="annual-meetings-title"/, "Events archive must retain the Annual Meetings section");
       assert.match(html, /id="annual-gathering-title"/, "Events archive must retain the Annual Gathering section");
     }
+    if (route === "/news/") {
+      assert.match(html, /Verified opportunities for the water-science community/, "News hero copy must match the static preview");
+      assert.match(html, /id="opportunities-title"/, "News must retain the Opportunities section");
+      assert.match(html, /id="spotlights-title"/, "News must retain the Spotlights section");
+      assert.equal((html.match(/class="news-feature"/g) || []).length, 1, "News must render one featured spotlight");
+      assert.equal((html.match(/class="news-item"/g) || []).length, 14, "News must render all remaining spotlights as rows");
+      assert.doesNotMatch(html, /class="news-row"|Hello world/i, "News must not use the obsolete generic archive row or default post");
+    }
+    if (route === "/awards/") {
+      assert.match(html, /Recognizing early-career research/, "Awards must retain its eligibility introduction");
+      assert.equal((html.match(/class="award-year"/g) || []).length, 14, "Awards must render the complete 2012-2025 yearbook");
+      assert.match(html, /Outstanding Papers/, "Awards must include Outstanding Paper records");
+      assert.match(html, /10\.1073\/pnas\.2421046122/, "Awards must retain verified DOI data");
+      assert.doesNotMatch(html, /class="award-grid/, "Awards must not use the obsolete card grid");
+    }
+    if (route === "/membership/") {
+      assert.equal((html.match(/<article class="tier\b/g) || []).length, 4, "Membership must render four approved membership tiers");
+      assert.match(html, /class="table fee-table"/, "Membership must retain the conference fee matrix");
+    }
   }
+
+  assert.match(readFileSync("wordpress/wp-content/themes/cywater/single.php", "utf8"), /article-hero/, "News detail must retain its dedicated layout");
+  assert.match(readFileSync("wordpress/wp-content/themes/cywater/single-cyw_event.php", "utf8"), /event-hero/, "Event detail must retain its dedicated layout");
 
   let result = await server.playground.run({
     code: `<?php
@@ -56,6 +79,8 @@ echo wp_json_encode(
         'event_count' => wp_count_posts( 'cyw_event' )->publish,
         'award_count' => wp_count_posts( 'cyw_award' )->publish,
         'news_count' => wp_count_posts( 'post' )->publish,
+		'news_order_meta' => (bool) get_post_meta( get_posts( array( 'post_type' => 'post', 'meta_key' => '_cyw_source_id', 'meta_value' => 'news:bpa-2025-result', 'fields' => 'ids', 'posts_per_page' => 1 ) )[0], '_cyw_news_order', true ),
+		'award_record_meta' => (bool) get_post_meta( get_posts( array( 'post_type' => 'cyw_award', 'meta_key' => '_cyw_source_id', 'meta_value' => 'award:2025', 'fields' => 'ids', 'posts_per_page' => 1 ) )[0], '_cyw_award_record', true ),
     )
 );`,
   });
@@ -72,6 +97,8 @@ echo wp_json_encode(
   assert.equal(Number(report.event_count), 19);
   assert.equal(Number(report.award_count), 14);
   assert.equal(Number(report.news_count), 16);
+  assert.equal(report.news_order_meta, true, "Normal setup must add missing News ordering metadata");
+  assert.equal(report.award_record_meta, true, "Normal setup must add missing structured Award metadata");
 
   result = await server.playground.run({
     code: `<?php

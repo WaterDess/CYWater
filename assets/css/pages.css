@@ -779,6 +779,7 @@
 }
 
 @media (max-width: 460px) {
+  .header-actions > a { display: none; }
   .event-archive-row { grid-template-columns: 1fr; }
   .event-archive-row > .link { grid-column: 1; }
   .hero h1 { font-size: 2.2rem; }

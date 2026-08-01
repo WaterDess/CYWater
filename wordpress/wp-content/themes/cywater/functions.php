@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CYWATER_THEME_VERSION', '0.1.1' );
+define( 'CYWATER_THEME_VERSION', '0.2.0' );
 
 function cywater_theme_setup() {
 	add_theme_support( 'title-tag' );
@@ -98,6 +98,26 @@ function cywater_featured_image_url( $post_id = null, $size = 'cywater-card', $f
 		return cywater_asset_uri( 'img/' . ltrim( $legacy, '/' ) );
 	}
 	return $fallback ? cywater_asset_uri( 'img/' . ltrim( $fallback, '/' ) ) : '';
+}
+
+function cywater_source_permalink( $source_id, $post_type = 'post' ) {
+	$posts = get_posts(
+		array(
+			'post_type'      => $post_type,
+			'post_status'    => 'publish',
+			'posts_per_page' => 1,
+			'fields'         => 'ids',
+			'meta_key'       => '_cyw_source_id',
+			'meta_value'     => $source_id,
+		)
+	);
+	return $posts ? get_permalink( $posts[0] ) : '';
+}
+
+function cywater_article_content( $post_id = null ) {
+	$post_id = $post_id ?: get_the_ID();
+	$content = apply_filters( 'the_content', get_post_field( 'post_content', $post_id ) );
+	return str_replace( 'gallery-grid', 'article-gallery', $content );
 }
 
 function cywater_body_classes( $classes ) {

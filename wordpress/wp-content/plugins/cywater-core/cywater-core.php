@@ -2,7 +2,7 @@
 /**
  * Plugin Name: CYWater Core
  * Description: Portable content models, editorial fields, and idempotent static-content import for CYWater.
- * Version: 0.1.2
+ * Version: 0.2.0
  * Requires at least: 7.0
  * Requires PHP: 8.1
  * Text Domain: cywater-core
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CYWATER_CORE_VERSION', '0.1.2' );
+define( 'CYWATER_CORE_VERSION', '0.2.0' );
 define( 'CYWATER_CORE_FILE', __FILE__ );
 define( 'CYWATER_CORE_DIR', plugin_dir_path( __FILE__ ) );
 

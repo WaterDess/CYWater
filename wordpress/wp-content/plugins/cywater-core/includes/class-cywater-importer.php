@@ -97,8 +97,9 @@ final class CYWater_Importer {
 
 	private function import_news() {
 		$visuals = array();
-		foreach ( $this->data['newsOrder'] ?? array() as $item ) {
+		foreach ( $this->data['newsOrder'] ?? array() as $index => $item ) {
 			$visuals[ $item['id'] ] = $item;
+			$visuals[ $item['id'] ]['order'] = $index + 1;
 		}
 		$count = 0;
 		foreach ( $this->data['articles'] as $source_id => $article ) {
@@ -120,6 +121,7 @@ final class CYWater_Importer {
 			}
 			$this->seed_meta( $post_id, '_cyw_source_url', esc_url_raw( $article['source'] ?? '' ) );
 			$display = $visuals[ $source_id ] ?? array();
+			$this->seed_meta_if_missing( $post_id, '_cyw_news_order', absint( $display['order'] ?? 999 ) );
 			if ( ! empty( $display['visual'] ) ) {
 				$this->seed_meta( $post_id, '_cyw_visual_title', sanitize_text_field( $display['visual']['title'] ?? '' ) );
 				$this->seed_meta( $post_id, '_cyw_visual_year', absint( $display['visual']['year'] ?? 0 ) );
@@ -225,6 +227,8 @@ final class CYWater_Importer {
 			$this->seed_meta( $post_id, '_cyw_journal', sanitize_text_field( $journal ) );
 			$this->seed_meta( $post_id, '_cyw_applications', absint( $award['applications'] ?? 0 ) );
 			$this->seed_meta( $post_id, '_cyw_chair', sanitize_text_field( $award['chair'] ?? '' ) );
+			$this->seed_meta_if_missing( $post_id, '_cyw_award_record', wp_json_encode( $award, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) );
+			$this->seed_meta_if_missing( $post_id, '_cyw_article_id', sanitize_key( $award['articleId'] ?? '' ) );
 			++$count;
 		}
 		return $count;
@@ -295,6 +299,15 @@ final class CYWater_Importer {
 		}
 	}
 
+	/**
+	 * Add newly introduced structural metadata without overwriting editorial data.
+	 */
+	private function seed_meta_if_missing( $post_id, $key, $value ) {
+		if ( $this->should_sync( $post_id ) || ! metadata_exists( 'post', $post_id, $key ) ) {
+			update_post_meta( $post_id, $key, $value );
+		}
+	}
+
 	private function render_blocks( $blocks ) {
 		$html = '';
 		foreach ( $blocks as $block ) {
@@ -312,7 +325,7 @@ final class CYWater_Importer {
 			} elseif ( 'figure' === $type ) {
 				$html .= $this->figure_html( $block );
 			} elseif ( 'gallery' === $type ) {
-				$html .= '<div class="gallery-grid">';
+				$html .= '<div class="article-gallery">';
 				foreach ( $block['items'] ?? array() as $item ) {
 					$html .= $this->figure_html( $item );
 				}
@@ -341,7 +354,8 @@ final class CYWater_Importer {
 		if ( ! $attachment_id ) {
 			return '';
 		}
-		return '<figure>' . wp_get_attachment_image( $attachment_id, 'large', false, array( 'loading' => 'lazy' ) ) . ( ! empty( $item['caption'] ) ? '<figcaption>' . esc_html( $item['caption'] ) . '</figcaption>' : '' ) . '</figure>';
+		$class = ! empty( $item['wide'] ) ? ' class="is-wide"' : '';
+		return '<figure' . $class . '>' . wp_get_attachment_image( $attachment_id, 'large', false, array( 'loading' => 'lazy' ) ) . ( ! empty( $item['caption'] ) ? '<figcaption>' . esc_html( $item['caption'] ) . '</figcaption>' : '' ) . '</figure>';
 	}
 
 	private function set_featured_image( $post_id, $relative_path, $alt ) {
