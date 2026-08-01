@@ -103,6 +103,76 @@ echo wp_json_encode(
   result = await server.playground.run({
     code: `<?php
 require '/wordpress/wp-load.php';
+$news_id = get_posts( array( 'post_type' => 'post', 'meta_key' => '_cyw_source_id', 'meta_value' => 'news:bpa-2025-result', 'fields' => 'ids', 'posts_per_page' => 1 ) )[0];
+$award_id = get_posts( array( 'post_type' => 'cyw_award', 'meta_key' => '_cyw_source_id', 'meta_value' => 'award:2025', 'fields' => 'ids', 'posts_per_page' => 1 ) )[0];
+wp_update_post( array( 'ID' => $news_id, 'post_title' => 'Upgrade preservation test' ) );
+$news_ids = get_posts(
+    array(
+        'post_type' => 'post',
+        'posts_per_page' => -1,
+        'fields' => 'ids',
+        'meta_query' => array(
+            array(
+                'key' => '_cyw_source_id',
+                'value' => 'news:',
+                'compare' => 'LIKE',
+            ),
+        ),
+    )
+);
+foreach ( $news_ids as $imported_news_id ) {
+    delete_post_meta( $imported_news_id, '_cyw_news_order' );
+}
+delete_post_meta( $award_id, '_cyw_award_record' );
+delete_post_meta( $award_id, '_cyw_article_id' );
+update_option( 'cywater_core_setup_version', '0.2.0' );
+echo 'prepared';`,
+  });
+  assert.equal(result.exitCode, 0, result.errors);
+  assert.equal(result.text, "prepared");
+
+  const fallbackResponse = await fetch(new URL("/news/", server.serverUrl));
+  const fallbackHtml = await fallbackResponse.text();
+  assert.equal((fallbackHtml.match(/class="news-feature"/g) || []).length, 1, "News fallback must retain its featured story");
+  assert.equal((fallbackHtml.match(/class="news-item"/g) || []).length, 14, "News fallback must render every imported story");
+  assert.doesNotMatch(fallbackHtml, /Hello world/i, "News fallback must exclude unrelated posts");
+
+  result = await server.playground.run({
+    code: `<?php
+require '/wordpress/wp-load.php';
+wp_set_current_user( 1 );
+$news_id = get_posts( array( 'post_type' => 'post', 'meta_key' => '_cyw_source_id', 'meta_value' => 'news:bpa-2025-result', 'fields' => 'ids', 'posts_per_page' => 1 ) )[0];
+$award_id = get_posts( array( 'post_type' => 'cyw_award', 'meta_key' => '_cyw_source_id', 'meta_value' => 'award:2025', 'fields' => 'ids', 'posts_per_page' => 1 ) )[0];
+cywater_core_maybe_upgrade();
+echo wp_json_encode(
+    array(
+        'setup_version' => get_option( 'cywater_core_setup_version' ),
+        'title_preserved' => 'Upgrade preservation test' === get_the_title( $news_id ),
+        'news_order_restored' => metadata_exists( 'post', $news_id, '_cyw_news_order' ),
+        'award_record_restored' => metadata_exists( 'post', $award_id, '_cyw_award_record' ),
+        'article_id_restored' => metadata_exists( 'post', $award_id, '_cyw_article_id' ),
+    )
+);`,
+  });
+  assert.equal(result.exitCode, 0, result.errors);
+  const upgrade = JSON.parse(result.text);
+  assert.equal(upgrade.setup_version, "0.2.1", "Automatic upgrade must record the completed version");
+  assert.equal(upgrade.title_preserved, true, "Automatic upgrade must preserve editorial content");
+  assert.equal(upgrade.news_order_restored, true, "Automatic upgrade must restore missing News metadata");
+  assert.equal(upgrade.award_record_restored, true, "Automatic upgrade must restore missing Award records");
+  assert.equal(upgrade.article_id_restored, true, "Automatic upgrade must restore Award announcement links");
+
+  const upgradedNewsHtml = await (await fetch(new URL("/news/", server.serverUrl))).text();
+  assert.equal((upgradedNewsHtml.match(/class="news-feature"/g) || []).length, 1, "Upgraded News must retain its featured story");
+  assert.equal((upgradedNewsHtml.match(/class="news-item"/g) || []).length, 14, "Upgraded News must render every imported story");
+  const upgradedAwardsHtml = await (await fetch(new URL("/awards/", server.serverUrl))).text();
+  assert.match(upgradedAwardsHtml, /Outstanding Papers/, "Upgraded Awards must render restored Outstanding Paper records");
+  assert.match(upgradedAwardsHtml, /10\.1073\/pnas\.2421046122/, "Upgraded Awards must render restored DOI data");
+  assert.match(upgradedAwardsHtml, /Read award announcement/, "Upgraded Awards must render restored announcement links");
+
+  result = await server.playground.run({
+    code: `<?php
+require '/wordpress/wp-load.php';
 require_once ABSPATH . 'wp-admin/includes/plugin.php';
 $error = activate_plugin( 'paid-memberships-pro/paid-memberships-pro.php' );
 if ( is_wp_error( $error ) ) {

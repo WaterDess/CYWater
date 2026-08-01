@@ -26,6 +26,26 @@ $spotlights = new WP_Query(
 		'order'          => 'ASC',
 	)
 );
+
+// Older installations may contain imported stories without the later ordering field.
+if ( ! $spotlights->have_posts() ) {
+	$spotlights = new WP_Query(
+		array(
+			'post_type'      => 'post',
+			'post_status'    => 'publish',
+			'posts_per_page' => -1,
+			'orderby'        => 'date',
+			'order'          => 'DESC',
+			'meta_query'     => array(
+				array(
+					'key'     => '_cyw_source_id',
+					'value'   => 'news:',
+					'compare' => 'LIKE',
+				),
+			),
+		)
+	);
+}
 ?>
 <section class="section">
 	<div class="container container-narrow">
