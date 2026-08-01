@@ -66,6 +66,10 @@ final class CYWater_Content_Types {
 				'supports'           => array( 'title', 'editor', 'thumbnail', 'revisions' ),
 			)
 		);
+
+		// Keep the public archive roots stable across hosts and rewrite engines.
+		add_rewrite_rule( '^events/?$', 'index.php?post_type=cyw_event', 'top' );
+		add_rewrite_rule( '^awards/?$', 'index.php?post_type=cyw_award', 'top' );
 	}
 
 	private static function labels( $singular, $plural ) {
