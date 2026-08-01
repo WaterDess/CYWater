@@ -25,6 +25,12 @@ try {
     assert.equal(response.status, 200, `${route} should return HTTP 200`);
     const html = await response.text();
     assert.doesNotMatch(html, /Fatal error|Parse error|Warning:/, `${route} should not expose a PHP error`);
+    if (route === "/events/") {
+      assert.match(html, /CYWater Annual Meeting 2026/, "Events archive must publish the upcoming 2026 meeting");
+      assert.equal((html.match(/class="event-archive-row"/g) || []).length, 19, "Events archive must render all verified event rows");
+      assert.match(html, /id="annual-meetings-title"/, "Events archive must retain the Annual Meetings section");
+      assert.match(html, /id="annual-gathering-title"/, "Events archive must retain the Annual Gathering section");
+    }
   }
 
   let result = await server.playground.run({
@@ -63,7 +69,7 @@ echo wp_json_encode(
   assert.equal(report.members_page, true, "Member directory page must exist");
   assert.equal(Number(report.bylaws_articles), 9, "All nine Bylaws articles must be seeded");
   assert.match(report.contact_address, /202 E\. Green St\./, "Verified mailing address must be editable page metadata");
-  assert.equal(Number(report.event_count), 18);
+  assert.equal(Number(report.event_count), 19);
   assert.equal(Number(report.award_count), 14);
   assert.equal(Number(report.news_count), 16);
 

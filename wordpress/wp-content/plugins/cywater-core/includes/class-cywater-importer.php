@@ -141,6 +141,9 @@ final class CYWater_Importer {
 		foreach ( $this->data['events'] as $source_id => $event ) {
 			$display_date = sanitize_text_field( $event['date'] ?? '' );
 			$start_date   = $this->infer_event_date( $source_id, $display_date );
+			$type         = $event['category'] ?? ( $ordering[ $source_id ]['category'] ?? 'meeting' );
+			$status       = ! empty( $event['upcoming'] ) || 'upcoming' === ( $ordering[ $source_id ]['status'] ?? '' ) ? 'upcoming' : 'past';
+			$post_date    = 'upcoming' === $status ? current_time( 'mysql' ) : $this->wordpress_date( $start_date );
 			$post_id      = $this->upsert_post(
 				'cyw_event',
 				'event:' . $source_id,
@@ -149,12 +152,22 @@ final class CYWater_Importer {
 					'post_name'    => sanitize_title( $source_id ),
 					'post_excerpt' => $event['lead'] ?? '',
 					'post_content' => $this->render_blocks( $event['blocks'] ?? array() ),
-					'post_date'    => $this->wordpress_date( $start_date ),
+					'post_date'    => $post_date,
 					'post_status'  => 'publish',
 				)
 			);
-			$type   = $event['category'] ?? ( $ordering[ $source_id ]['category'] ?? 'meeting' );
-			$status = ! empty( $event['upcoming'] ) || 'upcoming' === ( $ordering[ $source_id ]['status'] ?? '' ) ? 'upcoming' : 'past';
+			// WordPress schedules posts whose post_date is in the future. Event dates
+			// live in _cyw_start_date, so imported upcoming events must stay public.
+			if ( 'upcoming' === $status && 'future' === get_post_status( $post_id ) ) {
+				wp_update_post(
+					array(
+						'ID'            => $post_id,
+						'post_date'     => current_time( 'mysql' ),
+						'post_date_gmt' => current_time( 'mysql', true ),
+						'post_status'   => 'publish',
+					)
+				);
+			}
 			if ( $this->should_sync( $post_id ) ) {
 				wp_set_object_terms( $post_id, $type, 'cyw_event_type' );
 			}
