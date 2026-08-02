@@ -87,7 +87,7 @@ final class CYWater_Content_Types {
 		$public_fields = array(
 			'page'      => array( 'eyebrow', 'hero_title', 'lead', 'contact_email', 'mailing_address' ),
 			'post'      => array( 'visual_title', 'visual_year', 'source_image', 'source_url', 'source_id' ),
-			'cyw_event' => array( 'start_date', 'end_date', 'date_label', 'location', 'format', 'attendees', 'status', 'source_image', 'source_url', 'source_id' ),
+			'cyw_event' => array( 'start_date', 'end_date', 'date_label', 'location', 'format', 'attendees', 'image_alt', 'status', 'source_image', 'source_url', 'source_id' ),
 			'cyw_award' => array( 'year', 'recipient', 'paper_title', 'journal', 'applications', 'chair', 'source_id' ),
 		);
 

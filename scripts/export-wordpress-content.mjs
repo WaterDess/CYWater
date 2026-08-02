@@ -40,7 +40,9 @@ async function readPage(relativePath, contentSelector) {
 }
 
 const pages = {
+  home: await readPage("index.html", ".hero"),
   about: await readPage("about/index.html", ".about-intro-grid .stack"),
+  board: await readPage("about/board.html", ".board-status"),
   bylaws: await readPage("about/bylaws.html", ".bylaws-layout .prose"),
   membership: await readPage("membership/index.html", ".page-hero"),
   contact: await readPage("contact/index.html", ".contact-note"),
@@ -48,6 +50,7 @@ const pages = {
 
 const payload = {
   schemaVersion: 1,
+  seedRevision: 4,
   generatedFrom: "assets/js/content.js",
   articles: content.ARTICLES,
   events: content.EVENTS,

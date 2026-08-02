@@ -6,6 +6,9 @@
  */
 
 get_header();
+?>
+<main>
+<?php
 get_template_part(
 	'template-parts/page-hero',
 	null,
@@ -87,4 +90,5 @@ if ( ! $spotlights->have_posts() ) {
 		</section>
 	</div>
 </section>
+</main>
 <?php get_footer(); ?>

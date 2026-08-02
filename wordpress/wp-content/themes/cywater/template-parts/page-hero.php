@@ -20,5 +20,21 @@ $lead     = $args['lead'] ?? cywater_page_field( 'lead', get_the_excerpt() );
 		<?php if ( $lead ) : ?>
 			<p class="lead"><?php echo esc_html( $lead ); ?></p>
 		<?php endif; ?>
+		<?php if ( ! empty( $args['actions'] ) ) : ?>
+			<div class="hero-actions" style="margin-top:var(--sp-5)">
+				<?php
+				echo wp_kses(
+					$args['actions'],
+					array(
+						'a' => array(
+							'class'    => true,
+							'href'     => true,
+							'download' => true,
+						),
+					)
+				);
+				?>
+			</div>
+		<?php endif; ?>
 	</div>
 </section>

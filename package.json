@@ -1,6 +1,6 @@
 {
   "name": "cywater-wordpress",
-  "version": "0.1.0",
+  "version": "0.5.2",
   "private": true,
   "description": "Local WordPress integration tooling for CYWater.",
   "scripts": {
@@ -8,11 +8,14 @@
     "content:export": "node scripts/export-wordpress-content.mjs",
     "vendor:prepare": "node scripts/prepare-wordpress-vendor.mjs",
     "validate": "node scripts/validate-wordpress-structure.mjs",
+    "release:build": "npm run prepare && npm run validate && node scripts/build-wordpress-release.mjs",
+    "release:theme": "npm run assets:sync && npm run validate && node scripts/build-wordpress-theme-release.mjs",
     "wp:config": "node scripts/build-wp-env-config.mjs",
     "wp:start": "npm run vendor:prepare && npm run wp:config && wp-env --config wordpress/runtime/wp-env.local.json start --update",
     "wp:stop": "npm run wp:config && wp-env --config wordpress/runtime/wp-env.local.json stop",
     "wp:destroy": "npm run wp:config && wp-env --config wordpress/runtime/wp-env.local.json destroy",
     "wp:cli": "npm run wp:config && wp-env --config wordpress/runtime/wp-env.local.json run cli wp",
+    "static:start": "node scripts/start-static-preview.mjs",
     "playground:start": "node scripts/start-playground.mjs",
     "test:playground": "npm run vendor:prepare && node scripts/test-playground.mjs",
     "prepare": "npm run assets:sync && npm run content:export"

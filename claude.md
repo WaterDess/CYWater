@@ -135,6 +135,21 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   `127.0.0.1` URL as a Lenovo-laptop preview. No Playground service is expected
   to remain running after the review task.
 
+### Temporary Staging Snapshot (2026-08-02)
+
+- Hostinger staging is available at `https://staging.cywater.org/` with the
+  CYWater `0.5.2` theme and `0.5.1` releases of the three CYWater plugins.
+- The public home, News, Events, Awards, Contact, Board, and Bylaws routes match
+  the accepted static baseline. `/about/board/` and `/about/bylaws/` are
+  intentional 301 compatibility redirects; `/hello-world/` returns 404.
+- PMPro is active, but payment is disabled, the live-payment gate is closed,
+  Stripe keys are absent, and production SMTP is not configured.
+- Hostinger backups and a staging environment exist. Continue to use normal,
+  revision-aware setup only; force import remains destructive and requires an
+  explicit backup plus user approval.
+- The next acceptance gates are named-admin security, SMTP delivery, Stripe
+  Sandbox/webhook tests, the complete membership lifecycle, and restore QA.
+
 ### Organization Email Identity
 
 - Do not make one person's private Gmail address or phone the sole owner or
@@ -153,6 +168,67 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   systems. Mailpit is local test capture only and never an official mailbox.
 - Maintain at least two organization-authorized administrators, hardware-key
   or app-based MFA, documented recovery, and Board-approved account ownership.
+
+### Durable Web-Service Identity
+
+- `web@cywater.org` is the durable, association-owned identity for registering,
+  owning, recovering, and receiving operational notices for Hostinger,
+  WordPress platform administration, Postmark, membership infrastructure, and
+  related web services. It must remain stable through personnel changes.
+- Do not replace `web@cywater.org` with a named person's address merely because
+  that person performs setup or testing. Where a vendor supports team members
+  or delegated access, invite named organization accounts for daily work and
+  auditability while the vendor account's owner, recovery, and notification
+  identity remains `web@cywater.org`.
+- `web@cywater.org` may be a Google Group or shared role address and therefore
+  need not have a Google sign-in password. Vendor accounts registered with it
+  use the vendor's own authentication; verification and recovery mail is
+  delivered to authorized Group members.
+- Human administrators use named organization accounts and individual MFA.
+  When a person leaves, remove their delegated access and Group membership
+  without changing the vendor account's organization-owned identity.
+- Keep at least two custodians for `web@cywater.org` and store vendor
+  credentials and recovery codes in an organization-controlled password
+  manager. Never share a human Google Workspace password.
+- Use `billing@cywater.org` for invoices and renewal notices,
+  `membership@cywater.org` for member support, and `contact@cywater.org` for
+  public correspondence. These may be secondary contacts, but
+  `web@cywater.org` remains the web-platform service identity.
+- Services with legal identity requirements, such as Stripe KYC, still require
+  a named authorized representative. That compliance record does not change
+  the policy that platform ownership, recovery, and operational notices should
+  remain controlled by the association wherever the service permits it.
+
+### Hosted Staging Snapshot (2026-08-02)
+
+- Hostinger Business hosting is active. `staging.cywater.org` is the acceptance
+  environment. Manual and daily backups exist, and a staging clone has been
+  created.
+- The custom WordPress theme and CYWater plugins are installed. GitHub Pages
+  remains the visual and content source of truth until WordPress staging passes
+  final acceptance.
+- Google Workspace is active with named human users and role groups `web@`,
+  `billing@`, `contact@`, and `membership@`.
+- Paid Memberships Pro is active with Student `$20/year`, Professional
+  `$70/year`, Lifetime `$700`, and Partner `$1,000/year`. Live payment remains
+  disabled.
+- Postmark is approved. `cywater.org` DKIM and Return-Path are verified, and the
+  WordPress Postmark plugin has delivered a test email successfully.
+- A password-reset test was addressed to `web@staging.cywater.org`. That
+  staging-only address is incorrect for organization ownership. The WordPress
+  user and administration notification target must be corrected to
+  `web@cywater.org`, then retested. Do not replace it with a named person's
+  address.
+- A Postmark server token was visible in earlier setup screenshots. The user
+  confirmed on 2026-08-02 that it was revoked and replaced, WordPress was
+  updated, and a post-rotation test message was delivered. This confirmation
+  was not independently reverified during the local repository cleanup. Never
+  store the replacement token in Git, chat, screenshots, or documentation.
+- Remaining acceptance work includes transactional email workflows, Stripe
+  Sandbox and webhook integration, PMPro end-to-end scenarios, member profile,
+  privacy and directory behavior, MFA and least privilege, backup restoration,
+  mobile, security and performance QA, and production cutover after
+  organization approvals.
 
 ## Current Site Structure
 

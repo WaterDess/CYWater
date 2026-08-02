@@ -6,6 +6,9 @@
  */
 
 get_header();
+?>
+<main>
+<?php
 get_template_part(
 	'template-parts/page-hero',
 	null,
@@ -84,4 +87,5 @@ $render_paper = static function ( $paper ) {
 		</div>
 	</div>
 </section>
+</main>
 <?php get_footer(); ?>

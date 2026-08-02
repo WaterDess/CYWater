@@ -2,6 +2,13 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { runCLI } from "@wp-playground/cli";
 
+const corePluginHeader = readFileSync(
+  new URL("../wordpress/wp-content/plugins/cywater-core/cywater-core.php", import.meta.url),
+  "utf8"
+);
+const corePluginVersion = corePluginHeader.match(/^\s*\*\s*Version:\s*([^\s*]+)\s*$/m)?.[1];
+assert.ok(corePluginVersion, "CYWater Core must declare a plugin version");
+
 const mounts = [
   ["./wordpress/wp-content/themes/cywater", "/wordpress/wp-content/themes/cywater"],
   ["./wordpress/wp-content/plugins/cywater-core", "/wordpress/wp-content/plugins/cywater-core"],
@@ -21,7 +28,7 @@ const server = await runCLI({
 });
 
 try {
-  for (const route of ["/", "/about/", "/news/", "/events/", "/awards/", "/membership/", "/contact/", "/members/"]) {
+  for (const route of ["/", "/about/", "/board/", "/bylaws/", "/news/", "/events/", "/awards/", "/membership/", "/contact/", "/members/"]) {
     const response = await fetch(new URL(route, server.serverUrl));
     assert.equal(response.status, 200, `${route} should return HTTP 200`);
     const html = await response.text();
@@ -50,6 +57,24 @@ try {
     if (route === "/membership/") {
       assert.equal((html.match(/<article class="tier\b/g) || []).length, 4, "Membership must render four approved membership tiers");
       assert.match(html, /class="table fee-table"/, "Membership must retain the conference fee matrix");
+      assert.match(html, /membership-partner-head/, "Membership partners must use the centered shared section heading");
+      assert.match(html, /membership-partner-copy/, "Membership partner copy must retain its constrained centered layout");
+      assert.match(html, /membership-fees/, "Conference fees must retain its dedicated shared-layout hook");
+    }
+    if (route === "/board/") {
+      assert.match(html, /Board of Directors\./, "Board hero must match the static preview");
+      assert.match(html, /Board composition/, "Board must retain the composition section");
+      assert.match(html, /Committee framework/, "Board must retain the committee framework");
+      assert.equal((html.match(/class="role-card"/g) || []).length, 5, "Board must render all five governance roles");
+      for (const committee of ["Awards Committee", "Scientific and Technical Committee", "Nomination Committee", "Tellers Committee"]) {
+        assert.match(html, new RegExp(committee), `Board must render ${committee}`);
+      }
+    }
+    if (route === "/bylaws/") {
+      assert.match(html, /<h4>Contents<\/h4>/, "Bylaws must retain its table of contents");
+      assert.match(html, /Download bylaws \(\.docx\)/, "Bylaws must retain the source-document action");
+      assert.equal((html.match(/class="article-num">ARTICLE [IVX]+/g) || []).length, 9, "Bylaws must render all nine article headings");
+      assert.match(html, /ARTICLE IX/, "Bylaws must include the final article");
     }
   }
 
@@ -156,7 +181,7 @@ echo wp_json_encode(
   });
   assert.equal(result.exitCode, 0, result.errors);
   const upgrade = JSON.parse(result.text);
-  assert.equal(upgrade.setup_version, "0.2.1", "Automatic upgrade must record the completed version");
+  assert.equal(upgrade.setup_version, corePluginVersion, "Automatic upgrade must record the completed version");
   assert.equal(upgrade.title_preserved, true, "Automatic upgrade must preserve editorial content");
   assert.equal(upgrade.news_order_restored, true, "Automatic upgrade must restore missing News metadata");
   assert.equal(upgrade.award_record_restored, true, "Automatic upgrade must restore missing Award records");

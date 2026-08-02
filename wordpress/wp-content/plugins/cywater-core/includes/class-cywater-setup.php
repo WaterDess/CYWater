@@ -46,7 +46,7 @@ final class CYWater_Setup {
 		?>
 		<div class="wrap">
 			<h1>CYWater setup</h1>
-			<p>This imports verified static content, creates required pages, and asks installed CYWater modules to create their own local configuration. Existing imported posts and their metadata are preserved so later setup runs cannot overwrite editorial changes.</p>
+			<p>This imports verified static content, creates required pages, and asks installed CYWater modules to create their own local configuration. A new canonical seed revision is applied once to bring older imports up to date; later setup runs at the same revision preserve editorial changes.</p>
 			<p><strong>Current setup version:</strong> <?php echo esc_html( get_option( 'cywater_core_setup_version', 'Not run' ) ); ?></p>
 			<?php if ( isset( $_GET['cywater_setup'] ) ) : // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?><div class="notice notice-success"><p>CYWater setup completed.</p></div><?php endif; ?>
 			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">

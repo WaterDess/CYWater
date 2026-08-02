@@ -86,6 +86,15 @@
   margin-bottom: var(--sp-4);
 }
 
+.faq-item { border-bottom: 1px solid var(--line); }
+.faq-item:first-child { border-top: 1px solid var(--line); }
+.faq-q { display: flex; justify-content: space-between; align-items: center; gap: var(--sp-3); padding: var(--sp-4) 0; cursor: pointer; font-weight: 600; font-family: var(--font-body); }
+.faq-q::after { content: "+"; font-size: 1.4rem; color: var(--teal); transition: transform var(--dur) var(--ease); }
+.faq-item.is-open .faq-q::after { transform: rotate(45deg); }
+.faq-a { max-height: 0; overflow: hidden; transition: max-height var(--dur) var(--ease); }
+.faq-item.is-open .faq-a { max-height: 300px; }
+.faq-a p { padding-bottom: var(--sp-4); font-size: var(--fs-sm); }
+
 @media (max-width: 760px) {
   .entry-content .alignwide {
     margin-left: 0;

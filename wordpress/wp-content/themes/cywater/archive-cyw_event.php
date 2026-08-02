@@ -6,13 +6,34 @@
  */
 
 get_header();
+?>
+<main>
+<?php
 
-$events = array();
-while ( have_posts() ) {
-	the_post();
-	$events[] = get_post();
-}
-wp_reset_postdata();
+$events = get_posts(
+	array(
+		'post_type'      => 'cyw_event',
+		'post_status'    => 'publish',
+		'posts_per_page' => -1,
+		'orderby'        => 'date',
+		'order'          => 'DESC',
+	)
+);
+
+usort(
+	$events,
+	static function ( $left, $right ) {
+		$left_order  = metadata_exists( 'post', $left->ID, '_cyw_event_order' ) ? (int) get_post_meta( $left->ID, '_cyw_event_order', true ) : 10000;
+		$right_order = metadata_exists( 'post', $right->ID, '_cyw_event_order' ) ? (int) get_post_meta( $right->ID, '_cyw_event_order', true ) : 10000;
+		if ( $left_order !== $right_order ) {
+			return $left_order <=> $right_order;
+		}
+
+		$left_date  = (string) get_post_meta( $left->ID, '_cyw_start_date', true );
+		$right_date = (string) get_post_meta( $right->ID, '_cyw_start_date', true );
+		return strcmp( $right_date, $left_date );
+	}
+);
 
 $is_gathering = static function ( $event ) {
 	$source_id = (string) get_post_meta( $event->ID, '_cyw_source_id', true );
@@ -36,6 +57,9 @@ if ( ! $featured && $meetings ) {
 
 $hero_title = $featured ? rtrim( get_the_title( $featured ), '.' ) . '.' : 'CYWater events.';
 $hero_lead  = $featured ? get_the_excerpt( $featured ) : 'CYWater Annual Meetings and the Annual Gathering during the AGU Fall Meeting.';
+if ( $featured && 'event:annual-2026' === get_post_meta( $featured->ID, '_cyw_source_id', true ) ) {
+	$hero_lead .= ' Registration will open in August.';
+}
 
 get_template_part(
 	'template-parts/page-hero',
@@ -50,19 +74,20 @@ get_template_part(
 $render_events = static function ( $items ) {
 	foreach ( $items as $event ) {
 		$event_id = $event->ID;
-		$image    = cywater_featured_image_url( $event_id, 'cywater-card' );
+		$image    = cywater_featured_image_url( $event_id, 'full' );
 		$start    = (string) get_post_meta( $event_id, '_cyw_start_date', true );
 		$date     = (string) ( get_post_meta( $event_id, '_cyw_date_label', true ) ?: $start );
 		$location = (string) get_post_meta( $event_id, '_cyw_location', true );
 		$status   = (string) get_post_meta( $event_id, '_cyw_status', true );
 		$source   = (string) get_post_meta( $event_id, '_cyw_source_id', true );
+		$image_alt = (string) ( get_post_meta( $event_id, '_cyw_image_alt', true ) ?: get_the_title( $event ) );
 		$year     = preg_match( '/\b(20\d{2})\b/', $date, $matches ) ? $matches[1] : get_the_date( 'Y', $event );
 		$focus    = str_ends_with( $source, 'annual-gathering-2017' ) ? ' is-focus-lower' : '';
 		?>
 		<a class="event-archive-row" href="<?php echo esc_url( get_permalink( $event ) ); ?>" data-reveal>
 			<span class="event-archive-media<?php echo esc_attr( $focus ); ?>">
 				<?php if ( $image ) : ?>
-					<img src="<?php echo esc_url( $image ); ?>" alt="<?php echo esc_attr( get_the_title( $event ) ); ?>" loading="lazy">
+					<img src="<?php echo esc_url( $image ); ?>" alt="<?php echo esc_attr( $image_alt ); ?>" loading="lazy">
 				<?php else : ?>
 					<span class="event-year-mark"><?php echo esc_html( $year ); ?></span>
 				<?php endif; ?>
@@ -105,4 +130,5 @@ $render_events = static function ( $items ) {
 		</section>
 	</div>
 </section>
+</main>
 <?php get_footer(); ?>

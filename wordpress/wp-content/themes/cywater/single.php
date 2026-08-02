@@ -6,6 +6,9 @@
  */
 
 get_header();
+?>
+<main>
+<?php
 while ( have_posts() ) :
 	the_post();
 	$categories = get_the_category();
@@ -32,4 +35,6 @@ while ( have_posts() ) :
 	</section>
 	<?php
 endwhile;
-get_footer();
+?>
+</main>
+<?php get_footer();

@@ -6,7 +6,7 @@
  */
 
 $featured    = ! empty( $args['featured'] );
-$image       = cywater_featured_image_url( get_the_ID(), 'cywater-card' );
+$image       = cywater_featured_image_url( get_the_ID(), 'full' );
 $visual_name = get_post_meta( get_the_ID(), '_cyw_visual_title', true );
 $visual_year = get_post_meta( get_the_ID(), '_cyw_visual_year', true );
 $categories  = get_the_category();

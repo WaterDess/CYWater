@@ -1,83 +1,88 @@
 <?php
 /**
- * Membership page with PMPro-backed direct checkout actions.
+ * Membership page.
  *
  * @package CYWater
  */
 get_header();
+?>
+<main>
+<?php
 while ( have_posts() ) :
 	the_post();
-	get_template_part( 'template-parts/page-hero', null, array( 'eyebrow' => cywater_page_field( 'eyebrow', 'Membership' ), 'title' => get_the_title(), 'lead' => cywater_page_field( 'lead', 'Join an international community advancing water sciences and supporting emerging scholars.' ) ) );
+	get_template_part(
+		'template-parts/page-hero',
+		null,
+		array(
+			'eyebrow' => 'Membership',
+			'title'    => 'Membership and partnerships.',
+			'lead'     => 'Membership is open worldwide to individuals who support CYWater\'s objectives and are professionally engaged in or interested in water sciences, water resources, or related disciplines.',
+		)
+	);
 	?>
 	<section class="section-tight">
 		<div class="container container-narrow">
-			<div class="prose entry-content" data-reveal><?php the_content(); ?></div>
+			<div class="prototype-notice" data-reveal>
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+				<div><strong>Applications are not yet available online.</strong><span id="membership-preview-note" style="display:block; margin-top:.2rem">The membership and fee information below reflects the supplied CYWater website requirements. This preview does not accept applications, create accounts, or process payments.</span></div>
+			</div>
 		</div>
 	</section>
 
-	<section class="section"><div class="container">
-		<div class="section-head center" data-reveal><span class="eyebrow center">Benefits</span><h2>What membership offers.</h2></div>
-		<div class="benefits-grid grid-3">
-			<?php foreach ( array(
-				'Annual meetings' => 'Priority notice and access to CYWater Annual Meetings and the Annual Gathering during the AGU Fall Meeting.',
-				'Best Paper Award' => 'Eligibility for the Young Scientist Best Paper Award for qualifying early-career first authors.',
-				'Global community' => 'A worldwide network connecting students, researchers, practitioners, and partner institutions.',
-				'Newsletter archive' => 'Access to CYWater community news and historical updates.',
-				'Career opportunities' => 'Job and position notices shared through the community channel.',
-				'Recognition' => 'Member recognition in community activities and award ceremonies.',
-			) as $heading => $copy ) : ?>
-				<div class="feature" data-reveal><h3 style="font-size:var(--fs-md)"><?php echo esc_html( $heading ); ?></h3><p><?php echo esc_html( $copy ); ?></p></div>
-			<?php endforeach; ?>
+	<section class="section">
+		<div class="container">
+			<div class="section-head center" data-reveal><span class="eyebrow center">Benefits</span><h2>What membership offers.</h2></div>
+			<div class="benefits-grid grid-3">
+				<div class="feature" data-reveal><div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg></div><h3 style="font-size:var(--fs-md)">Annual meetings</h3><p>Priority notice and access to CYWater Annual Meetings and the Annual Gathering during the AGU Fall Meeting.</p></div>
+				<div class="feature" data-reveal><div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 4h12a4 4 0 0 1 4 4v12H8a4 4 0 0 1-4-4Z"/><path d="M8 9h8M8 13h5"/></svg></div><h3 style="font-size:var(--fs-md)">Best Paper Award</h3><p>Eligibility for the Young Scientist Best Paper Award (under-35 first authors).</p></div>
+				<div class="feature" data-reveal><div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2 21a7 7 0 0 1 14 0"/><circle cx="17" cy="10" r="2.5"/></svg></div><h3 style="font-size:var(--fs-md)">Global community</h3><p>A worldwide network connecting students, researchers, practitioners, and partner institutions.</p></div>
+				<div class="feature" data-reveal><div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="5"/><path d="m9 13-2 8 5-3 5 3-2-8"/></svg></div><h3 style="font-size:var(--fs-md)">Newsletter archive</h3><p>Access to CYWater's archive of community newsletters since 2012.</p></div>
+				<div class="feature" data-reveal><div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg></div><h3 style="font-size:var(--fs-md)">Career opportunities</h3><p>Job and position notices shared through the community channel.</p></div>
+				<div class="feature" data-reveal><div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 3v18l2-1 2 1 2-1 2 1 2-1 2 1V3l-2 1-2-1-2 1-2-1-2 1Z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div><h3 style="font-size:var(--fs-md)">Recognition</h3><p>Member recognition in community activities and award ceremonies.</p></div>
+			</div>
 		</div>
-	</div></section>
+	</section>
 
 	<section class="section section-tint membership-dues">
 		<div class="container">
-			<div class="section-head center" data-reveal><span class="eyebrow center">Calendar-year membership</span><h2>Membership types and dues.</h2><p class="lead">Choose a level to continue directly to secure checkout.<?php if ( 'production' !== wp_get_environment_type() ) : ?> This environment uses test mode only.<?php endif; ?></p></div>
+			<div class="section-head center" data-reveal><span class="eyebrow center">Calendar-year membership</span><h2>Membership types and dues.</h2><p class="lead">Compare the options and choose the membership that fits how you participate in CYWater.</p></div>
 			<div class="tiers">
-				<?php
-				$levels = function_exists( 'pmpro_getAllLevels' ) ? pmpro_getAllLevels( true, true ) : array();
-				if ( $levels ) {
-					usort( $levels, static fn( $a, $b ) => (float) $a->initial_payment <=> (float) $b->initial_payment );
-				}
-				$fallbacks = array(
-					(object) array( 'id' => 0, 'name' => 'Student', 'initial_payment' => 20, 'billing_amount' => 0, 'cycle_number' => 0, 'description' => 'For full-time students in water-related fields.' ),
-					(object) array( 'id' => 0, 'name' => 'Professional', 'initial_payment' => 70, 'billing_amount' => 0, 'cycle_number' => 0, 'description' => 'For researchers and practitioners in water sciences.' ),
-					(object) array( 'id' => 0, 'name' => 'Lifetime', 'initial_payment' => 700, 'billing_amount' => 0, 'cycle_number' => 0, 'description' => 'For long-term individual participation in CYWater.' ),
-					(object) array( 'id' => 0, 'name' => 'Partner', 'initial_payment' => 1000, 'billing_amount' => 0, 'cycle_number' => 0, 'description' => 'For institutions supporting CYWater programs.' ),
-				);
-				foreach ( $levels ?: $fallbacks as $level ) :
-					$is_standard = 'Professional' === $level->name;
-					$is_partner  = 'Partner' === $level->name;
-					$checkout    = $level->id && function_exists( 'pmpro_url' ) ? pmpro_url( 'checkout', '?level=' . absint( $level->id ) ) : '#membership-not-ready';
-					?>
-					<article class="tier <?php echo $is_partner ? 'tier-partner' : ''; ?>" data-reveal>
-						<div class="tier-heading"><h3 class="tier-title"><?php echo esc_html( $level->name ); ?></h3><?php if ( $is_standard ) : ?><span class="badge badge-teal">Standard</span><?php elseif ( $is_partner ) : ?><span class="badge badge-gold">Organization</span><?php endif; ?></div>
-						<p class="tier-tag"><?php echo wp_kses_post( wp_strip_all_tags( $level->description ) ); ?></p>
-						<div class="tier-price">$<?php echo esc_html( number_format_i18n( (float) $level->initial_payment, 0 ) ); ?> <small><?php echo 'Lifetime' === $level->name ? 'one time' : '/ year'; ?></small></div>
-						<p class="tier-cycle"><?php echo 'Lifetime' === $level->name ? 'Lifetime membership' : 'Calendar-year membership'; ?></p>
-						<div class="tier-features"><span>CYWater community participation</span><span>Member communications and opportunities</span><span><?php echo 'Student' === $level->name ? 'Student eligibility verification' : 'Membership profile access'; ?></span></div>
-						<a class="btn <?php echo $is_standard ? 'btn-accent' : 'btn-outline'; ?> btn-block tier-action" href="<?php echo esc_url( $checkout ); ?>">Join as <?php echo esc_html( $level->name ); ?></a>
-					</article>
-				<?php endforeach; ?>
+				<article class="tier" data-plan-card data-reveal><div class="tier-heading"><h3 class="tier-title">Student</h3></div><p class="tier-tag">For full-time students in water-related fields.</p><div class="tier-price">$20 <small>/ year</small></div><p class="tier-cycle">Calendar-year membership</p><div class="tier-features"><span>Individual annual membership</span><span>Student member conference rates</span><span>Undergraduate, graduate, or Ph.D. eligibility</span></div><button class="btn btn-outline btn-block tier-action" type="button" data-plan-action="Student" aria-describedby="membership-preview-note">Join as Student</button></article>
+				<article class="tier" data-plan-card data-reveal><div class="tier-heading"><h3 class="tier-title">Professional</h3><span class="badge badge-teal">Standard</span></div><p class="tier-tag">For researchers and practitioners in water sciences.</p><div class="tier-price">$70 <small>/ year</small></div><p class="tier-cycle">Calendar-year membership</p><div class="tier-features"><span>Individual annual membership</span><span>Professional member conference rates</span><span>CYWater community participation</span></div><button class="btn btn-accent btn-block tier-action" type="button" data-plan-action="Professional" aria-describedby="membership-preview-note">Join as Professional</button></article>
+				<article class="tier" data-plan-card data-reveal><div class="tier-heading"><h3 class="tier-title">Lifetime</h3></div><p class="tier-tag">For long-term individual participation in CYWater.</p><div class="tier-price">$700 <small>one time</small></div><p class="tier-cycle">Lifetime membership</p><div class="tier-features"><span>Individual lifetime membership</span><span>No annual dues renewal</span><span>CYWater community participation</span></div><button class="btn btn-outline btn-block tier-action" type="button" data-plan-action="Lifetime" aria-describedby="membership-preview-note">Join as Lifetime Member</button></article>
+				<article class="tier tier-partner" data-plan-card data-reveal><div class="tier-heading"><h3 class="tier-title">Partner</h3><span class="badge badge-gold">Organization</span></div><p class="tier-tag">For institutions supporting CYWater's programs.</p><div class="tier-price">$1,000 <small>/ year</small></div><p class="tier-cycle">Annual partnership</p><div class="tier-features"><span>Institutional or organizational partnership</span><span>Support for early-career programs</span><span>Connection with the CYWater community</span></div><button class="btn btn-outline btn-block tier-action" type="button" data-plan-action="Partner" aria-describedby="membership-preview-note">Join as Partner</button></article>
 			</div>
-			<?php if ( ! $levels ) : ?><div id="membership-not-ready" class="prototype-notice"><strong>Membership checkout is temporarily unavailable.</strong><span><?php echo 'production' === wp_get_environment_type() ? 'Please check back later.' : 'Activate Paid Memberships Pro and run the CYWater setup command.'; ?></span></div><?php endif; ?>
 		</div>
 	</section>
 
-	<section class="section" id="partnerships"><div class="container"><div class="about-intro-grid membership-partner-grid"><div data-reveal><span class="eyebrow">Sponsors and partners</span><h2 style="margin-top:var(--sp-3)">Support emerging water scholars.</h2></div><div class="stack" data-reveal><p>CYWater welcomes universities, research institutes, companies, professional societies, and foundations that share its mission.</p><p>Partnership arrangements remain subject to organizational review before production checkout is enabled.</p></div></div></div></section>
+	<section class="section membership-partners" id="partnerships"><div class="container container-narrow"><div class="section-head center membership-partner-head" data-reveal><span class="eyebrow center">Sponsors and partners</span><h2>Support emerging water scholars.</h2></div><div class="membership-partner-copy" data-reveal><p class="lead">CYWater welcomes partnerships with universities, research institutes, industries, professional societies, and foundations that share our commitment to advancing water science education, research, and early-career development.</p><p>Sponsors and partners help support conferences, publications, mentoring, workshops, and global networking opportunities for emerging water scholars.</p></div></div></section>
 
-	<section class="section section-tint"><div class="container container-narrow">
-		<div class="section-head" data-reveal><span class="eyebrow">Conference fees</span><h2>Abstract and registration fees.</h2><p class="lead">Fees support abstract review, program development, meeting logistics, publication and communication costs, and student and early-career activities.</p></div>
-		<div class="table-wrap" data-reveal><table class="table fee-table"><caption class="visually-hidden">CYWater conference abstract and registration fees</caption><thead><tr><th scope="col">Registration type</th><th scope="col">Abstract fee</th><th scope="col">Early registration</th><th scope="col">Standard registration</th></tr></thead><tbody><tr><th scope="row">Professional Member</th><td>$25 per abstract</td><td>$500</td><td>$600</td></tr><tr><th scope="row">Student Member</th><td>$25 per abstract</td><td>$250</td><td>$300</td></tr><tr><th scope="row">Nonmember</th><td>$25 per abstract</td><td>$600</td><td>$700</td></tr></tbody></table></div>
-	</div></section>
+	<section class="section section-tint membership-fees"><div class="container"><div class="section-head center" data-reveal><span class="eyebrow center">Conference fees</span><h2>Abstract and registration fees.</h2><p class="lead">Fees support abstract review, program development, meeting logistics, publication and communication costs, and student and early-career activities.</p></div><div class="table-wrap" data-reveal><table class="table fee-table"><caption class="visually-hidden">CYWater conference abstract and registration fees</caption><thead><tr><th scope="col">Registration type</th><th scope="col">Abstract fee</th><th scope="col">Early registration</th><th scope="col">Standard registration</th></tr></thead><tbody><tr><th scope="row">Professional Member</th><td>$25 per abstract</td><td>$500</td><td>$600</td></tr><tr><th scope="row">Student Member</th><td>$25 per abstract</td><td>$250</td><td>$300</td></tr><tr><th scope="row">Nonmember</th><td>$25 per abstract</td><td>$600</td><td>$700</td></tr></tbody></table></div></div></section>
 
-	<section class="section"><div class="container container-narrow"><div class="section-head center" data-reveal><span class="eyebrow center">Membership details</span><h2>Frequently asked questions.</h2></div><div class="prose" data-reveal>
-		<h3>How do I apply?</h3><p>Choose a membership level above. Test environments use sandbox checkout only; production applications remain disabled until organizational approval and live account verification are complete.</p>
-		<h3>Who can join?</h3><p>Membership is open worldwide to individuals who support CYWater's objectives and are engaged in or interested in water sciences, water resources, or related disciplines.</p>
-		<h3>Who qualifies for student membership?</h3><p>Full-time undergraduate, graduate, and Ph.D. students are eligible for student membership.</p>
-		<h3>What is the membership period?</h3><p>Annual membership follows the calendar year. The Board must approve the launch policy for mid-year applications before live checkout is enabled.</p>
+	<section class="section"><div class="container container-narrow"><div class="section-head center" data-reveal><span class="eyebrow center">Membership details</span><h2>Frequently asked questions.</h2></div><div data-reveal>
+		<div class="faq-item is-open"><div class="faq-q" aria-expanded="true">How do I apply?</div><div class="faq-a"><p>The application process and official contact email are being confirmed. Online applications are not enabled on this preview site.</p></div></div>
+		<div class="faq-item"><div class="faq-q" aria-expanded="false">Who can join?</div><div class="faq-a"><p>Membership is open worldwide to individuals who support CYWater's objectives and are engaged in or interested in water sciences, water resources, or related disciplines.</p></div></div>
+		<div class="faq-item"><div class="faq-q" aria-expanded="false">Who qualifies for student membership?</div><div class="faq-a"><p>Full-time undergraduate, graduate, and Ph.D. students are eligible for student membership.</p></div></div>
+		<div class="faq-item"><div class="faq-q" aria-expanded="false">What is the membership period?</div><div class="faq-a"><p>Membership is based on the calendar year.</p></div></div>
 	</div></div></section>
 	<?php
 endwhile;
+?>
+</main>
+<?php
+
+$membership_script = <<<'JS'
+(function () {
+  "use strict";
+  const cards = Array.from(document.querySelectorAll("[data-plan-card]"));
+  cards.forEach((card) => {
+    const action = card.querySelector("[data-plan-action]");
+    action.addEventListener("click", () => {
+      cards.forEach((item) => item.classList.toggle("is-selected", item === card));
+      window.CYWaterToast?.(`${action.dataset.planAction} applications are not yet available online.`);
+    });
+  });
+})();
+JS;
+wp_add_inline_script( 'cywater-main', $membership_script );
 get_footer();

@@ -318,30 +318,53 @@
   background: var(--teal-deep);
   color: var(--white);
 }
+.membership-fees .section-head {
+  max-width: 48rem;
+}
+.membership-fees .table-wrap {
+  max-width: 68rem;
+  margin-inline: auto;
+}
 .fee-table { min-width: 720px; }
+.fee-table th,
+.fee-table td {
+  padding: 1.05rem 1.25rem;
+}
+.fee-table thead th,
+.fee-table tbody th {
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: 0;
+}
 .fee-table thead th {
   background: var(--teal-tint);
   color: var(--teal-deep);
-  font-family: var(--font-display);
-  font-size: var(--fs-sm);
-  font-weight: 500;
-  line-height: 1.35;
   text-transform: none;
-  letter-spacing: 0;
+}
+.fee-table thead th:not(:first-child),
+.fee-table tbody td {
+  text-align: center;
 }
 .fee-table tbody th {
   color: var(--ink);
-  font-family: var(--font-display);
-  font-size: var(--fs-base);
-  font-weight: 500;
 }
 .fee-table tbody td { font-variant-numeric: tabular-nums; }
 
 .benefits-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-5); }
-.membership-partner-grid {
+.membership-partner-head {
+  max-width: 52rem;
+}
+.membership-partner-copy {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--sp-6);
+  gap: var(--sp-3);
+  max-width: 52rem;
+  margin-inline: auto;
+  text-align: center;
+}
+.membership-partner-copy .lead {
+  color: var(--ink-soft);
 }
 
 /* ============================ Member Dashboard ============================ */
@@ -771,7 +794,7 @@
   .contact-layout { grid-template-columns: 1fr; }
   .tiers { grid-template-columns: 1fr; }
   .tier-tag { min-height: 0; }
-  .role-grid, .membership-partner-grid, .award-intro { grid-template-columns: 1fr; }
+  .role-grid, .award-intro { grid-template-columns: 1fr; }
   .event-archive-row { grid-template-columns: 120px minmax(0, 1fr); }
   .event-archive-row > .link { grid-column: 2; }
   .award-year { grid-template-columns: 1fr; gap: var(--sp-3); }

@@ -4,7 +4,68 @@
  *
  * @package CYWater
  */
+
 get_header();
+
+$highlights = array(
+	array(
+		'source' => 'news:13th-annual-3rd',
+		'tag'    => 'Conference',
+		'action' => 'Read more',
+		'date'   => '2025-10-29',
+		'title'  => '13th Annual Meeting — 3rd round notice',
+		'excerpt' => 'Co-hosted with the Yangtze Technology & Economy Society Youth Committee. Full programme and venue details released.',
+		'alt'    => 'Participants at the 2025 CYWater Annual Meeting',
+	),
+	array(
+		'source' => 'event:annual-gathering-2024',
+		'tag'    => 'Annual Gathering',
+		'action' => 'View gathering',
+		'date'   => '2024-12-10',
+		'title'  => 'CYWater Annual Gathering — Washington, DC 2024',
+		'excerpt' => 'Members gathered during AGU24 for community exchange, conversation, and professional connection.',
+		'alt'    => 'CYWater members at the 2024 Annual Gathering in Washington, DC',
+	),
+	array(
+		'source' => 'news:12th-summer-xian',
+		'tag'    => 'Conference',
+		'action' => 'Read more',
+		'date'   => '2024-12-08',
+		'title'  => "12th Summer Meeting — Xi'an, Aug 2024",
+		'excerpt' => 'Hosted by Xi\'an University of Technology. Theme: "Gathering strength for new quality productive forces in water."',
+		'alt'    => 'Participants at the 2024 CYWater Annual Meeting',
+	),
+);
+
+$render_highlight = static function ( $highlight ) {
+	$post = cywater_source_post( $highlight['source'] );
+	if ( ! $post ) {
+		return;
+	}
+
+	$image = cywater_featured_image_url( $post->ID, 'full' );
+	$date  = $highlight['date'] ?? ( 'cyw_event' === $post->post_type
+		? (string) get_post_meta( $post->ID, '_cyw_start_date', true )
+		: get_the_date( 'Y-m-d', $post ) );
+	$title = $highlight['title'] ?? get_the_title( $post );
+	$excerpt = $highlight['excerpt'] ?? get_the_excerpt( $post );
+	$alt = $highlight['alt'] ?? $title;
+	?>
+	<article class="card" data-reveal>
+		<?php if ( $image ) : ?>
+			<a href="<?php echo esc_url( get_permalink( $post ) ); ?>">
+				<div class="card-media"><img src="<?php echo esc_url( $image ); ?>" alt="<?php echo esc_attr( $alt ); ?>" loading="lazy"></div>
+			</a>
+		<?php endif; ?>
+		<div class="card-body">
+			<div class="card-meta"><span class="card-tag"><?php echo esc_html( $highlight['tag'] ); ?></span><span>&middot; <?php echo esc_html( $date ); ?></span></div>
+			<h3 class="card-title"><a href="<?php echo esc_url( get_permalink( $post ) ); ?>"><?php echo esc_html( $title ); ?></a></h3>
+			<p class="card-excerpt"><?php echo esc_html( $excerpt ); ?></p>
+			<a class="link" href="<?php echo esc_url( get_permalink( $post ) ); ?>"><?php echo esc_html( $highlight['action'] ); ?></a>
+		</div>
+	</article>
+	<?php
+};
 ?>
 <main>
 	<section class="hero">
@@ -13,7 +74,7 @@ get_header();
 			<div class="hero-inner" data-reveal>
 				<span class="eyebrow"><?php echo esc_html( cywater_page_field( 'eyebrow', 'International Association · Water Sciences' ) ); ?></span>
 				<h1><?php echo wp_kses_post( nl2br( esc_html( cywater_page_field( 'hero_title', "Advancing water sciences,\nempowering young scholars." ) ) ) ); ?></h1>
-				<p class="lead"><?php echo esc_html( cywater_page_field( 'lead', 'An international, non-profit association advancing water sciences education, research, and professional development through scientific exchange, publications, and conferences.' ) ); ?></p>
+				<p class="lead"><?php echo esc_html( cywater_page_field( 'lead', 'An international, non-profit association advancing water sciences education, research, and professional development — through scientific exchange, publications, and conferences.' ) ); ?></p>
 				<div class="hero-actions">
 					<a class="btn btn-accent btn-lg" href="<?php echo esc_url( home_url( '/events/' ) ); ?>">Upcoming events</a>
 					<a class="btn btn-outline btn-lg" href="<?php echo esc_url( home_url( '/about/' ) ); ?>">About CYWater</a>
@@ -55,17 +116,10 @@ get_header();
 		<div class="container">
 			<div class="section-head center" data-reveal><span class="eyebrow center">What we do</span><h2>Exchange, conferences, and recognition.</h2></div>
 			<div class="grid grid-4">
-				<?php
-				$features = array(
-					array( 'Annual Meetings', 'Our flagship scientific gathering has connected water scholars every year since 2013.', '/events/' ),
-					array( 'Annual Gathering', 'A community gathering held during the AGU Fall Meeting.', '/events/#annual-gathering' ),
-					array( 'Best Paper Award', 'Recognising outstanding contributions to water sciences since 2012.', '/awards/' ),
-					array( 'Global Partnerships', 'Institutions and societies help expand scientific exchange and early-career development.', '/membership/#partnerships' ),
-				);
-				foreach ( $features as $feature ) :
-					?>
-					<div class="feature" data-reveal><h3><?php echo esc_html( $feature[0] ); ?></h3><p><?php echo esc_html( $feature[1] ); ?></p><a class="link" href="<?php echo esc_url( home_url( $feature[2] ) ); ?>">Learn more</a></div>
-				<?php endforeach; ?>
+				<div class="feature" data-reveal><div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/><path d="m9 14 2 2 4-4"/></svg></div><h3>Annual Meetings</h3><p>Our flagship scientific gathering has connected water scholars every year since 2013.</p><a class="link" href="<?php echo esc_url( home_url( '/events/' ) ); ?>">Learn more</a></div>
+				<div class="feature" data-reveal><div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h12a4 4 0 0 1 4 4v12H8a4 4 0 0 1-4-4Z"/><path d="M4 4v12a4 4 0 0 0 4 4"/><path d="M8 9h8M8 13h5"/></svg></div><h3>Annual Gathering</h3><p>A community gathering held during the AGU Fall Meeting, continuing a tradition established in 2011.</p><a class="link" href="<?php echo esc_url( home_url( '/events/#annual-gathering' ) ); ?>">Learn more</a></div>
+				<div class="feature" data-reveal><div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="5"/><path d="m9 13-2 8 5-3 5 3-2-8"/></svg></div><h3>Best Paper Award</h3><p>The Young Scientist Best Paper Award, recognising outstanding contributions to water sciences since 2012.</p><a class="link" href="<?php echo esc_url( home_url( '/awards/' ) ); ?>">Learn more</a></div>
+				<div class="feature" data-reveal><div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3.5"/><path d="M2 21a7 7 0 0 1 14 0"/><circle cx="17" cy="10" r="2.5"/><path d="M15 21a5 5 0 0 1 7-4.5"/></svg></div><h3>Global Partnerships</h3><p>Universities, research institutes, industry, societies, and foundations help expand scientific exchange and early-career development.</p><a class="link" href="<?php echo esc_url( home_url( '/membership/#partnerships' ) ); ?>">Learn more</a></div>
 			</div>
 		</div>
 	</section>
@@ -83,29 +137,14 @@ get_header();
 
 	<section class="section">
 		<div class="container">
-			<div class="latest-head" data-reveal><div class="section-head" style="margin-bottom:0"><span class="eyebrow">Highlights</span><h2>Meetings, recognition &amp; community.</h2></div><a class="btn btn-outline" href="<?php echo esc_url( home_url( '/news/' ) ); ?>">Explore news</a></div>
-			<div class="grid grid-3">
-				<?php
-				$latest = new WP_Query(
-					array(
-						'post_type'      => array( 'post', 'cyw_event', 'cyw_award' ),
-						'posts_per_page' => 3,
-						'post_status'    => 'publish',
-					)
-				);
-				while ( $latest->have_posts() ) :
-					$latest->the_post();
-					get_template_part( 'template-parts/content-card' );
-				endwhile;
-				wp_reset_postdata();
-				?>
-			</div>
+			<div class="latest-head" data-reveal><div class="section-head" style="margin-bottom:0"><span class="eyebrow">Highlights</span><h2>Meetings, recognition &amp; community.</h2></div><a class="btn btn-outline" href="<?php echo esc_url( home_url( '/events/' ) ); ?>">Explore events</a></div>
+			<div class="grid grid-3"><?php foreach ( $highlights as $highlight ) { $render_highlight( $highlight ); } ?></div>
 		</div>
 	</section>
 
 	<section class="section">
 		<div class="container">
-			<div class="cta-band" data-reveal><span class="eyebrow" style="color:var(--teal-soft)">Get involved</span><h2 style="margin-top:var(--sp-3)">Join the CYWater community.</h2><p class="lead">Connect through scientific exchange, annual meetings, and recognition of outstanding water research.</p><div class="hero-actions" style="margin-top:var(--sp-5)"><a class="btn btn-primary btn-lg" href="<?php echo esc_url( home_url( '/membership/' ) ); ?>">Membership options</a><a class="btn btn-ghost btn-lg" href="<?php echo esc_url( home_url( '/about/' ) ); ?>" style="color:#fff">Read our story</a></div></div>
+			<div class="cta-band" data-reveal><span class="eyebrow" style="color:var(--teal-soft)">Get involved</span><h2 style="margin-top:var(--sp-3)">Join the CYWater community.</h2><p class="lead">Since 2011, CYWater has connected water scholars through scientific exchange, annual meetings, and the Young Scientist Best Paper Award.</p><div class="hero-actions" style="margin-top:var(--sp-5)"><a class="btn btn-primary btn-lg" href="<?php echo esc_url( home_url( '/events/' ) ); ?>">See our events</a><a class="btn btn-ghost btn-lg" href="<?php echo esc_url( home_url( '/about/' ) ); ?>" style="color:#fff">Read our story</a></div></div>
 		</div>
 	</section>
 </main>

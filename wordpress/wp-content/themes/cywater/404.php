@@ -5,6 +5,9 @@
  * @package CYWater
  */
 get_header();
+?>
+<main>
+<?php
 get_template_part(
 	'template-parts/page-hero',
 	null,
@@ -18,4 +21,5 @@ get_template_part(
 <section class="section">
 	<div class="container container-narrow"><a class="btn btn-accent" href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php esc_html_e( 'Return home', 'cywater' ); ?></a></div>
 </section>
+</main>
 <?php get_footer(); ?>

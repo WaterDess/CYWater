@@ -2,7 +2,7 @@
 /**
  * Plugin Name: CYWater Environment
  * Description: Environment-variable adapters, payment safety gates, local Mailpit routing, and readiness status.
- * Version: 0.1.0
+ * Version: 0.5.2
  * Requires at least: 7.0
  * Requires PHP: 8.1
  * Text Domain: cywater-environment
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CYWATER_ENVIRONMENT_VERSION', '0.1.0' );
+define( 'CYWATER_ENVIRONMENT_VERSION', '0.5.2' );
 define( 'CYWATER_ENVIRONMENT_DIR', plugin_dir_path( __FILE__ ) );
 
 require_once CYWATER_ENVIRONMENT_DIR . 'includes/class-cywater-config.php';

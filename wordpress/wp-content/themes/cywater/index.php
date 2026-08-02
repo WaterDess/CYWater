@@ -5,6 +5,9 @@
  * @package CYWater
  */
 get_header();
+?>
+<main>
+<?php
 get_template_part(
 	'template-parts/page-hero',
 	null,
@@ -23,4 +26,5 @@ get_template_part(
 		<?php the_posts_pagination(); ?>
 	</div>
 </section>
+</main>
 <?php get_footer(); ?>

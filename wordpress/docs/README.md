@@ -43,14 +43,28 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 - `member-workflow.md` - registration, profile, privacy, and status model
 - `payment-testing.md` - Stripe sandbox and refund test matrix
 - `deployment.md` - development, staging, production, DNS, and release flow
+- `staging-next-actions.md` - ordered gates after visual/content staging acceptance
+- `hostinger-runtime-config.md` - exact non-secret staging and payment safety switches
 - `accounts-required.md` - account ownership and current blockers
 - `production-checklist.md` - launch acceptance gates
 - `email-copy.md` - approved-content drafts, not active mail overrides
 
 ## Current State
 
-The theme and three CYWater plugins run locally with WordPress 7.0.2 and PHP
-8.3. PMPro 3.8.2 is version-locked in the wp-env configuration and prepared in
-an ignored vendor directory; its full runtime requires wp-env/MySQL. No live
-Stripe key, bank account, production SMTP credential, domain credential, or
-hosting credential is present.
+Hostinger staging is available at `https://staging.cywater.org/`. The accepted
+baseline uses the CYWater `0.5.2` theme and the `0.5.1` releases of
+`cywater-core`, `cywater-membership`, and `cywater-environment`. PMPro is active,
+but payment remains disabled, the live-payment gate remains closed, and Stripe
+and production SMTP credentials are not configured. Postmark is connected on
+staging, its domain authentication is verified, and the user confirmed a
+successful post-rotation test message on 2026-08-02. Full transactional email
+workflow acceptance remains open.
+
+The next environment-plugin release is `0.5.2`. It preserves configured SMTP
+sender names outside local Mailpit and reports whether the WordPress file editor
+is disabled. It does not change the accepted public design or content baseline.
+
+The repository contains no live Stripe key, bank credential, production SMTP
+credential, domain credential, or hosting credential. GitHub Pages remains the
+visual and content reference until staging completes security, mail, Stripe
+Sandbox, membership-flow, mobile, and restore acceptance.

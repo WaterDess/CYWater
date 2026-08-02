@@ -12,14 +12,18 @@
 - [x] Payment mode and live-key safety gates are isolated from membership logic
 - [x] Local Mailpit routing is isolated from production SMTP
 - [x] CI validates Node dependencies, JSON, JavaScript, and PHP syntax
+- [x] Hostinger Business staging environment is deployed over HTTPS
+- [x] Hostinger daily backup and on-demand backup are available
+- [x] Google Workspace is active with named users and organization role groups
+- [x] Public staging routes and intentional legacy redirects pass smoke tests
 
 ## Must Pass Before Staging Approval
 
 - [ ] Board approves legal entity, operating country, prices, calendar-year
       proration/grace policy, recurring billing policy, refund policy, privacy
       notice, terms, and retention policy
-- [ ] Managed host plan and renewal price fit the budget and required features
-- [ ] Cloudflare, staging DNS, strict HTTPS, SMTP sandbox, and off-site backup exist
+- [x] Managed host plan and renewal price fit the budget and required features
+- [ ] Staging access controls, strict HTTPS, SMTP sandbox, and off-site backup exist
 - [ ] Stripe Sandbox keys and PMPro webhook are configured outside Git
 - [ ] Successful, failed, cancelled, duplicate, refund, expiry, and renewal tests pass
 - [ ] Registration, password reset, receipt, failure, welcome, expiry, and renewal

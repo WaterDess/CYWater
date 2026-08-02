@@ -5,6 +5,9 @@
  * @package CYWater
  */
 get_header();
+?>
+<main>
+<?php
 while ( have_posts() ) :
 	the_post();
 	get_template_part( 'template-parts/page-hero' );
@@ -29,4 +32,6 @@ while ( have_posts() ) :
 	<?php edit_post_link( __( 'Edit this page', 'cywater' ), '<span class="admin-edit-link">', '</span>' ); ?>
 	<?php
 endwhile;
-get_footer();
+?>
+</main>
+<?php get_footer();

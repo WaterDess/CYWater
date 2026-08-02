@@ -15,7 +15,7 @@ final class CYWater_Local_Mail {
 	}
 
 	public static function configure_mailpit( $phpmailer ) {
-		if ( ! CYWater_Config::is_non_production() || 'mailpit' !== CYWater_Config::get( 'CYWATER_MAIL_TRANSPORT', '' ) ) {
+		if ( ! self::uses_mailpit() ) {
 			return;
 		}
 		$phpmailer->isSMTP();
@@ -27,13 +27,18 @@ final class CYWater_Local_Mail {
 	}
 
 	public static function from_address( $address ) {
-		if ( CYWater_Config::is_non_production() && 'mailpit' === CYWater_Config::get( 'CYWATER_MAIL_TRANSPORT', '' ) ) {
+		if ( self::uses_mailpit() ) {
 			return 'noreply@cywater.local';
 		}
 		return $address;
 	}
 
 	public static function from_name( $name ) {
-		return CYWater_Config::is_non_production() ? 'CYWater Local' : $name;
+		return self::uses_mailpit() ? 'CYWater Local' : $name;
+	}
+
+	private static function uses_mailpit() {
+		return CYWater_Config::is_non_production()
+			&& 'mailpit' === CYWater_Config::get( 'CYWATER_MAIL_TRANSPORT', '' );
 	}
 }

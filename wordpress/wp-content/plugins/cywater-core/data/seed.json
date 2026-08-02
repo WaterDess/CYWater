@@ -1,5 +1,6 @@
 {
   "schemaVersion": 1,
+  "seedRevision": 4,
   "generatedFrom": "assets/js/content.js",
   "articles": {
     "bpa-2025-result": {
@@ -1682,11 +1683,23 @@
     }
   ],
   "pages": {
+    "home": {
+      "title": "",
+      "eyebrow": "",
+      "lead": "",
+      "content": "<div class=\"container\">\n        <svg class=\"hero-watermark\" viewBox=\"0 0 200 200\" aria-hidden=\"true\">\n          <path d=\"M100 20C100 20 40 80 40 130a60 60 0 0 0 120 0C160 80 100 20 100 20Z\" fill=\"none\" stroke=\"#0F766E\" stroke-width=\"2\"></path>\n        </svg>\n        <div class=\"hero-inner\" data-reveal=\"\">\n          <span class=\"eyebrow\">International Association · Water Sciences</span>\n          <h1>Advancing water sciences,<br>empowering young scholars.</h1>\n          <p class=\"lead\">An international, non-profit association advancing water sciences education, research, and professional development — through scientific exchange, publications, and conferences.</p>\n          <div class=\"hero-actions\">\n            <a class=\"btn btn-accent btn-lg\" href=\"./events/index.html\">Upcoming events</a>\n            <a class=\"btn btn-outline btn-lg\" href=\"./about/index.html\">About CYWater</a>\n          </div>\n        </div>\n      </div>"
+    },
     "about": {
       "title": "Advancing water sciences, empowering young scholars.",
       "eyebrow": "About CYWater",
       "lead": "CYWater is a non-profit international association advancing water sciences education, research, and professional development through scientific exchange, publications, and conferences.",
       "content": "<p>CYWater's mission is to advance water sciences education, research, and professional development by empowering young, early-career, and other professionals through scientific exchange, publications, and conferences for the public benefit.</p>\n              <p>The Association was founded in 2011 and is incorporated as a not-for-profit corporation in the State of Illinois. It operates as a virtual organization with a worldwide community of people interested in water sciences.</p>"
+    },
+    "board": {
+      "title": "Board of Directors.",
+      "eyebrow": "Leadership",
+      "lead": "The Board governs CYWater, sets strategic direction, oversees finances, appoints committees, and ensures compliance with law and mission.",
+      "content": "<strong>Leadership update in progress.</strong>\n          <p>Current Board appointments have not yet been confirmed for publication. Individual names and affiliations will be added after formal review.</p>"
     },
     "bylaws": {
       "title": "CYWater Bylaws",

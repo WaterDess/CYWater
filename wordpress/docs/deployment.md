@@ -14,14 +14,16 @@ secrets, salts, and administrator accounts.
 
 ## Hosting
 
-The preferred first production platform is managed WordPress hosting from
-Hostinger, selected at purchase time only after confirming current price,
-renewal price, daily backups, on-demand restore, SSL, staging support, SSH/SFTP,
-PHP 8.3+, cron, and database access. Total fixed annual platform cost must remain
-under USD 1,000. No service is purchased in this branch.
+CYWater now has a Hostinger Business managed WordPress plan with daily backup,
+on-demand backup, staging, SSL, SSH/SFTP, PHP 8.3, cron, and database access.
+The WordPress integration is deployed at `staging.cywater.org`; production DNS
+has not been switched to the WordPress site.
 
-Cloudflare owns authoritative DNS, CDN, baseline WAF/rate limiting, and HTTPS
-edge policy. The origin also keeps a valid certificate; SSL mode must be Full
+Squarespace Domains currently remains the registrar and authoritative DNS
+provider. Google Workspace mail records and the staging host record must be
+preserved during every DNS change. Cloudflare remains an optional later
+migration and is not a prerequisite for staging acceptance. If Cloudflare is
+adopted, the origin must also keep a valid certificate and SSL mode must be Full
 (strict), never Flexible.
 
 ## Release Flow

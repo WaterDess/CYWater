@@ -5,6 +5,9 @@
  * @package CYWater
  */
 get_header();
+?>
+<main>
+<?php
 while ( have_posts() ) :
 	the_post();
 	get_template_part( 'template-parts/page-hero' );
@@ -17,4 +20,6 @@ while ( have_posts() ) :
 	</section>
 	<?php
 endwhile;
-get_footer();
+?>
+</main>
+<?php get_footer();

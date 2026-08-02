@@ -28,6 +28,7 @@ final class CYWater_Meta_Boxes {
 			'location'   => array( 'label' => 'Location', 'type' => 'text' ),
 			'format'     => array( 'label' => 'Format', 'type' => 'text' ),
 			'attendees'  => array( 'label' => 'Attendance/registration note', 'type' => 'text' ),
+			'image_alt'  => array( 'label' => 'Featured image description', 'type' => 'text' ),
 			'status'     => array( 'label' => 'Status', 'type' => 'select', 'options' => array( 'upcoming' => 'Upcoming', 'past' => 'Past' ) ),
 			'source_url' => array( 'label' => 'Source URL', 'type' => 'url' ),
 		),

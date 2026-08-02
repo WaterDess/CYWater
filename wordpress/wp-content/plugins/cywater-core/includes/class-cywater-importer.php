@@ -11,6 +11,7 @@ final class CYWater_Importer {
 	private $data;
 	private $image_cache = array();
 	private $force;
+	private $seed_revision;
 	private $syncable_posts = array();
 
 	public function __construct( $data_file = '', $force = false ) {
@@ -23,6 +24,7 @@ final class CYWater_Importer {
 		if ( ! is_array( $this->data ) || 1 !== (int) ( $this->data['schemaVersion'] ?? 0 ) ) {
 			throw new RuntimeException( 'CYWater seed data has an unsupported schema.' );
 		}
+		$this->seed_revision = max( 1, absint( $this->data['seedRevision'] ?? 1 ) );
 	}
 
 	public function run() {
@@ -58,7 +60,7 @@ final class CYWater_Importer {
 			'account'    => array( 'Member account', 'Membership', 'Manage your CYWater membership and profile.', '[pmpro_account]' ),
 			'member-profile' => array( 'Member profile', 'Membership profile', 'Complete your professional profile and choose what may appear publicly.', '[pmpro_member_profile_edit][cywater_privacy_settings]' ),
 		);
-		foreach ( array( 'about', 'bylaws', 'membership', 'contact' ) as $slug ) {
+		foreach ( array( 'home', 'about', 'board', 'bylaws', 'membership', 'contact' ) as $slug ) {
 			if ( empty( $verified_pages[ $slug ] ) ) {
 				continue;
 			}
@@ -66,7 +68,7 @@ final class CYWater_Importer {
 			$pages[ $slug ][0] = sanitize_text_field( $page['title'] ?? $pages[ $slug ][0] );
 			$pages[ $slug ][1] = sanitize_text_field( $page['eyebrow'] ?? $pages[ $slug ][1] );
 			$pages[ $slug ][2] = sanitize_text_field( $page['lead'] ?? $pages[ $slug ][2] );
-			if ( in_array( $slug, array( 'about', 'bylaws' ), true ) && ! empty( $page['content'] ) ) {
+			if ( in_array( $slug, array( 'about', 'board', 'bylaws' ), true ) && ! empty( $page['content'] ) ) {
 				$pages[ $slug ][3] = wp_kses_post( $page['content'] );
 			}
 		}
@@ -84,12 +86,13 @@ final class CYWater_Importer {
 					'post_status'  => 'publish',
 				)
 			);
-			$this->seed_meta( $post_id, '_cyw_eyebrow', $page[1] );
-			$this->seed_meta( $post_id, '_cyw_lead', $page[2] );
+			$this->seed_meta_if_missing( $post_id, '_cyw_eyebrow', $page[1] );
+			$this->seed_meta_if_missing( $post_id, '_cyw_lead', $page[2] );
 			if ( 'contact' === $slug ) {
-				$this->seed_meta( $post_id, '_cyw_contact_email', '' );
-				$this->seed_meta( $post_id, '_cyw_mailing_address', "202 E. Green St. Suite 2\nChampaign, IL 61820, USA" );
+				$this->seed_meta_if_missing( $post_id, '_cyw_contact_email', '' );
+				$this->seed_meta_if_missing( $post_id, '_cyw_mailing_address', "202 E. Green St. Suite 2\nChampaign, IL 61820, USA" );
 			}
+			$this->complete_seed_revision( $post_id );
 			$result[ $slug ] = $post_id;
 		}
 		return $result;
@@ -119,16 +122,17 @@ final class CYWater_Importer {
 			if ( $this->should_sync( $post_id ) ) {
 				wp_set_post_categories( $post_id, $category ? array( $category ) : array() );
 			}
-			$this->seed_meta( $post_id, '_cyw_source_url', esc_url_raw( $article['source'] ?? '' ) );
+			$this->seed_meta_if_missing( $post_id, '_cyw_source_url', esc_url_raw( $article['source'] ?? '' ) );
 			$display = $visuals[ $source_id ] ?? array();
 			$this->seed_meta_if_missing( $post_id, '_cyw_news_order', absint( $display['order'] ?? 999 ) );
 			if ( ! empty( $display['visual'] ) ) {
-				$this->seed_meta( $post_id, '_cyw_visual_title', sanitize_text_field( $display['visual']['title'] ?? '' ) );
-				$this->seed_meta( $post_id, '_cyw_visual_year', absint( $display['visual']['year'] ?? 0 ) );
+				$this->seed_meta_if_missing( $post_id, '_cyw_visual_title', sanitize_text_field( $display['visual']['title'] ?? '' ) );
+				$this->seed_meta_if_missing( $post_id, '_cyw_visual_year', absint( $display['visual']['year'] ?? 0 ) );
 			}
 			if ( ! empty( $display['img'] ) ) {
 				$this->set_featured_image( $post_id, $display['img'], $display['alt'] ?? $article['title'] );
 			}
+			$this->complete_seed_revision( $post_id );
 			++$count;
 		}
 		return $count;
@@ -136,8 +140,9 @@ final class CYWater_Importer {
 
 	private function import_events() {
 		$ordering = array();
-		foreach ( $this->data['eventOrder'] ?? array() as $item ) {
-			$ordering[ $item['id'] ] = $item;
+		foreach ( $this->data['eventOrder'] ?? array() as $index => $item ) {
+			$ordering[ $item['id'] ]          = $item;
+			$ordering[ $item['id'] ]['order'] = $index + 1;
 		}
 		$count = 0;
 		foreach ( $this->data['events'] as $source_id => $event ) {
@@ -173,15 +178,18 @@ final class CYWater_Importer {
 			if ( $this->should_sync( $post_id ) ) {
 				wp_set_object_terms( $post_id, $type, 'cyw_event_type' );
 			}
-			$this->seed_meta( $post_id, '_cyw_start_date', $start_date );
-			$this->seed_meta( $post_id, '_cyw_date_label', $display_date );
-			$this->seed_meta( $post_id, '_cyw_location', sanitize_text_field( $event['location'] ?? '' ) );
-			$this->seed_meta( $post_id, '_cyw_format', sanitize_text_field( $event['format'] ?? '' ) );
-			$this->seed_meta( $post_id, '_cyw_attendees', sanitize_text_field( $event['attendees'] ?? '' ) );
-			$this->seed_meta( $post_id, '_cyw_status', $status );
+			$this->seed_meta_if_missing( $post_id, '_cyw_start_date', $start_date );
+			$this->seed_meta_if_missing( $post_id, '_cyw_date_label', $display_date );
+			$this->seed_meta_if_missing( $post_id, '_cyw_location', sanitize_text_field( $event['location'] ?? '' ) );
+			$this->seed_meta_if_missing( $post_id, '_cyw_format', sanitize_text_field( $event['format'] ?? '' ) );
+			$this->seed_meta_if_missing( $post_id, '_cyw_attendees', sanitize_text_field( $event['attendees'] ?? '' ) );
+			$this->seed_meta_if_missing( $post_id, '_cyw_image_alt', sanitize_text_field( $event['imageAlt'] ?? $event['title'] ) );
+			$this->seed_meta_if_missing( $post_id, '_cyw_status', $status );
+			$this->seed_meta_if_missing( $post_id, '_cyw_event_order', absint( $ordering[ $source_id ]['order'] ?? 999 ) );
 			if ( ! empty( $event['image'] ) ) {
 				$this->set_featured_image( $post_id, $event['image'], $event['imageAlt'] ?? $event['title'] );
 			}
+			$this->complete_seed_revision( $post_id );
 			++$count;
 		}
 		return $count;
@@ -221,14 +229,15 @@ final class CYWater_Importer {
 					'post_status'  => 'publish',
 				)
 			);
-			$this->seed_meta( $post_id, '_cyw_year', $year );
-			$this->seed_meta( $post_id, '_cyw_recipient', sanitize_text_field( $recipient ) );
-			$this->seed_meta( $post_id, '_cyw_paper_title', sanitize_text_field( $paper ) );
-			$this->seed_meta( $post_id, '_cyw_journal', sanitize_text_field( $journal ) );
-			$this->seed_meta( $post_id, '_cyw_applications', absint( $award['applications'] ?? 0 ) );
-			$this->seed_meta( $post_id, '_cyw_chair', sanitize_text_field( $award['chair'] ?? '' ) );
-			$this->seed_meta_if_missing( $post_id, '_cyw_award_record', wp_json_encode( $award, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) );
+			$this->seed_meta_if_missing( $post_id, '_cyw_year', $year );
+			$this->seed_meta_if_missing( $post_id, '_cyw_recipient', sanitize_text_field( $recipient ) );
+			$this->seed_meta_if_missing( $post_id, '_cyw_paper_title', sanitize_text_field( $paper ) );
+			$this->seed_meta_if_missing( $post_id, '_cyw_journal', sanitize_text_field( $journal ) );
+			$this->seed_meta_if_missing( $post_id, '_cyw_applications', absint( $award['applications'] ?? 0 ) );
+			$this->seed_meta_if_missing( $post_id, '_cyw_chair', sanitize_text_field( $award['chair'] ?? '' ) );
+			$this->seed_json_structure( $post_id, '_cyw_award_record', $award );
 			$this->seed_meta_if_missing( $post_id, '_cyw_article_id', sanitize_key( $award['articleId'] ?? '' ) );
+			$this->complete_seed_revision( $post_id );
 			++$count;
 		}
 		return $count;
@@ -238,10 +247,11 @@ final class CYWater_Importer {
 		$roles = array( 'President', 'President-Elect', 'Treasurer', 'Directors-at-Large', 'Executive Director' );
 		foreach ( $roles as $index => $role ) {
 			$post_id = $this->upsert_post( 'cyw_board_role', 'board:' . sanitize_title( $role ), array( 'post_title' => $role, 'post_status' => 'publish' ) );
-			$this->seed_meta( $post_id, '_cyw_order', $index + 1 );
+			$this->seed_meta_if_missing( $post_id, '_cyw_order', $index + 1 );
 			if ( '' === get_post_meta( $post_id, '_cyw_confirmed_public', true ) ) {
 				update_post_meta( $post_id, '_cyw_confirmed_public', 0 );
 			}
+			$this->complete_seed_revision( $post_id );
 		}
 		return count( $roles );
 	}
@@ -260,8 +270,10 @@ final class CYWater_Importer {
 		$post_data['post_type'] = $post_type;
 		if ( $existing ) {
 			$post_id = (int) $existing[0];
-			$this->syncable_posts[ $post_id ] = $this->force;
-			if ( $this->force ) {
+			$stored_revision = absint( get_post_meta( $post_id, '_cyw_seed_revision', true ) );
+			$should_sync = $this->force || $stored_revision < $this->seed_revision;
+			$this->syncable_posts[ $post_id ] = $should_sync;
+			if ( $should_sync ) {
 				$post_data['ID'] = $post_id;
 				$post_id         = wp_update_post( wp_slash( $post_data ), true );
 			}
@@ -276,6 +288,12 @@ final class CYWater_Importer {
 		}
 		update_post_meta( $post_id, '_cyw_source_id', $source_id );
 		return $post_id;
+	}
+
+	private function complete_seed_revision( $post_id ) {
+		if ( $this->should_sync( $post_id ) ) {
+			update_post_meta( $post_id, '_cyw_seed_revision', $this->seed_revision );
+		}
 	}
 
 	private function should_sync( $post_id ) {
@@ -306,6 +324,72 @@ final class CYWater_Importer {
 		if ( $this->should_sync( $post_id ) || ! metadata_exists( 'post', $post_id, $key ) ) {
 			update_post_meta( $post_id, $key, $value );
 		}
+	}
+
+	/**
+	 * Add a scalar metadata value when an older import left it blank.
+	 */
+	private function seed_meta_if_blank( $post_id, $key, $value ) {
+		$current = get_post_meta( $post_id, $key, true );
+		if ( $this->should_sync( $post_id ) || ! metadata_exists( 'post', $post_id, $key ) || '' === $current ) {
+			update_post_meta( $post_id, $key, $value );
+		}
+	}
+
+	/**
+	 * Backfill newly introduced keys in imported JSON while preserving edits.
+	 */
+	private function seed_json_structure( $post_id, $key, $seed ) {
+		if ( $this->should_sync( $post_id ) || ! metadata_exists( 'post', $post_id, $key ) ) {
+			update_post_meta( $post_id, $key, wp_json_encode( $seed, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) );
+			return;
+		}
+
+		$current = json_decode( (string) get_post_meta( $post_id, $key, true ), true );
+		if ( ! is_array( $current ) ) {
+			$current = array();
+		}
+
+		$merged = $this->merge_missing_structure( $current, $seed );
+		if ( $merged !== $current ) {
+			update_post_meta( $post_id, $key, wp_json_encode( $merged, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) );
+		}
+	}
+
+	/**
+	 * Recursively fill absent associative keys and empty imported lists.
+	 */
+	private function merge_missing_structure( $current, $seed ) {
+		if ( ! is_array( $seed ) ) {
+			return ( null === $current || '' === $current ) ? $seed : $current;
+		}
+
+		if ( ! is_array( $current ) || array() === $current ) {
+			return $seed;
+		}
+
+		if ( ! $this->is_associative_array( $seed ) ) {
+			return $current;
+		}
+
+		foreach ( $seed as $seed_key => $seed_value ) {
+			if ( ! array_key_exists( $seed_key, $current ) || null === $current[ $seed_key ] || '' === $current[ $seed_key ] || array() === $current[ $seed_key ] ) {
+				$current[ $seed_key ] = $seed_value;
+				continue;
+			}
+			if ( is_array( $seed_value ) && $this->is_associative_array( $seed_value ) ) {
+				$current[ $seed_key ] = $this->merge_missing_structure( $current[ $seed_key ], $seed_value );
+			}
+		}
+
+		return $current;
+	}
+
+	private function is_associative_array( $value ) {
+		if ( ! is_array( $value ) || array() === $value ) {
+			return false;
+		}
+		return array_keys( $value ) !== range( 0, count( $value ) - 1 );
 	}
 
 	private function render_blocks( $blocks ) {
@@ -359,7 +443,7 @@ final class CYWater_Importer {
 	}
 
 	private function set_featured_image( $post_id, $relative_path, $alt ) {
-		if ( ! $this->should_sync( $post_id ) ) {
+		if ( ! $this->should_sync( $post_id ) && has_post_thumbnail( $post_id ) ) {
 			return;
 		}
 		$attachment_id = $this->import_image( $relative_path, $alt );

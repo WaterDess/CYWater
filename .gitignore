@@ -15,3 +15,9 @@ node_modules/
 wordpress/.env
 wordpress/runtime/
 wordpress/artifacts/
+
+# Local visual QA output
+/artifacts/
+
+# Generated release packages
+dist/

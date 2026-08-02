@@ -6,6 +6,9 @@
  */
 
 get_header();
+?>
+<main>
+<?php
 while ( have_posts() ) :
 	the_post();
 	$date      = get_post_meta( get_the_ID(), '_cyw_date_label', true ) ?: get_post_meta( get_the_ID(), '_cyw_start_date', true );
@@ -13,7 +16,8 @@ while ( have_posts() ) :
 	$format    = get_post_meta( get_the_ID(), '_cyw_format', true ) ?: 'Event';
 	$attendees = get_post_meta( get_the_ID(), '_cyw_attendees', true );
 	$status    = get_post_meta( get_the_ID(), '_cyw_status', true );
-	$image     = cywater_featured_image_url( get_the_ID(), 'cywater-wide' );
+	$image     = cywater_featured_image_url( get_the_ID(), 'full' );
+	$image_alt = get_post_meta( get_the_ID(), '_cyw_image_alt', true ) ?: get_the_title();
 	?>
 	<section class="event-hero">
 		<div class="container">
@@ -33,7 +37,7 @@ while ( have_posts() ) :
 			<div class="event-body"><div>
 				<span class="eyebrow">About this event</span>
 				<p class="lead" style="margin:var(--sp-4) 0 var(--sp-5)" data-reveal><?php echo esc_html( get_the_excerpt() ); ?></p>
-				<?php if ( $image ) : ?><figure class="event-photo" data-reveal><img src="<?php echo esc_url( $image ); ?>" alt="<?php the_title_attribute(); ?>"><figcaption><?php the_title(); ?></figcaption></figure><?php endif; ?>
+				<?php if ( $image ) : ?><figure class="event-photo" data-reveal><img src="<?php echo esc_url( $image ); ?>" alt="<?php echo esc_attr( $image_alt ); ?>"><figcaption><?php echo esc_html( $image_alt ); ?></figcaption></figure><?php endif; ?>
 				<div class="prose entry-content" data-reveal><?php echo cywater_article_content(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
 				<div style="text-align:center; margin-top:var(--sp-6)"><a class="link" href="<?php echo esc_url( get_post_type_archive_link( 'cyw_event' ) ); ?>">Back to Events</a></div>
 				<?php edit_post_link( 'Edit this event', '<span class="admin-edit-link">', '</span>' ); ?>
@@ -42,4 +46,6 @@ while ( have_posts() ) :
 	</section>
 	<?php
 endwhile;
-get_footer();
+?>
+</main>
+<?php get_footer();

@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CYWATER_THEME_VERSION', '0.2.1' );
+define( 'CYWATER_THEME_VERSION', '0.5.2' );
 
 function cywater_theme_setup() {
 	add_theme_support( 'title-tag' );
@@ -32,6 +32,20 @@ function cywater_theme_setup() {
 	add_image_size( 'cywater-wide', 1600, 900, true );
 }
 add_action( 'after_setup_theme', 'cywater_theme_setup' );
+
+/**
+ * Preserve the verified static site's punctuation exactly.
+ *
+ * WordPress normally converts straight quotes and apostrophes to typographic
+ * variants. The public preview intentionally keeps the source registry text
+ * unchanged, so the WordPress renderer must do the same.
+ */
+function cywater_disable_texturize() {
+	foreach ( array( 'the_title', 'the_content', 'the_excerpt', 'single_post_title', 'wp_title' ) as $filter ) {
+		remove_filter( $filter, 'wptexturize' );
+	}
+}
+add_action( 'after_setup_theme', 'cywater_disable_texturize', 20 );
 
 function cywater_asset_version( $relative_path ) {
 	$file = get_theme_file_path( $relative_path );
@@ -101,6 +115,11 @@ function cywater_featured_image_url( $post_id = null, $size = 'cywater-card', $f
 }
 
 function cywater_source_permalink( $source_id, $post_type = 'post' ) {
+	$post = cywater_source_post( $source_id, $post_type );
+	return $post ? get_permalink( $post ) : '';
+}
+
+function cywater_source_post( $source_id, $post_type = 'any' ) {
 	$posts = get_posts(
 		array(
 			'post_type'      => $post_type,
@@ -111,7 +130,7 @@ function cywater_source_permalink( $source_id, $post_type = 'post' ) {
 			'meta_value'     => $source_id,
 		)
 	);
-	return $posts ? get_permalink( $posts[0] ) : '';
+	return $posts ? get_post( $posts[0] ) : null;
 }
 
 function cywater_article_content( $post_id = null ) {

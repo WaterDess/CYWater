@@ -29,6 +29,7 @@ final class CYWater_Readiness {
 			'Stripe publishable key'=> CYWater_Config::has( 'STRIPE_PUBLISHABLE_KEY' ) ? 'configured' : 'missing',
 			'Stripe secret key'     => CYWater_Config::has( 'STRIPE_SECRET_KEY' ) ? 'configured' : 'missing',
 			'Mail transport'        => (string) CYWater_Config::get( 'CYWATER_MAIL_TRANSPORT', 'not configured' ),
+			'WordPress file editor' => defined( 'DISALLOW_FILE_EDIT' ) && DISALLOW_FILE_EDIT ? 'disabled' : 'enabled',
 		);
 		?>
 		<div class="wrap"><h1>CYWater readiness</h1><p>This page reports presence and mode only. It never displays credential values.</p><table class="widefat striped"><tbody>

@@ -25,6 +25,12 @@ await cp(path.join(source, "css"), path.join(destination, "css"), {
 await cp(path.join(source, "img"), path.join(destination, "img"), {
   recursive: true,
 });
+// The static archive retains historical, unused mock assets for reference. They
+// are not part of the accepted WordPress release and must not ship in patches.
+await rm(path.join(destination, "img", "placeholders"), {
+  recursive: true,
+  force: true,
+});
 await cp(path.join(source, "docs"), path.join(destination, "docs"), {
   recursive: true,
 });
