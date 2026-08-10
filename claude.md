@@ -149,7 +149,7 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
 ### Temporary Staging Snapshot (2026-08-10)
 
 - Hostinger staging is available at `https://staging.cywater.org/` with the
-  CYWater `0.6.0` theme, CYWater Membership `0.8.0`, CYWater Environment
+  CYWater `0.6.0` theme, CYWater Membership `0.8.1`, CYWater Environment
   `0.5.4`, CYWater Core `0.5.4`, and Event Tickets `5.29.1`.
 - Dedicated Hostinger SSH access from the Lenovo workstation was established
   and independently verified with public-key authentication on 2026-08-02.
@@ -207,7 +207,7 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   displayed card, Apple Pay, Google Pay, and Alipay but not WeChat Pay. Stripe
   dynamically filters methods by checkout eligibility. Live payment remains
   disabled.
-- CYWater Membership `0.8.0` implements one current account-first path. A
+- CYWater Membership `0.8.1` implements one current account-first path. A
   logged-out checkout redirects to the PMPro sign-in page; that page links to a
   dedicated `/member-register/` account form. New accounts sign in but must
   complete a 24-hour one-time email-verification link before checkout. Mail uses
@@ -224,7 +224,7 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   intercepted and its disposable user removed. A separate real message was
   accepted by the configured WordPress/Postmark transport, but Workspace inbox
   receipt remains a human check.
-- CYWater Membership `0.8.0` adds a read-only administrator record on each
+- CYWater Membership `0.8.1` adds a read-only administrator record on each
   WordPress user profile. It summarizes account creation/last sign-in, email
   verification, required-profile completion, directory privacy, active level
   and expiry, and account-closure requests. It links to PMPro Members and Orders
@@ -239,6 +239,13 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   revoke another account's sessions, and CYWater profile/privacy metadata is
   integrated with WordPress core export/erasure while identity and transaction
   records remain retained for policy review.
+- CYWater Membership `0.8.1` supplies a local HTTPS default avatar for
+  WordPress avatar surfaces, including the logged-in admin bar, so an external
+  Gravatar failure cannot leave a broken image. The current user's valid
+  uploaded profile photo takes priority; another member's photo is used only
+  when that member has opted into the public directory and explicitly exposed
+  the profile-photo field. Staging `get_avatar_url()` and `get_avatar()` returned
+  the local SVG, whose HTTPS request returned HTTP 200 with `image/svg+xml`.
 - The protected PMPro membership-order page is the Sandbox receipt surface, not
   an approved tax invoice. A six-check staging invoice QA passed route,
   shortcode, Sandbox, PMPro URL, and completed/refunded-order evidence checks

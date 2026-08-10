@@ -57,7 +57,7 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 ## Current State
 
 Hostinger staging is available at `https://staging.cywater.org/`. The accepted
-baseline uses the CYWater `0.6.0` theme, CYWater Membership `0.8.0`, CYWater
+baseline uses the CYWater `0.6.0` theme, CYWater Membership `0.8.1`, CYWater
 Environment `0.5.4`, CYWater Core `0.5.4`, and Event Tickets `5.29.1`. PMPro and Stripe
 Sandbox are active for staging acceptance; the live-payment gate remains
 closed and no production Stripe credential is configured. Postmark is connected on
@@ -72,7 +72,7 @@ actions; final copy/legal review and a non-Gmail delivery target remain open.
 Dedicated Hostinger SSH access from the Lenovo workstation was established and
 verified with public-key authentication on 2026-08-02. A live WP-CLI check
 confirmed WordPress `7.0.2`, PHP CLI `8.3.30`, the active CYWater `0.6.0` theme,
-CYWater Membership `0.8.0`, CYWater Environment `0.5.4`, and CYWater Core
+CYWater Membership `0.8.1`, CYWater Environment `0.5.4`, and CYWater Core
 `0.5.4`. Five malformed inactive CYWater/PMPro upload directories were removed
 after exact-path and inactive-status verification; active components were not
 removed and the plugin-list warnings cleared.
@@ -106,7 +106,7 @@ affiliations, terms, biographies, photographs, or contact details were inferred.
 The public staging route was verified to contain each record exactly once; the
 GitHub Pages original was not modified.
 
-CYWater Membership `0.8.0` implements the current account-first path: logged-out
+CYWater Membership `0.8.1` implements the current account-first path: logged-out
 checkout redirects to sign-in, sign-in links to `/member-register/`, and a new
 account must complete a 24-hour one-time email-verification link before returning
 to the originally selected checkout. Verification mail uses
@@ -144,7 +144,7 @@ already processed, and created no duplicate order or membership. The recurring
 renewal/expiry queue is healthy; a manual hosted-Checkout decline click remains
 optional because the authoritative Sandbox decline result was already verified.
 
-CYWater Membership `0.8.0` also provides a read-only `CYWater member record` in the
+CYWater Membership `0.8.1` also provides a read-only `CYWater member record` in the
 WordPress user editor. It summarizes required-profile completion and directory
 privacy, account creation/last sign-in, email verification, active level and
 expiry, and account-closure requests. The Users list adds account/membership
@@ -161,6 +161,14 @@ attendee report. The view stores no duplicate account, membership, order,
 event-registration, or payment data. An authenticated administrator check verified the refunded test
 member has all five required fields, remains private, has no active membership,
 and exposes the intended PMPro Members/Orders links.
+
+CYWater Membership `0.8.1` supplies a local HTTPS default avatar for WordPress
+avatar surfaces, including the logged-in admin bar, so an external Gravatar
+failure cannot leave a broken image. A valid uploaded photo takes priority for
+the current user; another member's photo is used only when that member has opted
+into the public directory and exposed the profile-photo field. Staging
+`get_avatar_url()` and `get_avatar()` returned the local SVG, whose HTTPS request
+returned HTTP 200 with `image/svg+xml`.
 
 CYWater Membership `0.6.5` also checks the actual membership end date before
 rendering an opted-in directory profile, so an expired member is hidden even

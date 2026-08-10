@@ -26,6 +26,8 @@ const required = [
   "wordpress/wp-content/themes/cywater/page-contact.php",
   "wordpress/wp-content/plugins/cywater-core/cywater-core.php",
   "wordpress/wp-content/plugins/cywater-membership/cywater-membership.php",
+  "wordpress/wp-content/plugins/cywater-membership/assets/default-avatar.svg",
+  "wordpress/wp-content/plugins/cywater-membership/includes/class-cywater-membership-avatars.php",
   "wordpress/wp-content/plugins/cywater-environment/cywater-environment.php",
 ];
 
@@ -155,6 +157,16 @@ for (const event of Object.values(seed.events)) {
     assert(event.imageAlt, `Missing event image description for ${event.title}.`);
   }
 }
+
+const avatarProvider = await readFile(
+  path.join(root, "wordpress", "wp-content", "plugins", "cywater-membership", "includes", "class-cywater-membership-avatars.php"),
+  "utf8"
+);
+assertMarkers(
+  avatarProvider,
+  ["pre_get_avatar_data", "assets/default-avatar.svg", "cyw_profile_photo", "cyw_profile_public"],
+  "CYWater avatar provider"
+);
 
 for (const key of ["home", "about", "board", "bylaws", "membership", "contact"]) {
   assert(seed.pages?.[key], `Missing editable page seed: ${key}.`);
