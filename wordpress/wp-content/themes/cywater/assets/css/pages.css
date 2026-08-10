@@ -505,11 +505,6 @@
   object-fit: cover;
 }
 .event-archive-media.is-focus-lower img { object-position: center 92%; }
-.event-year-mark {
-  font-family: var(--font-display);
-  font-size: var(--fs-xl);
-  color: var(--teal);
-}
 .event-archive-copy { display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-2); }
 .event-archive-copy h3 { font-size: var(--fs-md); }
 .event-archive-copy .meta { font-size: var(--fs-xs); color: var(--ink-mute); }
@@ -562,7 +557,7 @@
 .news-item .card-media { aspect-ratio: 16/10; border-radius: var(--radius); }
 .news-item h3 { font-size: var(--fs-base); margin-bottom: 0.3rem; }
 .news-item p { font-size: var(--fs-sm); }
-.news-visual {
+.title-visual {
   display: grid;
   width: 100%;
   height: 100%;
@@ -575,22 +570,22 @@
   background: var(--paper-warm);
   text-align: center;
 }
-.news-visual strong {
+.title-visual strong {
   max-width: 14ch;
   font-family: var(--font-display);
   font-size: var(--fs-base);
   font-weight: 500;
   line-height: 1.18;
 }
-.news-visual-year {
+.title-visual-year {
   font-family: var(--font-display);
   font-size: var(--fs-xl);
   font-weight: 500;
   line-height: 1;
 }
-.news-feature .news-visual { padding: var(--sp-6); }
-.news-feature .news-visual strong { font-size: var(--fs-xl); }
-.news-feature .news-visual-year { font-size: var(--fs-4xl); }
+.news-feature .title-visual { padding: var(--sp-6); }
+.news-feature .title-visual strong { font-size: var(--fs-xl); }
+.news-feature .title-visual-year { font-size: var(--fs-4xl); }
 .news-section-block { margin-top: var(--sp-9); }
 .opportunities-empty {
   padding: var(--sp-5) 0;
@@ -787,8 +782,8 @@
   .dash-layout, .dash-cards { grid-template-columns: 1fr; }
   .news-feature { grid-template-columns: 1fr; }
   .news-item { grid-template-columns: 1fr; }
-  .news-item .news-visual strong { font-size: var(--fs-md); }
-  .news-item .news-visual-year { font-size: var(--fs-3xl); }
+  .news-item .title-visual strong { font-size: var(--fs-md); }
+  .news-item .title-visual-year { font-size: var(--fs-3xl); }
   .field-row { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr; }
   .footer-bottom { flex-direction: column; align-items: flex-start; }

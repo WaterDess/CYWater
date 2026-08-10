@@ -73,23 +73,35 @@ get_template_part(
 
 $render_events = static function ( $items ) {
 	foreach ( $items as $event ) {
-		$event_id = $event->ID;
-		$image    = cywater_featured_image_url( $event_id, 'full' );
-		$start    = (string) get_post_meta( $event_id, '_cyw_start_date', true );
-		$date     = (string) ( get_post_meta( $event_id, '_cyw_date_label', true ) ?: $start );
-		$location = (string) get_post_meta( $event_id, '_cyw_location', true );
-		$status   = (string) get_post_meta( $event_id, '_cyw_status', true );
-		$source   = (string) get_post_meta( $event_id, '_cyw_source_id', true );
-		$image_alt = (string) ( get_post_meta( $event_id, '_cyw_image_alt', true ) ?: get_the_title( $event ) );
-		$year     = preg_match( '/\b(20\d{2})\b/', $date, $matches ) ? $matches[1] : get_the_date( 'Y', $event );
-		$focus    = str_ends_with( $source, 'annual-gathering-2017' ) ? ' is-focus-lower' : '';
+		$event_id     = $event->ID;
+		$image        = cywater_featured_image_url( $event_id, 'full' );
+		$start        = (string) get_post_meta( $event_id, '_cyw_start_date', true );
+		$date         = (string) ( get_post_meta( $event_id, '_cyw_date_label', true ) ?: $start );
+		$location     = (string) get_post_meta( $event_id, '_cyw_location', true );
+		$status       = (string) get_post_meta( $event_id, '_cyw_status', true );
+		$source       = (string) get_post_meta( $event_id, '_cyw_source_id', true );
+		$image_alt    = (string) ( get_post_meta( $event_id, '_cyw_image_alt', true ) ?: get_the_title( $event ) );
+		$year         = preg_match( '/\b(20\d{2})\b/', $date, $matches ) ? $matches[1] : get_the_date( 'Y', $event );
+		$event_types  = wp_get_post_terms( $event_id, 'cyw_event_type' );
+		$visual_title = ! is_wp_error( $event_types ) && $event_types ? $event_types[0]->name : 'Event';
+		$focus        = str_ends_with( $source, 'annual-gathering-2017' ) ? ' is-focus-lower' : '';
 		?>
 		<a class="event-archive-row" href="<?php echo esc_url( get_permalink( $event ) ); ?>" data-reveal>
 			<span class="event-archive-media<?php echo esc_attr( $focus ); ?>">
 				<?php if ( $image ) : ?>
 					<img src="<?php echo esc_url( $image ); ?>" alt="<?php echo esc_attr( $image_alt ); ?>" loading="lazy">
 				<?php else : ?>
-					<span class="event-year-mark"><?php echo esc_html( $year ); ?></span>
+					<?php
+					get_template_part(
+						'template-parts/title-visual',
+						null,
+						array(
+							'title'      => $visual_title,
+							'year'       => $year,
+							'aria_label' => get_the_title( $event ),
+						)
+					);
+					?>
 				<?php endif; ?>
 			</span>
 			<span class="event-archive-copy">

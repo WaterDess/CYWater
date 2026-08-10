@@ -17,10 +17,17 @@ $tag         = $categories ? $categories[0]->name : 'News';
 		<?php if ( $image ) : ?>
 			<img src="<?php echo esc_url( $image ); ?>" alt="<?php the_title_attribute(); ?>" loading="lazy">
 		<?php else : ?>
-			<span class="news-visual" role="img" aria-label="<?php the_title_attribute(); ?>">
-				<strong><?php echo esc_html( $visual_name ?: $tag ); ?></strong>
-				<span class="news-visual-year"><?php echo esc_html( $visual_year ?: get_the_date( 'Y' ) ); ?></span>
-			</span>
+			<?php
+			get_template_part(
+				'template-parts/title-visual',
+				null,
+				array(
+					'title'      => $visual_name ?: $tag,
+					'year'       => $visual_year ?: get_the_date( 'Y' ),
+					'aria_label' => get_the_title(),
+				)
+			);
+			?>
 		<?php endif; ?>
 	</a>
 	<div<?php echo $featured ? ' class="card-body"' : ''; ?>>

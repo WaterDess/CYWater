@@ -57,8 +57,8 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 ## Current State
 
 Hostinger staging is available at `https://staging.cywater.org/`. The accepted
-baseline uses the CYWater `0.5.8` theme, CYWater Membership `0.8.0`, CYWater
-Environment `0.5.4`, CYWater Core `0.5.2`, and Event Tickets `5.29.1`. PMPro and Stripe
+baseline uses the CYWater `0.5.9` theme, CYWater Membership `0.8.0`, CYWater
+Environment `0.5.4`, CYWater Core `0.5.3`, and Event Tickets `5.29.1`. PMPro and Stripe
 Sandbox are active for staging acceptance; the live-payment gate remains
 closed and no production Stripe credential is configured. Postmark is connected on
 staging, its domain authentication is verified, and the user confirmed a
@@ -71,9 +71,9 @@ actions; final copy/legal review and a non-Gmail delivery target remain open.
 
 Dedicated Hostinger SSH access from the Lenovo workstation was established and
 verified with public-key authentication on 2026-08-02. A live WP-CLI check
-confirmed WordPress `7.0.2`, PHP CLI `8.3.30`, the active CYWater `0.5.8` theme,
+confirmed WordPress `7.0.2`, PHP CLI `8.3.30`, the active CYWater `0.5.9` theme,
 CYWater Membership `0.8.0`, CYWater Environment `0.5.4`, and CYWater Core
-`0.5.2`. Five malformed inactive CYWater/PMPro upload directories were removed
+`0.5.3`. Five malformed inactive CYWater/PMPro upload directories were removed
 after exact-path and inactive-status verification; active components were not
 removed and the plugin-list warnings cleared.
 
@@ -83,13 +83,20 @@ files and found zero missing, extra, or different files. All custom PHP files
 passed syntax checks, and the home, membership, sign-in, registration, account,
 profile, and logged-out checkout routes passed the expected HTTP smoke results.
 
-Theme `0.5.8` connects the four membership cards to PMPro checkout and removes
+Theme `0.5.9` connects the four membership cards to PMPro checkout and removes
 the incorrect article bullet/indentation rules from PMPro order and account
 lists. The accepted typography, palette, imagery, motion, and responsive system
 are otherwise unchanged. Real-browser desktop/mobile checks passed for the
 public account flow, and an authenticated administrator session verified the
 Account, Member Profile, and user-editor member-record surfaces without
 horizontal overflow.
+
+On 2026-08-10 CYWater Core `0.5.3` and theme `0.5.9` moved the 2020 online Best
+Paper Award Ceremony out of Annual Gathering and into the 2020 Award record.
+The exact duplicate Event was moved to trash, not permanently deleted. The
+Events archive now reuses the existing title/year tile language whenever a
+verified photograph is unavailable, so the 2026 meeting displays `Annual
+Meeting` above `2026`. GitHub Pages was not modified.
 
 CYWater Membership `0.8.0` implements the current account-first path: logged-out
 checkout redirects to sign-in, sign-in links to `/member-register/`, and a new
@@ -167,13 +174,13 @@ probe accepted a valid small PNG, rejected a PNG over 2 MB with
 `pmpro_upload_file_type_error`; all temporary files were removed.
 
 Event Tickets `5.29.1` is active on staging and is filtered by CYWater Core
-`0.5.2` to the existing `cyw_event` model only. It does not create a second
+`0.5.3` to the existing `cyw_event` model only. It does not create a second
 Events editor. A staging-only, self-cleaning acceptance probe created a
 temporary event, a free RSVP with capacity three, and one attendee; the public
 ticket form, capacity, attendee report, Editor content boundary, and cleanup
 all passed. A one-shot RSVP confirmation was accepted by the configured
 WordPress/Postmark transport and marked sent by Event Tickets; inbox/Postmark
-Activity confirmation remains a human check. Theme `0.5.8` scopes the third-party form to the existing body font,
+Activity confirmation remains a human check. Theme `0.5.9` scopes the third-party form to the existing body font,
 ink/teal palette, spacing, borders, and button language without changing the
 accepted public design. The temporary records were removed.
 
@@ -207,7 +214,9 @@ surface; it is not presented as an approved tax invoice. On 2026-08-09 a
 staging-only invoice QA passed six checks for the published route, exactly one
 PMPro invoice shortcode, Sandbox isolation, PMPro URL resolution, and existing
 completed/refunded order evidence. It created no order and exposed no member or
-payment identifier. A separate Stripe Billing Invoice workflow is not enabled.
+payment identifier. The local receipt sample uses the full organization name,
+`International Association of Contemporary Young Scholars in Water Sciences`,
+in its header. A separate Stripe Billing Invoice workflow is not enabled.
 
 CYWater Environment `0.5.4` is deployed on staging. It preserves configured
 SMTP sender names outside explicit local Mailpit mode, reports whether the

@@ -18,6 +18,7 @@ const required = [
   "wordpress/wp-content/themes/cywater/home.php",
   "wordpress/wp-content/themes/cywater/archive-cyw_event.php",
   "wordpress/wp-content/themes/cywater/archive-cyw_award.php",
+  "wordpress/wp-content/themes/cywater/template-parts/title-visual.php",
   "wordpress/wp-content/themes/cywater/page-about.php",
   "wordpress/wp-content/themes/cywater/page-board.php",
   "wordpress/wp-content/themes/cywater/page-bylaws.php",
@@ -95,27 +96,49 @@ const seed = JSON.parse(
   )
 );
 
-assert(seed.seedRevision >= 3, "WordPress seed revision must be at least 3.");
+assert(seed.seedRevision >= 5, "WordPress seed revision must be at least 5.");
 assert(seed.generatedFrom === "assets/js/content.js", "Seed source marker is incorrect.");
 assert(
   JSON.stringify(seed.articles) === JSON.stringify(registry.ARTICLES),
   "WordPress article seed differs from the static content registry."
 );
+
+const expectedEvents = structuredClone(registry.EVENTS);
+delete expectedEvents["annual-gathering-2020"];
 assert(
-  JSON.stringify(seed.events) === JSON.stringify(registry.EVENTS),
-  "WordPress event seed differs from the static content registry."
+  JSON.stringify(seed.events) === JSON.stringify(expectedEvents),
+  "WordPress event seed must exclude the misclassified 2020 award ceremony."
+);
+
+const expectedAwards = structuredClone(registry.AWARDS);
+const expectedAward2020 = expectedAwards.find(({ year }) => String(year) === "2020");
+expectedAward2020.ceremony = {
+  title: "CYWater Best Paper Award Ceremony — Online 2020",
+  date: "December 18, 2020",
+  location: "Online",
+  image: "gatherings/2020-cover.jpg",
+  imageAlt: "Participants in the online 2020 CYWater Best Paper Award Ceremony",
+  lead: "The 2020 Best Paper Award Ceremony was held online, with the recognized authors presenting their work.",
+};
+assert(
+  JSON.stringify(seed.awards) === JSON.stringify(expectedAwards),
+  "WordPress award seed is missing the normalized 2020 ceremony."
+);
+
+const expectedNewsOrder = structuredClone(registry.NEWS_LIST);
+expectedNewsOrder.find(({ id }) => id === "bpa-2020-result").alt =
+  "Participants in the online 2020 CYWater Best Paper Award Ceremony";
+assert(
+  JSON.stringify(seed.newsOrder) === JSON.stringify(expectedNewsOrder),
+  "WordPress news ordering or award-ceremony description is incorrect."
+);
+
+const expectedEventOrder = registry.EVENT_LIST.filter(
+  ({ id }) => id !== "annual-gathering-2020"
 );
 assert(
-  JSON.stringify(seed.awards) === JSON.stringify(registry.AWARDS),
-  "WordPress award seed differs from the static content registry."
-);
-assert(
-  JSON.stringify(seed.newsOrder) === JSON.stringify(registry.NEWS_LIST),
-  "WordPress news ordering differs from the static site."
-);
-assert(
-  JSON.stringify(seed.eventOrder) === JSON.stringify(registry.EVENT_LIST),
-  "WordPress event ordering differs from the static site."
+  JSON.stringify(seed.eventOrder) === JSON.stringify(expectedEventOrder),
+  "WordPress event ordering must exclude the 2020 award ceremony."
 );
 for (const event of Object.values(seed.events)) {
   if (event.image) {
@@ -148,7 +171,31 @@ const parityFiles = {
     path.join(root, "wordpress", "wp-content", "themes", "cywater", "assets", "css", "pages.css"),
     "utf8"
   ),
+  wordpressEventArchive: await readFile(
+    path.join(root, "wordpress", "wp-content", "themes", "cywater", "archive-cyw_event.php"),
+    "utf8"
+  ),
+  wordpressTitleVisual: await readFile(
+    path.join(root, "wordpress", "wp-content", "themes", "cywater", "template-parts", "title-visual.php"),
+    "utf8"
+  ),
 };
+
+assertMarkers(
+  parityFiles.wordpressEventArchive,
+  ["wp_get_post_terms", "template-parts/title-visual", "'year'       => $year"],
+  "WordPress event archive"
+);
+assertMarkers(
+  parityFiles.wordpressTitleVisual,
+  ['class="title-visual"', 'class="title-visual-year"'],
+  "Reusable title visual"
+);
+assertMarkers(
+  parityFiles.wordpressPagesCss,
+  [".title-visual {", ".title-visual strong {", ".title-visual-year {"],
+  "WordPress title visual styling"
+);
 
 const boardMarkers = [
   "Board of Directors.",

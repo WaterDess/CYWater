@@ -146,11 +146,11 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   `127.0.0.1` URL as a Lenovo-laptop preview. No Playground service is expected
   to remain running after the review task.
 
-### Temporary Staging Snapshot (2026-08-09)
+### Temporary Staging Snapshot (2026-08-10)
 
 - Hostinger staging is available at `https://staging.cywater.org/` with the
-  CYWater `0.5.8` theme, CYWater Membership `0.8.0`, CYWater Environment
-  `0.5.4`, CYWater Core `0.5.2`, and Event Tickets `5.29.1`.
+  CYWater `0.5.9` theme, CYWater Membership `0.8.0`, CYWater Environment
+  `0.5.4`, CYWater Core `0.5.3`, and Event Tickets `5.29.1`.
 - Dedicated Hostinger SSH access from the Lenovo workstation was established
   and independently verified with public-key authentication on 2026-08-02.
   The private key remains local and must never be copied into the repository.
@@ -162,7 +162,7 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   staging. Five malformed inactive CYWater/PMPro upload directories were
   removed on 2026-08-03 after exact-path and inactive-status verification;
   active plugin directories were untouched and plugin-list warnings cleared.
-- Theme `0.5.8` connects the existing Student, Professional, Lifetime, and
+- Theme `0.5.9` connects the existing Student, Professional, Lifetime, and
   Partner cards to their PMPro checkout levels and prevents PMPro order/account
   lists from inheriting the long-form article bullet and indentation rules.
   The accepted typography, palette, imagery, motion, and responsive system are
@@ -172,6 +172,12 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   Membership, sign-in, registration, and the logged-out checkout gate before
   the `0.5.7` typography-neutral wrapper follow-up, whose live HTML/CSS was
   verified structurally; authenticated cross-browser verification remains open.
+- On 2026-08-10 the 2020 online Best Paper Award record was corrected from an
+  Annual Gathering to `Best Paper Award Ceremony` and rendered under the 2020
+  Award. The exact misclassified Event was moved to the WordPress trash rather
+  than permanently deleted. Events without verified photographs now use one
+  reusable two-line title/year visual, matching the accepted News/Award tile
+  language. The GitHub Pages original was not changed.
 - Stripe Sandbox was connected through PMPro on 2026-08-02. A server-side
   presence-only check confirmed the Sandbox Connect values without reading or
   exposing them, and PMPro's own status check reports the Sandbox webhook as
@@ -275,11 +281,11 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   existing Administrator remain open. On 2026-08-03 MFA was explicitly
   deferred because no association-controlled phone, tablet, security key, or
   managed authenticator exists; do not make a private device the sole factor.
-- Event Tickets `5.29.1` is active and CYWater Core `0.5.2` limits it to the
+- Event Tickets `5.29.1` is active and CYWater Core `0.5.3` limits it to the
   existing `cyw_event` content model. A staging-only probe passed free RSVP,
   capacity, attendee reporting, public form output, Editor content boundaries,
   confirmation-mail handoff to the configured WordPress/Postmark transport,
-  and automatic cleanup. Theme `0.5.8` scopes its form to the accepted design
+  and automatic cleanup. Theme `0.5.9` scopes its form to the accepted design
   tokens without changing the public visual system. Paid event checkout remains
   disabled until Event Tickets is separately connected to the association's
   existing Stripe Sandbox and its success/decline/cancel/refund/duplicate/
@@ -423,7 +429,8 @@ Key requirements:
 - The 2026 Annual Meeting is in Nanjing, China, October 16-18; registration is
   expected to open in August.
 - Events are separated into Annual Meetings and the Annual Gathering.
-- Annual Gathering records currently include 2013, 2017, 2020, 2022, and 2024.
+- Annual Gathering records currently include 2013, 2017, 2022, and 2024. The
+  2020 online record is a Best Paper Award Ceremony and belongs under Awards.
 - Awards replace Journal in navigation and cover records from 2012 onward.
 - News is separated into Opportunities and Spotlights.
 - Membership uses calendar-year terms and the supplied dues/fee schedules.

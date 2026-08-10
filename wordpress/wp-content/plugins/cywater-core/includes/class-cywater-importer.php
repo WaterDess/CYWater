@@ -36,6 +36,7 @@ final class CYWater_Importer {
 			'awards' => $this->import_awards(),
 			'board'  => $this->import_board_roles(),
 		);
+		$report['retired_events'] = $this->retire_misclassified_events();
 		return $report;
 	}
 
@@ -237,9 +238,42 @@ final class CYWater_Importer {
 			$this->seed_meta_if_missing( $post_id, '_cyw_chair', sanitize_text_field( $award['chair'] ?? '' ) );
 			$this->seed_json_structure( $post_id, '_cyw_award_record', $award );
 			$this->seed_meta_if_missing( $post_id, '_cyw_article_id', sanitize_key( $award['articleId'] ?? '' ) );
+			if ( ! empty( $award['ceremony']['image'] ) ) {
+				$this->set_featured_image( $post_id, $award['ceremony']['image'], $award['ceremony']['imageAlt'] ?? $award['ceremony']['title'] ?? '' );
+			}
 			$this->complete_seed_revision( $post_id );
 			++$count;
 		}
+		return $count;
+	}
+
+	/**
+	 * Retire the duplicate 2020 ceremony from Events after it has been moved to
+	 * the corresponding Award record. Trashing keeps the operation recoverable.
+	 */
+	private function retire_misclassified_events() {
+		if ( $this->seed_revision < 5 ) {
+			return 0;
+		}
+
+		$posts = get_posts(
+			array(
+				'post_type'      => 'cyw_event',
+				'post_status'    => array( 'publish', 'future', 'draft', 'pending', 'private' ),
+				'posts_per_page' => -1,
+				'meta_key'       => '_cyw_source_id',
+				'meta_value'     => 'event:annual-gathering-2020',
+				'fields'         => 'ids',
+			)
+		);
+
+		$count = 0;
+		foreach ( $posts as $post_id ) {
+			if ( wp_trash_post( (int) $post_id ) ) {
+				++$count;
+			}
+		}
+
 		return $count;
 	}
 
