@@ -7,17 +7,23 @@ CYWater theme (presentation)
         |
         v
 CYWater Core (public content models)
-
-CYWater Membership (profile, privacy, level policy)
-        |
-        v
-Paid Memberships Pro (accounts, orders, membership state)
-        |
-        v
-CYWater Environment (configuration and safety gates)
-        |
-        v
-Stripe / SMTP / host environment
+        +------------------------------+
+        |                              |
+        v                              v
+Event Tickets                 CYWater Membership
+(event registration)          (profile/privacy policy)
+        |                              |
+        |                              v
+        |                     Paid Memberships Pro
+        |                     (membership state/orders)
+        +---------------+--------------+
+                        |
+                        v
+              CYWater Environment
+              (configuration/safety)
+                        |
+                        v
+              Stripe / SMTP / host
 ```
 
 ## Ownership
@@ -26,8 +32,9 @@ Stripe / SMTP / host environment
 | --- | --- | --- |
 | `themes/cywater` | Templates, CSS, images, navigation presentation | Content types, payment state, secrets |
 | `plugins/cywater-core` | News import, Events, Awards, Board roles, editorial metadata | Checkout, member profiles, CSS |
-| `plugins/cywater-membership` | PMPro levels, professional profile fields, privacy opt-in, directory | Stripe SDK, webhook endpoint, theme layout |
-| `plugins/cywater-environment` | Environment reads, Mailpit routing, test/live safety gates, readiness report | Membership rules, content rendering |
+| Event Tickets | Tickets and RSVPs attached only to `cyw_event`, capacity, attendees, event-order state | Membership levels, PMPro orders, CYWater content types, duplicated event records |
+| `plugins/cywater-membership` | PMPro levels, professional profile fields, privacy opt-in, directory, read-only admin projection | Stripe SDK, webhook endpoint, theme layout, duplicate member/order storage |
+| `plugins/cywater-environment` | Environment reads, Mailpit routing, test/live safety gates, readiness report, conservative response headers | Membership rules, content rendering, full CSP policy |
 | Paid Memberships Pro | Registration, orders, membership activation, renewal/expiry mechanics, Stripe gateway/webhook | CYWater content and visual design |
 
 ## Rules
@@ -44,3 +51,15 @@ Stripe / SMTP / host environment
    maintenance operation and requires a database backup plus explicit approval.
 6. The public member directory is opt-in twice: a master profile switch and a
    per-field allowlist. Email addresses are never rendered.
+7. The CYWater administrator record reads WordPress and PMPro data in place. It
+   must not persist a second copy of identity, membership, order, or payment
+   state.
+8. Event Tickets is filtered to the existing `cyw_event` post type. Do not
+   enable its Page/Post surfaces or install a second event-content model.
+9. PMPro remains authoritative only for membership dues. Event Tickets owns
+   conference/event registrations. A membership refund revokes the matching
+   membership; an event refund cancels only the matching attendee/seat. Neither
+   path may call the other's entitlement logic.
+10. Free RSVP and paid event tickets share the same event record, but paid
+    checkout stays disabled until the association's existing Stripe Sandbox is
+    connected to Event Tickets and the refund/duplicate-webhook matrix passes.

@@ -23,6 +23,104 @@ final class CYWater_Membership_Privacy {
 		add_shortcode( 'cywater_privacy_settings', array( __CLASS__, 'privacy_shortcode' ) );
 		add_shortcode( 'cywater_member_directory', array( __CLASS__, 'directory_shortcode' ) );
 		add_action( 'admin_post_cywater_save_privacy', array( __CLASS__, 'save_privacy' ) );
+		add_filter( 'wp_privacy_personal_data_exporters', array( __CLASS__, 'register_exporter' ) );
+		add_filter( 'wp_privacy_personal_data_erasers', array( __CLASS__, 'register_eraser' ) );
+	}
+
+	public static function public_field_labels() {
+		return self::$public_fields;
+	}
+
+	public static function register_exporter( $exporters ) {
+		$exporters['cywater-membership'] = array(
+			'exporter_friendly_name' => __( 'CYWater membership profile', 'cywater-membership' ),
+			'callback'               => array( __CLASS__, 'export_personal_data' ),
+		);
+		return $exporters;
+	}
+
+	public static function register_eraser( $erasers ) {
+		$erasers['cywater-membership'] = array(
+			'eraser_friendly_name' => __( 'CYWater membership profile', 'cywater-membership' ),
+			'callback'             => array( __CLASS__, 'erase_personal_data' ),
+		);
+		return $erasers;
+	}
+
+	public static function export_personal_data( $email_address, $page = 1 ) {
+		$user = get_user_by( 'email', sanitize_email( $email_address ) );
+		if ( ! $user || 1 !== absint( $page ) ) {
+			return array( 'data' => array(), 'done' => true );
+		}
+
+		$data = array();
+		foreach ( self::$public_fields as $key => $label ) {
+			$value = get_user_meta( $user->ID, $key, true );
+			if ( is_array( $value ) ) {
+				$value = wp_json_encode( $value );
+			}
+			if ( '' !== trim( (string) $value ) ) {
+				$data[] = array( 'name' => $label, 'value' => (string) $value );
+			}
+		}
+		$data[] = array(
+			'name'  => __( 'Public directory', 'cywater-membership' ),
+			'value' => get_user_meta( $user->ID, 'cyw_profile_public', true ) ? __( 'Opted in', 'cywater-membership' ) : __( 'Private', 'cywater-membership' ),
+		);
+		$selected = array_intersect( (array) get_user_meta( $user->ID, 'cyw_public_fields', true ), array_keys( self::$public_fields ) );
+		$data[]   = array(
+			'name'  => __( 'Public fields', 'cywater-membership' ),
+			'value' => $selected ? implode( ', ', array_map( static function ( $key ) { return self::$public_fields[ $key ]; }, $selected ) ) : __( 'None', 'cywater-membership' ),
+		);
+		$data[] = array(
+			'name'  => __( 'Email ownership', 'cywater-membership' ),
+			'value' => CYWater_Membership_Account_Security::is_verified( $user->ID ) ? __( 'Verified', 'cywater-membership' ) : __( 'Verification required', 'cywater-membership' ),
+		);
+		$last_login = CYWater_Membership_Account_Security::last_login_at( $user->ID );
+		if ( $last_login ) {
+			$data[] = array( 'name' => __( 'Last sign-in', 'cywater-membership' ), 'value' => gmdate( 'c', $last_login ) );
+		}
+		$closure = CYWater_Membership_Account_Security::closure_requested_at( $user->ID );
+		if ( $closure ) {
+			$data[] = array( 'name' => __( 'Account closure requested', 'cywater-membership' ), 'value' => gmdate( 'c', $closure ) );
+		}
+
+		return array(
+			'data' => array(
+				array(
+					'group_id'    => 'cywater-membership',
+					'group_label' => __( 'CYWater membership profile', 'cywater-membership' ),
+					'item_id'     => 'cywater-membership-' . $user->ID,
+					'data'        => $data,
+				),
+			),
+			'done' => true,
+		);
+	}
+
+	public static function erase_personal_data( $email_address, $page = 1 ) {
+		$user = get_user_by( 'email', sanitize_email( $email_address ) );
+		if ( ! $user || 1 !== absint( $page ) ) {
+			return array( 'items_removed' => false, 'items_retained' => false, 'messages' => array(), 'done' => true );
+		}
+
+		$removed = false;
+		foreach ( CYWater_Membership_Fields::field_keys() as $key ) {
+			if ( 'cyw_profile_photo' === $key ) {
+				self::delete_profile_photo_file( get_user_meta( $user->ID, $key, true ) );
+			}
+			$removed = delete_user_meta( $user->ID, $key ) || $removed;
+		}
+		foreach ( array( 'cyw_profile_public', 'cyw_public_fields', 'cyw_email_verification_hash', 'cyw_email_verification_expires', 'cyw_email_verification_sent', 'cyw_email_verification_window', 'cyw_email_verification_count', 'cyw_last_login_at' ) as $key ) {
+			$removed = delete_user_meta( $user->ID, $key ) || $removed;
+		}
+
+		return array(
+			'items_removed'  => $removed,
+			'items_retained' => true,
+			'messages'       => array( __( 'The WordPress identity, account-closure request, PMPro orders, refunds, memberships, and event records are retained for separate administrator review. This eraser does not delete the user account.', 'cywater-membership' ) ),
+			'done'           => true,
+		);
 	}
 
 	public static function privacy_shortcode() {
@@ -83,7 +181,7 @@ final class CYWater_Membership_Privacy {
 		ob_start();
 		echo '<div class="member-directory grid grid-3">';
 		foreach ( $users as $user ) {
-			if ( function_exists( 'pmpro_hasMembershipLevel' ) && ! pmpro_hasMembershipLevel( null, $user->ID ) ) {
+			if ( ! self::has_current_membership( $user->ID ) ) {
 				continue;
 			}
 			$fields = (array) get_user_meta( $user->ID, 'cyw_public_fields', true );
@@ -117,5 +215,38 @@ final class CYWater_Membership_Privacy {
 		}
 		echo '</div>';
 		return ob_get_clean();
+	}
+
+	private static function has_current_membership( $user_id ) {
+		if ( ! function_exists( 'pmpro_getMembershipLevelsForUser' ) ) {
+			return false;
+		}
+
+		$now    = current_time( 'timestamp' );
+		$levels = (array) pmpro_getMembershipLevelsForUser( $user_id );
+		foreach ( $levels as $level ) {
+			$enddate = isset( $level->enddate ) ? (int) $level->enddate : 0;
+			if ( 0 === $enddate || $enddate > $now ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private static function delete_profile_photo_file( $photo ) {
+		if ( ! is_array( $photo ) ) {
+			return;
+		}
+		if ( ! empty( $photo['attachment_id'] ) ) {
+			wp_delete_attachment( absint( $photo['attachment_id'] ), true );
+			return;
+		}
+		$path    = isset( $photo['fullpath'] ) ? wp_normalize_path( (string) $photo['fullpath'] ) : '';
+		$uploads = wp_get_upload_dir();
+		$base    = wp_normalize_path( (string) ( $uploads['basedir'] ?? '' ) );
+		if ( $path && $base && str_starts_with( $path, trailingslashit( $base ) ) && is_file( $path ) ) {
+			wp_delete_file( $path );
+		}
 	}
 }

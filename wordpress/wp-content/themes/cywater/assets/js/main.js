@@ -18,19 +18,28 @@
   /* ---------- Mobile nav ---------- */
   const toggle = document.querySelector(".nav-toggle");
   if (toggle) {
+    const closeMobileNav = () => {
+      document.body.classList.remove("nav-open");
+      document.body.style.overflow = "";
+      toggle.setAttribute("aria-expanded", "false");
+    };
     toggle.addEventListener("click", () => {
       document.body.classList.toggle("nav-open");
       const open = document.body.classList.contains("nav-open");
       toggle.setAttribute("aria-expanded", String(open));
       document.body.style.overflow = open ? "hidden" : "";
+      if (open) document.querySelector(".nav-mobile a")?.focus();
     });
     // close on link click
     document.querySelectorAll(".nav-mobile a").forEach((a) => {
       a.addEventListener("click", () => {
-        document.body.classList.remove("nav-open");
-        document.body.style.overflow = "";
-        toggle.setAttribute("aria-expanded", "false");
+        closeMobileNav();
       });
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape" || !document.body.classList.contains("nav-open")) return;
+      closeMobileNav();
+      toggle.focus();
     });
   }
 
@@ -79,19 +88,12 @@
   document.querySelectorAll(".faq-item").forEach((item) => {
     const q = item.querySelector(".faq-q");
     if (!q) return;
-    q.setAttribute("role", "button");
-    q.setAttribute("tabindex", "0");
     const toggleFaq = () => {
       const open = item.classList.toggle("is-open");
       q.setAttribute("aria-expanded", String(open));
+      item.querySelector(".faq-a")?.setAttribute("aria-hidden", String(!open));
     };
     q.addEventListener("click", toggleFaq);
-    q.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        toggleFaq();
-      }
-    });
   });
 
   /* ---------- Scroll-spy for bylaws TOC ---------- */

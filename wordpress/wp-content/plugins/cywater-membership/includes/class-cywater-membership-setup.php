@@ -59,14 +59,17 @@ final class CYWater_Membership_Setup {
 
 	private static function setup_pages() {
 		$pages = array(
-			'account'             => array( 'Member account', 'account', '[pmpro_account]', 'pmpro_account_page_id' ),
+			'account'             => array( 'Member account', 'account', '[pmpro_account][cywater_account_security]', 'pmpro_account_page_id' ),
 			'billing'             => array( 'Membership billing', 'membership-billing', '[pmpro_billing]', 'pmpro_billing_page_id' ),
 			'cancel'              => array( 'Cancel membership', 'membership-cancel', '[pmpro_cancel]', 'pmpro_cancel_page_id' ),
 			'checkout'            => array( 'Membership checkout', 'membership-checkout', '[pmpro_checkout]', 'pmpro_checkout_page_id' ),
 			'confirmation'        => array( 'Membership confirmation', 'membership-confirmation', '[pmpro_confirmation]', 'pmpro_confirmation_page_id' ),
 			'invoice'             => array( 'Membership order', 'membership-order', '[pmpro_invoice]', 'pmpro_invoice_page_id' ),
 			'levels'              => array( 'Membership', 'membership', '', 'pmpro_levels_page_id' ),
-			'login'               => array( 'Member sign in', 'member-login', '[pmpro_login]', 'pmpro_login_page_id' ),
+			'login'               => array( 'Member sign in', 'member-login', '[cywater_member_login]', 'pmpro_login_page_id' ),
+			'register'            => array( 'Create member account', 'member-register', '[cywater_member_register]', '' ),
+			'verify_email'        => array( 'Verify email', 'verify-email', '[cywater_email_verification]', '' ),
+			'close_account'       => array( 'Close account', 'close-account', '[cywater_account_closure]', '' ),
 			'member_profile_edit' => array( 'Member profile', 'member-profile', '[pmpro_member_profile_edit][cywater_privacy_settings]', 'pmpro_member_profile_edit_page_id' ),
 		);
 		$result = array();
@@ -74,8 +77,21 @@ final class CYWater_Membership_Setup {
 			$existing = get_page_by_path( $page[1] );
 			if ( $existing ) {
 				$page_id = $existing->ID;
-				if ( $page[2] && ! has_shortcode( $existing->post_content, trim( strtok( $page[2], ']' ), '[' ) ) ) {
-					wp_update_post( array( 'ID' => $page_id, 'post_content' => $page[2] ) );
+				$content = $existing->post_content;
+				if ( $page[2] && preg_match_all( '/\[([a-zA-Z0-9_-]+)/', $page[2], $matches ) ) {
+					foreach ( array_unique( $matches[1] ) as $shortcode ) {
+						if ( ! has_shortcode( $content, $shortcode ) ) {
+							$content .= '[' . $shortcode . ']';
+						}
+						$content = preg_replace(
+							'/(?:\[' . preg_quote( $shortcode, '/' ) . '\]\s*){2,}/',
+							'[' . $shortcode . ']',
+							$content
+						);
+					}
+					if ( $content !== $existing->post_content ) {
+						wp_update_post( array( 'ID' => $page_id, 'post_content' => $content ) );
+					}
 				}
 			} else {
 				$page_id = wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => $page[0], 'post_name' => $page[1], 'post_content' => $page[2] ) );

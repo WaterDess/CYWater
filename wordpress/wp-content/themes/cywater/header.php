@@ -52,11 +52,11 @@ $account = function_exists( 'pmpro_url' ) ? pmpro_url( 'account' ) : wp_login_ur
 		<div class="header-actions">
 			<a class="btn btn-ghost" href="<?php echo esc_url( $account ); ?>"><?php echo is_user_logged_in() ? esc_html__( 'Account', 'cywater' ) : esc_html__( 'Sign in', 'cywater' ); ?></a>
 			<a class="btn btn-primary" href="<?php echo esc_url( home_url( '/membership/' ) ); ?>"><?php esc_html_e( 'Join CYWater', 'cywater' ); ?></a>
-			<button class="nav-toggle" aria-label="<?php esc_attr_e( 'Menu', 'cywater' ); ?>" aria-expanded="false"><span></span></button>
+			<button class="nav-toggle" aria-label="<?php esc_attr_e( 'Menu', 'cywater' ); ?>" aria-controls="cywater-mobile-nav" aria-expanded="false"><span></span></button>
 		</div>
 	</div>
 </header>
-<nav class="nav-mobile" aria-label="<?php esc_attr_e( 'Mobile', 'cywater' ); ?>">
+<nav id="cywater-mobile-nav" class="nav-mobile" aria-label="<?php esc_attr_e( 'Mobile', 'cywater' ); ?>">
 	<a href="<?php echo esc_url( home_url( '/about/' ) ); ?>"><?php esc_html_e( 'About', 'cywater' ); ?></a>
 	<a href="<?php echo esc_url( home_url( '/board/' ) ); ?>" class="sub-link"><?php esc_html_e( 'Board', 'cywater' ); ?></a>
 	<a href="<?php echo esc_url( home_url( '/bylaws/' ) ); ?>" class="sub-link"><?php esc_html_e( 'Bylaws', 'cywater' ); ?></a>

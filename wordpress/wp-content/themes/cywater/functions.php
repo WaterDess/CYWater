@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CYWATER_THEME_VERSION', '0.5.2' );
+define( 'CYWATER_THEME_VERSION', '0.5.8' );
 
 function cywater_theme_setup() {
 	add_theme_support( 'title-tag' );
@@ -87,7 +87,7 @@ function cywater_current_section() {
 	if ( is_page( array( 'about', 'board', 'bylaws' ) ) ) {
 		return 'about';
 	}
-	if ( is_page( array( 'membership', 'account', 'membership-account', 'membership-billing', 'membership-cancel', 'membership-checkout', 'membership-confirmation', 'membership-order', 'member-login', 'member-profile', 'members' ) ) ) {
+	if ( is_page( array( 'membership', 'account', 'membership-account', 'membership-billing', 'membership-cancel', 'membership-checkout', 'membership-confirmation', 'membership-order', 'member-login', 'member-register', 'member-profile', 'members' ) ) ) {
 		return 'membership';
 	}
 	if ( is_page( 'contact' ) ) {

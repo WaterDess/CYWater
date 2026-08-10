@@ -188,13 +188,13 @@
 .prose h3 { margin-top: var(--sp-5); margin-bottom: var(--sp-2); font-size: var(--fs-md); }
 .prose p { margin-bottom: var(--sp-3); }
 .prose ul { list-style: none; margin-bottom: var(--sp-3); }
-.prose ul li {
+.prose ul:not(.pmpro_list) li {
   position: relative;
   padding-left: 1.4rem;
   margin-bottom: 0.4rem;
   color: var(--ink-soft);
 }
-.prose ul li::before {
+.prose ul:not(.pmpro_list) li::before {
   content: "";
   position: absolute; left: 0; top: 0.7em;
   width: 6px; height: 6px;
@@ -778,6 +778,7 @@
 }
 
 @media (max-width: 720px) {
+  .latest-head { flex-direction: column; align-items: flex-start; }
   .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
   .highlight-strip { grid-template-columns: repeat(2, 1fr); }
   .highlight-strip > div:nth-child(2) { border-right: 0; }

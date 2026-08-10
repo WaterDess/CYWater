@@ -54,6 +54,53 @@
   font-size: var(--fs-sm);
 }
 
+/* Event Tickets is an operational form, not long-form article content. */
+.single-cyw_event .entry-content .tribe-common,
+.single-cyw_event .entry-content .tribe-tickets {
+  max-width: 100%;
+  margin-top: var(--sp-6);
+  font-family: var(--font-body);
+  color: var(--ink);
+}
+
+.single-cyw_event .prose .tribe-common ul,
+.single-cyw_event .prose .tribe-common ol,
+.single-cyw_event .prose .tribe-tickets ul,
+.single-cyw_event .prose .tribe-tickets ol {
+  margin-left: 0;
+  list-style: none;
+}
+
+.single-cyw_event .prose .tribe-common li,
+.single-cyw_event .prose .tribe-tickets li {
+  padding-left: 0;
+}
+
+.single-cyw_event .prose .tribe-common li::before,
+.single-cyw_event .prose .tribe-tickets li::before {
+  content: none;
+}
+
+.single-cyw_event .tribe-common .tribe-common-c-btn,
+.single-cyw_event .tribe-tickets .tribe-common-c-btn {
+  border-radius: 100px;
+  background: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+.single-cyw_event .tribe-common .tribe-common-c-btn:hover,
+.single-cyw_event .tribe-tickets .tribe-common-c-btn:hover {
+  background: var(--teal-deep);
+}
+
+.single-cyw_event .tribe-tickets__form-field-input {
+  border-color: var(--line);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+}
+
 .cywater-privacy-form {
   display: grid;
   gap: var(--sp-5);
@@ -86,9 +133,38 @@
   margin-bottom: var(--sp-4);
 }
 
+.cywater-register {
+  max-width: 38rem;
+  padding: var(--sp-6);
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.cywater-register h2 {
+  margin: 0 0 var(--sp-2);
+}
+
+.cywater-register > p {
+  margin-bottom: var(--sp-5);
+}
+
+.cywater-register .notice {
+  margin-bottom: var(--sp-4);
+  padding: var(--sp-3) var(--sp-4);
+  border-left: 3px solid var(--rust);
+  background: var(--paper-warm);
+}
+
+.cywater-register .btn {
+  margin-top: var(--sp-2);
+}
+
 .faq-item { border-bottom: 1px solid var(--line); }
 .faq-item:first-child { border-top: 1px solid var(--line); }
-.faq-q { display: flex; justify-content: space-between; align-items: center; gap: var(--sp-3); padding: var(--sp-4) 0; cursor: pointer; font-weight: 600; font-family: var(--font-body); }
+.faq-item > h3 { margin: 0; font: inherit; }
+.faq-q { display: flex; width: 100%; justify-content: space-between; align-items: center; gap: var(--sp-3); padding: var(--sp-4) 0; border: 0; background: transparent; color: inherit; text-align: left; cursor: pointer; font-weight: 600; font-family: var(--font-body); }
 .faq-q::after { content: "+"; font-size: 1.4rem; color: var(--teal); transition: transform var(--dur) var(--ease); }
 .faq-item.is-open .faq-q::after { transform: rotate(45deg); }
 .faq-a { max-height: 0; overflow: hidden; transition: max-height var(--dur) var(--ease); }

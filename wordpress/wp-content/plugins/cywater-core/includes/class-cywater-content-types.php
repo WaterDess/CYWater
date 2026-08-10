@@ -12,6 +12,20 @@ final class CYWater_Content_Types {
 		add_action( 'init', array( __CLASS__, 'register_content_types' ) );
 		add_action( 'init', array( __CLASS__, 'register_meta' ) );
 		add_action( 'pre_get_posts', array( __CLASS__, 'order_archives' ) );
+		add_filter( 'tribe_tickets_post_types', array( __CLASS__, 'ticket_post_types' ) );
+	}
+
+	/**
+	 * Keep ticketing isolated to the CYWater event record.
+	 *
+	 * Event Tickets defaults to pages and its own calendar post type. CYWater
+	 * already owns the public event model, so enabling any other post type would
+	 * create a second, confusing editorial surface.
+	 *
+	 * @return array<int, string>
+	 */
+	public static function ticket_post_types() {
+		return array( 'cyw_event' );
 	}
 
 	public static function register_content_types() {

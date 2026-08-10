@@ -84,8 +84,9 @@ final class CYWater_Membership_Fields {
 					'required'           => false,
 					'profile'            => 'only',
 					'memberslistcsv'     => false,
-					'allowed_file_types' => array( 'jpg', 'jpeg', 'png', 'webp' ),
-					'max_file_size'      => 2 * MB_IN_BYTES,
+					// PMPro expects a comma-separated extension list and a size in MB.
+					'allowed_file_types' => 'jpg,jpeg,png,webp',
+					'max_file_size'      => 2,
 				)
 			),
 		);

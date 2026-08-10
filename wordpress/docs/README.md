@@ -1,8 +1,11 @@
 # CYWater WordPress Integration
 
 This directory describes the production candidate that is developed on the
-`wordpress-integration` branch. The public GitHub Pages preview remains on
-`main` and `gh-pages` until the WordPress site passes acceptance.
+`wordpress-integration` branch. The `staging` branch is a promotion snapshot
+for code already deployed to and checked against the actual Hostinger staging
+environment; it is not an automatic deployment source. The public GitHub Pages
+preview remains on `main` and `gh-pages` until the WordPress site passes
+acceptance.
 
 ## Quick Start
 
@@ -42,29 +45,202 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 - `module-boundaries.md` - ownership and dependency rules
 - `member-workflow.md` - registration, profile, privacy, and status model
 - `payment-testing.md` - Stripe sandbox and refund test matrix
+- `stripe-live-verification.md` - US nonprofit Live KYC and bank-document packet
 - `deployment.md` - development, staging, production, DNS, and release flow
 - `staging-next-actions.md` - ordered gates after visual/content staging acceptance
 - `hostinger-runtime-config.md` - exact non-secret staging and payment safety switches
 - `accounts-required.md` - account ownership and current blockers
 - `production-checklist.md` - launch acceptance gates
+- `manual-external-handoff.md` - remaining human, policy, license, and cutover work
 - `email-copy.md` - approved-content drafts, not active mail overrides
 
 ## Current State
 
 Hostinger staging is available at `https://staging.cywater.org/`. The accepted
-baseline uses the CYWater `0.5.2` theme and the `0.5.1` releases of
-`cywater-core`, `cywater-membership`, and `cywater-environment`. PMPro is active,
-but payment remains disabled, the live-payment gate remains closed, and Stripe
-and production SMTP credentials are not configured. Postmark is connected on
+baseline uses the CYWater `0.5.8` theme, CYWater Membership `0.8.0`, CYWater
+Environment `0.5.4`, CYWater Core `0.5.2`, and Event Tickets `5.29.1`. PMPro and Stripe
+Sandbox are active for staging acceptance; the live-payment gate remains
+closed and no production Stripe credential is configured. Postmark is connected on
 staging, its domain authentication is verified, and the user confirmed a
-successful post-rotation test message on 2026-08-02. Full transactional email
-workflow acceptance remains open.
+successful post-rotation test message on 2026-08-02. On 2026-08-03, PMPro's
+sender and the WordPress administrator notification address were corrected to
+the association-controlled `web@cywater.org` identity. Registration, password
+reset, and seven PMPro transaction/lifecycle templates were then Delivered.
+PMPro's recurring Action Scheduler jobs are pending normally with zero failed
+actions; final copy/legal review and a non-Gmail delivery target remain open.
 
-The next environment-plugin release is `0.5.2`. It preserves configured SMTP
-sender names outside local Mailpit and reports whether the WordPress file editor
-is disabled. It does not change the accepted public design or content baseline.
+Dedicated Hostinger SSH access from the Lenovo workstation was established and
+verified with public-key authentication on 2026-08-02. A live WP-CLI check
+confirmed WordPress `7.0.2`, PHP CLI `8.3.30`, the active CYWater `0.5.8` theme,
+CYWater Membership `0.8.0`, CYWater Environment `0.5.4`, and CYWater Core
+`0.5.2`. Five malformed inactive CYWater/PMPro upload directories were removed
+after exact-path and inactive-status verification; active components were not
+removed and the plugin-list warnings cleared.
 
-The repository contains no live Stripe key, bank credential, production SMTP
+After the `0.6.5` profile fix, all four custom code trees were redeployed from
+the Lenovo workspace to staging. A post-deploy SHA-256 comparison covered 104
+files and found zero missing, extra, or different files. All custom PHP files
+passed syntax checks, and the home, membership, sign-in, registration, account,
+profile, and logged-out checkout routes passed the expected HTTP smoke results.
+
+Theme `0.5.8` connects the four membership cards to PMPro checkout and removes
+the incorrect article bullet/indentation rules from PMPro order and account
+lists. The accepted typography, palette, imagery, motion, and responsive system
+are otherwise unchanged. Real-browser desktop/mobile checks passed for the
+public account flow, and an authenticated administrator session verified the
+Account, Member Profile, and user-editor member-record surfaces without
+horizontal overflow.
+
+CYWater Membership `0.8.0` implements the current account-first path: logged-out
+checkout redirects to sign-in, sign-in links to `/member-register/`, and a new
+account must complete a 24-hour one-time email-verification link before returning
+to the originally selected checkout. Verification mail uses
+`CYWater Accounts <accounts@cywater.org>` with replies routed to
+`membership@cywater.org`; resend is limited to once per minute, link replay is
+rejected, and an email change invalidates the earlier verification. General
+WordPress registration remains disabled. Existing staging accounts were
+backfilled for their current stored email during setup. A staging-only,
+self-cleaning test passed 37 checks covering sender/reply identity, hashed token
+issuance, one-time verification, replay rejection, email-change invalidation,
+closure cooling-off/review state, checkout blocking, request withdrawal,
+hourly mail limits, session revocation, WordPress privacy export/erasure,
+last-sign-in recording, and administrator-record/list rendering. Intercepted test mail
+was not sent and the temporary user was removed. A separate real verification
+message was accepted by the configured WordPress/Postmark transport and its
+temporary user was removed; final Workspace inbox delivery remains a human
+check. Stripe Sandbox was connected
+through PMPro on 2026-08-02. A Student `$20` Sandbox payment and the resulting
+`checkout.session.completed` webhook were verified on 2026-08-03. The Sandbox
+configuration reports card, Apple Pay, Google Pay/Link, Alipay, and WeChat Pay
+enabled and available; Stripe dynamically displays only methods eligible for a
+particular buyer and checkout. The verified USD Checkout displayed card, Apple
+Pay, Google Pay, and Alipay, but Stripe did not display WeChat Pay. A cancelled
+Alipay checkout left the PMPro order in `token` state and granted no membership.
+Stripe's official Sandbox decline method returned `card_declined` /
+`generic_decline`, with no successful PMPro order or active membership; the
+hosted-Checkout UI click remains open because browser control timed out. A full
+Sandbox refund changed the successful order to `refunded`. CYWater Membership
+`0.6.2` now revokes the matching membership level and its active renewal
+subscription, while a later successful order for the same user and level
+protects the newer entitlement. The historical refunded Student test order was
+reconciled from one active level to zero; a second execution was idempotent.
+An HTTP replay of the original successful event returned 200, was ignored as
+already processed, and created no duplicate order or membership. The recurring
+renewal/expiry queue is healthy; a manual hosted-Checkout decline click remains
+optional because the authoritative Sandbox decline result was already verified.
+
+CYWater Membership `0.8.0` also provides a read-only `CYWater member record` in the
+WordPress user editor. It summarizes required-profile completion and directory
+privacy, account creation/last sign-in, email verification, active level and
+expiry, and account-closure requests. The Users list adds account/membership
+columns and filters for verification required, closure cooling-off, and closure
+review due. A closure request starts a seven-day request-based cooling-off
+period, pauses new membership checkout, and never uses inactivity or automatic
+deletion. Members may sign out other devices and an administrator may revoke
+another account's sessions. CYWater profile/privacy metadata participates in
+WordPress core personal-data export/erasure without deleting the WordPress
+identity, closure request, PMPro orders/refunds, memberships, or event records.
+It links an authorized administrator to
+the matching PMPro Members and Orders views and to Events for the matching
+attendee report. The view stores no duplicate account, membership, order,
+event-registration, or payment data. An authenticated administrator check verified the refunded test
+member has all five required fields, remains private, has no active membership,
+and exposes the intended PMPro Members/Orders links.
+
+CYWater Membership `0.6.5` also checks the actual membership end date before
+rendering an opted-in directory profile, so an expired member is hidden even
+before PMPro's queued expiration callback changes the stored status. Staging
+probes passed opt-in/private/expired visibility, field allowlisting, email
+exclusion, ORCID output, expiration scheduling and callback behavior, and
+administrator/editor/subscriber capability boundaries. The PMPro Membership
+Manager role is not installed; the official Premium Add On and a valid license
+remain an external access-control gate.
+
+CYWater Membership `0.6.5` fixes the optional profile-photo field contract with
+PMPro: allowed extensions are passed as the required comma-separated string and
+the maximum size is passed in megabytes. This removed the authenticated profile
+page's PHP fatal error. Live HTML now renders the file input with
+`.jpg,.jpeg,.png,.webp`, a 2 MB server-side limit, all privacy controls, and no
+critical-error message on desktop or 375px mobile. A one-shot PMPro validation
+probe accepted a valid small PNG, rejected a PNG over 2 MB with
+`pmpro_upload_file_size_error`, and rejected GIF with
+`pmpro_upload_file_type_error`; all temporary files were removed.
+
+Event Tickets `5.29.1` is active on staging and is filtered by CYWater Core
+`0.5.2` to the existing `cyw_event` model only. It does not create a second
+Events editor. A staging-only, self-cleaning acceptance probe created a
+temporary event, a free RSVP with capacity three, and one attendee; the public
+ticket form, capacity, attendee report, Editor content boundary, and cleanup
+all passed. A one-shot RSVP confirmation was accepted by the configured
+WordPress/Postmark transport and marked sent by Event Tickets; inbox/Postmark
+Activity confirmation remains a human check. Theme `0.5.8` scopes the third-party form to the existing body font,
+ink/teal palette, spacing, borders, and button language without changing the
+accepted public design. The temporary records were removed.
+
+Paid event checkout is intentionally still closed. Event Tickets must be
+connected separately to the association's existing Stripe Sandbox because its
+event orders and attendee/seat entitlements are independent from PMPro
+membership orders. The free plugin also adds its current application fee to
+Stripe transactions; the association must accept that fee or buy Event Tickets
+Plus before paid-event launch. After connection, refund and duplicate-webhook
+acceptance must prove that a full event refund cancels only the matching
+registration and never an unrelated membership.
+
+The staging administrator's notification email was corrected from the invalid
+staging-only address to `web@cywater.org` on 2026-08-03 and verified through
+WP-CLI. Membership acceptance tests must use a separate logged-out test member
+instead of purchasing a membership while signed in as the administrator.
+
+The original paid-checkout and refund events reached PMPro's mail layer but its
+email log recorded both member and administrator messages as failed because
+PMPro still used Hostinger's default unverified sender. After setting the PMPro
+sender name/email to `CYWater <web@cywater.org>`, an actual account-registration
+mail and password-reset mail were Delivered through Postmark. PMPro paid
+checkout, refund, recurring payment failure, renewal invoice, cancellation,
+expiration warning, and expiration templates were also Delivered. The dated
+expiration probe included December 31, 2026. These probes verify transport and
+template rendering; scheduler-driven renewal/expiration acceptance, approved
+production copy/legal footer, and delivery to a non-Gmail provider remain open.
+
+The protected PMPro membership-order page is the current Sandbox receipt
+surface; it is not presented as an approved tax invoice. On 2026-08-09 a
+staging-only invoice QA passed six checks for the published route, exactly one
+PMPro invoice shortcode, Sandbox isolation, PMPro URL resolution, and existing
+completed/refunded order evidence. It created no order and exposed no member or
+payment identifier. A separate Stripe Billing Invoice workflow is not enabled.
+
+CYWater Environment `0.5.4` is deployed on staging. It preserves configured
+SMTP sender names outside explicit local Mailpit mode, reports whether the
+WordPress file editor is disabled, removes the PHP version header, and sends
+HSTS, nosniff, same-origin framing, strict-origin referrer, and restricted
+camera/microphone/geolocation headers. `DISALLOW_FILE_EDIT` is enabled and
+`WP_DEBUG_DISPLAY` is disabled. Anonymous REST user enumeration and author
+archives now return 404; only XML-RPC's three inert introspection methods remain,
+and publishing/authentication methods are unavailable. Directory indexing is
+denied and staging `wp-config.php` permissions are `600`. No public design or
+content changed. Staging has one association-owned full Administrator: login
+`web@staging.cywater.org`, notification/recovery email `web@cywater.org`. The
+association decided on 2026-08-03 that a second full WordPress Administrator is
+not a launch requirement. MFA and association-controlled recovery material for
+the existing Administrator remain open.
+
+The reusable `scripts/cywater-staging-lifecycle-qa.php` acceptance test is
+hard-guarded to `staging.cywater.org`. On 2026-08-03 it passed real database
+create, update, trash, and permanent-delete operations for News, Events,
+Awards, and Board roles. It also passed temporary Subscriber creation, required
+profile persistence, private-by-default directory controls, PMPro membership
+activation/cancellation, account deletion, and full-refund entitlement evidence.
+Its temporary posts and user were removed automatically.
+
+The reusable `scripts/cywater-staging-ticketing-qa.php` test is also hard-
+guarded to staging. It verifies the single `cyw_event` integration, built-in
+Editor capability boundary, RSVP inventory, attendee reporting, optional real
+confirmation-mail dispatch, public form, and automatic cleanup. Browser screenshot-level review of the ticket form
+remains open because both in-app attempts timed out; server-rendered HTML and
+HTTP acceptance passed.
+
+The remaining human/external steps and exact procedures are listed in
+`manual-external-handoff.md`. The repository contains no live Stripe key, bank credential, production SMTP
 credential, domain credential, or hosting credential. GitHub Pages remains the
 visual and content reference until staging completes security, mail, Stripe
 Sandbox, membership-flow, mobile, and restore acceptance.

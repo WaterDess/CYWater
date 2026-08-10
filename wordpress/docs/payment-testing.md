@@ -37,13 +37,43 @@ Stripe CLI when testing callbacks; localhost alone is not reachable by Stripe.
 | Duplicate submit | At most one successful order and one membership transition |
 | Duplicate webhook | Re-delivery does not create another order or extend membership twice |
 | Invalid webhook signature | HTTP rejection; no order or membership mutation |
-| Full refund | Order records refund; membership behavior follows the approved refund policy |
-| Partial refund | Amount recorded; no automatic status change unless policy says otherwise |
+| Full refund | Order becomes Refunded; cancel only its membership level and active renewal subscription unless a later successful order funds the same entitlement |
+| Partial refund | Amount recorded; no automatic entitlement cancellation; administrator review required |
 | Annual expiry | Student, Professional, and Partner expire at the configured calendar-year boundary |
 | Renewal | One new order and one new end date; no duplicate membership row |
 
 Record the Stripe event ID, PMPro order ID, user ID, before/after membership
 state, captured email, and result for every test. Never paste secret keys into
 the evidence document.
+
+## Receipts And Invoices
+
+PMPro owns the current membership-order document. A signed-in member opens an
+order from **Account > Orders** and views the protected
+`/membership-order/` page backed by one `[pmpro_invoice]` shortcode. This page
+and the corresponding PMPro email are a membership order receipt. They are not
+automatically a jurisdiction-specific tax invoice, and CYWater must not promise
+tax deductibility before its legal/tax status and receipt wording are approved.
+
+Stripe Sandbox can also create test Billing invoices, but test invoices do not
+move real funds and are not valid production documents. The current PMPro
+Stripe Checkout integration does not automatically create a separate Stripe
+Billing Invoice for every membership order. Do not add a parallel invoice
+engine merely to duplicate PMPro orders. If the association later requires
+Stripe Invoicing, first approve invoice numbering, issuer/legal name, address,
+tax wording, currency, payment terms, refunds/credit notes, and whether an
+invoice represents membership dues or a separate conference registration.
+
+On 2026-08-09 the staging invoice acceptance verified that the protected PMPro
+order page is published, contains exactly one invoice shortcode, resolves
+through PMPro, remains in Sandbox mode, and has completed/refunded Sandbox order
+evidence available for receipt rendering. The check created no order and
+printed no member or payment identifier.
+
+Official references:
+
+- https://www.paidmembershipspro.com/documentation/frontend-pages/membership-invoice/
+- https://docs.stripe.com/get-started/use-cases/invoices
+- https://docs.stripe.com/invoicing/integration/testing
 
 Stripe sandbox reference: https://docs.stripe.com/sandboxes

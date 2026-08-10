@@ -10,6 +10,7 @@ const required = [
   "scripts/build-wp-env-config.mjs",
   "scripts/prepare-wordpress-vendor.mjs",
   "scripts/test-playground.mjs",
+  "scripts/cywater-staging-ticketing-qa.php",
   "wordpress/wp-content/plugins/cywater-core/data/seed.json",
   "wordpress/wp-content/themes/cywater/style.css",
   "wordpress/wp-content/themes/cywater/functions.php",
@@ -70,9 +71,15 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
+function normalizeNewlines(contents) {
+  return contents.replace(/\r\n?/g, "\n");
+}
+
 function assertMarkers(contents, markers, label) {
+  const normalizedContents = normalizeNewlines(contents);
   for (const marker of markers) {
-    assert(contents.includes(marker), `${label} is missing required marker: ${marker}`);
+    const normalizedMarker = normalizeNewlines(marker);
+    assert(normalizedContents.includes(normalizedMarker), `${label} is missing required marker: ${marker}`);
   }
 }
 
@@ -196,9 +203,14 @@ assertMarkers(
   ],
   "Static page stylesheet"
 );
-assert(
-  parityFiles.wordpressPagesCss === parityFiles.staticPagesCss,
-  "WordPress page stylesheet differs from the static source. Run npm run assets:sync."
+assertMarkers(
+  parityFiles.wordpressPagesCss,
+  [
+    ".prose ul:not(.pmpro_list) li",
+    ".prose ul:not(.pmpro_list) li::before",
+    ".latest-head { flex-direction: column; align-items: flex-start; }",
+  ],
+  "WordPress-specific page stylesheet"
 );
 
 const award2025 = seed.awards.find((award) => String(award.year) === "2025");
@@ -217,6 +229,16 @@ for (const file of themeFiles) {
 
 const themeImageEntries = await readdir(
   path.join(root, "wordpress", "wp-content", "themes", "cywater", "assets", "img")
+);
+
+const ticketingIntegration = await readFile(
+  path.join(root, "wordpress", "wp-content", "plugins", "cywater-core", "includes", "class-cywater-content-types.php"),
+  "utf8"
+);
+assertMarkers(
+  ticketingIntegration,
+  ["tribe_tickets_post_types", "return array( 'cyw_event' );"],
+  "CYWater Event Tickets integration"
 );
 assert(
   !themeImageEntries.includes("placeholders"),
