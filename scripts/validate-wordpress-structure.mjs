@@ -96,7 +96,7 @@ const seed = JSON.parse(
   )
 );
 
-assert(seed.seedRevision >= 5, "WordPress seed revision must be at least 5.");
+assert(seed.seedRevision >= 6, "WordPress seed revision must be at least 6.");
 assert(seed.generatedFrom === "assets/js/content.js", "Seed source marker is incorrect.");
 assert(
   JSON.stringify(seed.articles) === JSON.stringify(registry.ARTICLES),
@@ -139,6 +139,16 @@ const expectedEventOrder = registry.EVENT_LIST.filter(
 assert(
   JSON.stringify(seed.eventOrder) === JSON.stringify(expectedEventOrder),
   "WordPress event ordering must exclude the 2020 award ceremony."
+);
+assert(
+  JSON.stringify(seed.board) === JSON.stringify([
+    { role: "President", personName: "Qiuhong Tang" },
+    { role: "President-Elect", personName: "Lifeng Luo" },
+    { role: "Treasurer", personName: "Zhenxing Zhang" },
+    { role: "Directors-at-Large", personName: "Ming Pan, Chaopeng Shen" },
+    { role: "Executive Director", personName: "Vacant (N/A)" },
+  ]),
+  "WordPress Board seed differs from the confirmed public leadership list."
 );
 for (const event of Object.values(seed.events)) {
   if (event.image) {
@@ -199,14 +209,14 @@ assertMarkers(
 
 const boardMarkers = [
   "Board of Directors.",
-  "Leadership update in progress.",
   "Board composition",
   "Committee framework",
   "Awards Committee",
   "Tellers Committee",
 ];
-assertMarkers(parityFiles.staticBoard, boardMarkers, "Static Board page");
+assertMarkers(parityFiles.staticBoard, [...boardMarkers, "Leadership update in progress."], "Static Board page");
 assertMarkers(parityFiles.wordpressBoard, boardMarkers, "WordPress Board template");
+assertMarkers(parityFiles.wordpressBoard, ["Current Board leadership."], "WordPress Board status");
 
 assertMarkers(
   parityFiles.staticBylaws,

@@ -78,15 +78,24 @@ if (award2020News?.alt) {
   award2020News.alt = "Participants in the online 2020 CYWater Best Paper Award Ceremony";
 }
 
+const board = [
+  { role: "President", personName: "Qiuhong Tang" },
+  { role: "President-Elect", personName: "Lifeng Luo" },
+  { role: "Treasurer", personName: "Zhenxing Zhang" },
+  { role: "Directors-at-Large", personName: "Ming Pan, Chaopeng Shen" },
+  { role: "Executive Director", personName: "Vacant (N/A)" },
+];
+
 const payload = {
   schemaVersion: 1,
-  seedRevision: 5,
+  seedRevision: 6,
   generatedFrom: "assets/js/content.js",
   articles,
   events,
   awards,
   newsOrder,
   eventOrder,
+  board,
   pages,
 };
 

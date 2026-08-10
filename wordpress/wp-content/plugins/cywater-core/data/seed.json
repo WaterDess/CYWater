@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "seedRevision": 5,
+  "seedRevision": 6,
   "generatedFrom": "assets/js/content.js",
   "articles": {
     "bpa-2025-result": {
@@ -1653,6 +1653,28 @@
       "id": "annual-gathering-2013",
       "status": "past",
       "category": "gathering"
+    }
+  ],
+  "board": [
+    {
+      "role": "President",
+      "personName": "Qiuhong Tang"
+    },
+    {
+      "role": "President-Elect",
+      "personName": "Lifeng Luo"
+    },
+    {
+      "role": "Treasurer",
+      "personName": "Zhenxing Zhang"
+    },
+    {
+      "role": "Directors-at-Large",
+      "personName": "Ming Pan, Chaopeng Shen"
+    },
+    {
+      "role": "Executive Director",
+      "personName": "Vacant (N/A)"
     }
   ],
   "pages": {

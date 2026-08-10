@@ -278,12 +278,24 @@ final class CYWater_Importer {
 	}
 
 	private function import_board_roles() {
-		$roles = array( 'President', 'President-Elect', 'Treasurer', 'Directors-at-Large', 'Executive Director' );
-		foreach ( $roles as $index => $role ) {
+		$roles = $this->data['board'] ?? array(
+			array( 'role' => 'President', 'personName' => '' ),
+			array( 'role' => 'President-Elect', 'personName' => '' ),
+			array( 'role' => 'Treasurer', 'personName' => '' ),
+			array( 'role' => 'Directors-at-Large', 'personName' => '' ),
+			array( 'role' => 'Executive Director', 'personName' => '' ),
+		);
+		foreach ( $roles as $index => $record ) {
+			$role    = sanitize_text_field( $record['role'] ?? '' );
+			$person  = sanitize_text_field( $record['personName'] ?? '' );
+			if ( ! $role ) {
+				continue;
+			}
 			$post_id = $this->upsert_post( 'cyw_board_role', 'board:' . sanitize_title( $role ), array( 'post_title' => $role, 'post_status' => 'publish' ) );
-			$this->seed_meta_if_missing( $post_id, '_cyw_order', $index + 1 );
-			if ( '' === get_post_meta( $post_id, '_cyw_confirmed_public', true ) ) {
-				update_post_meta( $post_id, '_cyw_confirmed_public', 0 );
+			if ( $this->should_sync( $post_id ) ) {
+				update_post_meta( $post_id, '_cyw_order', $index + 1 );
+				update_post_meta( $post_id, '_cyw_person_name', $person );
+				update_post_meta( $post_id, '_cyw_confirmed_public', $person ? 1 : 0 );
 			}
 			$this->complete_seed_revision( $post_id );
 		}

@@ -149,8 +149,8 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
 ### Temporary Staging Snapshot (2026-08-10)
 
 - Hostinger staging is available at `https://staging.cywater.org/` with the
-  CYWater `0.5.9` theme, CYWater Membership `0.8.0`, CYWater Environment
-  `0.5.4`, CYWater Core `0.5.3`, and Event Tickets `5.29.1`.
+  CYWater `0.6.0` theme, CYWater Membership `0.8.0`, CYWater Environment
+  `0.5.4`, CYWater Core `0.5.4`, and Event Tickets `5.29.1`.
 - Dedicated Hostinger SSH access from the Lenovo workstation was established
   and independently verified with public-key authentication on 2026-08-02.
   The private key remains local and must never be copied into the repository.
@@ -162,7 +162,7 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   staging. Five malformed inactive CYWater/PMPro upload directories were
   removed on 2026-08-03 after exact-path and inactive-status verification;
   active plugin directories were untouched and plugin-list warnings cleared.
-- Theme `0.5.9` connects the existing Student, Professional, Lifetime, and
+- Theme `0.6.0` connects the existing Student, Professional, Lifetime, and
   Partner cards to their PMPro checkout levels and prevents PMPro order/account
   lists from inheriting the long-form article bullet and indentation rules.
   The accepted typography, palette, imagery, motion, and responsive system are
@@ -178,6 +178,12 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   than permanently deleted. Events without verified photographs now use one
   reusable two-line title/year visual, matching the accepted News/Award tile
   language. The GitHub Pages original was not changed.
+- On 2026-08-10 the association confirmed the public Board records: President
+  Qiuhong Tang; President-Elect Lifeng Luo; Treasurer Zhenxing Zhang;
+  Directors-at-Large Ming Pan and Chaopeng Shen; Executive Director vacant.
+  Staging stores these in the existing editable Board-role model with public
+  display enabled. Affiliations and terms remain blank because they were not
+  supplied. The GitHub Pages original was not changed.
 - Stripe Sandbox was connected through PMPro on 2026-08-02. A server-side
   presence-only check confirmed the Sandbox Connect values without reading or
   exposing them, and PMPro's own status check reports the Sandbox webhook as
@@ -281,11 +287,11 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   existing Administrator remain open. On 2026-08-03 MFA was explicitly
   deferred because no association-controlled phone, tablet, security key, or
   managed authenticator exists; do not make a private device the sole factor.
-- Event Tickets `5.29.1` is active and CYWater Core `0.5.3` limits it to the
+- Event Tickets `5.29.1` is active and CYWater Core `0.5.4` limits it to the
   existing `cyw_event` content model. A staging-only probe passed free RSVP,
   capacity, attendee reporting, public form output, Editor content boundaries,
   confirmation-mail handoff to the configured WordPress/Postmark transport,
-  and automatic cleanup. Theme `0.5.9` scopes its form to the accepted design
+  and automatic cleanup. Theme `0.6.0` scopes its form to the accepted design
   tokens without changing the public visual system. Paid event checkout remains
   disabled until Event Tickets is separately connected to the association's
   existing Stripe Sandbox and its success/decline/cancel/refund/duplicate/
@@ -397,7 +403,8 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
 
 - `index.html` - home
 - `about/index.html` - association purpose and history
-- `about/board.html` - governance roles; names remain unconfirmed
+- `about/board.html` - static GitHub Pages governance reference; names remain
+  unconfirmed there because the original was not changed
 - `about/bylaws.html` - full nine-article Bylaws and document download
 - `membership/index.html` - eligibility, dues, partnerships, and conference fees
 - `membership/dashboard.html` - explicitly non-functional member mockup
@@ -425,7 +432,9 @@ official CYWater records.
 Key requirements:
 
 - Mission and governance language should follow the supplied Bylaws.
-- Board names are not confirmed; publish roles and status only.
+- Board names confirmed for WordPress publication on 2026-08-10: President
+  Qiuhong Tang; President-Elect Lifeng Luo; Treasurer Zhenxing Zhang;
+  Directors-at-Large Ming Pan and Chaopeng Shen; Executive Director vacant.
 - The 2026 Annual Meeting is in Nanjing, China, October 16-18; registration is
   expected to open in August.
 - Events are separated into Annual Meetings and the Annual Gathering.
@@ -569,7 +578,8 @@ describe sandbox activity as a real transaction.
 - Add a backend or build tooling to `main`/`gh-pages`
 - Replace the visual system wholesale
 - Reintroduce bilingual support
-- Publish Board names or an unverified contact email
+- Publish or change Board names without explicit association confirmation, or
+  publish an unverified contact email
 - Remove `.nojekyll`
 - Delete user-created research/source files
 - Move the `v0.1-prototype` tag
