@@ -878,6 +878,14 @@
   html[lang="en"] .hero h1 {
     font-size: 2.4rem;
   }
+  .hero-title-line { white-space: normal; }
+  .hero-identity-line { display: inline; }
+  .hero-identity-line + .hero-identity-line::before { content: " "; }
+  .hero-watermark {
+    right: -18%;
+    width: 78%;
+    opacity: 0.045;
+  }
 }
 
 @media (max-width: 520px) {

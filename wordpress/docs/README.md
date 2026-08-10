@@ -57,8 +57,8 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 ## Current State
 
 Hostinger staging is available at `https://staging.cywater.org/`. The accepted
-baseline uses the CYWater `0.6.1` theme, CYWater Membership `0.8.2`, CYWater
-Partnerships `0.1.0`, CYWater Environment `0.5.4`, CYWater Core `0.5.4`, and Event Tickets `5.29.1`. PMPro and Stripe
+baseline uses the CYWater `0.6.2` theme, CYWater Membership `0.8.2`, CYWater
+Partnerships `0.1.0`, CYWater Environment `0.5.4`, CYWater Core `0.5.5`, and Event Tickets `5.29.1`. PMPro and Stripe
 Sandbox are active for staging acceptance; the live-payment gate remains
 closed and no production Stripe credential is configured. Postmark is connected on
 staging, its domain authentication is verified, and the user confirmed a
@@ -71,9 +71,9 @@ actions; final copy/legal review and a non-Gmail delivery target remain open.
 
 Dedicated Hostinger SSH access from the Lenovo workstation was established and
 verified with public-key authentication on 2026-08-02. A live WP-CLI check
-confirmed WordPress `7.0.2`, PHP CLI `8.3.30`, the active CYWater `0.6.1` theme,
+confirmed WordPress `7.0.2`, PHP CLI `8.3.30`, the active CYWater `0.6.2` theme,
 CYWater Membership `0.8.2`, CYWater Partnerships `0.1.0`, CYWater Environment `0.5.4`, and CYWater Core
-`0.5.4`. Five malformed inactive CYWater/PMPro upload directories were removed
+`0.5.5`. Five malformed inactive CYWater/PMPro upload directories were removed
 after exact-path and inactive-status verification; active components were not
 removed and the plugin-list warnings cleared.
 
@@ -97,6 +97,17 @@ The exact duplicate Event was moved to trash, not permanently deleted. The
 Events archive now reuses the existing title/year tile language whenever a
 verified photograph is unavailable, so the 2026 meeting displays `Annual
 Meeting` above `2026`. GitHub Pages was not modified.
+
+On 2026-08-10 theme `0.6.2` placed the complete legal association name in the
+home Hero, rendered the English mission heading as two deliberate desktop
+lines at a smaller display size, and reduced the decorative water-drop outline
+to match the tighter composition. The same release limits the PMPro Account
+avatar to `48px` and restyles the native Member Profile file selector with the
+existing CYWater control tokens without replacing its accessible upload
+behavior. Core `0.5.5` carries the updated home identity for repeatable setup.
+Live HTML, cache-busted CSS, PHP syntax and the precise PMPro selectors passed;
+both available browser-control surfaces timed out, so screenshot-level and
+authenticated visual review remain human acceptance checks.
 
 On 2026-08-10 the confirmed Board list was written to the existing editable
 Board-role records and enabled for public display: Qiuhong Tang (President),

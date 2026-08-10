@@ -51,7 +51,7 @@ final class CYWater_Importer {
 	private function import_pages() {
 		$verified_pages = $this->data['pages'] ?? array();
 		$pages = array(
-			'home'       => array( 'Home', 'International Association · Water Sciences', 'Advancing water sciences, empowering young scholars.', '' ),
+			'home'       => array( 'Home', 'International Association of Contemporary Young Scholars in Water Sciences (CYWater)', 'Advancing water sciences, empowering young scholars.', '' ),
 			'about'      => array( 'About CYWater', 'Our association', 'Advancing water sciences for the public benefit.', '<p>CYWater is an international non-profit association founded in 2011 to advance education, research, and professional development in water sciences.</p>' ),
 			'board'      => array( 'Board of Directors', 'Leadership', 'The Board governs CYWater, sets strategic direction, oversees finances, appoints committees, and ensures compliance with law and mission.', '<div class="callout"><strong>Leadership update in progress.</strong><p>Current appointments will be published only after formal review.</p></div>' ),
 			'bylaws'     => array( 'Bylaws', 'Governance', 'The governing framework of the association.', '<p>The approved Bylaws document and article-by-article text will be migrated during editorial acceptance.</p>' ),

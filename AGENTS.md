@@ -152,8 +152,8 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
 ### Temporary Staging Snapshot (2026-08-10)
 
 - Hostinger staging is available at `https://staging.cywater.org/` with the
-  CYWater `0.6.1` theme, CYWater Membership `0.8.2`, CYWater Partnerships
-  `0.1.0`, CYWater Environment `0.5.4`, CYWater Core `0.5.4`, and Event Tickets
+  CYWater `0.6.2` theme, CYWater Membership `0.8.2`, CYWater Partnerships
+  `0.1.0`, CYWater Environment `0.5.4`, CYWater Core `0.5.5`, and Event Tickets
   `5.29.1`.
 - Dedicated Hostinger SSH access from the Lenovo workstation was established
   and independently verified with public-key authentication on 2026-08-02.
@@ -166,7 +166,7 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   staging. Five malformed inactive CYWater/PMPro upload directories were
   removed on 2026-08-03 after exact-path and inactive-status verification;
   active plugin directories were untouched and plugin-list warnings cleared.
-- Theme `0.6.1` connects the Student, Professional, and Lifetime cards to their
+- Theme `0.6.2` connects the Student, Professional, and Lifetime cards to their
   PMPro checkout levels and prevents PMPro order/account lists from inheriting
   the long-form article bullet and indentation rules. Partner is no longer a
   membership card or public PMPro checkout.
@@ -177,6 +177,14 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   Membership, sign-in, registration, and the logged-out checkout gate before
   the `0.5.7` typography-neutral wrapper follow-up, whose live HTML/CSS was
   verified structurally; authenticated cross-browser verification remains open.
+- Theme `0.6.2` also presents the full association name in the home Hero, keeps
+  its English mission headline to two deliberate desktop lines at a reduced
+  display size, and proportionally reduces the decorative water-drop outline.
+  It scopes the PMPro Account avatar to its requested `48px` size and styles
+  the native Member Profile file control with existing CYWater button tokens,
+  without changing avatar or upload behavior. Live HTML, asset versions, PHP
+  syntax, and CSS selectors passed; screenshot-level browser control timed out,
+  so final authenticated visual review remains open.
 - On 2026-08-10 the 2020 online Best Paper Award record was corrected from an
   Annual Gathering to `Best Paper Award Ceremony` and rendered under the 2020
   Award. The exact misclassified Event was moved to the WordPress trash rather
