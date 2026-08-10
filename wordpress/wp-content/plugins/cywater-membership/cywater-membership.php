@@ -2,7 +2,7 @@
 /**
  * Plugin Name: CYWater Membership
  * Description: CYWater member profile, privacy choices, calendar-year policy, and PMPro setup integration.
- * Version: 0.8.1
+ * Version: 0.8.2
  * Requires at least: 7.0
  * Requires PHP: 8.1
  * Text Domain: cywater-membership
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CYWATER_MEMBERSHIP_VERSION', '0.8.1' );
+define( 'CYWATER_MEMBERSHIP_VERSION', '0.8.2' );
 define( 'CYWATER_MEMBERSHIP_FILE', __FILE__ );
 define( 'CYWATER_MEMBERSHIP_DIR', plugin_dir_path( __FILE__ ) );
 

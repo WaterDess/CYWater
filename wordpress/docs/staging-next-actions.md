@@ -82,8 +82,10 @@ renewal/recurring failure, and expiry paths passed. Live mode remains closed.
 
 ## 5. Membership Acceptance
 
-- Verify Student, Professional, Lifetime, and Partner levels, prices, expiry,
+- Verify Student, Professional, and Lifetime levels, prices, expiry,
   registration fields, profile privacy controls, and opt-in directory behavior.
+- Verify the separate Partner expression-of-interest, Administrator-only
+  Board/MOU stages, private status link, and approved-only payment handoff.
 - Test administrator, membership manager, editor, member, expired member, and
   anonymous-user permissions.
 - Administrator, editor, ordinary-member, active/private/expired-directory,

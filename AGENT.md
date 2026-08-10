@@ -115,6 +115,9 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
 - `plugins/cywater-core` owns public content models and initial import.
 - `plugins/cywater-membership` owns PMPro levels, profile fields, privacy, and
   the opt-in directory.
+- `plugins/cywater-partnerships` owns institutional expressions of interest,
+  Board/MOU review state, private applicant status links, and approved payment
+  handoff. A partner is not an individual member.
 - `plugins/cywater-environment` owns runtime configuration, local mail routing,
   readiness checks, and payment safety gates.
 - Paid Memberships Pro owns accounts, orders, membership state, and Stripe
@@ -149,8 +152,9 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
 ### Temporary Staging Snapshot (2026-08-10)
 
 - Hostinger staging is available at `https://staging.cywater.org/` with the
-  CYWater `0.6.0` theme, CYWater Membership `0.8.1`, CYWater Environment
-  `0.5.4`, CYWater Core `0.5.4`, and Event Tickets `5.29.1`.
+  CYWater `0.6.1` theme, CYWater Membership `0.8.2`, CYWater Partnerships
+  `0.1.0`, CYWater Environment `0.5.4`, CYWater Core `0.5.4`, and Event Tickets
+  `5.29.1`.
 - Dedicated Hostinger SSH access from the Lenovo workstation was established
   and independently verified with public-key authentication on 2026-08-02.
   The private key remains local and must never be copied into the repository.
@@ -162,9 +166,10 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   staging. Five malformed inactive CYWater/PMPro upload directories were
   removed on 2026-08-03 after exact-path and inactive-status verification;
   active plugin directories were untouched and plugin-list warnings cleared.
-- Theme `0.6.0` connects the existing Student, Professional, Lifetime, and
-  Partner cards to their PMPro checkout levels and prevents PMPro order/account
-  lists from inheriting the long-form article bullet and indentation rules.
+- Theme `0.6.1` connects the Student, Professional, and Lifetime cards to their
+  PMPro checkout levels and prevents PMPro order/account lists from inheriting
+  the long-form article bullet and indentation rules. Partner is no longer a
+  membership card or public PMPro checkout.
   The accepted typography, palette, imagery, motion, and responsive system are
   otherwise unchanged. It also fixes the observed 375px home-page overflow and
   gives the mobile menu and Membership FAQ standard accessible control
@@ -184,6 +189,19 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   Staging stores these in the existing editable Board-role model with public
   display enabled. Affiliations and terms remain blank because they were not
   supplied. The GitHub Pages original was not changed.
+- On 2026-08-10 institutional Partner was separated from individual membership.
+  The public `Become Our Partner` action now opens `Guide to Becoming a Partner`
+  and accepts only an expression of interest. CYWater Partnerships `0.1.0`
+  stores a private application with `Submitted`, `Board review`, `MOU pending`,
+  `Approved to pay`, `Declined`, and `Payment received` states. A salted-hash
+  access link shows the applicant only their own status; an HTTPS payment link
+  appears only after approval. The historical PMPro Partner level was preserved
+  but public signup was disabled, direct level-4 checkout redirects to the guide,
+  and Partner records are excluded from the member directory. A self-cleaning
+  staging QA passed application, token, pre-approval payment denial, approved
+  payment visibility, invalid-token rejection, and cleanup checks. Screenshot-
+  level browser QA timed out; live HTML, HTTP redirects, PHP lint, and desktop/
+  mobile CSS structure were verified instead.
 - Stripe Sandbox was connected through PMPro on 2026-08-02. A server-side
   presence-only check confirmed the Sandbox Connect values without reading or
   exposing them, and PMPro's own status check reports the Sandbox webhook as
@@ -207,7 +225,7 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   displayed card, Apple Pay, Google Pay, and Alipay but not WeChat Pay. Stripe
   dynamically filters methods by checkout eligibility. Live payment remains
   disabled.
-- CYWater Membership `0.8.1` implements one current account-first path. A
+- CYWater Membership `0.8.2` implements one current account-first path. A
   logged-out checkout redirects to the PMPro sign-in page; that page links to a
   dedicated `/member-register/` account form. New accounts sign in but must
   complete a 24-hour one-time email-verification link before checkout. Mail uses
@@ -224,7 +242,7 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   intercepted and its disposable user removed. A separate real message was
   accepted by the configured WordPress/Postmark transport, but Workspace inbox
   receipt remains a human check.
-- CYWater Membership `0.8.1` adds a read-only administrator record on each
+- CYWater Membership `0.8.2` adds a read-only administrator record on each
   WordPress user profile. It summarizes account creation/last sign-in, email
   verification, required-profile completion, directory privacy, active level
   and expiry, and account-closure requests. It links to PMPro Members and Orders
@@ -239,7 +257,7 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   revoke another account's sessions, and CYWater profile/privacy metadata is
   integrated with WordPress core export/erasure while identity and transaction
   records remain retained for policy review.
-- CYWater Membership `0.8.1` supplies a local HTTPS default avatar for
+- CYWater Membership `0.8.2` supplies a local HTTPS default avatar for
   WordPress avatar surfaces, including the logged-in admin bar, so an external
   Gravatar failure cannot leave a broken image. The current user's valid
   uploaded profile photo takes priority; another member's photo is used only
@@ -483,17 +501,23 @@ award/COP27 entries use title-based visuals until matching source photos are
 available. Events use the supplied year-matched Annual Meeting and Annual
 Gathering archives.
 
-Membership dues are presented with the four-card visual structure adapted from
-the original prototype. Preserve the current confirmed categories and prices:
-Professional `$70/year`, Student `$20/year`, Lifetime `$700`, and Partner
-`$1,000/year`. Display them in ascending-price order, with Professional marked
-as the Standard option in the second position. Each card has its own direct
-Join action; there is no separate selection-summary step. No card is selected
-on initial load. Activating a Join action moves the teal selection accent to
-that card and shows the preview limitation without implying that an application
-or payment was processed. Professional uses the teal accent action; the other
-plans use restrained outline actions that turn teal on hover or activation.
-Do not revert to the prototype's old categories or amounts.
+Membership dues use three individual cards adapted from the original prototype:
+Student `$20/year`, Professional `$70/year`, and Lifetime `$700`. Display them
+in ascending-price order, with Professional marked as the Standard option in the
+second position. Each card has its own direct Join action; there is no separate
+selection-summary step. No card is selected on initial load. Professional uses
+the teal accent action; the other individual plans use restrained outline
+actions that turn teal on hover or activation.
+
+Institutional Partner is not an individual membership and must not appear in
+the membership-card grid or public PMPro level list. Present the current
+`$1,000/year` contribution under `Sponsors and partners` with the action
+`Become Our Partner`. That action opens `Guide to Becoming a Partner` and an
+expression-of-interest form. Payment is forbidden until Board approval and MOU
+completion; only then may an administrator attach an association-controlled
+HTTPS Stripe invoice or payment link to the private application status page.
+Approved website/logo recognition follows the MOU and must not imply product
+endorsement.
 
 Conference fees use a four-column matrix with separate Abstract, Early, and
 Standard fee columns. Build it from the established `.table-wrap` and `.table`

@@ -11,6 +11,7 @@ const required = [
   "scripts/prepare-wordpress-vendor.mjs",
   "scripts/test-playground.mjs",
   "scripts/cywater-staging-ticketing-qa.php",
+  "scripts/cywater-staging-partner-qa.php",
   "wordpress/wp-content/plugins/cywater-core/data/seed.json",
   "wordpress/wp-content/themes/cywater/style.css",
   "wordpress/wp-content/themes/cywater/functions.php",
@@ -23,11 +24,14 @@ const required = [
   "wordpress/wp-content/themes/cywater/page-board.php",
   "wordpress/wp-content/themes/cywater/page-bylaws.php",
   "wordpress/wp-content/themes/cywater/page-membership.php",
+  "wordpress/wp-content/themes/cywater/page-become-a-partner.php",
   "wordpress/wp-content/themes/cywater/page-contact.php",
   "wordpress/wp-content/plugins/cywater-core/cywater-core.php",
   "wordpress/wp-content/plugins/cywater-membership/cywater-membership.php",
   "wordpress/wp-content/plugins/cywater-membership/assets/default-avatar.svg",
   "wordpress/wp-content/plugins/cywater-membership/includes/class-cywater-membership-avatars.php",
+  "wordpress/wp-content/plugins/cywater-partnerships/cywater-partnerships.php",
+  "wordpress/wp-content/plugins/cywater-partnerships/includes/class-cywater-partnerships.php",
   "wordpress/wp-content/plugins/cywater-environment/cywater-environment.php",
 ];
 
@@ -168,6 +172,24 @@ assertMarkers(
   "CYWater avatar provider"
 );
 
+const partnershipProvider = await readFile(
+  path.join(root, "wordpress", "wp-content", "plugins", "cywater-partnerships", "includes", "class-cywater-partnerships.php"),
+  "utf8"
+);
+assertMarkers(
+  partnershipProvider,
+  [
+    "cywater_partner_application",
+    "Guide to Becoming a Partner",
+    "board_review",
+    "mou_pending",
+    "Approved payment URL",
+    "block_legacy_partner_checkout",
+    "wp_privacy_personal_data_exporters",
+  ],
+  "CYWater partnership workflow"
+);
+
 for (const key of ["home", "about", "board", "bylaws", "membership", "contact"]) {
   assert(seed.pages?.[key], `Missing editable page seed: ${key}.`);
 }
@@ -202,6 +224,16 @@ const parityFiles = {
     "utf8"
   ),
 };
+
+assertMarkers(
+  parityFiles.wordpressMembership,
+  ["Sponsors and partners", "Become Our Partner", "No payment is requested until Board approval and MOU completion."],
+  "WordPress partnership presentation"
+);
+assert(
+  !parityFiles.wordpressMembership.includes("Join as Partner"),
+  "WordPress membership template must not expose the former direct Partner checkout."
+);
 
 assertMarkers(
   parityFiles.wordpressEventArchive,

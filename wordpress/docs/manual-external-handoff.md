@@ -80,7 +80,30 @@ automatically deletes an account. The Board still must approve which unpaid
 accounts may be deleted, which paid/event records must be anonymized or
 retained, the retention duration, and how retained backups are handled.
 
-## 4. Paid Event Or Conference Registration
+## 4. Institutional Partner Approval And Payment
+
+The public application and approval gate are implemented. A partner is not a
+member: it submits an expression of interest, and the WordPress Administrator
+tracks Board review and MOU completion under **Partner applications**. No
+payment action is available before **Approved to pay**.
+
+For each approved organization:
+
+1. Confirm the Board decision and completed MOU outside WordPress.
+2. Create an association-controlled HTTPS Stripe invoice or payment link only
+   after Stripe Live is approved. Do not paste API keys or credentials.
+3. Set the WordPress application to **Approved to pay** and paste that URL into
+   **Approved payment URL**. WordPress emails the applicant a new private status
+   link containing the payment action.
+4. After authoritative Stripe settlement, mark the application **Payment
+   received** and publish any agreed name/logo/link recognition under the MOU.
+5. Apply the Board-approved retention and erasure policy to application, MOU,
+   recognition, and accounting records.
+
+The historical PMPro Partner level is preserved only for existing records and
+cannot accept new public signups.
+
+## 5. Paid Event Or Conference Registration
 
 The reusable framework is installed: Event Tickets `5.29.1` attaches tickets,
 capacity, attendees, and event-order state only to the existing `cyw_event`
@@ -109,7 +132,7 @@ The free plugin adds a 2% application fee to Stripe transactions. Before paid
 event launch, the association must either accept that fee or purchase Event
 Tickets Plus. Plus is not required for the current free RSVP framework.
 
-## 5. Host Restore And Cross-Browser Acceptance
+## 6. Host Restore And Cross-Browser Acceptance
 
 1. In hPanel, create an on-demand staging backup.
 2. Restore it into a separate staging clone, not over production.
@@ -120,7 +143,7 @@ Tickets Plus. Plus is not required for the current free RSVP framework.
    mobile viewport. Record only pass/fail and screenshots without credentials.
 5. Enable Hostinger staging access protection while private review continues.
 
-## 6. Stripe Live And Production Cutover
+## 7. Stripe Live And Production Cutover
 
 Prepare and complete the non-secret checklist in
 `stripe-live-verification.md` before connecting Live mode.

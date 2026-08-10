@@ -34,6 +34,7 @@ Event Tickets                 CYWater Membership
 | `plugins/cywater-core` | News import, Events, Awards, Board roles, editorial metadata | Checkout, member profiles, CSS |
 | Event Tickets | Tickets and RSVPs attached only to `cyw_event`, capacity, attendees, event-order state | Membership levels, PMPro orders, CYWater content types, duplicated event records |
 | `plugins/cywater-membership` | PMPro levels, professional profile fields, privacy opt-in, directory, read-only admin projection | Stripe SDK, webhook endpoint, theme layout, duplicate member/order storage |
+| `plugins/cywater-partnerships` | Institutional expressions of interest, private applicant status, Board/MOU workflow, approved external payment-link handoff | Individual membership, PMPro orders, Stripe credentials, automatic Board approval |
 | `plugins/cywater-environment` | Environment reads, Mailpit routing, test/live safety gates, readiness report, conservative response headers | Membership rules, content rendering, full CSP policy |
 | Paid Memberships Pro | Registration, orders, membership activation, renewal/expiry mechanics, Stripe gateway/webhook | CYWater content and visual design |
 
@@ -63,3 +64,7 @@ Event Tickets                 CYWater Membership
 10. Free RSVP and paid event tickets share the same event record, but paid
     checkout stays disabled until the association's existing Stripe Sandbox is
     connected to Event Tickets and the refund/duplicate-webhook matrix passes.
+11. Partner is not a member. New institutional partner applications live only
+    in `cywater-partnerships`; no payment link may render before Board approval
+    and MOU completion. The historical PMPro Partner level is retained only for
+    existing records with signup disabled.

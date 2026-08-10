@@ -254,7 +254,7 @@
 /* ============================ Membership ============================ */
 .membership-dues { padding-block: clamp(3.5rem, 6vw, 5rem); }
 .membership-dues .section-head { margin-bottom: var(--sp-6); }
-.tiers { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--sp-4); align-items: stretch; }
+.tiers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-4); align-items: stretch; }
 .tier {
   background: var(--white);
   border: 1px solid var(--line);
@@ -273,8 +273,6 @@
   background: #FCFEFD;
   box-shadow: inset 0 4px 0 var(--teal), 0 0 0 2px rgba(17,122,111,0.16), var(--shadow);
 }
-.tier-partner { border-color: rgba(182,138,53,0.45); }
-.tier-partner.is-selected { border-color: var(--teal); }
 .tier-heading {
   display: flex;
   min-width: 0;
@@ -356,16 +354,87 @@
 .membership-partner-head {
   max-width: 52rem;
 }
+.partner-overview {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(18rem, .75fr);
+  gap: var(--sp-7);
+  align-items: start;
+  max-width: 68rem;
+  margin-inline: auto;
+}
 .membership-partner-copy {
   display: grid;
   gap: var(--sp-3);
   max-width: 52rem;
-  margin-inline: auto;
-  text-align: center;
 }
 .membership-partner-copy .lead {
   color: var(--ink-soft);
 }
+.partner-benefits {
+  display: grid;
+  gap: var(--sp-2);
+  margin-top: var(--sp-2);
+}
+.partner-cta {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: var(--sp-6);
+}
+.partner-cta h3 { margin-top: var(--sp-3); }
+.partner-cta p { margin: var(--sp-3) 0 var(--sp-5); }
+.partner-guide {
+  width: min(100% - 2rem, var(--container));
+  margin-inline: auto;
+  padding-block: var(--sp-8);
+}
+.partner-guide-intro { max-width: 52rem; margin-bottom: var(--sp-7); }
+.partner-guide-steps { margin-bottom: var(--sp-7); }
+.partner-guide-details {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(17rem, .6fr);
+  gap: var(--sp-7);
+  align-items: start;
+  margin-bottom: var(--sp-8);
+}
+.partner-contribution,
+.partner-application-form {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-6);
+}
+.partner-contribution strong {
+  display: block;
+  margin-block: var(--sp-2);
+  font-family: var(--font-display);
+  font-size: var(--fs-2xl);
+  font-weight: 500;
+  color: var(--ink);
+}
+.partner-application-form { max-width: 58rem; margin-inline: auto; }
+.partner-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-4);
+}
+.partner-application-form label {
+  display: grid;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-4);
+  font-weight: 600;
+  color: var(--ink);
+}
+.partner-application-form .partner-consent {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  font-weight: 400;
+}
+.partner-application-form .partner-consent input { margin-top: .25rem; }
+.partner-honeypot { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+.partner-status { max-width: 48rem; margin: var(--sp-8) auto; }
+.partner-status-help { margin-top: var(--sp-6); color: var(--ink-mute); }
 
 /* ============================ Member Dashboard ============================ */
 .dash-layout {
@@ -720,7 +789,7 @@
   .about-intro-grid .media-frame { position: static; }
   .bylaws-layout { grid-template-columns: 1fr; }
   .toc { position: static; }
-  .tiers { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .partner-overview, .partner-guide-details { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 960px) {
@@ -789,6 +858,7 @@
   .footer-bottom { flex-direction: column; align-items: flex-start; }
   .contact-layout { grid-template-columns: 1fr; }
   .tiers { grid-template-columns: 1fr; }
+  .partner-form-grid { grid-template-columns: 1fr; }
   .tier-tag { min-height: 0; }
   .role-grid, .award-intro { grid-template-columns: 1fr; }
   .event-archive-row { grid-template-columns: 120px minmax(0, 1fr); }

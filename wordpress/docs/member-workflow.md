@@ -13,9 +13,10 @@ membership step:
 - current title or role
 - career stage
 
-Student, Professional, Lifetime, and Partner are separate PMPro membership
-levels. Photo, ORCID iD, and research interests are completed later from the
-member profile.
+Student, Professional, and Lifetime are separate PMPro membership levels.
+Institutional Partner is not a member level and does not create a member account
+or directory profile. Photo, ORCID iD, and research interests are completed
+later from the member profile.
 
 The account state is explicit:
 
@@ -65,6 +66,35 @@ Active
 PMPro owns the order and membership state. CYWater profile metadata does not
 activate a membership and Stripe metadata does not become a second member
 database.
+
+## Institutional Partnership Workflow
+
+Partner is an organization relationship, not individual membership. The public
+membership page presents the `$1,000/year` contribution under **Sponsors and
+partners**, outside the membership-card grid. **Become Our Partner** opens
+`/become-a-partner/`, where an organization submits an expression of interest
+without creating an account, invoice, partnership, or payment obligation.
+
+The WordPress Administrator reviews **Partner applications** using these stages:
+
+1. Submitted
+2. Board review
+3. MOU pending
+4. Approved to pay
+5. Declined
+6. Payment received
+
+The applicant receives a private status link. Its token is stored only as a
+salted hash and rotates whenever review status or payment instructions change.
+No payment action is shown before **Approved to pay**. After Board approval and
+MOU completion, an administrator may add an association-controlled HTTPS Stripe
+invoice or payment link. Logo/name/link recognition on the website follows the
+approved MOU and must not imply product endorsement.
+
+The historical PMPro Partner level remains in place for existing records but
+public signup is disabled, direct checkout redirects to the partnership guide,
+and the level is excluded from the public member directory. It must not be used
+for new partner applications.
 
 ## Administrator Operations
 
@@ -160,8 +190,8 @@ Stripe payment and refund acceptance remains the PMPro/Stripe boundary test in
 
 ## Calendar-Year Policy
 
-Student, Professional, and Partner levels expire on December 31. Lifetime has
-no expiration. The current local setup charges the full annual amount at any
+Student and Professional levels expire on December 31. Lifetime has no
+expiration. The current local setup charges the full annual amount at any
 join date; proration, a late-year grace period, and refund-driven cancellation
 for full refunds is now approved and implemented. Proration and a late-year
 grace period remain Board decisions and launch blockers. Annual renewal is manual until

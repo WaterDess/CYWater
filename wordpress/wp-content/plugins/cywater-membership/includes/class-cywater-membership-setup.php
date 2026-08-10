@@ -111,7 +111,6 @@ final class CYWater_Membership_Setup {
 			'Student'      => array( 20, 'For full-time undergraduate, graduate, and Ph.D. students.', true ),
 			'Professional' => array( 70, 'For researchers and practitioners in water sciences.', true ),
 			'Lifetime'     => array( 700, 'A one-time individual lifetime membership.', false ),
-			'Partner'      => array( 1000, 'An annual partnership for institutions and organizations.', true ),
 		);
 		$existing = function_exists( 'pmpro_getAllLevels' ) ? pmpro_getAllLevels( true, true ) : array();
 		$by_name  = array();
@@ -137,6 +136,13 @@ final class CYWater_Membership_Setup {
 			$level->save();
 			$result[ sanitize_key( $name ) ] = absint( $level->id );
 		}
+		if ( isset( $by_name['Partner'] ) ) {
+			$legacy_partner               = new PMPro_Membership_Level( $by_name['Partner']->id );
+			$legacy_partner->description  = 'Legacy institutional partnership payment record. Public signup is disabled; new partnerships require Board and MOU review.';
+			$legacy_partner->allow_signups = 0;
+			$legacy_partner->save();
+			$result['partner_legacy'] = absint( $legacy_partner->id );
+		}
 		return $result;
 	}
 
@@ -145,7 +151,7 @@ final class CYWater_Membership_Setup {
 			return $enddate;
 		}
 		$ids    = (array) get_option( 'cywater_membership_level_ids', array() );
-		$annual = array_filter( array( $ids['student'] ?? 0, $ids['professional'] ?? 0, $ids['partner'] ?? 0 ) );
+		$annual = array_filter( array( $ids['student'] ?? 0, $ids['professional'] ?? 0 ) );
 		if ( ! in_array( (int) $level->id, array_map( 'intval', $annual ), true ) ) {
 			return $enddate;
 		}

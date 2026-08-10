@@ -55,7 +55,8 @@ try {
       assert.doesNotMatch(html, /class="award-grid/, "Awards must not use the obsolete card grid");
     }
     if (route === "/membership/") {
-      assert.equal((html.match(/<article class="tier\b/g) || []).length, 4, "Membership must render four approved membership tiers");
+      assert.equal((html.match(/<article class="tier\b/g) || []).length, 3, "Membership must render three individual membership tiers");
+      assert.match(html, /Become Our Partner/, "Membership must route institutions to the separate Partner application");
       assert.match(html, /class="table fee-table"/, "Membership must retain the conference fee matrix");
       assert.match(html, /membership-partner-head/, "Membership partners must use the centered shared section heading");
       assert.match(html, /membership-partner-copy/, "Membership partner copy must retain its constrained centered layout");
