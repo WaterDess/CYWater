@@ -142,8 +142,12 @@ final class CYWater_Partnerships {
 				<article class="card"><div class="card-body"><span class="eyebrow">Step 3</span><h2 class="card-title">Approved contribution</h2><p>Only after approval and MOU completion will CYWater issue the organization an authorized payment link or invoice.</p></div></article>
 			</div>
 			<div class="partner-guide-details">
-				<div><h2>Partnership recognition</h2><p>Approved partners may be acknowledged on the CYWater website and in relevant association materials, with the organization name, logo, and link presented under the agreed MOU. Recognition does not imply endorsement of products or services.</p></div>
-				<div class="partner-contribution"><span class="eyebrow">Current annual contribution</span><strong>$1,000</strong><p>Requested only after Board approval and MOU completion.</p></div>
+				<h2>Partnership recognition</h2>
+				<p>Approved partners may be acknowledged on the CYWater website and in relevant association materials, with the organization name, logo, and link presented under the agreed MOU. Recognition does not imply endorsement of products or services.</p>
+				<div class="partner-contribution" aria-label="Current annual partnership contribution">
+					<div><span class="eyebrow">Annual contribution after approval</span><p class="partner-contribution-amount"><strong>$1,000</strong><span>per year</span></p></div>
+					<p>CYWater requests the contribution only after Board approval and completion of the partnership MOU.</p>
+				</div>
 			</div>
 			<?php if ( $error ) : ?>
 				<div class="pmpro_message pmpro_error" role="alert">We could not submit the application. Please review all required fields and try again.</div>

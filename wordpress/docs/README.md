@@ -57,8 +57,8 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 ## Current State
 
 Hostinger staging is available at `https://staging.cywater.org/`. The accepted
-baseline uses the CYWater `0.6.3` theme, CYWater Membership `0.8.2`, CYWater
-Partnerships `0.1.0`, CYWater Logo Call `0.1.1`, CYWater Environment `0.5.4`, CYWater Core `0.5.7`, and Event Tickets `5.29.1`. PMPro and Stripe
+baseline uses the CYWater `0.6.4` theme, CYWater Membership `0.8.2`, CYWater
+Partnerships `0.1.1`, CYWater Logo Call `0.1.1`, CYWater Environment `0.5.4`, CYWater Core `0.5.7`, and Event Tickets `5.29.1`. PMPro and Stripe
 Sandbox are active for staging acceptance; the live-payment gate remains
 closed and no production Stripe credential is configured. Postmark is connected on
 staging, its domain authentication is verified, and the user confirmed a
@@ -196,6 +196,13 @@ qualifies a profile for the member directory. A self-cleaning staging QA passed
 application creation, token storage, pre-approval payment denial, approved link
 visibility, invalid-token rejection, and cleanup. Live HTML and HTTP redirects
 passed; screenshot-level browser QA timed out and remains open.
+
+On 2026-08-12 theme `0.6.4` and CYWater Partnerships `0.1.1` replaced the
+detached annual-contribution card on the Partner guide with one editorial
+recognition block. A thin divider introduces a responsive `$1,000 per year`
+information row and its Board/MOU condition; narrow screens stack the two
+parts. Existing typography, color, spacing, and motion tokens are unchanged.
+Live HTTP, version, and DOM markers passed; browser screenshot control timed out.
 
 CYWater Membership `0.6.5` also checks the actual membership end date before
 rendering an opted-in directory profile, so an expired member is hidden even

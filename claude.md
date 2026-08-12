@@ -152,8 +152,8 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
 ### Temporary Staging Snapshot (2026-08-12)
 
 - Hostinger staging is available at `https://staging.cywater.org/` with the
-  CYWater `0.6.3` theme, CYWater Membership `0.8.2`, CYWater Partnerships
-  `0.1.0`, CYWater Logo Call `0.1.1`, CYWater Environment `0.5.4`, CYWater Core `0.5.7`, and Event Tickets
+  CYWater `0.6.4` theme, CYWater Membership `0.8.2`, CYWater Partnerships
+  `0.1.1`, CYWater Logo Call `0.1.1`, CYWater Environment `0.5.4`, CYWater Core `0.5.7`, and Event Tickets
   `5.29.1`.
 - Dedicated Hostinger SSH access from the Lenovo workstation was established
   and independently verified with public-key authentication on 2026-08-02.
@@ -239,6 +239,13 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   ID 3, no end date, zero PMPro orders, and Logo Call submit/vote eligibility.
   No Stripe payment, PMPro order, invoice, or receipt was fabricated. Partner
   was not assigned because institutional Partner is not a membership level.
+- Theme `0.6.4` and CYWater Partnerships `0.1.1` remove the visually detached
+  annual-contribution card from `Guide to Becoming a Partner`. Partnership
+  recognition is now one editorial block with a thin divider and a responsive
+  `$1,000 per year` information row beside the Board/MOU condition. It reuses
+  the accepted typography, spacing, line, and color tokens and becomes a simple
+  vertical flow on narrow screens. Live HTTP, version, and DOM markers passed;
+  screenshot-level browser control timed out, so final visual review remains open.
 - Stripe Sandbox was connected through PMPro on 2026-08-02. A server-side
   presence-only check confirmed the Sandbox Connect values without reading or
   exposing them, and PMPro's own status check reports the Sandbox webhook as

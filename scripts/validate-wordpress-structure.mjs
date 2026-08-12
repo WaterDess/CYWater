@@ -192,6 +192,8 @@ assertMarkers(
     "Approved payment URL",
     "block_legacy_partner_checkout",
     "wp_privacy_personal_data_exporters",
+    "partner-contribution-amount",
+    "Annual contribution after approval",
   ],
   "CYWater partnership workflow"
 );
