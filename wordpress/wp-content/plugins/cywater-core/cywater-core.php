@@ -2,7 +2,7 @@
 /**
  * Plugin Name: CYWater Core
  * Description: Portable content models, editorial fields, and idempotent static-content import for CYWater.
- * Version: 0.5.6
+ * Version: 0.5.7
  * Requires at least: 7.0
  * Requires PHP: 8.1
  * Text Domain: cywater-core
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CYWATER_CORE_VERSION', '0.5.6' );
+define( 'CYWATER_CORE_VERSION', '0.5.7' );
 define( 'CYWATER_CORE_FILE', __FILE__ );
 define( 'CYWATER_CORE_DIR', plugin_dir_path( __FILE__ ) );
 
@@ -25,6 +25,7 @@ require_once CYWATER_CORE_DIR . 'includes/class-cywater-setup.php';
 function cywater_core_boot() {
 	CYWater_Content_Types::register();
 	CYWater_Meta_Boxes::register();
+	CYWater_Policy_Drafts::register();
 	CYWater_Setup::register();
 	add_action( 'admin_init', 'cywater_core_maybe_upgrade' );
 	add_action( 'init', 'cywater_core_maybe_flush_rewrite_rules', 99 );

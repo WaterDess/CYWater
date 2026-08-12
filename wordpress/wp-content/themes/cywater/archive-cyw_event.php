@@ -40,8 +40,13 @@ $is_gathering = static function ( $event ) {
 	return has_term( 'gathering', 'cyw_event_type', $event ) || str_contains( $source_id, 'annual-gathering-' );
 };
 
-$meetings   = array_values( array_filter( $events, static fn( $event ) => ! $is_gathering( $event ) ) );
+$is_member_program = static function ( $event ) {
+	return has_term( 'member-program', 'cyw_event_type', $event );
+};
+
+$meetings   = array_values( array_filter( $events, static fn( $event ) => ! $is_gathering( $event ) && ! $is_member_program( $event ) ) );
 $gatherings = array_values( array_filter( $events, $is_gathering ) );
+$programs   = array_values( array_filter( $events, $is_member_program ) );
 $featured   = null;
 
 foreach ( $meetings as $meeting ) {
@@ -140,6 +145,18 @@ $render_events = static function ( $items ) {
 				<?php $render_events( $gatherings ); ?>
 			</div>
 		</section>
+
+		<?php if ( $programs ) : ?>
+		<section id="member-programs" class="event-series-section" aria-labelledby="member-programs-title">
+			<div class="section-head">
+				<span class="eyebrow">Member participation</span>
+				<h2 id="member-programs-title">Member programs</h2>
+			</div>
+			<div class="event-archive-list">
+				<?php $render_events( $programs ); ?>
+			</div>
+		</section>
+		<?php endif; ?>
 	</div>
 </section>
 </main>

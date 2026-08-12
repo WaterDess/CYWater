@@ -37,6 +37,7 @@ const required = [
   "wordpress/wp-content/plugins/cywater-logo-call/includes/class-cywater-logo-call.php",
   "wordpress/wp-content/plugins/cywater-logo-call/includes/class-cywater-logo-call-eligibility.php",
   "wordpress/wp-content/plugins/cywater-logo-call/assets/logo-call.css",
+  "wordpress/wp-content/plugins/cywater-logo-call/assets/logo-call.js",
   "wordpress/wp-content/plugins/cywater-environment/cywater-environment.php",
 ];
 
@@ -207,6 +208,9 @@ assertMarkers(
     "CYWater_Logo_Call_Eligibility::can_vote",
     "One submission set per active Student, Professional or Lifetime member.",
     "permanent use of a selected design requires a separate written rights agreement",
+    "data-cywater-logo-preview-input",
+    "Public member voting is a later phase",
+    "member-program",
     "cywater-private/logo-call",
   ],
   "CYWater removable Logo Call workflow"
@@ -223,6 +227,8 @@ assertMarkers(
     "billing-cancellation-refund-policy-draft",
     "data-retention-account-closure-policy-draft",
     "Selection does not itself transfer ownership",
+    "wp_robots",
+    "noarchive",
   ],
   "CYWater policy drafts"
 );
@@ -274,7 +280,7 @@ assert(
 
 assertMarkers(
   parityFiles.wordpressEventArchive,
-  ["wp_get_post_terms", "template-parts/title-visual", "'year'       => $year"],
+  ["wp_get_post_terms", "template-parts/title-visual", "'year'       => $year", "Member programs", "member-programs"],
   "WordPress event archive"
 );
 assertMarkers(

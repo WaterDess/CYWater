@@ -125,6 +125,7 @@ final class CYWater_Logo_Call {
 	public static function enqueue_assets() {
 		if ( is_singular( 'cyw_event' ) && self::is_enabled( get_queried_object_id() ) ) {
 			wp_enqueue_style( 'cywater-logo-call', CYWATER_LOGO_CALL_URL . 'assets/logo-call.css', array(), CYWATER_LOGO_CALL_VERSION );
+			wp_enqueue_script( 'cywater-logo-call', CYWATER_LOGO_CALL_URL . 'assets/logo-call.js', array(), CYWATER_LOGO_CALL_VERSION, true );
 		}
 	}
 
@@ -143,6 +144,8 @@ final class CYWater_Logo_Call {
 		$phase  = self::phase( $event_id );
 		$user_id = get_current_user_id();
 		$close  = self::date_label( get_post_meta( $event_id, '_cywater_logo_call_close_at', true ) );
+		$vote_open  = self::date_label( get_post_meta( $event_id, '_cywater_logo_call_vote_open', true ) );
+		$vote_close = self::date_label( get_post_meta( $event_id, '_cywater_logo_call_vote_close', true ) );
 		ob_start();
 		?>
 		<section class="cywater-logo-call" aria-labelledby="cywater-logo-call-title">
@@ -156,6 +159,7 @@ final class CYWater_Logo_Call {
 				<li><?php esc_html_e( 'Entrants warrant originality. CYWater receives review/display permission; permanent use of a selected design requires a separate written rights agreement.', 'cywater-logo-call' ); ?></li>
 				<li><?php esc_html_e( 'During voting, each active Professional or Lifetime member has one final vote. Student members may submit but do not vote.', 'cywater-logo-call' ); ?></li>
 			</ul></div>
+			<p class="cywater-logo-call__schedule"><?php echo esc_html( sprintf( __( 'Public member voting is a later phase, from %1$s to %2$s. Only designs shortlisted by the administrators appear there.', 'cywater-logo-call' ), $vote_open, $vote_close ) ); ?></p>
 			<?php self::render_feedback(); ?>
 			<?php if ( 'submission' === $phase ) : ?>
 				<?php self::render_submission_form( $event_id, $user_id ); ?>
@@ -193,22 +197,30 @@ final class CYWater_Logo_Call {
 			return;
 		}
 		if ( ! CYWater_Logo_Call_Eligibility::can_submit( $user_id ) ) {
-			echo '<p class="cywater-logo-call__notice">' . esc_html__( 'Submissions are available to active individual members.', 'cywater-logo-call' ) . '</p>';
+			echo '<p class="cywater-logo-call__notice">' . esc_html__( 'This account is registered but has no active Student, Professional or Lifetime membership. The form preview below is disabled; it becomes usable when an eligible membership is active.', 'cywater-logo-call' ) . '</p>';
+			self::render_submission_fields( $event_id, true );
 			return;
 		}
 		if ( self::existing_entry( $event_id, $user_id ) ) {
 			echo '<p class="cywater-logo-call__notice">' . esc_html__( 'Your one submission set has been received for this event.', 'cywater-logo-call' ) . '</p>';
 			return;
 		}
+		self::render_submission_fields( $event_id, false );
+	}
+
+	private static function render_submission_fields( $event_id, $disabled ) {
+		$disabled_attr = $disabled ? ' disabled' : '';
 		?>
-		<form class="cywater-logo-call__form" method="post" enctype="multipart/form-data" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+		<form class="cywater-logo-call__form<?php echo $disabled ? ' is-disabled' : ''; ?>" method="post" enctype="multipart/form-data" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 			<input type="hidden" name="action" value="cywater_logo_submit"><input type="hidden" name="event_id" value="<?php echo esc_attr( $event_id ); ?>">
 			<?php wp_nonce_field( 'cywater_logo_submit_' . $event_id, 'cywater_logo_nonce' ); ?>
-			<p><label for="cywater_logo_source"><strong><?php esc_html_e( 'Original logo file', 'cywater-logo-call' ); ?></strong></label><br><input required type="file" id="cywater_logo_source" name="cywater_logo_source" accept=".pdf,.png,.jpg,.jpeg,.webp"></p>
-			<p><label for="cywater_logo_lockup"><strong><?php esc_html_e( 'Logo with the full CYWater association name', 'cywater-logo-call' ); ?></strong></label><br><input required type="file" id="cywater_logo_lockup" name="cywater_logo_lockup" accept=".png,.jpg,.jpeg,.webp"></p>
-			<p><label for="cywater_logo_statement"><strong><?php esc_html_e( 'Design statement (optional, up to 1,000 characters)', 'cywater-logo-call' ); ?></strong></label><br><textarea id="cywater_logo_statement" name="cywater_logo_statement" maxlength="1000" rows="5"></textarea></p>
-			<p><label><input required type="checkbox" name="cywater_logo_terms" value="1"> <?php esc_html_e( 'I warrant that this is original work and agree to the review, display and selected-design rights process stated above.', 'cywater-logo-call' ); ?></label></p>
-			<button class="button" type="submit"><?php esc_html_e( 'Submit one logo set', 'cywater-logo-call' ); ?></button>
+			<h3><?php esc_html_e( 'Submission form', 'cywater-logo-call' ); ?></h3>
+			<p><label for="cywater_logo_source"><strong><?php esc_html_e( 'Original logo file', 'cywater-logo-call' ); ?></strong></label><br><input required type="file" id="cywater_logo_source" name="cywater_logo_source" accept=".pdf,.png,.jpg,.jpeg,.webp"<?php echo $disabled_attr; ?>></p>
+			<p><label for="cywater_logo_lockup"><strong><?php esc_html_e( 'Logo with the full CYWater association name', 'cywater-logo-call' ); ?></strong></label><br><input required type="file" id="cywater_logo_lockup" name="cywater_logo_lockup" accept=".png,.jpg,.jpeg,.webp" data-cywater-logo-preview-input<?php echo $disabled_attr; ?>></p>
+			<figure class="cywater-logo-call__preview" data-cywater-logo-preview hidden><img alt=""><figcaption><?php esc_html_e( 'Local preview of the full-name effect image. Nothing is uploaded until you submit.', 'cywater-logo-call' ); ?></figcaption></figure>
+			<p><label for="cywater_logo_statement"><strong><?php esc_html_e( 'Design statement (optional, up to 1,000 characters)', 'cywater-logo-call' ); ?></strong></label><br><textarea id="cywater_logo_statement" name="cywater_logo_statement" maxlength="1000" rows="5"<?php echo $disabled_attr; ?>></textarea></p>
+			<p><label><input required type="checkbox" name="cywater_logo_terms" value="1"<?php echo $disabled_attr; ?>> <?php esc_html_e( 'I warrant that this is original work and agree to the review, display and selected-design rights process stated above.', 'cywater-logo-call' ); ?></label></p>
+			<button class="button" type="submit"<?php echo $disabled_attr; ?>><?php echo esc_html( $disabled ? __( 'Eligible membership required', 'cywater-logo-call' ) : __( 'Submit one logo set', 'cywater-logo-call' ) ); ?></button>
 		</form>
 		<?php
 	}
@@ -473,6 +485,8 @@ final class CYWater_Logo_Call {
 		if ( is_wp_error( $id ) ) { WP_CLI::error( $id->get_error_message() ); }
 		$dates = array( 'open_at' => '2026-08-12 00:00', 'close_at' => '2026-09-12 23:59', 'vote_open' => '2026-09-14 00:00', 'vote_close' => '2026-09-21 23:59' );
 		update_post_meta( $id, '_cywater_logo_call_enabled', '1' );
+		if ( ! term_exists( 'member-program', 'cyw_event_type' ) ) { wp_insert_term( 'Member program', 'cyw_event_type', array( 'slug' => 'member-program' ) ); }
+		wp_set_object_terms( $id, 'member-program', 'cyw_event_type' );
 		foreach ( $dates as $key => $value ) { update_post_meta( $id, '_cywater_logo_call_' . $key, $value ); }
 		update_post_meta( $id, '_cyw_start_date', '2026-08-12' ); update_post_meta( $id, '_cyw_end_date', '2026-09-21' ); update_post_meta( $id, '_cyw_date_label', 'Aug 12–Sep 21, 2026' ); update_post_meta( $id, '_cyw_location', 'Online' ); update_post_meta( $id, '_cyw_format', 'Member design call' ); update_post_meta( $id, '_cyw_status', 'upcoming' );
 		WP_CLI::success( 'Created ' . $status . ' review event: ' . $id );

@@ -10,6 +10,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 final class CYWater_Policy_Drafts {
 	const META_KEY = '_cywater_board_review_policy';
 
+	/** Keep staging review drafts out of search-engine indexes. */
+	public static function register() {
+		add_filter( 'wp_robots', array( __CLASS__, 'filter_robots' ) );
+	}
+
+	public static function filter_robots( $robots ) {
+		if ( is_singular( 'page' ) && '1' === (string) get_post_meta( get_queried_object_id(), self::META_KEY, true ) ) {
+			$robots['noindex']   = true;
+			$robots['nofollow']  = true;
+			$robots['noarchive'] = true;
+		}
+		return $robots;
+	}
+
 	/**
 	 * Create missing drafts without overwriting later editorial work.
 	 *
