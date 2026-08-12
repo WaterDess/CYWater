@@ -46,6 +46,14 @@
     },
     {
       "step": "activatePlugin",
+      "pluginPath": "cywater-partnerships/cywater-partnerships.php"
+    },
+    {
+      "step": "activatePlugin",
+      "pluginPath": "cywater-logo-call/cywater-logo-call.php"
+    },
+    {
+      "step": "activatePlugin",
       "pluginPath": "cywater-environment/cywater-environment.php"
     },
     {

@@ -28,6 +28,7 @@ final class CYWater_Setup {
 		update_option( 'timezone_string', 'America/Chicago' );
 		update_option( 'blogname', 'CYWater' );
 		update_option( 'blogdescription', 'International Association of Contemporary Young Scholars in Water Sciences' );
+		$report['policy_drafts'] = CYWater_Policy_Drafts::ensure();
 
 		do_action( 'cywater_after_core_setup', $report );
 		flush_rewrite_rules();

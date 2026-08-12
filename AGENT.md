@@ -153,7 +153,7 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
 
 - Hostinger staging is available at `https://staging.cywater.org/` with the
   CYWater `0.6.2` theme, CYWater Membership `0.8.2`, CYWater Partnerships
-  `0.1.0`, CYWater Environment `0.5.4`, CYWater Core `0.5.5`, and Event Tickets
+  `0.1.0`, CYWater Logo Call `0.1.0`, CYWater Environment `0.5.4`, CYWater Core `0.5.6`, and Event Tickets
   `5.29.1`.
 - Dedicated Hostinger SSH access from the Lenovo workstation was established
   and independently verified with public-key authentication on 2026-08-02.
@@ -210,6 +210,24 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   payment visibility, invalid-token rejection, and cleanup checks. Screenshot-
   level browser QA timed out; live HTML, HTTP redirects, PHP lint, and desktop/
   mobile CSS structure were verified instead.
+- On 2026-08-12 four editable policy pages were created as drafts only:
+  Privacy Notice, Terms of Use, Billing/Cancellation/Refund, and Data Retention/
+  Account Closure. Each is marked `Draft for Board Review — Not approved or in
+  effect`, is absent from navigation, and is preserved from later setup
+  overwrites. CYWater confirmed that its Stripe settlement bank account is
+  present and its named representative is association-authorized; do not record
+  bank, birth-date, home-address, tax-ID, or credential values in Git.
+- CYWater Logo Call `0.1.0` is an independent removable plugin attached only to
+  the enabled 2026 Logo Design Call event. Submissions run August 12 through
+  September 12, 2026: one original/logo-lockup set (5 MB per file) per active
+  Student, Professional, or Lifetime member. Professional and Lifetime members
+  have one final vote; Student members may submit but cannot vote. Protected
+  files live outside public uploads; only shortlisted lockups can render during
+  voting. There is no cash prize or promised membership upgrade. Permanent use
+  of a selected design requires a separate Board-approved written assignment or
+  license. An 11-check self-cleaning staging QA passed and removed its temporary
+  users and entries. Disabling the plugin removes its UI without changing the
+  theme, navigation, event, or retained review records.
 - Stripe Sandbox was connected through PMPro on 2026-08-02. A server-side
   presence-only check confirmed the Sandbox Connect values without reading or
   exposing them, and PMPro's own status check reports the Sandbox webhook as

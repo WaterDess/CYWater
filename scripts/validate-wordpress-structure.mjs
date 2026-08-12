@@ -27,11 +27,16 @@ const required = [
   "wordpress/wp-content/themes/cywater/page-become-a-partner.php",
   "wordpress/wp-content/themes/cywater/page-contact.php",
   "wordpress/wp-content/plugins/cywater-core/cywater-core.php",
+  "wordpress/wp-content/plugins/cywater-core/includes/class-cywater-policy-drafts.php",
   "wordpress/wp-content/plugins/cywater-membership/cywater-membership.php",
   "wordpress/wp-content/plugins/cywater-membership/assets/default-avatar.svg",
   "wordpress/wp-content/plugins/cywater-membership/includes/class-cywater-membership-avatars.php",
   "wordpress/wp-content/plugins/cywater-partnerships/cywater-partnerships.php",
   "wordpress/wp-content/plugins/cywater-partnerships/includes/class-cywater-partnerships.php",
+  "wordpress/wp-content/plugins/cywater-logo-call/cywater-logo-call.php",
+  "wordpress/wp-content/plugins/cywater-logo-call/includes/class-cywater-logo-call.php",
+  "wordpress/wp-content/plugins/cywater-logo-call/includes/class-cywater-logo-call-eligibility.php",
+  "wordpress/wp-content/plugins/cywater-logo-call/assets/logo-call.css",
   "wordpress/wp-content/plugins/cywater-environment/cywater-environment.php",
 ];
 
@@ -188,6 +193,38 @@ assertMarkers(
     "wp_privacy_personal_data_exporters",
   ],
   "CYWater partnership workflow"
+);
+
+const logoCallProvider = await readFile(
+  path.join(root, "wordpress", "wp-content", "plugins", "cywater-logo-call", "includes", "class-cywater-logo-call.php"),
+  "utf8"
+);
+assertMarkers(
+  logoCallProvider,
+  [
+    "_cywater_logo_call_enabled",
+    "CYWater_Logo_Call_Eligibility::can_submit",
+    "CYWater_Logo_Call_Eligibility::can_vote",
+    "One submission set per active Student, Professional or Lifetime member.",
+    "permanent use of a selected design requires a separate written rights agreement",
+    "cywater-private/logo-call",
+  ],
+  "CYWater removable Logo Call workflow"
+);
+
+const policyDraftProvider = await readFile(
+  path.join(root, "wordpress", "wp-content", "plugins", "cywater-core", "includes", "class-cywater-policy-drafts.php"),
+  "utf8"
+);
+assertMarkers(
+  policyDraftProvider,
+  [
+    "Draft for Board Review — Not approved or in effect.",
+    "billing-cancellation-refund-policy-draft",
+    "data-retention-account-closure-policy-draft",
+    "Selection does not itself transfer ownership",
+  ],
+  "CYWater policy drafts"
 );
 
 for (const key of ["home", "about", "board", "bylaws", "membership", "contact"]) {

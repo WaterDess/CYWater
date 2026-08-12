@@ -58,7 +58,7 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 
 Hostinger staging is available at `https://staging.cywater.org/`. The accepted
 baseline uses the CYWater `0.6.2` theme, CYWater Membership `0.8.2`, CYWater
-Partnerships `0.1.0`, CYWater Environment `0.5.4`, CYWater Core `0.5.5`, and Event Tickets `5.29.1`. PMPro and Stripe
+Partnerships `0.1.0`, CYWater Logo Call `0.1.0`, CYWater Environment `0.5.4`, CYWater Core `0.5.6`, and Event Tickets `5.29.1`. PMPro and Stripe
 Sandbox are active for staging acceptance; the live-payment gate remains
 closed and no production Stripe credential is configured. Postmark is connected on
 staging, its domain authentication is verified, and the user confirmed a
@@ -235,6 +235,29 @@ Stripe transactions; the association must accept that fee or buy Event Tickets
 Plus before paid-event launch. After connection, refund and duplicate-webhook
 acceptance must prove that a full event refund cancels only the matching
 registration and never an unrelated membership.
+
+On 2026-08-12 CYWater Core `0.5.6` created four non-destructive WordPress page
+drafts for Board review: Privacy Notice, Terms of Use, Billing/Cancellation/
+Refund, and Data Retention/Account Closure. They are not in navigation and are
+explicitly marked not approved or in effect. Later editorial work is preserved
+because setup creates only missing slugs. The association confirmed that its
+Stripe settlement bank account is present and that the named representative is
+authorized; no bank, birth-date, home-address, tax-ID, or credential value is
+stored in the repository.
+
+CYWater Logo Call `0.1.0` is an independent removable plugin attached only to
+the enabled `CYWater Logo Design Call 2026` staging event. The review schedule
+accepts one set per active Student, Professional, or Lifetime member from
+August 12 through September 12, 2026; the set contains an original logo and a
+full-association-name lockup, each capped at 5 MB. Professional and Lifetime
+members have one final vote; Student members may submit but cannot vote. Files
+are stored outside public uploads behind direct-access denial, and only a
+shortlisted lockup is streamable for voting. No cash prize or membership
+upgrade is promised. Non-selected rights remain with the entrant, while
+permanent use of a selected design requires a separate Board-approved written
+assignment or license. An 11-check self-cleaning staging QA passed membership
+gates, one-entry/one-vote enforcement, phases, shortlisting, and protected
+storage; temporary users and entries were removed.
 
 The staging administrator's notification email was corrected from the invalid
 staging-only address to `web@cywater.org` on 2026-08-03 and verified through

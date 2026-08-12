@@ -31,6 +31,18 @@ const packages = [
   },
   {
     type: "plugin",
+    slug: "cywater-partnerships",
+    source: path.join(wpContent, "plugins", "cywater-partnerships"),
+    header: "cywater-partnerships.php",
+  },
+  {
+    type: "plugin",
+    slug: "cywater-logo-call",
+    source: path.join(wpContent, "plugins", "cywater-logo-call"),
+    header: "cywater-logo-call.php",
+  },
+  {
+    type: "plugin",
     slug: "cywater-environment",
     source: path.join(wpContent, "plugins", "cywater-environment"),
     header: "cywater-environment.php",
@@ -90,13 +102,10 @@ installable top-level folder and contains no prior release archive or runtime da
 
 Install or replace the packages in this order:
 
-1. \`${packages[0].slug}-${packages[0].version}.zip\` (theme)
-2. \`${packages[1].slug}-${packages[1].version}.zip\`
-3. \`${packages[2].slug}-${packages[2].version}.zip\`
-4. \`${packages[3].slug}-${packages[3].version}.zip\`
-5. Activate all three CYWater plugins and Paid Memberships Pro.
-6. Open Tools > CYWater setup and run the normal setup once. Do not use force import.
-7. Purge LiteSpeed and browser caches before visual acceptance.
+${packages.map((item, index) => `${index + 1}. \`${item.slug}-${item.version}.zip\`${item.type === "theme" ? " (theme)" : ""}`).join("\n")}
+${packages.length + 1}. Activate all five CYWater plugins and Paid Memberships Pro.
+${packages.length + 2}. Open Tools > CYWater setup and run the normal setup once. Do not use force import.
+${packages.length + 3}. Purge LiteSpeed and browser caches before visual acceptance.
 
 The normal setup is revision-aware: it upgrades seeded records but does not delete administrator-
 created Events, News, Awards, or later editorial changes at the current seed revision.

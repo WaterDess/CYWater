@@ -35,6 +35,7 @@ Event Tickets                 CYWater Membership
 | Event Tickets | Tickets and RSVPs attached only to `cyw_event`, capacity, attendees, event-order state | Membership levels, PMPro orders, CYWater content types, duplicated event records |
 | `plugins/cywater-membership` | PMPro levels, professional profile fields, privacy opt-in, directory, read-only admin projection | Stripe SDK, webhook endpoint, theme layout, duplicate member/order storage |
 | `plugins/cywater-partnerships` | Institutional expressions of interest, private applicant status, Board/MOU workflow, approved external payment-link handoff | Individual membership, PMPro orders, Stripe credentials, automatic Board approval |
+| `plugins/cywater-logo-call` | Temporary event-scoped submissions, protected design files, shortlisting, eligible-member vote | Theme/navigation, membership state, payment state, permanent IP transfer |
 | `plugins/cywater-environment` | Environment reads, Mailpit routing, test/live safety gates, readiness report, conservative response headers | Membership rules, content rendering, full CSP policy |
 | Paid Memberships Pro | Registration, orders, membership activation, renewal/expiry mechanics, Stripe gateway/webhook | CYWater content and visual design |
 
@@ -68,3 +69,9 @@ Event Tickets                 CYWater Membership
     in `cywater-partnerships`; no payment link may render before Board approval
     and MOU completion. The historical PMPro Partner level is retained only for
     existing records with signup disabled.
+12. Logo Call is a removable event module, not a permanent theme feature. It
+    reads current PMPro levels, stores no duplicate member/order data, and
+    appears only on an explicitly enabled `cyw_event`. Deactivation removes the
+    UI without deleting the event or review records. Selection alone does not
+    transfer intellectual property; permanent use requires a separate written
+    Board-approved assignment or license.

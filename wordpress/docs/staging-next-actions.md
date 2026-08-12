@@ -1,5 +1,15 @@
 # Staging Next Actions
 
+## Board review pack added 2026-08-12
+
+The four launch-policy drafts are in WordPress under **Pages → Drafts** and are
+not active public policy. Review and approve legal copy before changing their
+status or adding footer/navigation links. The temporary Logo Call review is at
+`/events/logo-design-call-2026/`; its event dates, shortlisting, and status are
+editable in the existing Events administration. Submitted designs appear under
+**Events → Logo submissions**. Deactivating `CYWater Logo Call` removes the
+module without changing the theme.
+
 The visual and content baseline is accepted at `staging.cywater.org`. Keep
 production traffic, live payment, and production mail disabled while completing
 the following gates in order.

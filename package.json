@@ -1,6 +1,6 @@
 {
   "name": "cywater-wordpress",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "private": true,
   "description": "Local WordPress integration tooling for CYWater.",
   "scripts": {
