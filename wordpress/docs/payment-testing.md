@@ -39,8 +39,8 @@ Stripe CLI when testing callbacks; localhost alone is not reachable by Stripe.
 | Invalid webhook signature | HTTP rejection; no order or membership mutation |
 | Full refund | Order becomes Refunded; cancel only its membership level and active renewal subscription unless a later successful order funds the same entitlement |
 | Partial refund | Amount recorded; no automatic entitlement cancellation; administrator review required |
-| Annual expiry | Student, Professional, and Partner expire at the configured calendar-year boundary |
-| Renewal | One new order and one new end date; no duplicate membership row |
+| Annual expiry | Student and Professional expire one full year after their successful payment date; Lifetime does not expire |
+| Renewal | One new order and a new end date one year after the renewal payment date; no duplicate membership row |
 
 Record the Stripe event ID, PMPro order ID, user ID, before/after membership
 state, captured email, and result for every test. Never paste secret keys into

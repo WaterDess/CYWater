@@ -188,11 +188,12 @@ opt-in/opt-out, membership activation/cancellation, and content CRUD. Real
 Stripe payment and refund acceptance remains the PMPro/Stripe boundary test in
 `payment-testing.md`.
 
-## Calendar-Year Policy
+## Rolling Annual-Term Policy
 
-Student and Professional levels expire on December 31. Lifetime has no
-expiration. The current local setup charges the full annual amount at any
-join date; proration, a late-year grace period, and refund-driven cancellation
-for full refunds is now approved and implemented. Proration and a late-year
-grace period remain Board decisions and launch blockers. Annual renewal is manual until
-the Board explicitly approves recurring billing terms.
+Each successful Student or Professional payment purchases one full year of
+membership beginning on that payment date. The price is never prorated.
+Lifetime has no expiration. A later annual payment starts a new one-year term
+from that later successful payment date; it does not retain the old calendar-
+year boundary. Annual renewal remains manual until the Board explicitly
+approves recurring billing terms. A full refund revokes only the entitlement
+funded by the refunded order under the documented refund rules.

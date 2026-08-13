@@ -310,7 +310,12 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   displayed card, Apple Pay, Google Pay, and Alipay but not WeChat Pay. Stripe
   dynamically filters methods by checkout eligibility. Live payment remains
   disabled.
-- CYWater Membership `0.8.2` implements one current account-first path. A
+- CYWater Membership `0.8.3` implements rolling annual Student and Professional
+  terms: every successful full-price payment starts a new one-year term on its
+  payment date, with no proration or December 31 boundary. Lifetime remains
+  non-expiring. Staging had no active Student or Professional membership to
+  migrate when this policy changed on 2026-08-13.
+- The same plugin retains the current account-first path: a
   logged-out checkout redirects to the PMPro sign-in page; that page links to a
   dedicated `/member-register/` account form. New accounts sign in but must
   complete a 24-hour one-time email-verification link before checkout. Mail uses
@@ -552,7 +557,9 @@ Key requirements:
   2020 online record is a Best Paper Award Ceremony and belongs under Awards.
 - Awards replace Journal in navigation and cover records from 2012 onward.
 - News is separated into Opportunities and Spotlights.
-- Membership uses calendar-year terms and the supplied dues/fee schedules.
+- Student and Professional membership each run for one full year from the
+  successful payment date, without proration. Lifetime remains non-expiring;
+  the supplied dues/fee schedules otherwise remain authoritative.
 - Mailing address: `202 E. Green St. Suite 2, Champaign, IL 61820, USA`.
 - Contact email is pending confirmation; never invent an address.
 

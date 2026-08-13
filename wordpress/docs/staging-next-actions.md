@@ -110,7 +110,7 @@ renewal/recurring failure, and expiry paths passed. Live mode remains closed.
   field allowlist, email exclusion, and expiration action boundaries passed on
   2026-08-03. The Membership Manager role remains unavailable until the
   official licensed PMPro Premium Add On is installed.
-- Confirm the approved refund, renewal, calendar-year, privacy, and retention
+- Confirm the approved refund, renewal, rolling annual-term, privacy, and retention
   policies before treating the workflow as release-ready.
 
 ## 6. Event Registration

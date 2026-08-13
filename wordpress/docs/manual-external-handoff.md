@@ -61,7 +61,7 @@ becomes available.
 ## 3. Policy Decisions
 
 The Board must approve the privacy notice, terms, refund policy, recurring
-billing policy, calendar-year proration/grace rule, data-retention rule, and
+billing policy, rolling annual-term rule, data-retention rule, and
 account-erasure process. Membership cancellation, a full refund, sign-out, and
 account erasure are intentionally different operations:
 

@@ -32,8 +32,7 @@
         "DISALLOW_FILE_EDIT": true,
         "CYWATER_PAYMENT_MODE": "test",
         "CYWATER_ALLOW_LIVE_PAYMENTS": false,
-        "CYWATER_MAIL_TRANSPORT": "disabled",
-        "CYWATER_ENABLE_CALENDAR_YEAR_END": true
+        "CYWATER_MAIL_TRANSPORT": "disabled"
       }
     },
     {
