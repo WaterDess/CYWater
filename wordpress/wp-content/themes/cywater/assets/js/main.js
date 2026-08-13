@@ -109,17 +109,60 @@
     const section = carousel.closest(".event-upcoming");
     const previous = section?.querySelector("[data-carousel-previous]");
     const next = section?.querySelector("[data-carousel-next]");
-    const step = () => Math.max(carousel.clientWidth * 0.78, 280);
-    const updateControls = () => {
-      if (!previous || !next) return;
-      previous.disabled = carousel.scrollLeft <= 2;
-      next.disabled = carousel.scrollLeft + carousel.clientWidth >= carousel.scrollWidth - 2;
+    const pagination = section?.querySelector("[data-carousel-pagination]");
+    let pageCount = 1;
+
+    const maximumScroll = () => Math.max(0, carousel.scrollWidth - carousel.clientWidth);
+    const activePage = () => {
+      const maximum = maximumScroll();
+      return maximum > 0 ? Math.round((carousel.scrollLeft / maximum) * (pageCount - 1)) : 0;
     };
-    previous?.addEventListener("click", () => carousel.scrollBy({ left: -step(), behavior: "smooth" }));
-    next?.addEventListener("click", () => carousel.scrollBy({ left: step(), behavior: "smooth" }));
+
+    const updateControls = () => {
+      const currentPage = activePage();
+      if (previous) previous.disabled = carousel.scrollLeft <= 2;
+      if (next) next.disabled = carousel.scrollLeft >= maximumScroll() - 2;
+      pagination?.querySelectorAll(".event-carousel-dot").forEach((dot, index) => {
+        const isActive = index === currentPage;
+        dot.classList.toggle("is-active", isActive);
+        dot.setAttribute("aria-current", isActive ? "true" : "false");
+      });
+    };
+
+    const rebuildPagination = () => {
+      pageCount = Math.max(1, Math.ceil(carousel.scrollWidth / Math.max(carousel.clientWidth, 1)));
+      if (pagination) {
+        pagination.replaceChildren();
+        for (let index = 0; index < pageCount; index += 1) {
+          const dot = document.createElement("button");
+          dot.type = "button";
+          dot.className = "event-carousel-dot";
+          dot.setAttribute("aria-label", `Show upcoming-event page ${index + 1} of ${pageCount}`);
+          dot.addEventListener("click", () => {
+            const left = pageCount > 1 ? maximumScroll() * (index / (pageCount - 1)) : 0;
+            carousel.scrollTo({ left, behavior: "smooth" });
+          });
+          pagination.append(dot);
+        }
+      }
+      updateControls();
+    };
+
+    const movePage = (direction) => {
+      const targetPage = Math.min(pageCount - 1, Math.max(0, activePage() + direction));
+      const left = pageCount > 1 ? maximumScroll() * (targetPage / (pageCount - 1)) : 0;
+      carousel.scrollTo({ left, behavior: "smooth" });
+    };
+
+    previous?.addEventListener("click", () => movePage(-1));
+    next?.addEventListener("click", () => movePage(1));
     carousel.addEventListener("scroll", updateControls, { passive: true });
-    window.addEventListener("resize", updateControls, { passive: true });
-    updateControls();
+    if ("ResizeObserver" in window) {
+      new ResizeObserver(rebuildPagination).observe(carousel);
+    } else {
+      window.addEventListener("resize", rebuildPagination, { passive: true });
+    }
+    rebuildPagination();
   });
 
   /* ---------- FAQ accordion ---------- */

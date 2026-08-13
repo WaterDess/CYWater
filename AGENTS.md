@@ -263,12 +263,18 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
 - Theme `0.6.5` reorganizes the Events archive into Upcoming, Annual Meetings,
   Annual Gathering, and Member Programs. A sticky desktop category navigator
   becomes a compact horizontal navigator on narrow screens. Upcoming events use
-  a restrained multi-card horizontal carousel with previous/next controls,
-  touch scrolling, and scroll snapping, while each record remains in its
+  a restrained multi-card horizontal carousel with touch scrolling and scroll
+  snapping, while each record remains in its
   canonical category. This makes the removable Logo Design Call discoverable
   without hard-coding it into permanent primary navigation. Live HTML, asset,
   mobile CSS, PHP syntax, cache, and no-secret marker checks passed; browser
   screenshot control timed out, so final human visual review remains open.
+- Theme `0.6.7` compacts the Upcoming cards so the archive shows as many events
+  per row as the viewport permits. Previous/next controls now sit at the
+  vertical sides of the carousel rather than in the section heading, and a
+  responsive page indicator below the cards shows the current group. One-page
+  layouts retain one active indicator and disable both arrows; narrower layouts
+  automatically expose additional groups without duplicating Event records.
 - Stripe Sandbox was connected through PMPro on 2026-08-02. A server-side
   presence-only check confirmed the Sandbox Connect values without reading or
   exposing them, and PMPro's own status check reports the Sandbox webhook as

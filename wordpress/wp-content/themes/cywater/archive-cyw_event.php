@@ -194,14 +194,15 @@ $render_upcoming = static function ( $items ) {
 						<span class="eyebrow">On the horizon</span>
 						<h2 id="upcoming-title">Upcoming</h2>
 					</div>
-					<div class="event-carousel-controls" aria-label="Upcoming event carousel controls">
-						<button type="button" data-carousel-previous aria-label="Show previous upcoming events">&larr;</button>
-						<button type="button" data-carousel-next aria-label="Show next upcoming events">&rarr;</button>
+				</div>
+				<div class="event-carousel-shell" data-event-carousel-shell>
+					<button class="event-carousel-arrow event-carousel-arrow--previous" type="button" data-carousel-previous aria-label="Show previous upcoming events">&larr;</button>
+					<div class="upcoming-event-carousel" data-event-carousel tabindex="0" aria-label="Upcoming events">
+						<?php $render_upcoming( $upcoming ); ?>
 					</div>
+					<button class="event-carousel-arrow event-carousel-arrow--next" type="button" data-carousel-next aria-label="Show next upcoming events">&rarr;</button>
 				</div>
-				<div class="upcoming-event-carousel" data-event-carousel tabindex="0" aria-label="Upcoming events">
-					<?php $render_upcoming( $upcoming ); ?>
-				</div>
+				<div class="event-carousel-pagination" data-carousel-pagination aria-label="Choose an upcoming-event page"></div>
 			</section>
 			<?php endif; ?>
 
