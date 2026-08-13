@@ -120,6 +120,12 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   handoff. A partner is not an individual member.
 - `plugins/cywater-environment` owns runtime configuration, local mail routing,
   readiness checks, and payment safety gates.
+- Every new or modified public form control—including file inputs, buttons,
+  selects, checkboxes, text fields, and textareas—must reuse the established
+  CYWater design tokens and interaction language. Do not expose an unstyled
+  browser-default or third-party control when an accepted CYWater equivalent
+  already exists; verify desktop, mobile, focus, hover, disabled, and error
+  states on staging before calling the surface complete.
 - Paid Memberships Pro owns accounts, orders, membership state, and Stripe
   gateway/webhook behavior. Do not implement a parallel transaction engine.
 - Playground on port `8890` is a disposable content/theme review environment;
@@ -153,7 +159,7 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
 
 - Hostinger staging is available at `https://staging.cywater.org/` with the
   CYWater `0.6.4` theme, CYWater Membership `0.8.2`, CYWater Partnerships
-  `0.1.1`, CYWater Logo Call `0.1.1`, CYWater Environment `0.5.4`, CYWater Core `0.5.7`, and Event Tickets
+  `0.1.1`, CYWater Logo Call `0.1.2`, CYWater Environment `0.5.4`, CYWater Core `0.5.7`, and Event Tickets
   `5.29.1`.
 - Dedicated Hostinger SSH access from the Lenovo workstation was established
   and independently verified with public-key authentication on 2026-08-02.
@@ -219,7 +225,7 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   still creates missing policy pages as drafts. CYWater confirmed that its Stripe settlement bank account is
   present and its named representative is association-authorized; do not record
   bank, birth-date, home-address, tax-ID, or credential values in Git.
-- CYWater Logo Call `0.1.1` is an independent removable plugin attached only to
+- CYWater Logo Call `0.1.2` is an independent removable plugin attached only to
   the enabled 2026 Logo Design Call event. Submissions run August 12 through
   September 12, 2026: one original/logo-lockup set (5 MB per file) per active
   Student, Professional, or Lifetime member. Professional and Lifetime members
@@ -234,6 +240,14 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   The submission form remains visible with an eligibility explanation when
   disabled, and an eligible member receives a browser-local full-name-lockup
   preview before submitting; no file leaves the browser until submission.
+- Theme `0.6.6` makes the Logo Call's core content and submission module visible
+  without waiting for scroll-reveal animation. Its event summary now reads only
+  stored editorial content, so plugin-appended submission copy is not duplicated
+  or truncated into the lead. Logo Call file inputs, textarea, submit action,
+  focus, hover, and disabled states reuse the accepted CYWater form controls.
+  Anonymous live HTML had zero reveal markers and one invitation paragraph;
+  an authenticated, read-only Lifetime-user render exposed both required file
+  fields, local preview, and enabled submit action without uploading a file.
 - On 2026-08-12, at the user's explicit direction, staging user `grups` was
   assigned the highest individual level, Lifetime. The server verified level
   ID 3, no end date, zero PMPro orders, and Logo Call submit/vote eligibility.

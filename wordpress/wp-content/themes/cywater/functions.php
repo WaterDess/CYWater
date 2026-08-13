@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CYWATER_THEME_VERSION', '0.6.5' );
+define( 'CYWATER_THEME_VERSION', '0.6.6' );
 
 function cywater_theme_setup() {
 	add_theme_support( 'title-tag' );
@@ -112,6 +112,21 @@ function cywater_featured_image_url( $post_id = null, $size = 'cywater-card', $f
 		return cywater_asset_uri( 'img/' . ltrim( $legacy, '/' ) );
 	}
 	return $fallback ? cywater_asset_uri( 'img/' . ltrim( $fallback, '/' ) ) : '';
+}
+
+/**
+ * Build an event summary from stored editorial content only.
+ *
+ * Event-scoped plugins may append interactive modules through `the_content`.
+ * Those modules must never leak into archive cards or the detail-page lead.
+ */
+function cywater_event_summary( $post_id, $words = 44 ) {
+	$post = get_post( $post_id );
+	if ( ! $post ) {
+		return '';
+	}
+	$source = $post->post_excerpt ?: $post->post_content;
+	return wp_trim_words( wp_strip_all_tags( strip_shortcodes( $source ) ), $words, '…' );
 }
 
 function cywater_source_permalink( $source_id, $post_type = 'post' ) {

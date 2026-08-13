@@ -67,7 +67,7 @@ if ( ! $featured && $meetings ) {
 }
 
 $hero_title = $featured ? rtrim( get_the_title( $featured ), '.' ) . '.' : 'CYWater events.';
-$hero_lead  = $featured ? get_the_excerpt( $featured ) : 'CYWater Annual Meetings and the Annual Gathering during the AGU Fall Meeting.';
+$hero_lead  = $featured ? cywater_event_summary( $featured->ID ) : 'CYWater Annual Meetings and the Annual Gathering during the AGU Fall Meeting.';
 if ( $featured && 'event:annual-2026' === get_post_meta( $featured->ID, '_cyw_source_id', true ) ) {
 	$hero_lead .= ' Registration will open in August.';
 }
@@ -122,7 +122,7 @@ $render_events = static function ( $items ) {
 					<?php echo esc_html( $date ); ?>
 					<?php if ( $location ) : ?> &middot; <?php echo esc_html( $location ); ?><?php endif; ?>
 				</span>
-				<span class="event-archive-lead"><?php echo esc_html( get_the_excerpt( $event ) ); ?></span>
+				<span class="event-archive-lead"><?php echo esc_html( cywater_event_summary( $event_id ) ); ?></span>
 			</span>
 			<span class="link">View details</span>
 		</a>

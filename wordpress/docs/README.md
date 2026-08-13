@@ -58,7 +58,7 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 
 Hostinger staging is available at `https://staging.cywater.org/`. The accepted
 baseline uses the CYWater `0.6.4` theme, CYWater Membership `0.8.2`, CYWater
-Partnerships `0.1.1`, CYWater Logo Call `0.1.1`, CYWater Environment `0.5.4`, CYWater Core `0.5.7`, and Event Tickets `5.29.1`. PMPro and Stripe
+Partnerships `0.1.1`, CYWater Logo Call `0.1.2`, CYWater Environment `0.5.4`, CYWater Core `0.5.7`, and Event Tickets `5.29.1`. PMPro and Stripe
 Sandbox are active for staging acceptance; the live-payment gate remains
 closed and no production Stripe credential is configured. Postmark is connected on
 staging, its domain authentication is verified, and the user confirmed a
@@ -254,7 +254,7 @@ Stripe settlement bank account is present and that the named representative is
 authorized; no bank, birth-date, home-address, tax-ID, or credential value is
 stored in the repository.
 
-CYWater Logo Call `0.1.1` is an independent removable plugin attached only to
+CYWater Logo Call `0.1.2` is an independent removable plugin attached only to
 the enabled `CYWater Logo Design Call 2026` staging event. The review schedule
 accepts one set per active Student, Professional, or Lifetime member from
 August 12 through September 12, 2026; the set contains an original logo and a
@@ -276,6 +276,11 @@ now opens with an `Upcoming` horizontal card
 carousel and a category navigator for Upcoming, Annual Meetings, Annual
 Gathering, and Member Programs. Upcoming records also remain in their canonical
 category, so the carousel is discovery rather than a duplicate content model.
+The Logo Call detail page does not defer its explanatory content or submission
+module behind scroll-reveal animation. Its event summary is generated from the
+stored editorial content before plugin modules are appended, preventing the
+submission copy from appearing twice. File inputs, textarea, submit button,
+focus, hover, and disabled states reuse the accepted CYWater form language.
 At the user's explicit direction, staging user `grups`
 was assigned Lifetime on 2026-08-12. Verification found no expiry, zero PMPro
 orders, and both submission and voting eligibility; no payment record, invoice,
