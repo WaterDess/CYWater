@@ -268,10 +268,15 @@ assignment or license. An 11-check self-cleaning staging QA passed membership
 gates, one-entry/one-vote enforcement, phases, shortlisting, and protected
 storage; temporary users and entries were removed.
 
-Theme `0.6.3` renders the Call under a separate `Member programs` Event section.
+Theme `0.6.5` renders the Call under a separate `Member Programs` Event section.
 The form shows its fields plus an eligibility explanation when unavailable; an
 eligible member receives a local lockup preview after choosing an image, before
-anything is uploaded. At the user's explicit direction, staging user `grups`
+submission, and no file leaves the browser until submission. The Events archive
+now opens with an `Upcoming` horizontal card
+carousel and a category navigator for Upcoming, Annual Meetings, Annual
+Gathering, and Member Programs. Upcoming records also remain in their canonical
+category, so the carousel is discovery rather than a duplicate content model.
+At the user's explicit direction, staging user `grups`
 was assigned Lifetime on 2026-08-12. Verification found no expiry, zero PMPro
 orders, and both submission and voting eligibility; no payment record, invoice,
 or receipt was fabricated.

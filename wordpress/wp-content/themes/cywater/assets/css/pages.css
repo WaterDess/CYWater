@@ -592,6 +592,78 @@
 .event-archive-lead { font-size: var(--fs-sm); color: var(--ink-soft); }
 .event-series-section { margin-top: var(--sp-9); }
 
+.event-index-layout {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: start;
+}
+.event-index-nav-inner {
+  position: sticky;
+  top: 104px;
+  padding-left: var(--sp-4);
+  border-left: 1px solid var(--line);
+}
+.event-index-nav .eyebrow::before { display: none; }
+.event-index-nav nav { display: flex; flex-direction: column; gap: var(--sp-2); margin-top: var(--sp-4); }
+.event-index-nav a {
+  padding: 0.35rem 0;
+  font-size: var(--fs-sm);
+  color: var(--ink-mute);
+  transition: color var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+.event-index-nav a:hover,
+.event-index-nav a.is-active { color: var(--teal); transform: translateX(4px); }
+.event-index-content { min-width: 0; }
+.event-category-section { scroll-margin-top: 104px; }
+.event-category-section + .event-category-section { margin-top: var(--sp-9); }
+.event-category-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--sp-4); }
+.event-carousel-controls { display: flex; gap: var(--sp-2); padding-bottom: var(--sp-5); }
+.event-carousel-controls button {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--ink);
+  transition: border-color var(--dur) var(--ease), color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+.event-carousel-controls button:hover,
+.event-carousel-controls button:focus-visible { border-color: var(--teal); color: var(--teal); background: var(--white); }
+.event-carousel-controls button:disabled { opacity: 0.35; cursor: default; }
+.upcoming-event-carousel {
+  display: flex;
+  gap: var(--sp-5);
+  overflow-x: auto;
+  padding: 1px 1px var(--sp-3);
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: none;
+}
+.upcoming-event-carousel::-webkit-scrollbar { display: none; }
+.upcoming-event-card {
+  flex: 0 0 min(340px, calc(50% - 0.75rem));
+  min-width: 260px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  scroll-snap-align: start;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.upcoming-event-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); border-color: var(--teal-soft); }
+.upcoming-event-media { position: relative; display: grid; place-items: center; aspect-ratio: 16 / 9; overflow: hidden; background: var(--paper-warm); }
+.upcoming-event-media > img { width: 100%; height: 100%; object-fit: cover; }
+.upcoming-event-body { display: flex; flex: 1; flex-direction: column; align-items: flex-start; gap: var(--sp-2); padding: var(--sp-5); }
+.upcoming-event-type::before { display: none; }
+.upcoming-event-body h3 { font-size: var(--fs-lg); }
+.upcoming-event-body .meta { font-size: var(--fs-xs); color: var(--ink-mute); }
+.upcoming-event-body .link { margin-top: auto; padding-top: var(--sp-3); }
+
 /* event detail */
 .event-hero { background: var(--ink); color: var(--white); padding-block: clamp(3rem,6vw,4.5rem); position: relative; overflow: hidden; }
 .event-hero::after {
@@ -803,6 +875,18 @@
   .toc { position: static; }
   .partner-overview { grid-template-columns: 1fr; }
   .partner-contribution { grid-template-columns: 1fr; gap: var(--sp-3); }
+  .event-index-layout { grid-template-columns: 1fr; gap: var(--sp-6); }
+  .event-index-nav-inner {
+    position: static;
+    display: flex;
+    align-items: center;
+    gap: var(--sp-4);
+    padding: 0 0 var(--sp-3);
+    border-left: 0;
+    border-bottom: 1px solid var(--line);
+    overflow-x: auto;
+  }
+  .event-index-nav nav { flex-direction: row; flex-wrap: nowrap; margin-top: 0; white-space: nowrap; }
 }
 
 @media (max-width: 960px) {
@@ -876,6 +960,9 @@
   .role-grid, .award-intro { grid-template-columns: 1fr; }
   .event-archive-row { grid-template-columns: 120px minmax(0, 1fr); }
   .event-archive-row > .link { grid-column: 2; }
+  .upcoming-event-card { flex-basis: 82%; }
+  .event-category-heading { align-items: center; }
+  .event-carousel-controls { padding-bottom: var(--sp-4); }
   .award-year { grid-template-columns: 1fr; gap: var(--sp-3); }
   .prose { max-width: 100%; }
 }

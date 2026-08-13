@@ -246,6 +246,15 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   the accepted typography, spacing, line, and color tokens and becomes a simple
   vertical flow on narrow screens. Live HTTP, version, and DOM markers passed;
   screenshot-level browser control timed out, so final visual review remains open.
+- Theme `0.6.5` reorganizes the Events archive into Upcoming, Annual Meetings,
+  Annual Gathering, and Member Programs. A sticky desktop category navigator
+  becomes a compact horizontal navigator on narrow screens. Upcoming events use
+  a restrained multi-card horizontal carousel with previous/next controls,
+  touch scrolling, and scroll snapping, while each record remains in its
+  canonical category. This makes the removable Logo Design Call discoverable
+  without hard-coding it into permanent primary navigation. Live HTML, asset,
+  mobile CSS, PHP syntax, cache, and no-secret marker checks passed; browser
+  screenshot control timed out, so final human visual review remains open.
 - Stripe Sandbox was connected through PMPro on 2026-08-02. A server-side
   presence-only check confirmed the Sandbox Connect values without reading or
   exposing them, and PMPro's own status check reports the Sandbox webhook as

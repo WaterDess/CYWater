@@ -84,6 +84,44 @@
   }
   window.CYWaterToast = toast;
 
+  /* ---------- Events category navigation and upcoming carousel ---------- */
+  const eventNavLinks = Array.from(document.querySelectorAll(".event-index-nav a[href^='#']"));
+  if (eventNavLinks.length && "IntersectionObserver" in window) {
+    const eventSections = eventNavLinks
+      .map((link) => document.querySelector(link.getAttribute("href")))
+      .filter(Boolean);
+    const eventSpy = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((left, right) => left.boundingClientRect.top - right.boundingClientRect.top)[0];
+        if (!visible) return;
+        eventNavLinks.forEach((link) => {
+          link.classList.toggle("is-active", link.getAttribute("href") === `#${visible.target.id}`);
+        });
+      },
+      { rootMargin: "-20% 0px -65% 0px", threshold: 0 }
+    );
+    eventSections.forEach((section) => eventSpy.observe(section));
+  }
+
+  document.querySelectorAll("[data-event-carousel]").forEach((carousel) => {
+    const section = carousel.closest(".event-upcoming");
+    const previous = section?.querySelector("[data-carousel-previous]");
+    const next = section?.querySelector("[data-carousel-next]");
+    const step = () => Math.max(carousel.clientWidth * 0.78, 280);
+    const updateControls = () => {
+      if (!previous || !next) return;
+      previous.disabled = carousel.scrollLeft <= 2;
+      next.disabled = carousel.scrollLeft + carousel.clientWidth >= carousel.scrollWidth - 2;
+    };
+    previous?.addEventListener("click", () => carousel.scrollBy({ left: -step(), behavior: "smooth" }));
+    next?.addEventListener("click", () => carousel.scrollBy({ left: step(), behavior: "smooth" }));
+    carousel.addEventListener("scroll", updateControls, { passive: true });
+    window.addEventListener("resize", updateControls, { passive: true });
+    updateControls();
+  });
+
   /* ---------- FAQ accordion ---------- */
   document.querySelectorAll(".faq-item").forEach((item) => {
     const q = item.querySelector(".faq-q");
