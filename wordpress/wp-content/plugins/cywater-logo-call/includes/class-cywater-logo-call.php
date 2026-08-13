@@ -71,7 +71,25 @@ final class CYWater_Logo_Call {
 			'vote_close' => __( 'Voting closes', 'cywater-logo-call' ),
 		);
 		echo '<p><label><input type="checkbox" name="cywater_logo_call_enabled" value="1" ' . checked( get_post_meta( $post->ID, '_cywater_logo_call_enabled', true ), '1', false ) . '> <strong>' . esc_html__( 'Enable the removable Logo Call module on this event', 'cywater-logo-call' ) . '</strong></label></p>';
-		echo '<p>' . esc_html__( 'Submission: active Student, Professional or Lifetime members, one set each. Voting: active Professional and Lifetime members, one final vote each.', 'cywater-logo-call' ) . '</p>';
+		echo '<p>' . esc_html__( 'Accounts, memberships, Events and participation permissions remain separate. Choose the audience for each action on this Event; no membership level is changed by these settings.', 'cywater-logo-call' ) . '</p>';
+		foreach ( array( 'submit' => __( 'Who may submit', 'cywater-logo-call' ), 'vote' => __( 'Who may vote', 'cywater-logo-call' ) ) as $action => $label ) {
+			$policy = CYWater_Logo_Call_Eligibility::policy( $post->ID, $action );
+			echo '<fieldset style="margin:1rem 0;padding:0.75rem;border:1px solid #dcdcde"><legend><strong>' . esc_html( $label ) . '</strong></legend>';
+			echo '<select name="cywater_logo_call_' . esc_attr( $action ) . '_audience">';
+			foreach ( CYWater_Logo_Call_Eligibility::audiences() as $key => $audience_label ) {
+				echo '<option value="' . esc_attr( $key ) . '" ' . selected( $policy['audience'], $key, false ) . '>' . esc_html( $audience_label ) . '</option>';
+			}
+			echo '</select><div style="margin-top:.6rem">';
+			foreach ( CYWater_Logo_Call_Eligibility::level_options() as $key => $level_label ) {
+				echo '<label style="margin-right:1rem"><input type="checkbox" name="cywater_logo_call_' . esc_attr( $action ) . '_levels[]" value="' . esc_attr( $key ) . '" ' . checked( in_array( $key, $policy['levels'], true ), true, false ) . '> ' . esc_html( $level_label ) . '</label>';
+			}
+			echo '</div><p class="description">' . esc_html__( 'Level choices apply only when “Selected active membership levels” is selected.', 'cywater-logo-call' ) . '</p></fieldset>';
+		}
+		$reward = (string) get_post_meta( $post->ID, '_cywater_logo_call_reward', true );
+		if ( '' === $reward ) {
+			$reward = self::default_reward();
+		}
+		echo '<p><label for="cywater_logo_call_reward"><strong>' . esc_html__( 'Selected-design reward', 'cywater-logo-call' ) . '</strong></label><br><input class="widefat" type="text" id="cywater_logo_call_reward" name="cywater_logo_call_reward" value="' . esc_attr( $reward ) . '"></p>';
 		foreach ( $fields as $key => $label ) {
 			$value = (string) get_post_meta( $post->ID, '_cywater_logo_call_' . $key, true );
 			echo '<p><label for="cywater_logo_call_' . esc_attr( $key ) . '"><strong>' . esc_html( $label ) . '</strong></label><br><input type="datetime-local" id="cywater_logo_call_' . esc_attr( $key ) . '" name="cywater_logo_call_' . esc_attr( $key ) . '" value="' . esc_attr( str_replace( ' ', 'T', $value ) ) . '"></p>';
@@ -83,6 +101,20 @@ final class CYWater_Logo_Call {
 			return;
 		}
 		update_post_meta( $post_id, '_cywater_logo_call_enabled', isset( $_POST['cywater_logo_call_enabled'] ) ? '1' : '0' );
+		$audiences = CYWater_Logo_Call_Eligibility::audiences();
+		$levels    = CYWater_Logo_Call_Eligibility::level_options();
+		foreach ( array( 'submit', 'vote' ) as $action ) {
+			$audience = isset( $_POST[ 'cywater_logo_call_' . $action . '_audience' ] ) ? sanitize_key( wp_unslash( $_POST[ 'cywater_logo_call_' . $action . '_audience' ] ) ) : CYWater_Logo_Call_Eligibility::AUDIENCE_REGISTERED;
+			if ( ! isset( $audiences[ $audience ] ) ) {
+				$audience = CYWater_Logo_Call_Eligibility::AUDIENCE_REGISTERED;
+			}
+			$selected_levels = isset( $_POST[ 'cywater_logo_call_' . $action . '_levels' ] ) ? array_map( 'sanitize_key', (array) wp_unslash( $_POST[ 'cywater_logo_call_' . $action . '_levels' ] ) ) : array();
+			$selected_levels = array_values( array_intersect( array_keys( $levels ), $selected_levels ) );
+			update_post_meta( $post_id, '_cywater_logo_call_' . $action . '_audience', $audience );
+			update_post_meta( $post_id, '_cywater_logo_call_' . $action . '_levels', $selected_levels );
+		}
+		$reward = isset( $_POST['cywater_logo_call_reward'] ) ? sanitize_text_field( wp_unslash( $_POST['cywater_logo_call_reward'] ) ) : self::default_reward();
+		update_post_meta( $post_id, '_cywater_logo_call_reward', $reward ?: self::default_reward() );
 		foreach ( array( 'open_at', 'close_at', 'vote_open', 'vote_close' ) as $key ) {
 			$value = isset( $_POST[ 'cywater_logo_call_' . $key ] ) ? sanitize_text_field( wp_unslash( $_POST[ 'cywater_logo_call_' . $key ] ) ) : '';
 			update_post_meta( $post_id, '_cywater_logo_call_' . $key, str_replace( 'T', ' ', $value ) );
@@ -99,7 +131,7 @@ final class CYWater_Logo_Call {
 		$event  = absint( get_post_meta( $post->ID, '_cywater_logo_event_id', true ) );
 		$user   = get_userdata( (int) $post->post_author );
 		echo '<p><strong>' . esc_html__( 'Event:', 'cywater-logo-call' ) . '</strong> ' . esc_html( get_the_title( $event ) ) . '</p>';
-		echo '<p><strong>' . esc_html__( 'Member:', 'cywater-logo-call' ) . '</strong> ' . esc_html( $user ? $user->user_login : __( 'Unavailable', 'cywater-logo-call' ) ) . '</p>';
+		echo '<p><strong>' . esc_html__( 'Registered account:', 'cywater-logo-call' ) . '</strong> ' . esc_html( $user ? $user->user_login : __( 'Unavailable', 'cywater-logo-call' ) ) . '</p>';
 		echo '<p><strong>' . esc_html__( 'Statement:', 'cywater-logo-call' ) . '</strong><br>' . nl2br( esc_html( (string) get_post_meta( $post->ID, '_cywater_logo_statement', true ) ) ) . '</p>';
 		foreach ( array( 'source' => __( 'Original design file', 'cywater-logo-call' ), 'lockup' => __( 'Full-name lockup', 'cywater-logo-call' ) ) as $kind => $label ) {
 			$url = wp_nonce_url( admin_url( 'admin-post.php?action=cywater_logo_asset&entry=' . $post->ID . '&kind=' . $kind ), 'cywater_logo_asset_' . $post->ID . '_' . $kind );
@@ -109,7 +141,17 @@ final class CYWater_Logo_Call {
 		foreach ( self::statuses() as $key => $label ) {
 			echo '<option value="' . esc_attr( $key ) . '" ' . selected( $status, $key, false ) . '>' . esc_html( $label ) . '</option>';
 		}
-		echo '</select></p><p>' . esc_html__( 'Only shortlisted and selected entries are displayed for voting. Selection still requires a separate written rights agreement before permanent use.', 'cywater-logo-call' ) . '</p>';
+		echo '</select></p>';
+		$reward        = (string) get_post_meta( $event, '_cywater_logo_call_reward', true );
+		$reward        = $reward ?: self::default_reward();
+		$reward_status = (string) get_post_meta( $post->ID, '_cywater_logo_reward_status', true );
+		$reward_status = $reward_status ?: ( 'selected' === $status ? 'pending' : 'not_applicable' );
+		echo '<p><strong>' . esc_html__( 'Configured reward:', 'cywater-logo-call' ) . '</strong> ' . esc_html( $reward ) . '</p>';
+		echo '<p><label for="cywater_logo_reward_status"><strong>' . esc_html__( 'Reward fulfillment', 'cywater-logo-call' ) . '</strong></label><br><select id="cywater_logo_reward_status" name="cywater_logo_reward_status">';
+		foreach ( self::reward_statuses() as $key => $label ) {
+			echo '<option value="' . esc_attr( $key ) . '" ' . selected( $reward_status, $key, false ) . '>' . esc_html( $label ) . '</option>';
+		}
+		echo '</select></p><p>' . esc_html__( 'Only shortlisted and selected entries are displayed for voting. Selection records the configured reward as due; an administrator must separately complete the rights agreement and membership fulfillment.', 'cywater-logo-call' ) . '</p>';
 	}
 
 	public static function save_entry_review( $post_id ) {
@@ -119,6 +161,13 @@ final class CYWater_Logo_Call {
 		$status = sanitize_key( wp_unslash( $_POST['cywater_logo_status'] ) );
 		if ( isset( self::statuses()[ $status ] ) ) {
 			update_post_meta( $post_id, '_cywater_logo_status', $status );
+			$reward_status = isset( $_POST['cywater_logo_reward_status'] ) ? sanitize_key( wp_unslash( $_POST['cywater_logo_reward_status'] ) ) : '';
+			if ( 'selected' !== $status ) {
+				$reward_status = 'not_applicable';
+			} elseif ( ! isset( self::reward_statuses()[ $reward_status ] ) || 'not_applicable' === $reward_status ) {
+				$reward_status = 'pending';
+			}
+			update_post_meta( $post_id, '_cywater_logo_reward_status', $reward_status );
 		}
 	}
 
@@ -141,25 +190,29 @@ final class CYWater_Logo_Call {
 	}
 
 	private static function render_module( $event_id ) {
-		$phase  = self::phase( $event_id );
+		$phase   = self::phase( $event_id );
 		$user_id = get_current_user_id();
-		$close  = self::date_label( get_post_meta( $event_id, '_cywater_logo_call_close_at', true ) );
+		$close   = self::date_label( get_post_meta( $event_id, '_cywater_logo_call_close_at', true ) );
 		$vote_open  = self::date_label( get_post_meta( $event_id, '_cywater_logo_call_vote_open', true ) );
 		$vote_close = self::date_label( get_post_meta( $event_id, '_cywater_logo_call_vote_close', true ) );
+		$submitter   = CYWater_Logo_Call_Eligibility::public_label( $event_id, 'submit' );
+		$voter       = CYWater_Logo_Call_Eligibility::public_label( $event_id, 'vote' );
+		$reward      = (string) get_post_meta( $event_id, '_cywater_logo_call_reward', true );
+		$reward      = $reward ?: self::default_reward();
 		ob_start();
 		?>
 		<section class="cywater-logo-call" aria-labelledby="cywater-logo-call-title">
-			<p class="cywater-logo-call__eyebrow"><?php esc_html_e( 'Member design call', 'cywater-logo-call' ); ?></p>
+			<p class="cywater-logo-call__eyebrow"><?php esc_html_e( 'Logo design call', 'cywater-logo-call' ); ?></p>
 			<h2 id="cywater-logo-call-title"><?php esc_html_e( 'Design the next CYWater logo', 'cywater-logo-call' ); ?></h2>
 			<p><?php echo esc_html( sprintf( __( 'Submit one original logo set by %s. The set must include the logo itself and a version paired with “International Association of Contemporary Young Scholars in Water Sciences”.', 'cywater-logo-call' ), $close ) ); ?></p>
 			<div class="cywater-logo-call__rules"><h3><?php esc_html_e( 'Rules at a glance', 'cywater-logo-call' ); ?></h3><ul>
-				<li><?php esc_html_e( 'One submission set per active Student, Professional or Lifetime member.', 'cywater-logo-call' ); ?></li>
+				<li><?php echo esc_html( sprintf( __( 'One submission set per %s.', 'cywater-logo-call' ), $submitter ) ); ?></li>
 				<li><?php esc_html_e( 'Original file: PDF, PNG, JPEG or WebP; full-name preview: PNG, JPEG or WebP. Maximum 5 MB per file.', 'cywater-logo-call' ); ?></li>
-				<li><?php esc_html_e( 'No cash prize is offered. Selected work may receive association recognition; no membership upgrade is promised.', 'cywater-logo-call' ); ?></li>
+				<li><?php echo esc_html( sprintf( __( 'Selected-design reward: %s.', 'cywater-logo-call' ), $reward ) ); ?></li>
 				<li><?php esc_html_e( 'Entrants warrant originality. CYWater receives review/display permission; permanent use of a selected design requires a separate written rights agreement.', 'cywater-logo-call' ); ?></li>
-				<li><?php esc_html_e( 'During voting, each active Professional or Lifetime member has one final vote. Student members may submit but do not vote.', 'cywater-logo-call' ); ?></li>
+				<li><?php echo esc_html( sprintf( __( 'During voting, each %s has one final vote.', 'cywater-logo-call' ), $voter ) ); ?></li>
 			</ul></div>
-			<p class="cywater-logo-call__schedule"><?php echo esc_html( sprintf( __( 'Public member voting is a later phase, from %1$s to %2$s. Only designs shortlisted by the administrators appear there.', 'cywater-logo-call' ), $vote_open, $vote_close ) ); ?></p>
+			<p class="cywater-logo-call__schedule"><?php echo esc_html( sprintf( __( 'Registered-user voting is a later phase, from %1$s to %2$s. Only designs shortlisted by the administrators appear there.', 'cywater-logo-call' ), $vote_open, $vote_close ) ); ?></p>
 			<?php self::render_feedback(); ?>
 			<?php if ( 'submission' === $phase ) : ?>
 				<?php self::render_submission_form( $event_id, $user_id ); ?>
@@ -181,7 +234,7 @@ final class CYWater_Logo_Call {
 			'submitted'      => __( 'Your submission set was received. CYWater will email you after review.', 'cywater-logo-call' ),
 			'voted'          => __( 'Your vote was recorded.', 'cywater-logo-call' ),
 			'already'        => __( 'This account has already used its one submission or vote for this event.', 'cywater-logo-call' ),
-			'ineligible'     => __( 'Your current membership is not eligible for this action.', 'cywater-logo-call' ),
+			'ineligible'     => __( 'This account is not eligible for this action under the Event participation settings.', 'cywater-logo-call' ),
 			'closed'         => __( 'This stage is not currently open.', 'cywater-logo-call' ),
 			'invalid_file'   => __( 'A required file was missing, too large or not an accepted format.', 'cywater-logo-call' ),
 			'error'          => __( 'The request could not be completed. Please contact membership@cywater.org.', 'cywater-logo-call' ),
@@ -193,11 +246,11 @@ final class CYWater_Logo_Call {
 
 	private static function render_submission_form( $event_id, $user_id ) {
 		if ( ! $user_id ) {
-			echo '<p class="cywater-logo-call__notice"><a href="' . esc_url( wp_login_url( get_permalink( $event_id ) ) ) . '">' . esc_html__( 'Sign in to check submission eligibility', 'cywater-logo-call' ) . '</a></p>';
+			echo '<p class="cywater-logo-call__notice"><a href="' . esc_url( wp_login_url( get_permalink( $event_id ) ) ) . '">' . esc_html__( 'Sign in to submit a design', 'cywater-logo-call' ) . '</a></p>';
 			return;
 		}
-		if ( ! CYWater_Logo_Call_Eligibility::can_submit( $user_id ) ) {
-			echo '<p class="cywater-logo-call__notice">' . esc_html__( 'This account is registered but has no active Student, Professional or Lifetime membership. The form preview below is disabled; it becomes usable when an eligible membership is active.', 'cywater-logo-call' ) . '</p>';
+		if ( ! CYWater_Logo_Call_Eligibility::can_submit( $event_id, $user_id ) ) {
+			echo '<p class="cywater-logo-call__notice">' . esc_html__( 'This account does not match the submission audience selected by the Event administrator.', 'cywater-logo-call' ) . '</p>';
 			self::render_submission_fields( $event_id, true );
 			return;
 		}
@@ -220,7 +273,7 @@ final class CYWater_Logo_Call {
 			<figure class="cywater-logo-call__preview" data-cywater-logo-preview hidden><img alt=""><figcaption><?php esc_html_e( 'Local preview of the full-name effect image. Nothing is uploaded until you submit.', 'cywater-logo-call' ); ?></figcaption></figure>
 			<p><label for="cywater_logo_statement"><strong><?php esc_html_e( 'Design statement (optional, up to 1,000 characters)', 'cywater-logo-call' ); ?></strong></label><br><textarea id="cywater_logo_statement" name="cywater_logo_statement" maxlength="1000" rows="5"<?php echo $disabled_attr; ?>></textarea></p>
 			<p><label><input required type="checkbox" name="cywater_logo_terms" value="1"<?php echo $disabled_attr; ?>> <?php esc_html_e( 'I warrant that this is original work and agree to the review, display and selected-design rights process stated above.', 'cywater-logo-call' ); ?></label></p>
-			<button class="button" type="submit"<?php echo $disabled_attr; ?>><?php echo esc_html( $disabled ? __( 'Eligible membership required', 'cywater-logo-call' ) : __( 'Submit one logo set', 'cywater-logo-call' ) ); ?></button>
+			<button class="button" type="submit"<?php echo $disabled_attr; ?>><?php echo esc_html( $disabled ? __( 'Submission access required', 'cywater-logo-call' ) : __( 'Submit one logo set', 'cywater-logo-call' ) ); ?></button>
 		</form>
 		<?php
 	}
@@ -231,11 +284,11 @@ final class CYWater_Logo_Call {
 			echo '<p class="cywater-logo-call__notice">' . esc_html__( 'No shortlisted designs are available yet.', 'cywater-logo-call' ) . '</p>';
 			return;
 		}
-		$can_vote = $user_id && CYWater_Logo_Call_Eligibility::can_vote( $user_id ) && ! get_user_meta( $user_id, self::VOTE_META . $event_id, true );
+		$can_vote = $user_id && CYWater_Logo_Call_Eligibility::can_vote( $event_id, $user_id ) && ! get_user_meta( $user_id, self::VOTE_META . $event_id, true );
 		if ( ! $user_id ) {
-			echo '<p class="cywater-logo-call__notice"><a href="' . esc_url( wp_login_url( get_permalink( $event_id ) ) ) . '">' . esc_html__( 'Sign in to vote if eligible', 'cywater-logo-call' ) . '</a></p>';
-		} elseif ( ! CYWater_Logo_Call_Eligibility::can_vote( $user_id ) ) {
-			echo '<p class="cywater-logo-call__notice">' . esc_html__( 'Voting is limited to active Professional and Lifetime members.', 'cywater-logo-call' ) . '</p>';
+			echo '<p class="cywater-logo-call__notice"><a href="' . esc_url( wp_login_url( get_permalink( $event_id ) ) ) . '">' . esc_html__( 'Sign in to vote', 'cywater-logo-call' ) . '</a></p>';
+		} elseif ( ! CYWater_Logo_Call_Eligibility::can_vote( $event_id, $user_id ) ) {
+			echo '<p class="cywater-logo-call__notice">' . esc_html__( 'This account does not match the voting audience selected by the Event administrator.', 'cywater-logo-call' ) . '</p>';
 		} elseif ( ! $can_vote ) {
 			echo '<p class="cywater-logo-call__notice">' . esc_html__( 'This account has already cast its final vote.', 'cywater-logo-call' ) . '</p>';
 		}
@@ -276,7 +329,7 @@ final class CYWater_Logo_Call {
 		if ( 'submission' !== self::phase( $event_id ) ) {
 			self::redirect( $event_id, 'closed' );
 		}
-		if ( ! CYWater_Logo_Call_Eligibility::can_submit( $user_id ) ) {
+		if ( ! CYWater_Logo_Call_Eligibility::can_submit( $event_id, $user_id ) ) {
 			self::redirect( $event_id, 'ineligible' );
 		}
 		if ( self::existing_entry( $event_id, $user_id ) ) {
@@ -327,7 +380,7 @@ final class CYWater_Logo_Call {
 		if ( 'voting' !== self::phase( $event_id ) ) {
 			self::redirect( $event_id, 'closed' );
 		}
-		if ( ! CYWater_Logo_Call_Eligibility::can_vote( $user_id ) ) {
+		if ( ! CYWater_Logo_Call_Eligibility::can_vote( $event_id, $user_id ) ) {
 			self::redirect( $event_id, 'ineligible' );
 		}
 		if ( get_user_meta( $user_id, self::VOTE_META . $event_id, true ) ) {
@@ -449,6 +502,10 @@ final class CYWater_Logo_Call {
 		return $value ? wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ) . ' T', self::local_timestamp( $value ) ) : __( 'the published deadline', 'cywater-logo-call' );
 	}
 
+	private static function default_reward() {
+		return __( 'Two years of CYWater Professional membership', 'cywater-logo-call' );
+	}
+
 	private static function local_timestamp( $value ) {
 		$date = date_create_immutable_from_format( 'Y-m-d H:i', (string) $value, wp_timezone() );
 		return $date ? $date->getTimestamp() : 0;
@@ -461,11 +518,19 @@ final class CYWater_Logo_Call {
 	}
 
 	private static function statuses() {
-		return array( 'submitted' => __( 'Submitted', 'cywater-logo-call' ), 'shortlisted' => __( 'Shortlisted for voting', 'cywater-logo-call' ), 'not_selected' => __( 'Not selected', 'cywater-logo-call' ), 'selected' => __( 'Selected — rights agreement pending/completed separately', 'cywater-logo-call' ), 'withdrawn' => __( 'Withdrawn', 'cywater-logo-call' ) );
+		return array( 'submitted' => __( 'Submitted', 'cywater-logo-call' ), 'shortlisted' => __( 'Shortlisted for voting', 'cywater-logo-call' ), 'not_selected' => __( 'Not selected', 'cywater-logo-call' ), 'selected' => __( 'Selected — rights agreement and reward fulfillment tracked separately', 'cywater-logo-call' ), 'withdrawn' => __( 'Withdrawn', 'cywater-logo-call' ) );
+	}
+
+	private static function reward_statuses() {
+		return array(
+			'not_applicable' => __( 'Not applicable until selected', 'cywater-logo-call' ),
+			'pending'        => __( 'Pending fulfillment', 'cywater-logo-call' ),
+			'fulfilled'      => __( 'Fulfilled', 'cywater-logo-call' ),
+		);
 	}
 
 	public static function columns( $columns ) {
-		return array( 'cb' => $columns['cb'], 'title' => __( 'Submission', 'cywater-logo-call' ), 'event' => __( 'Event', 'cywater-logo-call' ), 'member' => __( 'Member', 'cywater-logo-call' ), 'status' => __( 'Status', 'cywater-logo-call' ), 'votes' => __( 'Votes', 'cywater-logo-call' ), 'date' => $columns['date'] );
+		return array( 'cb' => $columns['cb'], 'title' => __( 'Submission', 'cywater-logo-call' ), 'event' => __( 'Event', 'cywater-logo-call' ), 'member' => __( 'Account', 'cywater-logo-call' ), 'status' => __( 'Status', 'cywater-logo-call' ), 'votes' => __( 'Votes', 'cywater-logo-call' ), 'date' => $columns['date'] );
 	}
 
 	public static function column_value( $column, $post_id ) {
@@ -477,23 +542,30 @@ final class CYWater_Logo_Call {
 
 	public static function cli_create_review_event( $args, $assoc_args ) {
 		$existing = get_page_by_path( 'logo-design-call-2026', OBJECT, 'cyw_event' );
-		if ( $existing ) {
-			WP_CLI::success( 'Review event already exists: ' . $existing->ID ); return;
-		}
 		$status = isset( $assoc_args['publish'] ) ? 'publish' : 'draft';
-		$id = wp_insert_post( array( 'post_type' => 'cyw_event', 'post_status' => $status, 'post_name' => 'logo-design-call-2026', 'post_title' => 'CYWater Logo Design Call 2026', 'post_content' => '<p>CYWater invites active individual members to propose an original association logo and a companion lockup showing the association’s full legal name. This staging event hosts the removable submission and voting module below.</p>' ), true );
-		if ( is_wp_error( $id ) ) { WP_CLI::error( $id->get_error_message() ); }
+		if ( $existing ) {
+			$id     = (int) $existing->ID;
+			$status = (string) $existing->post_status;
+		} else {
+			$id = wp_insert_post( array( 'post_type' => 'cyw_event', 'post_status' => $status, 'post_name' => 'logo-design-call-2026', 'post_title' => 'CYWater Logo Design Call 2026', 'post_content' => '<p>CYWater invites registered users to propose an original association logo and a companion lockup showing the association’s full legal name. This staging event hosts the removable submission and voting module below.</p>' ), true );
+			if ( is_wp_error( $id ) ) { WP_CLI::error( $id->get_error_message() ); }
+		}
 		$dates = array( 'open_at' => '2026-08-12 00:00', 'close_at' => '2026-09-12 23:59', 'vote_open' => '2026-09-14 00:00', 'vote_close' => '2026-09-21 23:59' );
 		update_post_meta( $id, '_cywater_logo_call_enabled', '1' );
 		if ( ! term_exists( 'member-program', 'cyw_event_type' ) ) { wp_insert_term( 'Member program', 'cyw_event_type', array( 'slug' => 'member-program' ) ); }
 		wp_set_object_terms( $id, 'member-program', 'cyw_event_type' );
 		foreach ( $dates as $key => $value ) { update_post_meta( $id, '_cywater_logo_call_' . $key, $value ); }
-		update_post_meta( $id, '_cyw_start_date', '2026-08-12' ); update_post_meta( $id, '_cyw_end_date', '2026-09-21' ); update_post_meta( $id, '_cyw_date_label', 'Aug 12–Sep 21, 2026' ); update_post_meta( $id, '_cyw_location', 'Online' ); update_post_meta( $id, '_cyw_format', 'Member design call' ); update_post_meta( $id, '_cyw_status', 'upcoming' );
-		WP_CLI::success( 'Created ' . $status . ' review event: ' . $id );
+		foreach ( array( 'submit', 'vote' ) as $action ) {
+			update_post_meta( $id, '_cywater_logo_call_' . $action . '_audience', CYWater_Logo_Call_Eligibility::AUDIENCE_REGISTERED );
+			update_post_meta( $id, '_cywater_logo_call_' . $action . '_levels', array() );
+		}
+		update_post_meta( $id, '_cywater_logo_call_reward', self::default_reward() );
+		update_post_meta( $id, '_cyw_start_date', '2026-08-12' ); update_post_meta( $id, '_cyw_end_date', '2026-09-21' ); update_post_meta( $id, '_cyw_date_label', 'Aug 12–Sep 21, 2026' ); update_post_meta( $id, '_cyw_location', 'Online' ); update_post_meta( $id, '_cyw_format', 'Logo design call' ); update_post_meta( $id, '_cyw_status', 'upcoming' );
+		WP_CLI::success( 'Configured ' . $status . ' review event: ' . $id );
 	}
 
 	/**
-	 * Self-cleaning staging acceptance for membership gates and workflow state.
+	 * Self-cleaning staging acceptance for event policies and workflow state.
 	 */
 	public static function cli_qa() {
 		if ( ! function_exists( 'pmpro_changeMembershipLevel' ) ) {
@@ -511,6 +583,9 @@ final class CYWater_Logo_Call {
 		$posts = array();
 		$checks = 0;
 		try {
+			$registered_id = wp_create_user( 'cyw_logo_qa_registered_' . wp_generate_password( 6, false ), wp_generate_password( 24 ), 'cyw-logo-qa-registered-' . wp_generate_password( 6, false ) . '@example.invalid' );
+			if ( is_wp_error( $registered_id ) ) { throw new RuntimeException( $registered_id->get_error_message() ); }
+			$users['registered'] = (int) $registered_id;
 			foreach ( $required as $key ) {
 				$user_id = wp_create_user( 'cyw_logo_qa_' . $key . '_' . wp_generate_password( 6, false ), wp_generate_password( 24 ), 'cyw-logo-qa-' . $key . '-' . wp_generate_password( 6, false ) . '@example.invalid' );
 				if ( is_wp_error( $user_id ) ) { throw new RuntimeException( $user_id->get_error_message() ); }
@@ -518,15 +593,22 @@ final class CYWater_Logo_Call {
 				if ( ! pmpro_changeMembershipLevel( (int) $level_ids[ $key ], $user_id ) ) { throw new RuntimeException( 'Could not assign ' . $key ); }
 			}
 
-			self::qa_assert( CYWater_Logo_Call_Eligibility::can_submit( $users['student'] ), 'Student may submit' ); ++$checks;
-			self::qa_assert( ! CYWater_Logo_Call_Eligibility::can_vote( $users['student'] ), 'Student may not vote' ); ++$checks;
-			self::qa_assert( CYWater_Logo_Call_Eligibility::can_submit( $users['professional'] ) && CYWater_Logo_Call_Eligibility::can_vote( $users['professional'] ), 'Professional may submit and vote' ); ++$checks;
-			self::qa_assert( CYWater_Logo_Call_Eligibility::can_submit( $users['lifetime'] ) && CYWater_Logo_Call_Eligibility::can_vote( $users['lifetime'] ), 'Lifetime may submit and vote' ); ++$checks;
-
 			$event_id = wp_insert_post( array( 'post_type' => 'cyw_event', 'post_status' => 'draft', 'post_title' => 'CYWater Logo Call QA ' . wp_generate_password( 6, false ) ), true );
 			if ( is_wp_error( $event_id ) ) { throw new RuntimeException( $event_id->get_error_message() ); }
 			$posts[] = (int) $event_id;
 			update_post_meta( $event_id, '_cywater_logo_call_enabled', '1' );
+			update_post_meta( $event_id, '_cywater_logo_call_submit_audience', CYWater_Logo_Call_Eligibility::AUDIENCE_REGISTERED );
+			update_post_meta( $event_id, '_cywater_logo_call_vote_audience', CYWater_Logo_Call_Eligibility::AUDIENCE_REGISTERED );
+			self::qa_assert( CYWater_Logo_Call_Eligibility::can_submit( $event_id, $users['registered'] ), 'Registered non-member may submit when configured' ); ++$checks;
+			self::qa_assert( CYWater_Logo_Call_Eligibility::can_vote( $event_id, $users['registered'] ), 'Registered non-member may vote when configured' ); ++$checks;
+			self::qa_assert( CYWater_Logo_Call_Eligibility::can_submit( $event_id, $users['student'] ) && CYWater_Logo_Call_Eligibility::can_vote( $event_id, $users['student'] ), 'Registered Student may submit and vote when configured' ); ++$checks;
+			update_post_meta( $event_id, '_cywater_logo_call_vote_audience', CYWater_Logo_Call_Eligibility::AUDIENCE_SELECTED_LEVELS );
+			update_post_meta( $event_id, '_cywater_logo_call_vote_levels', array( 'professional', 'lifetime' ) );
+			self::qa_assert( ! CYWater_Logo_Call_Eligibility::can_vote( $event_id, $users['registered'] ) && ! CYWater_Logo_Call_Eligibility::can_vote( $event_id, $users['student'] ), 'Selected-level policy excludes non-member and Student' ); ++$checks;
+			self::qa_assert( CYWater_Logo_Call_Eligibility::can_vote( $event_id, $users['professional'] ) && CYWater_Logo_Call_Eligibility::can_vote( $event_id, $users['lifetime'] ), 'Selected-level policy admits Professional and Lifetime' ); ++$checks;
+			update_post_meta( $event_id, '_cywater_logo_call_vote_audience', CYWater_Logo_Call_Eligibility::AUDIENCE_REGISTERED );
+			update_post_meta( $event_id, '_cywater_logo_call_reward', self::default_reward() );
+			self::qa_assert( self::default_reward() === get_post_meta( $event_id, '_cywater_logo_call_reward', true ), 'Reward is stored independently on the Event' ); ++$checks;
 			update_post_meta( $event_id, '_cywater_logo_call_open_at', wp_date( 'Y-m-d H:i', current_time( 'timestamp' ) - HOUR_IN_SECONDS ) );
 			update_post_meta( $event_id, '_cywater_logo_call_close_at', wp_date( 'Y-m-d H:i', current_time( 'timestamp' ) + HOUR_IN_SECONDS ) );
 			self::qa_assert( 'submission' === self::phase( $event_id ), 'Submission phase is open' ); ++$checks;
@@ -543,8 +625,8 @@ final class CYWater_Logo_Call {
 			update_post_meta( $event_id, '_cywater_logo_call_vote_open', wp_date( 'Y-m-d H:i', current_time( 'timestamp' ) - HOUR_IN_SECONDS ) );
 			update_post_meta( $event_id, '_cywater_logo_call_vote_close', wp_date( 'Y-m-d H:i', current_time( 'timestamp' ) + HOUR_IN_SECONDS ) );
 			self::qa_assert( 'voting' === self::phase( $event_id ), 'Voting phase is open' ); ++$checks;
-			self::qa_assert( add_user_meta( $users['professional'], self::VOTE_META . $event_id, $entry_id, true ), 'First vote is accepted' ); ++$checks;
-			self::qa_assert( ! add_user_meta( $users['professional'], self::VOTE_META . $event_id, $entry_id, true ), 'Second vote is rejected' ); ++$checks;
+			self::qa_assert( add_user_meta( $users['registered'], self::VOTE_META . $event_id, $entry_id, true ), 'Registered non-member first vote is accepted' ); ++$checks;
+			self::qa_assert( ! add_user_meta( $users['registered'], self::VOTE_META . $event_id, $entry_id, true ), 'Registered non-member second vote is rejected' ); ++$checks;
 			self::qa_assert( file_exists( trailingslashit( self::private_directory() ) . '.htaccess' ), 'Private upload protection exists' ); ++$checks;
 
 			WP_CLI::success( sprintf( 'Logo Call QA passed %d checks; temporary data will be removed.', $checks ) );

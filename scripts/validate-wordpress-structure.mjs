@@ -202,16 +202,22 @@ const logoCallProvider = await readFile(
   path.join(root, "wordpress", "wp-content", "plugins", "cywater-logo-call", "includes", "class-cywater-logo-call.php"),
   "utf8"
 );
+const logoCallEligibility = await readFile(
+  path.join(root, "wordpress", "wp-content", "plugins", "cywater-logo-call", "includes", "class-cywater-logo-call-eligibility.php"),
+  "utf8"
+);
 assertMarkers(
-  logoCallProvider,
+  `${logoCallProvider}\n${logoCallEligibility}`,
   [
     "_cywater_logo_call_enabled",
     "CYWater_Logo_Call_Eligibility::can_submit",
     "CYWater_Logo_Call_Eligibility::can_vote",
-    "One submission set per active Student, Professional or Lifetime member.",
+    "All registered users",
+    "Selected active membership levels",
+    "Two years of CYWater Professional membership",
     "permanent use of a selected design requires a separate written rights agreement",
     "data-cywater-logo-preview-input",
-    "Public member voting is a later phase",
+    "Registered-user voting is a later phase",
     "member-program",
     "cywater-private/logo-call",
   ],
@@ -282,7 +288,7 @@ assert(
 
 assertMarkers(
   parityFiles.wordpressEventArchive,
-  ["wp_get_post_terms", "template-parts/title-visual", "'year'       => $year", "Member programs", "member-programs"],
+  ["wp_get_post_terms", "template-parts/title-visual", "'year'       => $year", "Member Programs", "member-programs"],
   "WordPress event archive"
 );
 assertMarkers(

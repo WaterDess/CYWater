@@ -57,8 +57,8 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 ## Current State
 
 Hostinger staging is available at `https://staging.cywater.org/`. The accepted
-baseline uses the CYWater `0.6.4` theme, CYWater Membership `0.8.2`, CYWater
-Partnerships `0.1.1`, CYWater Logo Call `0.1.2`, CYWater Environment `0.5.4`, CYWater Core `0.5.7`, and Event Tickets `5.29.1`. PMPro and Stripe
+baseline uses the CYWater `0.6.8` theme, CYWater Membership `0.8.2`, CYWater
+Partnerships `0.1.1`, CYWater Logo Call `0.2.0`, CYWater Environment `0.5.4`, CYWater Core `0.5.7`, and Event Tickets `5.29.1`. PMPro and Stripe
 Sandbox are active for staging acceptance; the live-payment gate remains
 closed and no production Stripe credential is configured. Postmark is connected on
 staging, its domain authentication is verified, and the user confirmed a
@@ -254,18 +254,23 @@ Stripe settlement bank account is present and that the named representative is
 authorized; no bank, birth-date, home-address, tax-ID, or credential value is
 stored in the repository.
 
-CYWater Logo Call `0.1.2` is an independent removable plugin attached only to
+CYWater Logo Call `0.2.0` is an independent removable plugin attached only to
 the enabled `CYWater Logo Design Call 2026` staging event. The review schedule
-accepts one set per active Student, Professional, or Lifetime member from
-August 12 through September 12, 2026; the set contains an original logo and a
-full-association-name lockup, each capped at 5 MB. Professional and Lifetime
-members have one final vote; Student members may submit but cannot vote. Files
+accepts one set per registered user from August 12 through September 12, 2026;
+the set contains an original logo and a full-association-name lockup, each
+capped at 5 MB. Every registered user has one final vote during the configured
+voting phase. Submission and voting audiences are independently configurable
+per Event as all registered users, all active individual members, or selected
+active membership levels; no permission decision changes membership state. Files
 are stored outside public uploads behind direct-access denial, and only a
-shortlisted lockup is streamable for voting. No cash prize or membership
-upgrade is promised. Non-selected rights remain with the entrant, while
+shortlisted lockup is streamable for voting. The selected-design reward is two
+years of CYWater Professional membership, recorded as a separately fulfilled
+administrator task rather than an automatic membership mutation. Non-selected
+rights remain with the entrant, while
 permanent use of a selected design requires a separate Board-approved written
-assignment or license. An 11-check self-cleaning staging QA passed membership
-gates, one-entry/one-vote enforcement, phases, shortlisting, and protected
+assignment or license. A self-cleaning staging QA covers registered-user and
+membership policies, one-entry/one-vote enforcement, phases, shortlisting,
+reward configuration, and protected
 storage; temporary users and entries were removed.
 
 Theme `0.6.5` renders the Call under a separate `Member Programs` Event section.

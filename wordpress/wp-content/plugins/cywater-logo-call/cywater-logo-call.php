@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: CYWater Logo Call
- * Description: Event-scoped, removable member logo submissions and eligibility-limited voting.
- * Version: 0.1.2
+ * Description: Event-scoped, removable logo submissions and configurable registered-user or membership participation policies.
+ * Version: 0.2.0
  * Requires at least: 7.0
  * Requires PHP: 8.1
  * Text Domain: cywater-logo-call
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CYWATER_LOGO_CALL_VERSION', '0.1.2' );
+define( 'CYWATER_LOGO_CALL_VERSION', '0.2.0' );
 define( 'CYWATER_LOGO_CALL_DIR', plugin_dir_path( __FILE__ ) );
 define( 'CYWATER_LOGO_CALL_URL', plugin_dir_url( __FILE__ ) );
 

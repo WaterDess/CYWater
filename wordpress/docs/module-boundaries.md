@@ -35,7 +35,7 @@ Event Tickets                 CYWater Membership
 | Event Tickets | Tickets and RSVPs attached only to `cyw_event`, capacity, attendees, event-order state | Membership levels, PMPro orders, CYWater content types, duplicated event records |
 | `plugins/cywater-membership` | PMPro levels, professional profile fields, privacy opt-in, directory, read-only admin projection | Stripe SDK, webhook endpoint, theme layout, duplicate member/order storage |
 | `plugins/cywater-partnerships` | Institutional expressions of interest, private applicant status, Board/MOU workflow, approved external payment-link handoff | Individual membership, PMPro orders, Stripe credentials, automatic Board approval |
-| `plugins/cywater-logo-call` | Temporary event-scoped submissions, protected design files, shortlisting, eligible-member vote | Theme/navigation, membership state, payment state, permanent IP transfer |
+| `plugins/cywater-logo-call` | Temporary event-scoped submissions, protected design files, shortlisting, configurable submission/voting audiences, reward-fulfillment status | Theme/navigation, account or membership state, payment state, permanent IP transfer |
 | `plugins/cywater-environment` | Environment reads, Mailpit routing, test/live safety gates, readiness report, conservative response headers | Membership rules, content rendering, full CSP policy |
 | Paid Memberships Pro | Registration, orders, membership activation, renewal/expiry mechanics, Stripe gateway/webhook | CYWater content and visual design |
 
@@ -69,9 +69,16 @@ Event Tickets                 CYWater Membership
     in `cywater-partnerships`; no payment link may render before Board approval
     and MOU completion. The historical PMPro Partner level is retained only for
     existing records with signup disabled.
-12. Logo Call is a removable event module, not a permanent theme feature. It
-    reads current PMPro levels, stores no duplicate member/order data, and
-    appears only on an explicitly enabled `cyw_event`. Deactivation removes the
-    UI without deleting the event or review records. Selection alone does not
-    transfer intellectual property; permanent use requires a separate written
-    Board-approved assignment or license.
+12. Logo Call is a removable event module, not a permanent theme feature.
+    WordPress accounts, PMPro membership state, Events, and participation
+    permissions remain separate. Each enabled `cyw_event` independently chooses
+    whether submission and voting are open to all registered users, all active
+    individual members, or selected active membership levels. The module reads
+    PMPro only when a membership-based rule is selected, stores no duplicate
+    account/member/order data, and never changes membership as a side effect of
+    a permission decision. Deactivation removes the UI without deleting the
+    event or review records. Selection alone does not transfer intellectual
+    property or grant the configured reward; both rights and reward fulfillment
+    remain explicit administrator-reviewed steps. These temporary Event rules
+    must not become the authority for Board elections or other governance votes;
+    governance eligibility belongs in a separately approved governance module.

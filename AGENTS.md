@@ -155,11 +155,11 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   `127.0.0.1` URL as a Lenovo-laptop preview. No Playground service is expected
   to remain running after the review task.
 
-### Temporary Staging Snapshot (2026-08-12)
+### Temporary Staging Snapshot (2026-08-13)
 
 - Hostinger staging is available at `https://staging.cywater.org/` with the
-  CYWater `0.6.4` theme, CYWater Membership `0.8.2`, CYWater Partnerships
-  `0.1.1`, CYWater Logo Call `0.1.2`, CYWater Environment `0.5.4`, CYWater Core `0.5.7`, and Event Tickets
+  CYWater `0.6.8` theme, CYWater Membership `0.8.2`, CYWater Partnerships
+  `0.1.1`, CYWater Logo Call `0.2.0`, CYWater Environment `0.5.4`, CYWater Core `0.5.7`, and Event Tickets
   `5.29.1`.
 - Dedicated Hostinger SSH access from the Lenovo workstation was established
   and independently verified with public-key authentication on 2026-08-02.
@@ -225,17 +225,22 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   still creates missing policy pages as drafts. CYWater confirmed that its Stripe settlement bank account is
   present and its named representative is association-authorized; do not record
   bank, birth-date, home-address, tax-ID, or credential values in Git.
-- CYWater Logo Call `0.1.2` is an independent removable plugin attached only to
+- CYWater Logo Call `0.2.0` is an independent removable plugin attached only to
   the enabled 2026 Logo Design Call event. Submissions run August 12 through
-  September 12, 2026: one original/logo-lockup set (5 MB per file) per active
-  Student, Professional, or Lifetime member. Professional and Lifetime members
-  have one final vote; Student members may submit but cannot vote. Protected
-  files live outside public uploads; only shortlisted lockups can render during
-  voting. There is no cash prize or promised membership upgrade. Permanent use
-  of a selected design requires a separate Board-approved written assignment or
-  license. An 11-check self-cleaning staging QA passed and removed its temporary
-  users and entries. Disabling the plugin removes its UI without changing the
-  theme, navigation, event, or retained review records. Theme `0.6.3` gives
+  September 12, 2026: one original/logo-lockup set (5 MB per file) per
+  registered user, and every registered user has one final vote. Accounts,
+  membership levels, Events, and participation permissions remain separate.
+  Each Event independently configures submission and voting for all registered
+  users, all active individual members, or selected active membership levels;
+  permission checks never mutate membership state. Protected files live outside
+  public uploads; only shortlisted lockups can render during voting. The
+  selected-design reward is two years of Professional membership, tracked as a
+  separate administrator fulfillment item rather than granted automatically.
+  Permanent use still requires a separate Board-approved written assignment or
+  license. A self-cleaning staging QA covers both registered-user and
+  membership-based policies and removes its temporary users and entries.
+  Disabling the plugin removes its UI without changing the theme, navigation,
+  event, or retained review records. Theme `0.6.3` gives
   this non-conference Event a separate `Member programs` archive section.
   The submission form remains visible with an eligibility explanation when
   disabled, and an eligible member receives a browser-local full-name-lockup

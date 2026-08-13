@@ -10,6 +10,14 @@ editable in the existing Events administration. Submitted designs appear under
 **Events → Logo submissions**. Deactivating `CYWater Logo Call` removes the
 module without changing the theme.
 
+The Logo Call event editor independently controls **Who may submit** and **Who
+may vote**. Each action can target all registered users, all active individual
+members, or selected active membership levels. The 2026 Call uses all
+registered users for both actions and offers the selected entrant two years of
+Professional membership. Marking an entry selected creates a pending reward
+fulfillment record; it does not silently change PMPro membership or create a
+payment/order.
+
 The visual and content baseline is accepted at `staging.cywater.org`. Keep
 production traffic, live payment, and production mail disabled while completing
 the following gates in order.
