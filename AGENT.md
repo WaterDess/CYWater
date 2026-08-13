@@ -561,7 +561,12 @@ Key requirements:
   successful payment date, without proration. Lifetime remains non-expiring;
   the supplied dues/fee schedules otherwise remain authoritative.
 - Mailing address: `202 E. Green St. Suite 2, Champaign, IL 61820, USA`.
-- Contact email is pending confirmation; never invent an address.
+- The confirmed public contact email is `contact@cywater.org`. Use
+  `membership@cywater.org` for member support and `billing@cywater.org` for
+  billing, renewals, and invoices.
+- On 2026-08-14 the WordPress Contact page and its editable contact-email field
+  were updated on staging to these confirmed addresses; the former
+  `To be confirmed` and channel-verification copy was removed.
 
 Annual Gathering photo sources supplied by a CYWater teacher:
 

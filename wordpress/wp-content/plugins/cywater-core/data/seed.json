@@ -1711,8 +1711,8 @@
     "contact": {
       "title": "Get in touch.",
       "eyebrow": "Contact",
-      "lead": "CYWater's official contact email is being confirmed. The mailing address below may be used for formal correspondence.",
-      "content": "<span class=\"eyebrow\">Contact status</span>\n            <h2 style=\"margin-top:var(--sp-3)\">Official channels are being verified.</h2>\n            <p class=\"lead\" style=\"margin-top:var(--sp-4)\">To avoid publishing an unconfirmed email address or a non-functional form, direct online messaging is temporarily unavailable on this preview.</p>\n            <p style=\"margin-top:var(--sp-4)\">Membership, event, partnership, and media inquiries will be accepted once the official contact channel is confirmed.</p>"
+      "lead": "Contact CYWater for general correspondence, events, partnerships, and media inquiries.",
+      "content": "<span class=\"eyebrow\">Official contact</span>\n            <h2 style=\"margin-top:var(--sp-3)\">How can we help?</h2>\n            <p class=\"lead\" style=\"margin-top:var(--sp-4)\">Use contact@cywater.org for general correspondence, events, partnerships, and media inquiries.</p>\n            <p style=\"margin-top:var(--sp-4)\">Membership support: membership@cywater.org. Billing, renewals, and invoices: billing@cywater.org.</p>"
     }
   }
 }

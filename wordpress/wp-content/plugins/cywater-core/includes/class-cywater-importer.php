@@ -57,7 +57,7 @@ final class CYWater_Importer {
 			'bylaws'     => array( 'Bylaws', 'Governance', 'The governing framework of the association.', '<p>The approved Bylaws document and article-by-article text will be migrated during editorial acceptance.</p>' ),
 			'membership' => array( 'Membership', 'Join CYWater', 'Join an international community advancing water sciences and supporting emerging scholars.', '<p>Membership is open worldwide to individuals professionally engaged in or interested in water sciences, water resources, or related disciplines.</p>' ),
 			'news'       => array( 'News', 'News and updates', 'Opportunities and spotlights.', '' ),
-			'contact'    => array( 'Get in touch', 'Contact', 'CYWater\'s official contact email is being confirmed.', '<h2>Official channels are being verified.</h2><p>Membership, event, partnership, and media inquiries will be accepted once the official contact channel is confirmed.</p>' ),
+			'contact'    => array( 'Get in touch', 'Contact', 'Contact CYWater for general correspondence, events, partnerships, and media inquiries.', '<h2>How can we help?</h2><p>Use contact@cywater.org for general correspondence, events, partnerships, and media inquiries.</p>' ),
 			'account'    => array( 'Member account', 'Membership', 'Manage your CYWater membership and profile.', '[pmpro_account]' ),
 			'member-profile' => array( 'Member profile', 'Membership profile', 'Complete your professional profile and choose what may appear publicly.', '[pmpro_member_profile_edit][cywater_privacy_settings]' ),
 		);
@@ -90,7 +90,7 @@ final class CYWater_Importer {
 			$this->seed_meta_if_missing( $post_id, '_cyw_eyebrow', $page[1] );
 			$this->seed_meta_if_missing( $post_id, '_cyw_lead', $page[2] );
 			if ( 'contact' === $slug ) {
-				$this->seed_meta_if_missing( $post_id, '_cyw_contact_email', '' );
+				$this->seed_meta_if_missing( $post_id, '_cyw_contact_email', 'contact@cywater.org' );
 				$this->seed_meta_if_missing( $post_id, '_cyw_mailing_address', "202 E. Green St. Suite 2\nChampaign, IL 61820, USA" );
 			}
 			$this->complete_seed_revision( $post_id );
