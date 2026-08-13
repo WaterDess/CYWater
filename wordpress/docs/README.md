@@ -286,6 +286,12 @@ more compact: cards use a smaller, concise layout; responsive previous/next
 controls sit at the two vertical sides of the card row; and a page indicator
 below the row tracks the current responsive group. If all Upcoming records fit,
 one active indicator remains and both arrows are disabled.
+Theme `0.6.8` supersedes the multi-card presentation with a single featured
+Event and dimmed previous/next side previews. Its arrows overlay the two sides,
+its indicators map one-to-one to Upcoming Event records, and it rotates every
+6.5 seconds unless hover, keyboard focus, document visibility, or reduced-motion
+preferences pause it. Keyboard arrows and touch swipes select the same records;
+no Event data is copied into a separate slider model.
 At the user's explicit direction, staging user `grups`
 was assigned Lifetime on 2026-08-12. Verification found no expiry, zero PMPro
 orders, and both submission and voting eligibility; no payment record, invoice,

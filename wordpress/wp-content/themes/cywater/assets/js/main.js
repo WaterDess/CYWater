@@ -110,59 +110,103 @@
     const previous = section?.querySelector("[data-carousel-previous]");
     const next = section?.querySelector("[data-carousel-next]");
     const pagination = section?.querySelector("[data-carousel-pagination]");
-    let pageCount = 1;
+    const cards = Array.from(carousel.querySelectorAll(".upcoming-event-card"));
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let activeIndex = 0;
+    let rotationTimer;
+    let touchStartX = null;
 
-    const maximumScroll = () => Math.max(0, carousel.scrollWidth - carousel.clientWidth);
-    const activePage = () => {
-      const maximum = maximumScroll();
-      return maximum > 0 ? Math.round((carousel.scrollLeft / maximum) * (pageCount - 1)) : 0;
+    const clearPreviewClones = () => {
+      carousel.querySelectorAll(".is-preview-clone").forEach((clone) => clone.remove());
     };
 
-    const updateControls = () => {
-      const currentPage = activePage();
-      if (previous) previous.disabled = carousel.scrollLeft <= 2;
-      if (next) next.disabled = carousel.scrollLeft >= maximumScroll() - 2;
+    const updateCarousel = () => {
+      clearPreviewClones();
+      cards.forEach((card, index) => {
+        card.classList.remove("is-active", "is-previous", "is-next");
+        card.classList.toggle("is-active", index === activeIndex);
+        card.setAttribute("aria-hidden", index === activeIndex ? "false" : "true");
+        card.tabIndex = index === activeIndex ? 0 : -1;
+      });
+
+      if (cards.length > 1) {
+        const previousIndex = (activeIndex - 1 + cards.length) % cards.length;
+        const nextIndex = (activeIndex + 1) % cards.length;
+        cards[previousIndex].classList.add("is-previous");
+        if (previousIndex === nextIndex) {
+          const clone = cards[nextIndex].cloneNode(true);
+          clone.classList.remove("is-active", "is-previous");
+          clone.classList.add("is-next", "is-preview-clone");
+          clone.setAttribute("aria-hidden", "true");
+          clone.tabIndex = -1;
+          carousel.append(clone);
+        } else {
+          cards[nextIndex].classList.add("is-next");
+        }
+      }
+
       pagination?.querySelectorAll(".event-carousel-dot").forEach((dot, index) => {
-        const isActive = index === currentPage;
+        const isActive = index === activeIndex;
         dot.classList.toggle("is-active", isActive);
         dot.setAttribute("aria-current", isActive ? "true" : "false");
       });
+      if (previous) previous.disabled = cards.length < 2;
+      if (next) next.disabled = cards.length < 2;
     };
 
-    const rebuildPagination = () => {
-      pageCount = Math.max(1, Math.ceil(carousel.scrollWidth / Math.max(carousel.clientWidth, 1)));
-      if (pagination) {
-        pagination.replaceChildren();
-        for (let index = 0; index < pageCount; index += 1) {
-          const dot = document.createElement("button");
-          dot.type = "button";
-          dot.className = "event-carousel-dot";
-          dot.setAttribute("aria-label", `Show upcoming-event page ${index + 1} of ${pageCount}`);
-          dot.addEventListener("click", () => {
-            const left = pageCount > 1 ? maximumScroll() * (index / (pageCount - 1)) : 0;
-            carousel.scrollTo({ left, behavior: "smooth" });
-          });
-          pagination.append(dot);
-        }
+    const showEvent = (index) => {
+      activeIndex = (index + cards.length) % cards.length;
+      updateCarousel();
+    };
+
+    const stopRotation = () => window.clearInterval(rotationTimer);
+    const startRotation = () => {
+      stopRotation();
+      if (cards.length > 1 && !reduceMotion.matches && !document.hidden) {
+        rotationTimer = window.setInterval(() => showEvent(activeIndex + 1), 6500);
       }
-      updateControls();
     };
 
-    const movePage = (direction) => {
-      const targetPage = Math.min(pageCount - 1, Math.max(0, activePage() + direction));
-      const left = pageCount > 1 ? maximumScroll() * (targetPage / (pageCount - 1)) : 0;
-      carousel.scrollTo({ left, behavior: "smooth" });
-    };
-
-    previous?.addEventListener("click", () => movePage(-1));
-    next?.addEventListener("click", () => movePage(1));
-    carousel.addEventListener("scroll", updateControls, { passive: true });
-    if ("ResizeObserver" in window) {
-      new ResizeObserver(rebuildPagination).observe(carousel);
-    } else {
-      window.addEventListener("resize", rebuildPagination, { passive: true });
+    if (pagination) {
+      pagination.replaceChildren();
+      cards.forEach((card, index) => {
+        const dot = document.createElement("button");
+        dot.type = "button";
+        dot.className = "event-carousel-dot";
+        dot.setAttribute("aria-label", `Show ${card.querySelector("h3")?.textContent || `upcoming event ${index + 1}`}`);
+        dot.addEventListener("click", () => {
+          showEvent(index);
+          startRotation();
+        });
+        pagination.append(dot);
+      });
     }
-    rebuildPagination();
+
+    previous?.addEventListener("click", () => { showEvent(activeIndex - 1); startRotation(); });
+    next?.addEventListener("click", () => { showEvent(activeIndex + 1); startRotation(); });
+    carousel.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+        event.preventDefault();
+        showEvent(activeIndex + (event.key === "ArrowLeft" ? -1 : 1));
+        startRotation();
+      }
+    });
+    carousel.addEventListener("touchstart", (event) => { touchStartX = event.changedTouches[0]?.clientX ?? null; }, { passive: true });
+    carousel.addEventListener("touchend", (event) => {
+      if (touchStartX === null) return;
+      const distance = (event.changedTouches[0]?.clientX ?? touchStartX) - touchStartX;
+      if (Math.abs(distance) > 45) showEvent(activeIndex + (distance < 0 ? 1 : -1));
+      touchStartX = null;
+      startRotation();
+    }, { passive: true });
+    section?.addEventListener("mouseenter", stopRotation);
+    section?.addEventListener("mouseleave", startRotation);
+    section?.addEventListener("focusin", stopRotation);
+    section?.addEventListener("focusout", startRotation);
+    document.addEventListener("visibilitychange", startRotation);
+    reduceMotion.addEventListener?.("change", startRotation);
+    updateCarousel();
+    startRotation();
   });
 
   /* ---------- FAQ accordion ---------- */

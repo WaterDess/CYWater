@@ -131,6 +131,7 @@ $render_events = static function ( $items ) {
 };
 
 $render_upcoming = static function ( $items ) {
+	$index = 0;
 	foreach ( $items as $event ) {
 		$event_id    = $event->ID;
 		$image       = cywater_featured_image_url( $event_id, 'cywater-card' );
@@ -140,7 +141,7 @@ $render_upcoming = static function ( $items ) {
 		$type        = ! is_wp_error( $event_types ) && $event_types ? $event_types[0]->name : 'Event';
 		$year        = preg_match( '/\b(20\d{2})\b/', $date, $matches ) ? $matches[1] : get_the_date( 'Y', $event );
 		?>
-		<a class="upcoming-event-card" href="<?php echo esc_url( get_permalink( $event ) ); ?>">
+		<a class="upcoming-event-card<?php echo 0 === $index ? ' is-active' : ''; ?>" href="<?php echo esc_url( get_permalink( $event ) ); ?>" aria-hidden="<?php echo 0 === $index ? 'false' : 'true'; ?>" tabindex="<?php echo 0 === $index ? '0' : '-1'; ?>">
 			<span class="upcoming-event-media">
 				<?php if ( $image ) : ?>
 					<img src="<?php echo esc_url( $image ); ?>" alt="<?php echo esc_attr( get_the_title( $event ) ); ?>" loading="lazy">
@@ -165,10 +166,12 @@ $render_upcoming = static function ( $items ) {
 					<?php echo esc_html( $date ); ?>
 					<?php if ( $location ) : ?> &middot; <?php echo esc_html( $location ); ?><?php endif; ?>
 				</span>
+				<span class="upcoming-event-summary"><?php echo esc_html( cywater_event_summary( $event_id, 28 ) ); ?></span>
 				<span class="link">View details</span>
 			</span>
 		</a>
 		<?php
+		++$index;
 	}
 };
 ?>
@@ -196,13 +199,13 @@ $render_upcoming = static function ( $items ) {
 					</div>
 				</div>
 				<div class="event-carousel-shell" data-event-carousel-shell>
-					<button class="event-carousel-arrow event-carousel-arrow--previous" type="button" data-carousel-previous aria-label="Show previous upcoming events">&larr;</button>
-					<div class="upcoming-event-carousel" data-event-carousel tabindex="0" aria-label="Upcoming events">
+					<button class="event-carousel-arrow event-carousel-arrow--previous" type="button" data-carousel-previous aria-label="Show previous upcoming event">&#8249;</button>
+					<div class="upcoming-event-carousel" data-event-carousel tabindex="0" role="region" aria-roledescription="carousel" aria-label="Upcoming events">
 						<?php $render_upcoming( $upcoming ); ?>
 					</div>
-					<button class="event-carousel-arrow event-carousel-arrow--next" type="button" data-carousel-next aria-label="Show next upcoming events">&rarr;</button>
+					<button class="event-carousel-arrow event-carousel-arrow--next" type="button" data-carousel-next aria-label="Show next upcoming event">&#8250;</button>
 				</div>
-				<div class="event-carousel-pagination" data-carousel-pagination aria-label="Choose an upcoming-event page"></div>
+				<div class="event-carousel-pagination" data-carousel-pagination aria-label="Choose an upcoming event"></div>
 			</section>
 			<?php endif; ?>
 

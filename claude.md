@@ -275,6 +275,13 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   responsive page indicator below the cards shows the current group. One-page
   layouts retain one active indicator and disable both arrows; narrower layouts
   automatically expose additional groups without duplicating Event records.
+- Theme `0.6.8` replaces the multi-card Upcoming strip with one editorial
+  feature carousel: the current Event is the only fully presented card, while
+  the previous and next Events appear as dimmed side previews. Side-overlay
+  chevrons, one indicator per Event, 6.5-second rotation, hover/focus pause,
+  keyboard arrows, touch swipes, and reduced-motion handling follow the
+  interaction structure requested from the Steam reference while retaining
+  CYWater typography, color, spacing, radius, and Event data ownership.
 - Stripe Sandbox was connected through PMPro on 2026-08-02. A server-side
   presence-only check confirmed the Sandbox Connect values without reading or
   exposing them, and PMPro's own status check reports the Sandbox webhook as
