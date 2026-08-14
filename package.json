@@ -18,6 +18,8 @@
     "static:start": "node scripts/start-static-preview.mjs",
     "playground:start": "node scripts/start-playground.mjs",
     "test:playground": "npm run vendor:prepare && node scripts/test-playground.mjs",
+    "test:forum": "npm run vendor:prepare && node scripts/test-forum-playground.mjs",
+    "forum:preview": "npm run vendor:prepare && node scripts/start-forum-preview.mjs",
     "prepare": "npm run assets:sync && npm run content:export"
   },
   "devDependencies": {

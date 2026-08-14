@@ -171,9 +171,230 @@
 .faq-item.is-open .faq-a { max-height: 300px; }
 .faq-a p { padding-bottom: var(--sp-4); font-size: var(--fs-sm); }
 
+/* ---------------------------------------------------------------------------
+   Rules that must survive `npm run assets:sync`.
+
+   The sync step deletes this theme's assets/css and re-copies the static site's
+   stylesheets over it, so anything WordPress-only that is written into the
+   mirrored pages.css is destroyed on the next `npm run prepare`. These rules
+   previously lived there and were lost that way. They belong here, in the one
+   theme stylesheet the sync never overwrites.
+
+   PMPro renders order and account tables as .pmpro_list lists inside .prose.
+   The article bullet and indent are wrong for them, so they are reset rather
+   than scoped out of the mirrored rule.
+   --------------------------------------------------------------------------- */
+
+.prose ul.pmpro_list li {
+  padding-left: 0;
+  margin-bottom: 0;
+  color: inherit;
+}
+
+.prose ul.pmpro_list li::before {
+  content: none;
+}
+
+@media (max-width: 720px) {
+  .latest-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Forum
+
+   Reuses the accepted card, badge, and prose system. Nothing here introduces a
+   new palette, type scale, or motion rule.
+   --------------------------------------------------------------------------- */
+
+.forum-filters {
+  display: grid;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-6);
+}
+
+.forum-filters .tag-list a.badge:hover {
+  background: var(--teal);
+  color: var(--white);
+}
+
+.forum-byline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--line);
+  font-size: var(--fs-sm);
+}
+
+.forum-byline a {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.forum-byline a:hover {
+  color: var(--teal);
+}
+
+.forum-replies {
+  color: var(--ink-soft, #5a6a6a);
+}
+
+.forum-article-byline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.forum-article-media {
+  margin-top: calc(var(--sp-7) * -1);
+  margin-bottom: var(--sp-6);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.forum-article-media img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.forum-article-topics {
+  margin-top: var(--sp-6);
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--line);
+}
+
+.forum-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--sp-2);
+  margin-top: var(--sp-7);
+}
+
+.forum-pagination .page-numbers {
+  padding: .45rem .7rem;
+  color: var(--ink);
+  border-bottom: 1px solid transparent;
+}
+
+.forum-pagination .page-numbers.current,
+.forum-pagination .page-numbers:hover {
+  color: var(--teal);
+  border-bottom-color: var(--teal);
+}
+
+.forum-endorsement-status {
+  margin: 0 0 var(--sp-5);
+  padding-left: var(--sp-5);
+  font-size: var(--fs-sm);
+}
+
+.forum-endorsement-note {
+  margin-top: var(--sp-5);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--line);
+  font-size: var(--fs-sm);
+}
+
+/* Discussion */
+
+.forum-comments .comment-list {
+  margin: var(--sp-6) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.forum-comments .comment-list ol.children {
+  margin: var(--sp-4) 0 0 var(--sp-5);
+  padding: 0;
+  list-style: none;
+  border-left: 2px solid var(--line);
+  padding-left: var(--sp-5);
+}
+
+.forum-comments .comment-body {
+  padding: var(--sp-5) 0;
+  border-top: 1px solid var(--line);
+}
+
+.forum-comments .comment-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-3);
+  font-size: var(--fs-sm);
+}
+
+.forum-comments .comment-author img {
+  border-radius: 100px;
+  vertical-align: middle;
+  margin-right: var(--sp-2);
+}
+
+.forum-comments .comment-awaiting-moderation {
+  display: block;
+  margin-top: var(--sp-2);
+  font-size: var(--fs-sm);
+  color: var(--rust);
+}
+
+.forum-comments-gate,
+.forum-comments-note {
+  margin-top: var(--sp-5);
+  font-size: var(--fs-sm);
+}
+
+.forum-comments-gate {
+  padding: var(--sp-5);
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+}
+
+.forum-comments .comment-form {
+  display: grid;
+  gap: var(--sp-4);
+  margin-top: var(--sp-6);
+}
+
+.forum-comments .comment-form label {
+  display: block;
+  margin-bottom: var(--sp-2);
+  font-weight: 600;
+  font-size: var(--fs-sm);
+}
+
+.forum-comments .comment-form textarea {
+  width: 100%;
+  padding: var(--sp-3);
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  resize: vertical;
+}
+
 @media (max-width: 760px) {
   .entry-content .alignwide {
     margin-left: 0;
     margin-right: 0;
+  }
+
+  .forum-article-media {
+    margin-top: 0;
+    border-radius: 0;
+  }
+
+  .forum-comments .comment-list ol.children {
+    margin-left: var(--sp-3);
+    padding-left: var(--sp-3);
   }
 }

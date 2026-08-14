@@ -6,11 +6,11 @@ The dependency direction is deliberately one-way:
 CYWater theme (presentation)
         |
         v
-CYWater Core (public content models)
-        +------------------------------+
-        |                              |
-        v                              v
-Event Tickets                 CYWater Membership
+CYWater Core (public content models)        CYWater Forum
+        +------------------------------+    (member-authored articles)
+        |                              |            |
+        v                              v            |
+Event Tickets                 CYWater Membership <--+
 (event registration)          (profile/privacy policy)
         |                              |
         |                              v
@@ -34,12 +34,21 @@ Event Tickets                 CYWater Membership
 | `plugins/cywater-core` | News import, Events, Awards, Board roles, editorial metadata | Checkout, member profiles, CSS |
 | Event Tickets | Tickets and RSVPs attached only to `cyw_event`, capacity, attendees, event-order state | Membership levels, PMPro orders, CYWater content types, duplicated event records |
 | `plugins/cywater-membership` | PMPro levels, professional profile fields, privacy opt-in, directory, read-only admin projection | Stripe SDK, webhook endpoint, theme layout, duplicate member/order storage |
+| `plugins/cywater-forum` | Forum article type, categories/topics, author endorsement, forum authorship roles, discussion scoping, forum policy parameters | Membership state, payment, secrets, core content types, theme layout |
 | `plugins/cywater-environment` | Environment reads, Mailpit routing, test/live safety gates, readiness report, conservative response headers | Membership rules, content rendering, full CSP policy |
 | Paid Memberships Pro | Registration, orders, membership activation, renewal/expiry mechanics, Stripe gateway/webhook | CYWater content and visual design |
 
 ## Rules
 
-1. Custom post types stay in `cywater-core`, so content survives a theme change.
+1. Custom post types stay in a plugin, so content survives a theme change.
+   Association-published content models — News, Events, Awards, Board roles —
+   stay in `cywater-core`. The forum is the one deliberate exception to keeping
+   them all in one module: it is member-published rather than
+   association-published, it carries its own authorship, endorsement, and
+   discussion policy, and folding that into Core would blur that module's
+   "public content models" ownership. The dependency stays one-way — the forum
+   reads membership and account-verification state, and neither Core nor
+   Membership knows the forum exists.
 2. The theme calls public WordPress or PMPro APIs only; it never writes payment
    or membership records.
 3. CYWater does not implement a second Stripe webhook handler. PMPro remains the
@@ -63,3 +72,17 @@ Event Tickets                 CYWater Membership
 10. Free RSVP and paid event tickets share the same event record, but paid
     checkout stays disabled until the association's existing Stripe Sandbox is
     connected to Event Tickets and the refund/duplicate-webhook matrix passes.
+11. Comments exist only on forum articles. No other post type may open
+    discussion, and the restriction is enforced by filter rather than by
+    convention.
+12. Author archives stay closed by default. `cywater-environment` owns that
+    protection and exposes `cywater_public_author_archive_allowed`; a module may
+    open one account that has actually published, never the archive wholesale.
+13. The forum's AI seam is declared and dormant. No outbound call may appear in
+    it until the association approves the feature; `npm run validate` enforces
+    this. When implemented, the reaction renders client-side only and must fail
+    silently, leaving no visible trace of the feature.
+14. Forum authorship policy lives in versioned defaults plus one administrator
+    option. Publishing prerequisites are evaluated per request, not frozen into
+    a role, so a lapsed membership stops new publishing without destroying an
+    author's drafts or existing articles.

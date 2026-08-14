@@ -34,9 +34,15 @@ await rm(path.join(destination, "img", "placeholders"), {
 await cp(path.join(source, "docs"), path.join(destination, "docs"), {
   recursive: true,
 });
-await cp(
-  path.join(source, "js", "main.js"),
-  path.join(destination, "js", "main.js")
-);
+// The theme's main.js is deliberately NOT synced.
+//
+// It has diverged for a structural reason: the static site marks FAQ questions
+// up as divs and needs role/tabindex/keydown shims, while the theme emits real
+// <button> elements and instead maintains aria-hidden on the answer, closes the
+// mobile drawer on Escape, and returns focus to the toggle. Copying the static
+// file over it silently reverts that accessibility work — which is exactly what
+// happened once already. Theme-owned behaviour stays theme-owned, the same way
+// wordpress.css owns WordPress-only styling.
+
 
 console.log(`Synced static assets to ${path.relative(root, destination)}`);

@@ -26,6 +26,18 @@ const required = [
   "wordpress/wp-content/plugins/cywater-core/cywater-core.php",
   "wordpress/wp-content/plugins/cywater-membership/cywater-membership.php",
   "wordpress/wp-content/plugins/cywater-environment/cywater-environment.php",
+  "wordpress/wp-content/plugins/cywater-forum/cywater-forum.php",
+  "wordpress/wp-content/plugins/cywater-forum/includes/defaults.php",
+  "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-settings.php",
+  "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-content.php",
+  "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-roles.php",
+  "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-endorsement.php",
+  "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-comments.php",
+  "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-ai.php",
+  "wordpress/wp-content/themes/cywater/archive-cyw_forum_post.php",
+  "wordpress/wp-content/themes/cywater/single-cyw_forum_post.php",
+  "wordpress/wp-content/themes/cywater/comments.php",
+  "wordpress/wp-content/themes/cywater/author.php",
 ];
 
 for (const relativePath of required) {
@@ -148,6 +160,12 @@ const parityFiles = {
     path.join(root, "wordpress", "wp-content", "themes", "cywater", "assets", "css", "pages.css"),
     "utf8"
   ),
+  // Theme-owned and never overwritten by assets:sync, unlike the mirrored
+  // stylesheets above.
+  wordpressCss: await readFile(
+    path.join(root, "wordpress", "wp-content", "themes", "cywater", "wordpress.css"),
+    "utf8"
+  ),
 };
 
 const boardMarkers = [
@@ -203,14 +221,34 @@ assertMarkers(
   ],
   "Static page stylesheet"
 );
+// These rules must live in the theme-owned stylesheet. Asserting them against
+// the mirrored pages.css is what let `npm run prepare` silently delete them.
 assertMarkers(
-  parityFiles.wordpressPagesCss,
-  [
-    ".prose ul:not(.pmpro_list) li",
-    ".prose ul:not(.pmpro_list) li::before",
-    ".latest-head { flex-direction: column; align-items: flex-start; }",
-  ],
-  "WordPress-specific page stylesheet"
+  parityFiles.wordpressCss,
+  [".prose ul.pmpro_list li", ".prose ul.pmpro_list li::before", ".latest-head {"],
+  "WordPress-specific theme stylesheet"
+);
+assert(
+  parityFiles.wordpressPagesCss === parityFiles.staticPagesCss,
+  "The theme's mirrored pages.css must be byte-identical to the static site's. " +
+    "WordPress-only rules belong in wordpress.css, which assets:sync does not overwrite."
+);
+
+// The theme's main.js is theme-owned and must keep its accessibility behaviour.
+// It was silently reverted once by assets:sync copying the static file over it.
+const themeMainJs = await readFile(
+  path.join(root, "wordpress", "wp-content", "themes", "cywater", "main.js"),
+  "utf8"
+);
+assertMarkers(
+  themeMainJs,
+  ["closeMobileNav", 'event.key !== "Escape"', 'querySelector(".faq-a")?.setAttribute("aria-hidden"'],
+  "WordPress theme main.js"
+);
+assert(
+  !/setAttribute\("role", "button"\)/.test(themeMainJs),
+  "The theme emits real <button> FAQ controls, so it must not carry the static site's div shims. " +
+    "This file has been overwritten by assets:sync."
 );
 
 const award2025 = seed.awards.find((award) => String(award.year) === "2025");
@@ -243,6 +281,53 @@ assertMarkers(
 assert(
   !themeImageEntries.includes("placeholders"),
   "Unused legacy placeholder assets must not be included in the WordPress theme."
+);
+
+const forumDirectory = path.join(root, "wordpress", "wp-content", "plugins", "cywater-forum");
+
+// The AI reaction is declared but not implemented. Keep it that way until the
+// association approves the feature: nothing in the seam may call out to a
+// provider, and the endpoint must keep answering 204 by default.
+const forumAi = await readFile(path.join(forumDirectory, "includes", "class-cywater-forum-ai.php"), "utf8");
+for (const outbound of ["wp_remote_", "curl_", "file_get_contents(", "fsockopen"]) {
+  assert(
+    !forumAi.includes(outbound),
+    `The forum AI seam must stay dormant, but it contains an outbound call: ${outbound}.`
+  );
+}
+assertMarkers(
+  forumAi,
+  ["new WP_REST_Response( null, 204 )", "cywater_forum_ai_reaction"],
+  "Forum AI seam"
+);
+
+// Discussion must stay scoped to forum articles. News, Events, Awards, and
+// Board roles have never had comments and must not acquire them by accident.
+const forumComments = await readFile(
+  path.join(forumDirectory, "includes", "class-cywater-forum-comments.php"),
+  "utf8"
+);
+assertMarkers(
+  forumComments,
+  ["CYWater_Forum_Content::POST_TYPE !== get_post_type( $post_id )", "'comments_open'"],
+  "Forum discussion scoping"
+);
+
+// Author archives are opened one account at a time. A blanket allow would undo
+// the account-enumeration protection in cywater-environment.
+const publicSurface = await readFile(
+  path.join(root, "wordpress", "wp-content", "plugins", "cywater-environment", "includes", "class-cywater-public-surface.php"),
+  "utf8"
+);
+assertMarkers(publicSurface, ["cywater_public_author_archive_allowed"], "Author archive gate");
+const forumContent = await readFile(
+  path.join(forumDirectory, "includes", "class-cywater-forum-content.php"),
+  "utf8"
+);
+assertMarkers(
+  forumContent,
+  ["cywater_public_author_archive_allowed", "return self::published_count( $author_id ) > 0;"],
+  "Forum author archive opt-in"
 );
 
 console.log(

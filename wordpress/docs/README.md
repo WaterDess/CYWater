@@ -43,6 +43,7 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 ## Document Map
 
 - `module-boundaries.md` - ownership and dependency rules
+- `forum.md` - member-authored forum, endorsement, discussion, and the AI seam
 - `member-workflow.md` - registration, profile, privacy, and status model
 - `payment-testing.md` - Stripe sandbox and refund test matrix
 - `stripe-live-verification.md` - US nonprofit Live KYC and bank-document packet
@@ -53,6 +54,15 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 - `production-checklist.md` - launch acceptance gates
 - `manual-external-handoff.md` - remaining human, policy, license, and cutover work
 - `email-copy.md` - approved-content drafts, not active mail overrides
+
+## Forum (new, not yet accepted)
+
+CYWater Forum `0.1.0` adds a member-authored article section with arXiv-style
+author endorsement and scoped discussion. It is written but has not been
+deployed to staging, exercised against a database, or reviewed in a browser, and
+the association has not yet approved the feature. The per-viewer AI reaction is
+declared as a dormant contract only — no provider, no key, no outbound call, and
+`npm run validate` fails if one appears. See `forum.md`.
 
 ## Current State
 

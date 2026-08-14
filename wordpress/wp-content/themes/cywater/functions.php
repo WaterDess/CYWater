@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CYWATER_THEME_VERSION', '0.5.8' );
+define( 'CYWATER_THEME_VERSION', '0.5.9' );
 
 function cywater_theme_setup() {
 	add_theme_support( 'title-tag' );
@@ -63,7 +63,9 @@ function cywater_enqueue_assets() {
 	wp_enqueue_style( 'cywater-components', get_theme_file_uri( 'assets/css/components.css' ), array( 'cywater-base' ), cywater_asset_version( 'assets/css/components.css' ) );
 	wp_enqueue_style( 'cywater-pages', get_theme_file_uri( 'assets/css/pages.css' ), array( 'cywater-components' ), cywater_asset_version( 'assets/css/pages.css' ) );
 	wp_enqueue_style( 'cywater-wordpress', get_theme_file_uri( 'wordpress.css' ), array( 'cywater-pages' ), cywater_asset_version( 'wordpress.css' ) );
-	wp_enqueue_script( 'cywater-main', get_theme_file_uri( 'assets/js/main.js' ), array(), cywater_asset_version( 'assets/js/main.js' ), true );
+	// Theme-owned, and deliberately outside assets/ so `npm run assets:sync`
+	// cannot overwrite it with the static site's copy. See wordpress.css.
+	wp_enqueue_script( 'cywater-main', get_theme_file_uri( 'main.js' ), array(), cywater_asset_version( 'main.js' ), true );
 }
 add_action( 'wp_enqueue_scripts', 'cywater_enqueue_assets' );
 
@@ -80,6 +82,9 @@ function cywater_current_section() {
 	}
 	if ( is_post_type_archive( 'cyw_award' ) || is_singular( 'cyw_award' ) ) {
 		return 'awards';
+	}
+	if ( is_post_type_archive( 'cyw_forum_post' ) || is_singular( 'cyw_forum_post' ) || is_tax( array( 'cyw_forum_category', 'cyw_forum_topic' ) ) || is_author() || is_page( 'forum-endorsement' ) ) {
+		return 'forum';
 	}
 	if ( is_home() || is_singular( 'post' ) || is_category() ) {
 		return 'news';
@@ -153,3 +158,112 @@ function cywater_excerpt_more() {
 	return '&hellip;';
 }
 add_filter( 'excerpt_more', 'cywater_excerpt_more' );
+
+/**
+ * Forum helpers.
+ *
+ * Presentation only. Authorship policy, endorsement state, and discussion rules
+ * belong to cywater-forum; this theme asks it questions and renders answers.
+ */
+
+function cywater_forum_enabled() {
+	return post_type_exists( 'cyw_forum_post' );
+}
+
+/**
+ * Resolve the sign-in URL the same way the membership plugin does.
+ *
+ * The `/member-login/` page is created by PMPro setup, so it does not exist
+ * wherever PMPro is inactive — including the Playground review environment.
+ * Hardcoding that slug produces a 404 there. Ask PMPro when it is present and
+ * fall back to the WordPress login otherwise.
+ *
+ * @param string $redirect Optional URL to return to after signing in.
+ * @return string
+ */
+function cywater_login_url( $redirect = '' ) {
+	$url = function_exists( 'pmpro_url' ) ? pmpro_url( 'login' ) : wp_login_url();
+	return $redirect ? add_query_arg( 'redirect_to', $redirect, $url ) : $url;
+}
+
+/**
+ * Call to action for the forum hero, matched to what this visitor can do.
+ */
+function cywater_forum_hero_actions() {
+	if ( ! class_exists( 'CYWater_Forum_Roles' ) ) {
+		return '';
+	}
+	if ( ! is_user_logged_in() ) {
+		return '<a class="btn btn-accent" href="' . esc_url( cywater_login_url( get_post_type_archive_link( 'cyw_forum_post' ) ) ) . '">' . esc_html__( 'Sign in to take part', 'cywater' ) . '</a>';
+	}
+	if ( CYWater_Forum_Roles::can_publish( get_current_user_id() ) ) {
+		return '<a class="btn btn-accent" href="' . esc_url( admin_url( 'post-new.php?post_type=cyw_forum_post' ) ) . '">' . esc_html__( 'Write an article', 'cywater' ) . '</a>';
+	}
+	$endorsement = class_exists( 'CYWater_Forum_Endorsement' ) ? CYWater_Forum_Endorsement::page_url() : home_url( '/forum-endorsement/' );
+	return '<a class="btn btn-accent" href="' . esc_url( $endorsement ) . '">' . esc_html__( 'Become an author', 'cywater' ) . '</a>';
+}
+
+function cywater_forum_pagination() {
+	$links = paginate_links(
+		array(
+			'type'      => 'array',
+			'prev_text' => __( 'Previous', 'cywater' ),
+			'next_text' => __( 'Next', 'cywater' ),
+		)
+	);
+	if ( ! $links ) {
+		return;
+	}
+	echo '<nav class="forum-pagination" aria-label="' . esc_attr__( 'Forum pages', 'cywater' ) . '">';
+	foreach ( $links as $link ) {
+		// aria-current marks the current page for assistive technology and must
+		// survive the allowlist.
+		echo wp_kses(
+			$link,
+			array(
+				'a'    => array( 'href' => true, 'class' => true, 'aria-current' => true ),
+				'span' => array( 'class' => true, 'aria-current' => true ),
+				'br'   => array(),
+			)
+		);
+	}
+	echo '</nav>';
+}
+
+/**
+ * Shared body for the forum category and topic archives.
+ *
+ * @param string $eyebrow Label above the term name.
+ */
+function cywater_forum_term_archive( $eyebrow ) {
+	$term = get_queried_object();
+	get_template_part(
+		'template-parts/page-hero',
+		null,
+		array(
+			'eyebrow'     => $eyebrow,
+			'title'       => $term instanceof WP_Term ? $term->name : __( 'Forum', 'cywater' ),
+			'lead'        => $term instanceof WP_Term && $term->description ? $term->description : '',
+			'breadcrumbs' => '<a href="' . esc_url( get_post_type_archive_link( 'cyw_forum_post' ) ) . '">' . esc_html__( 'Forum', 'cywater' ) . '</a>',
+		)
+	);
+	?>
+	<section class="section">
+		<div class="container">
+			<?php if ( have_posts() ) : ?>
+				<div class="grid grid-3">
+					<?php
+					while ( have_posts() ) :
+						the_post();
+						get_template_part( 'template-parts/forum-card' );
+					endwhile;
+					?>
+				</div>
+				<?php cywater_forum_pagination(); ?>
+			<?php else : ?>
+				<p class="lead"><?php esc_html_e( 'Nothing has been published here yet.', 'cywater' ); ?></p>
+			<?php endif; ?>
+		</div>
+	</section>
+	<?php
+}

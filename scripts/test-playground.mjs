@@ -14,6 +14,7 @@ const mounts = [
   ["./wordpress/wp-content/plugins/cywater-core", "/wordpress/wp-content/plugins/cywater-core"],
   ["./wordpress/wp-content/plugins/cywater-membership", "/wordpress/wp-content/plugins/cywater-membership"],
   ["./wordpress/wp-content/plugins/cywater-environment", "/wordpress/wp-content/plugins/cywater-environment"],
+  ["./wordpress/wp-content/plugins/cywater-forum", "/wordpress/wp-content/plugins/cywater-forum"],
   ["./wordpress/runtime/vendor/paid-memberships-pro", "/wordpress/wp-content/plugins/paid-memberships-pro"],
 ].map(([hostPath, vfsPath]) => ({ hostPath, vfsPath }));
 
@@ -27,11 +28,37 @@ const server = await runCLI({
   blueprint: "./wordpress/blueprint.json",
 });
 
+/**
+ * Two Playground-only transients, neither of which says anything about the
+ * site: the worker pool answers 503 when momentarily exhausted, and its virtual
+ * filesystem intermittently fails to read `/wordpress/.maintenance`, which
+ * WordPress reports as a fatal before any theme code runs.
+ *
+ * Both are retried. Every other status and every other PHP error still fails on
+ * the first attempt, so a genuinely broken page cannot hide behind this.
+ */
+const MAINTENANCE_RACE = /Failed opening required '.*\.maintenance'/;
+
+async function fetchPage(url, attempts = 5) {
+  let last;
+  let lastHtml = "";
+  for (let attempt = 0; attempt < attempts; attempt++) {
+    last = await fetch(url);
+    lastHtml = await last.text();
+    if (last.status !== 503 && ! MAINTENANCE_RACE.test(lastHtml)) {
+      break;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 500 * (attempt + 1)));
+  }
+  // The body is already consumed, so hand it back alongside the response.
+  return { status: last.status, html: lastHtml };
+}
+
 try {
   for (const route of ["/", "/about/", "/board/", "/bylaws/", "/news/", "/events/", "/awards/", "/membership/", "/contact/", "/members/"]) {
-    const response = await fetch(new URL(route, server.serverUrl));
+    const response = await fetchPage(new URL(route, server.serverUrl));
     assert.equal(response.status, 200, `${route} should return HTTP 200`);
-    const html = await response.text();
+    const html = response.html;
     assert.doesNotMatch(html, /Fatal error|Parse error|Warning:/, `${route} should not expose a PHP error`);
     if (route === "/events/") {
       assert.match(html, /CYWater Annual Meeting 2026/, "Events archive must publish the upcoming 2026 meeting");
@@ -156,8 +183,7 @@ echo 'prepared';`,
   assert.equal(result.exitCode, 0, result.errors);
   assert.equal(result.text, "prepared");
 
-  const fallbackResponse = await fetch(new URL("/news/", server.serverUrl));
-  const fallbackHtml = await fallbackResponse.text();
+  const fallbackHtml = (await fetchPage(new URL("/news/", server.serverUrl))).html;
   assert.equal((fallbackHtml.match(/class="news-feature"/g) || []).length, 1, "News fallback must retain its featured story");
   assert.equal((fallbackHtml.match(/class="news-item"/g) || []).length, 14, "News fallback must render every imported story");
   assert.doesNotMatch(fallbackHtml, /Hello world/i, "News fallback must exclude unrelated posts");
@@ -187,10 +213,10 @@ echo wp_json_encode(
   assert.equal(upgrade.award_record_restored, true, "Automatic upgrade must restore missing Award records");
   assert.equal(upgrade.article_id_restored, true, "Automatic upgrade must restore Award announcement links");
 
-  const upgradedNewsHtml = await (await fetch(new URL("/news/", server.serverUrl))).text();
+  const upgradedNewsHtml = (await fetchPage(new URL("/news/", server.serverUrl))).html;
   assert.equal((upgradedNewsHtml.match(/class="news-feature"/g) || []).length, 1, "Upgraded News must retain its featured story");
   assert.equal((upgradedNewsHtml.match(/class="news-item"/g) || []).length, 14, "Upgraded News must render every imported story");
-  const upgradedAwardsHtml = await (await fetch(new URL("/awards/", server.serverUrl))).text();
+  const upgradedAwardsHtml = (await fetchPage(new URL("/awards/", server.serverUrl))).html;
   assert.match(upgradedAwardsHtml, /Outstanding Papers/, "Upgraded Awards must render restored Outstanding Paper records");
   assert.match(upgradedAwardsHtml, /10\.1073\/pnas\.2421046122/, "Upgraded Awards must render restored DOI data");
   assert.match(upgradedAwardsHtml, /Read award announcement/, "Upgraded Awards must render restored announcement links");
