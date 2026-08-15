@@ -77,7 +77,7 @@
         profile-photo/privacy controls, and the administrator member record.
         Forum desktop/mobile cards and the Events two-record carousel also pass
         local browser checks; live HTTP/DOM structure passes after theme 0.6.12.
-        Theme 0.6.16 retains non-interactive Forum article topic labels and the shared
+        Theme 0.6.17 retains non-interactive Forum article topic labels and the shared
         Reply radius/focus treatment, and a five-slot circular Event buffer so
         both incoming side previews remain present during forward/reverse motion.
         Its target-index state machine passed rapid arrows, alternating arrows,
@@ -88,6 +88,10 @@
         News and Events, becomes immediate under `prefers-reduced-motion`, and
         passed desktop plus 375px layout/overflow and console checks. The Logo
         Call form remains immediately visible rather than scroll-gated.
+        The Upcoming side previews are now light background cues, chevrons are
+        vertically centered over the full card region, and the active-card
+        shadow fades without a clipped baseline. Logo Call 0.2.1 also removes
+        the redundant white file-input container while preserving focus.
         A second browser engine and final authenticated live visual pass remain
         open.
 - [ ] Backup restore is performed and verified on staging

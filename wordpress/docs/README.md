@@ -72,8 +72,8 @@ moderation pass, and authenticated second-browser acceptance remain open. See
 ## Current State
 
 Hostinger staging is available at `https://staging.cywater.org/`. The current
-acceptance candidate uses WordPress `7.0.4`, the CYWater `0.6.16` theme, CYWater Membership `0.8.3`, CYWater
-Partnerships `0.1.1`, CYWater Logo Call `0.2.0`, CYWater Environment `0.5.5`, CYWater Forum `0.1.0`, CYWater Core `0.5.8`, and Event Tickets `5.29.1`. PMPro and Stripe
+acceptance candidate uses WordPress `7.0.4`, the CYWater `0.6.17` theme, CYWater Membership `0.8.3`, CYWater
+Partnerships `0.1.1`, CYWater Logo Call `0.2.1`, CYWater Environment `0.5.5`, CYWater Forum `0.1.0`, CYWater Core `0.5.8`, and Event Tickets `5.29.1`. PMPro and Stripe
 Sandbox are active for staging acceptance; the live-payment gate remains
 closed and no production Stripe credential is configured. Postmark is connected on
 staging, its domain authentication is verified, and the user confirmed a
@@ -269,7 +269,7 @@ Stripe settlement bank account is present and that the named representative is
 authorized; no bank, birth-date, home-address, tax-ID, or credential value is
 stored in the repository.
 
-CYWater Logo Call `0.2.0` is an independent removable plugin attached only to
+CYWater Logo Call `0.2.1` is an independent removable plugin attached only to
 the enabled `CYWater Logo Design Call 2026` staging event. The review schedule
 accepts one set per registered user from August 12 through September 12, 2026;
 the set contains an original logo and a full-association-name lockup, each
@@ -361,6 +361,15 @@ button panels. A disposable two-record browser fixture passed direction, rapid
 alternating input, in-motion dot navigation, and single-active-state checks;
 the deployed staging HTML, JavaScript, CSS markers, and theme version were read
 back after cache purge.
+Theme `0.6.17` makes the side previews lighter and less saturated, aligns both
+transparent chevron controls to the full card region, and replaces the clipped
+shadow band with a soft negative-spread shadow that can fade vertically. Logo
+Call `0.2.1` removes the redundant white file-input container while preserving
+the CYWater selector button and focus state. Desktop and 390px browser checks
+confirmed 0px control/card centre offset, no horizontal overflow, intended
+computed styles, rapid input convergence, and no console errors. Staging
+version, PHP syntax, live asset markers, and HTTP routes passed; live screenshot
+control timed out, so final human visual review remains open.
 At the user's explicit direction, staging user `grups`
 was assigned Lifetime on 2026-08-12. Verification found no expiry, zero PMPro
 orders, and both submission and voting eligibility; no payment record, invoice,

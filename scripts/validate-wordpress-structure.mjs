@@ -525,10 +525,40 @@ assertMarkers(
   [
     ".event-carousel-arrow::before",
     "background: transparent;",
+    "top: var(--sp-2);",
+    "bottom: var(--sp-3);",
+    "overflow-x: clip;",
+    "overflow-y: visible;",
+    "opacity: 0.24;",
+    "filter: saturate(0.3) brightness(1.02);",
+    "box-shadow: 0 18px 46px -22px rgba(8,28,45,0.28);",
     ".event-carousel-arrow--previous::before { transform: rotate(-135deg); }",
     ".event-carousel-arrow--next::before { transform: rotate(45deg); }",
   ],
   "Events directional transparent carousel controls"
+);
+const eventArrowCss = themePagesCss.slice(
+  themePagesCss.indexOf(".event-carousel-arrow {"),
+  themePagesCss.indexOf(".event-carousel-arrow::before")
+);
+assert(
+  !eventArrowCss.includes("top: 50%;") && !eventArrowCss.includes("translateY(-50%)"),
+  "Events carousel arrows must center within the full card height instead of relying on a brittle midpoint translation."
+);
+
+const logoCallCss = await readFile(
+  path.join(root, "wordpress", "wp-content", "plugins", "cywater-logo-call", "assets", "logo-call.css"),
+  "utf8"
+);
+assertMarkers(
+  logoCallCss,
+  [
+    '.cywater-logo-call__form input[type="file"]',
+    "border: 0;",
+    "background: transparent;",
+    '.cywater-logo-call__form input[type="file"]:focus-visible::file-selector-button',
+  ],
+  "Logo Call integrated file controls"
 );
 
 // WordPress adds the generic `avatar` class to comment portraits. The static

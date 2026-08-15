@@ -158,8 +158,8 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
 ### Temporary Staging Snapshot (2026-08-16)
 
 - Hostinger staging is available at `https://staging.cywater.org/` with the
-  CYWater `0.6.16` theme, CYWater Membership `0.8.3`, CYWater Partnerships
-  `0.1.1`, CYWater Logo Call `0.2.0`, CYWater Environment `0.5.5`, CYWater
+  CYWater `0.6.17` theme, CYWater Membership `0.8.3`, CYWater Partnerships
+  `0.1.1`, CYWater Logo Call `0.2.1`, CYWater Environment `0.5.5`, CYWater
   Forum `0.1.0`, CYWater Core `0.5.8`, and Event Tickets `5.29.1`.
 - Dedicated Hostinger SSH access from the Lenovo workstation was established
   and independently verified with public-key authentication on 2026-08-02.
@@ -225,7 +225,7 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   still creates missing policy pages as drafts. CYWater confirmed that its Stripe settlement bank account is
   present and its named representative is association-authorized; do not record
   bank, birth-date, home-address, tax-ID, or credential values in Git.
-- CYWater Logo Call `0.2.0` is an independent removable plugin attached only to
+- CYWater Logo Call `0.2.1` is an independent removable plugin attached only to
   the enabled 2026 Logo Design Call event. Submissions run August 12 through
   September 12, 2026: one original/logo-lockup set (5 MB per file) per
   registered user, and every registered user has one final vote. Accounts,
@@ -341,6 +341,19 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   in-motion dot-jump, single-active-dot, and final-state checks. Hostinger
   staging reports theme `0.6.16`; live HTML contains both Upcoming Events and
   the deployed JavaScript/CSS markers after cache purge.
+- Theme `0.6.17` reduces the Upcoming side previews to a light, low-saturation
+  background cue so they no longer compete with the active Event. Transparent
+  arrow hit areas now span the card region and center the chevrons vertically.
+  The active card keeps a soft floating shadow with negative spread, while the
+  shell clips only horizontally so the blur fades naturally instead of ending
+  in a hard baseline. CYWater Logo Call `0.2.1` removes the redundant white
+  file-input container while retaining the styled selector button and its
+  keyboard focus ring. Desktop and 390px local browser checks returned 0px
+  arrow/card centre offset, no horizontal overflow, the intended computed
+  preview/filter/shadow styles, and no console errors. Staging reports both new
+  versions; public Events and Logo Call routes return HTTP 200 and expose the
+  deployed assets. Live screenshot control timed out, so final human visual
+  review remains open.
 - On 2026-08-16 theme `0.6.13`, CYWater Environment `0.5.5`, and the independent
   CYWater Forum `0.1.0` were deployed to Hostinger staging from the reviewed
   integration branch. Forum articles use core WordPress posts, taxonomies,
