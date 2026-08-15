@@ -207,7 +207,7 @@ function cywater_forum_hero_actions() {
 		return '';
 	}
 	if ( ! is_user_logged_in() ) {
-		return '<a class="btn btn-accent" href="' . esc_url( cywater_login_url( get_post_type_archive_link( 'cyw_forum_post' ) ) ) . '">' . esc_html__( 'Sign in to take part', 'cywater' ) . '</a>';
+		return '<a class="btn btn-accent" href="' . esc_url( cywater_login_url( get_post_type_archive_link( 'cyw_forum_post' ) ) ) . '">' . esc_html__( 'Sign in', 'cywater' ) . '</a>';
 	}
 	if ( CYWater_Forum_Roles::can_publish( get_current_user_id() ) ) {
 		return '<a class="btn btn-accent" href="' . esc_url( admin_url( 'post-new.php?post_type=cyw_forum_post' ) ) . '">' . esc_html__( 'Write an article', 'cywater' ) . '</a>';

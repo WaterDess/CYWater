@@ -642,6 +642,7 @@ wp_trash_post( $post_id );
 $trashed = get_post_status( $post_id );
 wp_untrash_post( $post_id );
 $untrashed = get_post_status( $post_id );
+$untrashed_title = get_the_title( $post_id );
 
 $comment_trashed = $comment_id ? (bool) wp_trash_comment( $comment_id ) : null;
 $comment_gone_after_trash = $comment_id ? ( '1' !== (string) get_comment( $comment_id )->comment_approved ) : null;
@@ -673,13 +674,50 @@ echo wp_json_encode( array(
   assert.equal(deletion.caps.author_delete_own, true, "An author must be able to delete their own article");
   assert.equal(deletion.caps.other_delete_other, false, "An author must not be able to delete someone else's article");
   assert.equal(deletion.trashed, "trash", "Trashing must move the article to the bin");
-  assert.equal(deletion.untrashed, "draft", "Restoring from the bin must bring the article back");
+  assert.equal(
+    deletion.untrashed,
+    "publish",
+    "Restoring a published article must republish it, not silently leave it as a draft"
+  );
   assert.equal(deletion.comment_trashed, true, "An administrator must be able to trash a reply");
   assert.equal(deletion.comment_unapproved, true, "A trashed reply must stop being approved");
   assert.equal(deletion.comment_deleted, true, "An administrator must be able to delete a reply outright");
   assert.equal(deletion.post_deleted, true, "Permanent deletion must remove the article");
   assert.equal(deletion.orphan_comments, 0, "Deleting an article must not orphan its replies");
   record("administrator can trash, restore, and permanently delete articles and replies");
+
+  // The round trip that actually matters to a reader: an article that is binned
+  // and restored must reappear on the public archive, not disappear silently.
+  const restoreCheck = await json(`
+wp_set_current_user( 1 );
+$post_id = wp_insert_post( array(
+    'post_type'    => 'cyw_forum_post',
+    'post_status'  => 'publish',
+    'post_title'   => 'Restore round trip QA article',
+    'post_content' => '<p>Binned and brought back.</p>',
+    'post_author'  => ${candidateId},
+) );
+echo wp_json_encode( array( 'post_id' => $post_id, 'url' => get_permalink( $post_id ) ) );`);
+
+  const beforeTrash = await (await fetch(new URL("/forum/", server.serverUrl))).text();
+  assert.match(beforeTrash, /Restore round trip QA article/, "The article must be listed before trashing");
+
+  await php(`wp_set_current_user( 1 ); wp_trash_post( ${restoreCheck.post_id} ); echo 'trashed';`);
+  const whileTrashed = await (await fetch(new URL("/forum/", server.serverUrl))).text();
+  assert.doesNotMatch(whileTrashed, /Restore round trip QA article/, "A trashed article must leave the archive");
+
+  await php(`wp_set_current_user( 1 ); wp_untrash_post( ${restoreCheck.post_id} ); echo 'restored';`);
+  const afterRestore = await (await fetch(new URL("/forum/", server.serverUrl))).text();
+  assert.match(
+    afterRestore,
+    /Restore round trip QA article/,
+    "A restored article must come back to the archive rather than vanish as a draft"
+  );
+  const restoredPage = await fetch(new URL(new URL(restoreCheck.url).pathname, server.serverUrl));
+  assert.equal(restoredPage.status, 200, "The restored article's own page must be public again");
+
+  await php(`wp_set_current_user( 1 ); wp_delete_post( ${restoreCheck.post_id}, true ); echo 'cleaned';`);
+  record("trash and restore round trip returns the article to the public archive");
 
   // The public surfaces must not still be advertising the deleted article.
   const archiveAfterDelete = await (await fetch(new URL("/forum/", server.serverUrl))).text();

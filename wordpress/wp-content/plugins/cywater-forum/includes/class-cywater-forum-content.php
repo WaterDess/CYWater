@@ -22,6 +22,34 @@ final class CYWater_Forum_Content {
 		add_action( 'pre_get_posts', array( __CLASS__, 'order_archives' ) );
 		add_action( 'cywater_after_core_setup', array( __CLASS__, 'seed_categories' ), 30 );
 		add_filter( 'cywater_public_author_archive_allowed', array( __CLASS__, 'allow_author_archive' ), 10, 2 );
+		add_filter( 'wp_untrash_post_status', array( __CLASS__, 'restore_previous_status' ), 10, 3 );
+	}
+
+	/**
+	 * Restoring a forum article from the bin puts it back as it was.
+	 *
+	 * WordPress calls this `wp_untrash_post_status`; the similarly named
+	 * `wp_untrash_post_set_previous_status` is a different hook and registering
+	 * against it does nothing at all.
+	 *
+	 * Since WordPress 5.6 `wp_untrash_post()` restores everything to `draft`
+	 * regardless of what it was before, so a published article that is binned
+	 * and then restored silently vanishes from the public archive with no
+	 * indication of why. For a member-authored article that reads as data loss.
+	 *
+	 * This is a restore, not a new publication, so it does not re-run the
+	 * publishing gate: the article was already public before it was binned.
+	 *
+	 * @param string $new_status      Status WordPress intends to use.
+	 * @param int    $post_id         Post being restored.
+	 * @param string $previous_status Status it held before it was trashed.
+	 * @return string
+	 */
+	public static function restore_previous_status( $new_status, $post_id, $previous_status ) {
+		if ( self::POST_TYPE !== get_post_type( $post_id ) ) {
+			return $new_status;
+		}
+		return $previous_status ? $previous_status : $new_status;
 	}
 
 	/**
