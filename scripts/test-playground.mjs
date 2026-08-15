@@ -265,11 +265,15 @@ echo wp_json_encode(
   assert.equal(result.exitCode, 0, result.errors);
   const membership = JSON.parse(result.text);
   assert.equal(membership.status, "ready");
-  assert.deepEqual(Object.keys(membership.configured_level_ids).sort(), ["lifetime", "partner", "professional", "student"]);
+  // Partner is no longer created as a membership level. Institutional interest
+  // lives in cywater-partnerships, and the historical PMPro Partner level is
+  // only retained, with signups disabled, where one already exists — so a fresh
+  // install configures three levels, not four.
+  assert.deepEqual(Object.keys(membership.configured_level_ids).sort(), ["lifetime", "professional", "student"]);
   if (Object.keys(membership.levels).length) {
     assert.deepEqual(
       Object.fromEntries(Object.entries(membership.levels).map(([name, data]) => [name, data.price])),
-      { Student: 20, Professional: 70, Lifetime: 700, Partner: 1000 },
+      { Student: 20, Professional: 70, Lifetime: 700 },
     );
     assert.equal(membership.levels.Lifetime.expires, 0);
     assert.equal(membership.levels.Student.expires, 1);
