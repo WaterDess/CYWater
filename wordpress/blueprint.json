@@ -32,7 +32,10 @@
         "DISALLOW_FILE_EDIT": true,
         "CYWATER_PAYMENT_MODE": "test",
         "CYWATER_ALLOW_LIVE_PAYMENTS": false,
-        "CYWATER_MAIL_TRANSPORT": "disabled"
+        "CYWATER_MAIL_TRANSPORT": "disabled",
+        "AUTOMATIC_UPDATER_DISABLED": true,
+        "WP_AUTO_UPDATE_CORE": false,
+        "DISALLOW_FILE_MODS": true
       }
     },
     {
@@ -54,6 +57,10 @@
     {
       "step": "activatePlugin",
       "pluginPath": "cywater-environment/cywater-environment.php"
+    },
+    {
+      "step": "activatePlugin",
+      "pluginPath": "cywater-forum/cywater-forum.php"
     },
     {
       "step": "activateTheme",

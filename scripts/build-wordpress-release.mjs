@@ -47,6 +47,12 @@ const packages = [
     source: path.join(wpContent, "plugins", "cywater-environment"),
     header: "cywater-environment.php",
   },
+  {
+    type: "plugin",
+    slug: "cywater-forum",
+    source: path.join(wpContent, "plugins", "cywater-forum"),
+    header: "cywater-forum.php",
+  },
 ];
 
 async function readPackageVersion(item) {
@@ -102,8 +108,13 @@ installable top-level folder and contains no prior release archive or runtime da
 
 Install or replace the packages in this order:
 
-${packages.map((item, index) => `${index + 1}. \`${item.slug}-${item.version}.zip\`${item.type === "theme" ? " (theme)" : ""}`).join("\n")}
-${packages.length + 1}. Activate all five CYWater plugins and Paid Memberships Pro.
+${packages
+  .map(
+    (item, index) =>
+      `${index + 1}. \`${item.slug}-${item.version}.zip\`${item.type === "theme" ? " (theme)" : ""}`
+  )
+  .join("\n")}
+${packages.length + 1}. Activate all ${packages.filter((item) => item.type === "plugin").length} CYWater plugins and Paid Memberships Pro.
 ${packages.length + 2}. Open Tools > CYWater setup and run the normal setup once. Do not use force import.
 ${packages.length + 3}. Purge LiteSpeed and browser caches before visual acceptance.
 

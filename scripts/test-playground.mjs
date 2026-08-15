@@ -16,6 +16,7 @@ const mounts = [
   ["./wordpress/wp-content/plugins/cywater-partnerships", "/wordpress/wp-content/plugins/cywater-partnerships"],
   ["./wordpress/wp-content/plugins/cywater-logo-call", "/wordpress/wp-content/plugins/cywater-logo-call"],
   ["./wordpress/wp-content/plugins/cywater-environment", "/wordpress/wp-content/plugins/cywater-environment"],
+  ["./wordpress/wp-content/plugins/cywater-forum", "/wordpress/wp-content/plugins/cywater-forum"],
   ["./wordpress/runtime/vendor/paid-memberships-pro", "/wordpress/wp-content/plugins/paid-memberships-pro"],
 ].map(([hostPath, vfsPath]) => ({ hostPath, vfsPath }));
 
@@ -29,15 +30,41 @@ const server = await runCLI({
   blueprint: "./wordpress/blueprint.json",
 });
 
+/**
+ * Two Playground-only transients, neither of which says anything about the
+ * site: the worker pool answers 503 when momentarily exhausted, and its virtual
+ * filesystem intermittently fails to read `/wordpress/.maintenance`, which
+ * WordPress reports as a fatal before any theme code runs.
+ *
+ * Both are retried. Every other status and every other PHP error still fails on
+ * the first attempt, so a genuinely broken page cannot hide behind this.
+ */
+const MAINTENANCE_RACE = /Failed opening required '.*\.maintenance'/;
+
+async function fetchPage(url, attempts = 5) {
+  let last;
+  let lastHtml = "";
+  for (let attempt = 0; attempt < attempts; attempt++) {
+    last = await fetch(url);
+    lastHtml = await last.text();
+    if (last.status !== 503 && ! MAINTENANCE_RACE.test(lastHtml)) {
+      break;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 500 * (attempt + 1)));
+  }
+  // The body is already consumed, so hand it back alongside the response.
+  return { status: last.status, html: lastHtml };
+}
+
 try {
   for (const route of ["/", "/about/", "/board/", "/bylaws/", "/news/", "/events/", "/awards/", "/membership/", "/contact/", "/members/"]) {
-    const response = await fetch(new URL(route, server.serverUrl));
+    const response = await fetchPage(new URL(route, server.serverUrl));
     assert.equal(response.status, 200, `${route} should return HTTP 200`);
-    const html = await response.text();
+    const html = response.html;
     assert.doesNotMatch(html, /Fatal error|Parse error|Warning:/, `${route} should not expose a PHP error`);
     if (route === "/events/") {
       assert.match(html, /CYWater Annual Meeting 2026/, "Events archive must publish the upcoming 2026 meeting");
-      assert.equal((html.match(/class="event-archive-row"/g) || []).length, 19, "Events archive must render all verified event rows");
+      assert.equal((html.match(/class="event-archive-row"/g) || []).length, 18, "Events archive must render all verified event rows");
       assert.match(html, /id="annual-meetings-title"/, "Events archive must retain the Annual Meetings section");
       assert.match(html, /id="annual-gathering-title"/, "Events archive must retain the Annual Gathering section");
     }
@@ -122,7 +149,7 @@ echo wp_json_encode(
   assert.equal(report.members_page, true, "Member directory page must exist");
   assert.equal(Number(report.bylaws_articles), 9, "All nine Bylaws articles must be seeded");
   assert.match(report.contact_address, /202 E\. Green St\./, "Verified mailing address must be editable page metadata");
-  assert.equal(Number(report.event_count), 19);
+  assert.equal(Number(report.event_count), 18);
   assert.equal(Number(report.award_count), 14);
   assert.equal(Number(report.news_count), 16);
   assert.equal(report.news_order_meta, true, "Normal setup must add missing News ordering metadata");
@@ -159,8 +186,7 @@ echo 'prepared';`,
   assert.equal(result.exitCode, 0, result.errors);
   assert.equal(result.text, "prepared");
 
-  const fallbackResponse = await fetch(new URL("/news/", server.serverUrl));
-  const fallbackHtml = await fallbackResponse.text();
+  const fallbackHtml = (await fetchPage(new URL("/news/", server.serverUrl))).html;
   assert.equal((fallbackHtml.match(/class="news-feature"/g) || []).length, 1, "News fallback must retain its featured story");
   assert.equal((fallbackHtml.match(/class="news-item"/g) || []).length, 14, "News fallback must render every imported story");
   assert.doesNotMatch(fallbackHtml, /Hello world/i, "News fallback must exclude unrelated posts");
@@ -190,10 +216,10 @@ echo wp_json_encode(
   assert.equal(upgrade.award_record_restored, true, "Automatic upgrade must restore missing Award records");
   assert.equal(upgrade.article_id_restored, true, "Automatic upgrade must restore Award announcement links");
 
-  const upgradedNewsHtml = await (await fetch(new URL("/news/", server.serverUrl))).text();
+  const upgradedNewsHtml = (await fetchPage(new URL("/news/", server.serverUrl))).html;
   assert.equal((upgradedNewsHtml.match(/class="news-feature"/g) || []).length, 1, "Upgraded News must retain its featured story");
   assert.equal((upgradedNewsHtml.match(/class="news-item"/g) || []).length, 14, "Upgraded News must render every imported story");
-  const upgradedAwardsHtml = await (await fetch(new URL("/awards/", server.serverUrl))).text();
+  const upgradedAwardsHtml = (await fetchPage(new URL("/awards/", server.serverUrl))).html;
   assert.match(upgradedAwardsHtml, /Outstanding Papers/, "Upgraded Awards must render restored Outstanding Paper records");
   assert.match(upgradedAwardsHtml, /10\.1073\/pnas\.2421046122/, "Upgraded Awards must render restored DOI data");
   assert.match(upgradedAwardsHtml, /Read award announcement/, "Upgraded Awards must render restored announcement links");
@@ -239,11 +265,15 @@ echo wp_json_encode(
   assert.equal(result.exitCode, 0, result.errors);
   const membership = JSON.parse(result.text);
   assert.equal(membership.status, "ready");
-  assert.deepEqual(Object.keys(membership.configured_level_ids).sort(), ["lifetime", "partner", "professional", "student"]);
+  // Partner is no longer created as a membership level. Institutional interest
+  // lives in cywater-partnerships, and the historical PMPro Partner level is
+  // only retained, with signups disabled, where one already exists — so a fresh
+  // install configures three levels, not four.
+  assert.deepEqual(Object.keys(membership.configured_level_ids).sort(), ["lifetime", "professional", "student"]);
   if (Object.keys(membership.levels).length) {
     assert.deepEqual(
       Object.fromEntries(Object.entries(membership.levels).map(([name, data]) => [name, data.price])),
-      { Student: 20, Professional: 70, Lifetime: 700, Partner: 1000 },
+      { Student: 20, Professional: 70, Lifetime: 700 },
     );
     assert.equal(membership.levels.Lifetime.expires, 0);
     assert.equal(membership.levels.Student.expires, 1);
