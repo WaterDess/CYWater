@@ -158,7 +158,7 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
 ### Temporary Staging Snapshot (2026-08-16)
 
 - Hostinger staging is available at `https://staging.cywater.org/` with the
-  CYWater `0.6.14` theme, CYWater Membership `0.8.3`, CYWater Partnerships
+  CYWater `0.6.15` theme, CYWater Membership `0.8.3`, CYWater Partnerships
   `0.1.1`, CYWater Logo Call `0.2.0`, CYWater Environment `0.5.5`, CYWater
   Forum `0.1.0`, CYWater Core `0.5.8`, and Event Tickets `5.29.1`.
 - Dedicated Hostinger SSH access from the Lenovo workstation was established
@@ -319,6 +319,17 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   queue/clone marker returns. Hostinger staging reports theme `0.6.14`; all theme
   PHP files passed server-side syntax checks and the live Events route/assets
   expose the new state machine.
+- Theme `0.6.15` defines one reusable entrance-motion hierarchy for page Heroes,
+  section headings, featured modules, and ordinary records. News and Events use
+  those roles without page-specific animation fragments; the Logo Call form
+  remains immediately visible, and `prefers-reduced-motion` exposes every level
+  without animation. Desktop and 375px browser checks passed motion markers,
+  layout, zero overflow, and zero console warnings/errors. The Annual Gathering
+  label now reads `During the AGU Fall Meeting`, clarifying the American
+  Geophysical Union meeting as context rather than event ownership. The local
+  Playground launcher also mounts every plugin activated by the blueprint.
+  Hostinger staging reports theme `0.6.15`; the live News and Events routes
+  return HTTP 200 and expose the new entrance markers after cache purge.
 - On 2026-08-16 theme `0.6.13`, CYWater Environment `0.5.5`, and the independent
   CYWater Forum `0.1.0` were deployed to Hostinger staging from the reviewed
   integration branch. Forum articles use core WordPress posts, taxonomies,

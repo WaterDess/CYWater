@@ -177,7 +177,7 @@ $render_upcoming = static function ( $items ) {
 ?>
 <section class="section event-index-section">
 	<div class="container event-index-layout">
-		<aside class="event-index-nav" aria-label="Event categories">
+		<aside class="event-index-nav" aria-label="Event categories" data-reveal="section">
 			<div class="event-index-nav-inner">
 				<span class="eyebrow">Browse</span>
 				<nav>
@@ -193,24 +193,24 @@ $render_upcoming = static function ( $items ) {
 			<?php if ( $upcoming ) : ?>
 			<section id="upcoming" class="event-category-section event-upcoming" aria-labelledby="upcoming-title">
 				<div class="event-category-heading">
-					<div class="section-head">
+					<div class="section-head" data-reveal="section">
 						<span class="eyebrow">On the horizon</span>
 						<h2 id="upcoming-title">Upcoming</h2>
 					</div>
 				</div>
-				<div class="event-carousel-shell" data-event-carousel-shell>
+				<div class="event-carousel-shell" data-event-carousel-shell data-reveal="feature">
 					<button class="event-carousel-arrow event-carousel-arrow--previous" type="button" data-carousel-previous aria-label="Show previous upcoming event">&#8249;</button>
 					<div class="upcoming-event-carousel" data-event-carousel tabindex="0" role="region" aria-roledescription="carousel" aria-label="Upcoming events">
 						<?php $render_upcoming( $upcoming ); ?>
 					</div>
 					<button class="event-carousel-arrow event-carousel-arrow--next" type="button" data-carousel-next aria-label="Show next upcoming event">&#8250;</button>
 				</div>
-				<div class="event-carousel-pagination" data-carousel-pagination aria-label="Choose an upcoming event"></div>
+				<div class="event-carousel-pagination" data-carousel-pagination data-reveal="feature" aria-label="Choose an upcoming event"></div>
 			</section>
 			<?php endif; ?>
 
 			<section id="annual-meetings" class="event-category-section" aria-labelledby="annual-meetings-title">
-			<div class="section-head">
+			<div class="section-head" data-reveal="section">
 				<span class="eyebrow">Conference series</span>
 				<h2 id="annual-meetings-title">Annual Meetings</h2>
 			</div>
@@ -220,8 +220,8 @@ $render_upcoming = static function ( $items ) {
 		</section>
 
 			<section id="annual-gathering" class="event-category-section" aria-labelledby="annual-gathering-title">
-			<div class="section-head">
-				<span class="eyebrow">AGU tradition</span>
+			<div class="section-head" data-reveal="section">
+				<span class="eyebrow">During the AGU Fall Meeting</span>
 				<h2 id="annual-gathering-title">Annual Gathering</h2>
 			</div>
 			<div class="event-archive-list">
@@ -231,7 +231,7 @@ $render_upcoming = static function ( $items ) {
 
 			<?php if ( $programs ) : ?>
 			<section id="member-programs" class="event-category-section" aria-labelledby="member-programs-title">
-				<div class="section-head">
+				<div class="section-head" data-reveal="section">
 					<span class="eyebrow">Member participation</span>
 					<h2 id="member-programs-title">Member Programs</h2>
 				</div>

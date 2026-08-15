@@ -18,7 +18,7 @@ while ( have_posts() ) :
 	<main>
 		<article class="forum-article">
 			<section class="page-hero">
-				<div class="container container-narrow">
+				<div class="container container-narrow" data-page-enter="hero">
 					<div class="crumbs">
 						<a href="<?php echo esc_url( get_post_type_archive_link( 'cyw_forum_post' ) ); ?>"><?php esc_html_e( 'Forum', 'cywater' ); ?></a>
 						<?php if ( $categories && ! is_wp_error( $categories ) ) : ?>

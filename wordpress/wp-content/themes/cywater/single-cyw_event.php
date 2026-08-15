@@ -23,7 +23,7 @@ while ( have_posts() ) :
 	$event_summary = cywater_event_summary( get_the_ID() );
 	?>
 	<section class="event-hero">
-		<div class="container">
+		<div class="container" data-page-enter="hero">
 			<div class="crumbs" style="color:rgba(255,255,255,.6)"><a href="<?php echo esc_url( home_url( '/' ) ); ?>" style="color:rgba(255,255,255,.6)">Home</a><span>/</span><a href="<?php echo esc_url( get_post_type_archive_link( 'cyw_event' ) ); ?>" style="color:rgba(255,255,255,.6)">Events</a></div>
 			<span class="badge badge-teal" style="margin-bottom:var(--sp-3)"><?php echo esc_html( $format ); ?></span>
 			<h1><?php the_title(); ?></h1>

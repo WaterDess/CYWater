@@ -614,6 +614,7 @@
 }
 .event-index-nav a:hover { color: var(--teal); }
 .event-index-nav a.is-active { color: var(--teal); font-weight: 600; }
+.event-index-nav,
 .event-index-content { min-width: 0; }
 .event-category-section { scroll-margin-top: 104px; }
 .event-category-section + .event-category-section { margin-top: var(--sp-9); }

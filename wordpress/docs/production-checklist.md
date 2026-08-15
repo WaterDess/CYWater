@@ -77,13 +77,17 @@
         profile-photo/privacy controls, and the administrator member record.
         Forum desktop/mobile cards and the Events two-record carousel also pass
         local browser checks; live HTTP/DOM structure passes after theme 0.6.12.
-        Theme 0.6.14 retains non-interactive Forum article topic labels and the shared
+        Theme 0.6.15 retains non-interactive Forum article topic labels and the shared
         Reply radius/focus treatment, and a five-slot circular Event buffer so
         both incoming side previews remain present during forward/reverse motion.
         Its target-index state machine passed rapid arrows, alternating arrows,
         in-motion pagination-dot jumps, desktop/mobile no-overflow, and zero
         browser-console-error checks. Theme validation also rejects undefined
         CSS custom properties and the obsolete carousel queue/clone markers.
+        Its global Hero/section/feature/item entrance hierarchy is shared by
+        News and Events, becomes immediate under `prefers-reduced-motion`, and
+        passed desktop plus 375px layout/overflow and console checks. The Logo
+        Call form remains immediately visible rather than scroll-gated.
         A second browser engine and final authenticated live visual pass remain
         open.
 - [ ] Backup restore is performed and verified on staging

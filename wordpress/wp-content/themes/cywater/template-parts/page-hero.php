@@ -9,7 +9,7 @@ $title    = $args['title'] ?? get_the_title();
 $lead     = $args['lead'] ?? cywater_page_field( 'lead', get_the_excerpt() );
 ?>
 <section class="page-hero">
-	<div class="container">
+	<div class="container" data-page-enter="hero">
 		<?php if ( ! empty( $args['breadcrumbs'] ) ) : ?>
 			<div class="crumbs"><?php echo wp_kses_post( $args['breadcrumbs'] ); ?></div>
 		<?php endif; ?>

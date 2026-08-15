@@ -72,7 +72,7 @@ moderation pass, and authenticated second-browser acceptance remain open. See
 ## Current State
 
 Hostinger staging is available at `https://staging.cywater.org/`. The current
-acceptance candidate uses WordPress `7.0.4`, the CYWater `0.6.14` theme, CYWater Membership `0.8.3`, CYWater
+acceptance candidate uses WordPress `7.0.4`, the CYWater `0.6.15` theme, CYWater Membership `0.8.3`, CYWater
 Partnerships `0.1.1`, CYWater Logo Call `0.2.0`, CYWater Environment `0.5.5`, CYWater Forum `0.1.0`, CYWater Core `0.5.8`, and Event Tickets `5.29.1`. PMPro and Stripe
 Sandbox are active for staging acceptance; the live-payment gate remains
 closed and no production Stripe credential is configured. Postmark is connected on
@@ -338,6 +338,19 @@ right-right-left, in-motion dot-jump, single-active-dot, five-slot, console, and
 no-overflow assertions. The cleanup also removes the obsolete preview-clone
 class and corrects two undefined design tokens; validation now rejects any
 undefined theme custom property or restoration of the obsolete queue/clone.
+Theme `0.6.15` defines one shared entrance-motion hierarchy instead of adding
+page-specific animation fragments: page Heroes use a short stagger, section
+headings use a restrained rise, featured modules use a shallow rise/scale, and
+ordinary records retain the existing item reveal. News and Events now use those
+roles consistently; the Logo Call body still renders immediately so its form
+is never gated by scroll position. `prefers-reduced-motion` exposes every level
+without animation. Desktop and 375px in-app-browser checks passed News and
+Events motion markers, layout, zero horizontal overflow, and zero console
+warnings/errors. The Events archive now labels the association's Annual
+Gathering context as `During the AGU Fall Meeting`, making clear that it occurs
+during the American Geophysical Union meeting rather than presenting AGU as the
+event owner. The local Playground launcher also mounts every plugin activated by
+the blueprint, preventing preview startup from drifting behind the integration.
 At the user's explicit direction, staging user `grups`
 was assigned Lifetime on 2026-08-12. Verification found no expiry, zero PMPro
 orders, and both submission and voting eligibility; no payment record, invoice,
@@ -398,7 +411,7 @@ confirmation-mail dispatch, public form, and automatic cleanup. Browser screensh
 remains open because both in-app attempts timed out; server-rendered HTML and
 HTTP acceptance passed.
 
-CYWater theme `0.6.14`, CYWater Environment `0.5.5`, and CYWater Forum `0.1.0` were deployed on
+CYWater theme `0.6.15`, CYWater Environment `0.5.5`, and CYWater Forum `0.1.0` were deployed on
 2026-08-16 without running a force import or modifying the GitHub Pages source.
 The staging Forum archive and its preview article return HTTP 200, the archive
 contains the full-card article link, the four editable categories exist, and

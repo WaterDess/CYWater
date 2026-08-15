@@ -458,6 +458,47 @@ const themeMainJs = await readFile(
   path.join(root, "wordpress", "wp-content", "themes", "cywater", "assets", "js", "main.js"),
   "utf8"
 );
+const themeBaseCss = await readFile(
+  path.join(root, "wordpress", "wp-content", "themes", "cywater", "assets", "css", "base.css"),
+  "utf8"
+);
+const pageHeroTemplate = await readFile(
+  path.join(root, "wordpress", "wp-content", "themes", "cywater", "template-parts", "page-hero.php"),
+  "utf8"
+);
+const eventArchiveTemplate = await readFile(
+  path.join(root, "wordpress", "wp-content", "themes", "cywater", "archive-cyw_event.php"),
+  "utf8"
+);
+assertMarkers(
+  themeBaseCss,
+  [
+    '--motion-page-duration:',
+    '[data-page-enter="hero"] > *',
+    '[data-reveal="section"]',
+    '[data-reveal="feature"]',
+    '@media (prefers-reduced-motion: reduce)',
+  ],
+  "Global page entrance hierarchy"
+);
+assertMarkers(
+  pageHeroTemplate,
+  ['data-page-enter="hero"'],
+  "Shared page hero entrance"
+);
+assertMarkers(
+  eventArchiveTemplate,
+  [
+    'data-reveal="section"',
+    'data-reveal="feature"',
+    'During the AGU Fall Meeting',
+  ],
+  "Events entrance roles and AGU context"
+);
+assert(
+  !eventArchiveTemplate.includes("AGU tradition"),
+  "Events must not restore the ambiguous AGU tradition label."
+);
 assertMarkers(
   themeMainJs,
   [
