@@ -424,7 +424,7 @@
   font-weight: 500;
   color: var(--ink);
 }
-.partner-contribution-amount span { color: var(--muted); }
+.partner-contribution-amount span { color: var(--ink-mute); }
 .partner-application-form { max-width: 58rem; margin-inline: auto; }
 .partner-form-grid {
   display: grid;

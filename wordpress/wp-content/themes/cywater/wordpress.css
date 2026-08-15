@@ -97,7 +97,7 @@
 
 .single-cyw_event .tribe-tickets__form-field-input {
   border-color: var(--line);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius);
   font-family: var(--font-body);
 }
 

@@ -63,7 +63,7 @@ const forbidden = [
   /(?:sk|rk|pk)_(?:live|test)_[A-Za-z0-9]{8,}/,
   /whsec_[A-Za-z0-9]{8,}/,
 ];
-const textExtensions = new Set([".example", ".js", ".json", ".md", ".mjs", ".php", ".yaml", ".yml"]);
+const textExtensions = new Set([".css", ".example", ".js", ".json", ".md", ".mjs", ".php", ".yaml", ".yml"]);
 
 async function findTextFiles(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
@@ -454,6 +454,26 @@ assertMarkers(
   "Forum discussion scoping"
 );
 
+const themeMainJs = await readFile(
+  path.join(root, "wordpress", "wp-content", "themes", "cywater", "assets", "js", "main.js"),
+  "utf8"
+);
+assertMarkers(
+  themeMainJs,
+  [
+    "let desiredIndex = 0;",
+    "let movingStep = 0;",
+    "const requestIndex = (index) =>",
+    "const requestStep = (delta) =>",
+    "const base = moving ? desiredIndex : activeIndex;",
+  ],
+  "Events carousel input queue"
+);
+assert(
+  !themeMainJs.includes("queuedTarget") && !themeMainJs.includes("is-preview-clone"),
+  "Events carousel must not restore the obsolete target queue or unused preview-clone class."
+);
+
 // WordPress adds the generic `avatar` class to comment portraits. The static
 // design system uses that same class for full-width profile tiles, so the
 // forum must pin comment avatars to the requested 48px size or they expand to
@@ -461,6 +481,25 @@ assertMarkers(
 const wordpressCss = await readFile(
   path.join(root, "wordpress", "wp-content", "themes", "cywater", "wordpress.css"),
   "utf8"
+);
+
+const themeStyleFiles = (await findTextFiles(path.join(root, "wordpress", "wp-content", "themes", "cywater")))
+  .filter((file) => [".css", ".php"].includes(path.extname(file)));
+const themeStyles = (
+  await Promise.all(themeStyleFiles.map((file) => readFile(file, "utf8")))
+).join("\n");
+const customPropertyDefinitions = new Set(
+  Array.from(themeStyles.matchAll(/(--[a-zA-Z0-9-]+)\s*:/g), (match) => match[1])
+);
+const customPropertyUsages = new Set(
+  Array.from(themeStyles.matchAll(/var\(\s*(--[a-zA-Z0-9-]+)/g), (match) => match[1])
+);
+const undefinedCustomProperties = Array.from(customPropertyUsages)
+  .filter((property) => !customPropertyDefinitions.has(property))
+  .sort();
+assert(
+  undefinedCustomProperties.length === 0,
+  `Theme uses undefined CSS custom properties: ${undefinedCustomProperties.join(", ")}.`
 );
 assertMarkers(
   wordpressCss,

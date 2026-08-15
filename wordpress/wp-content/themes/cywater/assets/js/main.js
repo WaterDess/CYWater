@@ -110,19 +110,26 @@
     const previous = section?.querySelector("[data-carousel-previous]");
     const next = section?.querySelector("[data-carousel-next]");
     const pagination = section?.querySelector("[data-carousel-pagination]");
-    const cards = Array.from(carousel.querySelectorAll(".upcoming-event-card"));
-    const templates = cards.map((card) => card.cloneNode(true));
+    const sourceCards = Array.from(carousel.querySelectorAll(".upcoming-event-card"));
+    const templates = sourceCards.map((card) => card.cloneNode(true));
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let activeIndex = 0;
+    let desiredIndex = 0;
     let rotationTimer;
     let touchStartX = null;
     let moving = false;
+    let movingStep = 0;
     let transitionFallback;
-    let queuedTarget = null;
     const track = document.createElement("div");
     track.className = "event-carousel-track";
 
-    const normalizeIndex = (index) => (index + cards.length) % cards.length;
+    const normalizeIndex = (index) => (index + sourceCards.length) % sourceCards.length;
+
+    const directionTo = (target) => {
+      const forward = normalizeIndex(target - activeIndex);
+      const backward = normalizeIndex(activeIndex - target);
+      return forward <= backward ? 1 : -1;
+    };
 
     const createSlot = (index, position) => {
       const card = templates[normalizeIndex(index)].cloneNode(true);
@@ -131,8 +138,7 @@
         "is-previous",
         "is-next",
         "is-far-previous",
-        "is-far-next",
-        "is-preview-clone"
+        "is-far-next"
       );
       card.classList.add(`is-${position}`);
       card.setAttribute("aria-hidden", position === "active" ? "false" : "true");
@@ -144,7 +150,7 @@
 
     const renderSlots = () => {
       track.classList.remove("is-moving-previous", "is-moving-next");
-      if (cards.length === 1) {
+      if (sourceCards.length === 1) {
         track.classList.add("has-single-event");
         track.replaceChildren(createSlot(0, "active"));
       } else {
@@ -163,23 +169,33 @@
         dot.classList.toggle("is-active", isActive);
         dot.setAttribute("aria-current", isActive ? "true" : "false");
       });
-      if (previous) previous.disabled = cards.length < 2;
-      if (next) next.disabled = cards.length < 2;
+      if (previous) previous.disabled = sourceCards.length < 2;
+      if (next) next.disabled = sourceCards.length < 2;
     };
 
     const stopRotation = () => window.clearTimeout(rotationTimer);
+    const isInteracting = () => section?.matches(":hover") || section?.contains(document.activeElement);
     const startRotation = () => {
       stopRotation();
-      if (cards.length > 1 && !reduceMotion.matches && !document.hidden) {
-        rotationTimer = window.setTimeout(() => moveBy(1), 6500);
+      if (sourceCards.length > 1 && !reduceMotion.matches && !document.hidden && !moving && !isInteracting()) {
+        rotationTimer = window.setTimeout(() => requestStep(1), 6500);
       }
     };
 
-    const finishMove = (delta) => {
+    const continueToDesired = () => {
+      if (desiredIndex !== activeIndex) {
+        animateStep(directionTo(desiredIndex));
+      } else {
+        startRotation();
+      }
+    };
+
+    const finishMove = () => {
       if (!moving) return;
       window.clearTimeout(transitionFallback);
-      activeIndex = normalizeIndex(activeIndex + delta);
+      activeIndex = normalizeIndex(activeIndex + movingStep);
       moving = false;
+      movingStep = 0;
       carousel.classList.add("is-resetting");
       renderSlots();
       // The five-slot buffer already contains the incoming side preview, so
@@ -187,59 +203,59 @@
       // frame. Motion resumes only after the stable slots are back at rest.
       window.requestAnimationFrame(() => window.requestAnimationFrame(() => {
         carousel.classList.remove("is-resetting");
-        if (queuedTarget !== null && queuedTarget !== activeIndex) {
-          const forward = normalizeIndex(queuedTarget - activeIndex);
-          const backward = normalizeIndex(activeIndex - queuedTarget);
-          moveBy(forward <= backward ? 1 : -1, true);
-        } else {
-          queuedTarget = null;
-          startRotation();
-        }
+        continueToDesired();
       }));
     };
 
-    const moveBy = (delta, keepQueue = false) => {
-      if (moving || cards.length < 2) return;
-      if (!keepQueue) queuedTarget = null;
+    const animateStep = (delta) => {
+      if (moving || sourceCards.length < 2 || desiredIndex === activeIndex) return;
       stopRotation();
       if (reduceMotion.matches) {
-        activeIndex = normalizeIndex(activeIndex + delta);
+        activeIndex = desiredIndex;
         renderSlots();
+        startRotation();
         return;
       }
       moving = true;
-      const direction = delta < 0 ? "previous" : "next";
+      movingStep = delta < 0 ? -1 : 1;
+      const direction = movingStep < 0 ? "previous" : "next";
       track.classList.add(`is-moving-${direction}`);
       const complete = (event) => {
         if (event.target !== track || event.propertyName !== "transform") return;
         track.removeEventListener("transitionend", complete);
-        finishMove(delta < 0 ? -1 : 1);
+        finishMove();
       };
       track.addEventListener("transitionend", complete);
       transitionFallback = window.setTimeout(() => {
         track.removeEventListener("transitionend", complete);
-        finishMove(delta < 0 ? -1 : 1);
+        finishMove();
       }, 700);
     };
 
-    const moveTo = (index) => {
+    const requestIndex = (index) => {
       const target = normalizeIndex(index);
-      if (target === activeIndex || moving) return;
-      queuedTarget = target;
-      const forward = normalizeIndex(target - activeIndex);
-      const backward = normalizeIndex(activeIndex - target);
-      moveBy(forward <= backward ? 1 : -1, true);
+      desiredIndex = target;
+      stopRotation();
+      if (!moving) {
+        if (target === activeIndex) startRotation();
+        else animateStep(directionTo(target));
+      }
+    };
+
+    const requestStep = (delta) => {
+      const base = moving ? desiredIndex : activeIndex;
+      requestIndex(base + (delta < 0 ? -1 : 1));
     };
 
     if (pagination) {
       pagination.replaceChildren();
-      cards.forEach((card, index) => {
+      sourceCards.forEach((card, index) => {
         const dot = document.createElement("button");
         dot.type = "button";
         dot.className = "event-carousel-dot";
         dot.setAttribute("aria-label", `Show ${card.querySelector("h3")?.textContent || `upcoming event ${index + 1}`}`);
         dot.addEventListener("click", () => {
-          moveTo(index);
+          requestIndex(index);
         });
         pagination.append(dot);
       });
@@ -249,19 +265,19 @@
     carousel.replaceChildren(track);
     renderSlots();
 
-    previous?.addEventListener("click", () => moveBy(-1));
-    next?.addEventListener("click", () => moveBy(1));
+    previous?.addEventListener("click", () => requestStep(-1));
+    next?.addEventListener("click", () => requestStep(1));
     carousel.addEventListener("keydown", (event) => {
       if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
         event.preventDefault();
-        moveBy(event.key === "ArrowLeft" ? -1 : 1);
+        requestStep(event.key === "ArrowLeft" ? -1 : 1);
       }
     });
     carousel.addEventListener("touchstart", (event) => { touchStartX = event.changedTouches[0]?.clientX ?? null; }, { passive: true });
     carousel.addEventListener("touchend", (event) => {
       if (touchStartX === null) return;
       const distance = (event.changedTouches[0]?.clientX ?? touchStartX) - touchStartX;
-      if (Math.abs(distance) > 45) moveBy(distance < 0 ? 1 : -1);
+      if (Math.abs(distance) > 45) requestStep(distance < 0 ? 1 : -1);
       touchStartX = null;
     }, { passive: true });
     section?.addEventListener("mouseenter", stopRotation);

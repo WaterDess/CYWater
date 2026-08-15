@@ -72,7 +72,7 @@ moderation pass, and authenticated second-browser acceptance remain open. See
 ## Current State
 
 Hostinger staging is available at `https://staging.cywater.org/`. The current
-acceptance candidate uses WordPress `7.0.4`, the CYWater `0.6.13` theme, CYWater Membership `0.8.3`, CYWater
+acceptance candidate uses WordPress `7.0.4`, the CYWater `0.6.14` theme, CYWater Membership `0.8.3`, CYWater
 Partnerships `0.1.1`, CYWater Logo Call `0.2.0`, CYWater Environment `0.5.5`, CYWater Forum `0.1.0`, CYWater Core `0.5.8`, and Event Tickets `5.29.1`. PMPro and Stripe
 Sandbox are active for staging acceptance; the live-payment gate remains
 closed and no production Stripe credential is configured. Postmark is connected on
@@ -329,6 +329,15 @@ transition midframes, the static initial state, and 375px overflow were checked
 in a disposable browser fixture. Forum article topics are now non-interactive
 labels on the article itself, while archive topic filters remain links. The
 Forum reply textarea uses the shared CYWater large radius and focus treatment.
+Theme `0.6.14` keeps that five-slot visual buffer but replaces its discarded-
+input behavior with one target-index state machine. Rapid arrow clicks,
+alternating directions, and pagination-dot changes made during a transition now
+converge on the latest requested Event without blank previews or duplicated
+active states. Desktop and 375px browser checks passed four-click, three-click,
+right-right-left, in-motion dot-jump, single-active-dot, five-slot, console, and
+no-overflow assertions. The cleanup also removes the obsolete preview-clone
+class and corrects two undefined design tokens; validation now rejects any
+undefined theme custom property or restoration of the obsolete queue/clone.
 At the user's explicit direction, staging user `grups`
 was assigned Lifetime on 2026-08-12. Verification found no expiry, zero PMPro
 orders, and both submission and voting eligibility; no payment record, invoice,
@@ -389,7 +398,7 @@ confirmation-mail dispatch, public form, and automatic cleanup. Browser screensh
 remains open because both in-app attempts timed out; server-rendered HTML and
 HTTP acceptance passed.
 
-CYWater theme `0.6.13`, CYWater Environment `0.5.5`, and CYWater Forum `0.1.0` were deployed on
+CYWater theme `0.6.14`, CYWater Environment `0.5.5`, and CYWater Forum `0.1.0` were deployed on
 2026-08-16 without running a force import or modifying the GitHub Pages source.
 The staging Forum archive and its preview article return HTTP 200, the archive
 contains the full-card article link, the four editable categories exist, and
