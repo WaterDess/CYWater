@@ -658,17 +658,17 @@
 }
 .event-carousel-track {
   display: grid;
-  grid-template-columns: repeat(3, 100%);
+  grid-template-columns: repeat(5, 100%);
   width: 100%;
-  transform: translateX(-100%);
+  transform: translateX(-200%);
   transition: transform 560ms var(--ease);
 }
 .event-carousel-track.has-single-event {
   grid-template-columns: minmax(0, 1fr);
   transform: none;
 }
-.event-carousel-track.is-moving-previous { transform: translateX(0); }
-.event-carousel-track.is-moving-next { transform: translateX(-200%); }
+.event-carousel-track.is-moving-previous { transform: translateX(-100%); }
+.event-carousel-track.is-moving-next { transform: translateX(-300%); }
 .upcoming-event-carousel.is-initializing .event-carousel-track,
 .upcoming-event-carousel.is-initializing .upcoming-event-card,
 .upcoming-event-carousel.is-resetting .event-carousel-track,

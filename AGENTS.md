@@ -158,7 +158,7 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
 ### Temporary Staging Snapshot (2026-08-16)
 
 - Hostinger staging is available at `https://staging.cywater.org/` with the
-  CYWater `0.6.12` theme, CYWater Membership `0.8.3`, CYWater Partnerships
+  CYWater `0.6.13` theme, CYWater Membership `0.8.3`, CYWater Partnerships
   `0.1.1`, CYWater Logo Call `0.2.0`, CYWater Environment `0.5.5`, CYWater
   Forum `0.1.0`, CYWater Core `0.5.8`, and Event Tickets `5.29.1`.
 - Dedicated Hostinger SSH access from the Lenovo workstation was established
@@ -298,7 +298,16 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   375px, initial-state, left/right-transition, and overflow checks passed; live
   staging HTTP/DOM and asset checks passed after deployment, while live in-app
   screenshot control timed out.
-- On 2026-08-16 theme `0.6.12`, CYWater Environment `0.5.5`, and the independent
+- Theme `0.6.13` replaces the three-slot Upcoming track with one five-slot
+  circular buffer. A prepared off-screen card on each side now moves into the
+  newly exposed preview position during the same transform, eliminating the
+  delayed right-side appearance without duplicating Event records. A disposable
+  three-Event browser fixture passed static-entry, transition-midframe, repeated
+  forward wrap, reverse motion, indicator, and 375px no-overflow checks. Forum
+  article topics are non-interactive metadata labels on detail pages, while
+  archive filters remain navigable; the Reply textarea now uses the shared
+  CYWater large radius and teal focus treatment.
+- On 2026-08-16 theme `0.6.13`, CYWater Environment `0.5.5`, and the independent
   CYWater Forum `0.1.0` were deployed to Hostinger staging from the reviewed
   integration branch. Forum articles use core WordPress posts, taxonomies,
   media, revisions, comments, privacy tools, and the existing PMPro membership

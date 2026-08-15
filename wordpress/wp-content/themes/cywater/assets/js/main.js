@@ -126,10 +126,19 @@
 
     const createSlot = (index, position) => {
       const card = templates[normalizeIndex(index)].cloneNode(true);
-      card.classList.remove("is-active", "is-previous", "is-next", "is-preview-clone");
+      card.classList.remove(
+        "is-active",
+        "is-previous",
+        "is-next",
+        "is-far-previous",
+        "is-far-next",
+        "is-preview-clone"
+      );
       card.classList.add(`is-${position}`);
       card.setAttribute("aria-hidden", position === "active" ? "false" : "true");
       card.tabIndex = position === "active" ? 0 : -1;
+      if (position === "active") card.removeAttribute("inert");
+      else card.setAttribute("inert", "");
       return card;
     };
 
@@ -141,9 +150,11 @@
       } else {
         track.classList.remove("has-single-event");
         track.replaceChildren(
+          createSlot(activeIndex - 2, "far-previous"),
           createSlot(activeIndex - 1, "previous"),
           createSlot(activeIndex, "active"),
-          createSlot(activeIndex + 1, "next")
+          createSlot(activeIndex + 1, "next"),
+          createSlot(activeIndex + 2, "far-next")
         );
       }
 
@@ -171,8 +182,9 @@
       moving = false;
       carousel.classList.add("is-resetting");
       renderSlots();
-      // Keep the reset frame transition-free; motion resumes only after the
-      // three stable visual slots are back in their resting positions.
+      // The five-slot buffer already contains the incoming side preview, so
+      // this transition-free recenter is visually identical to the completed
+      // frame. Motion resumes only after the stable slots are back at rest.
       window.requestAnimationFrame(() => window.requestAnimationFrame(() => {
         carousel.classList.remove("is-resetting");
         if (queuedTarget !== null && queuedTarget !== activeIndex) {

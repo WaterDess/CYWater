@@ -204,6 +204,10 @@ Hostinger staging acceptance on 2026-08-16 additionally passed:
   the accepted CYWater paper, white, line, radius, type, spacing, focus, and
   hover tokens; the 0.6.12 browser review confirmed the compact mobile card
   flow without introducing a Forum-only visual system.
+- Theme 0.6.13 keeps archive category/topic filters navigable, but renders an
+  article's own topic metadata as non-interactive labels so it is not mistaken
+  for back navigation. The reply textarea now uses the same large radius and
+  teal focus ring as other accepted CYWater form surfaces.
 
 Still required before production:
 

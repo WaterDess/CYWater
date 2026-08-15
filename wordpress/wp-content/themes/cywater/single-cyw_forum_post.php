@@ -56,7 +56,7 @@ while ( have_posts() ) :
 					<?php if ( $topics && ! is_wp_error( $topics ) ) : ?>
 						<div class="tag-list forum-article-topics" data-reveal>
 							<?php foreach ( $topics as $topic ) : ?>
-								<a class="badge" href="<?php echo esc_url( get_term_link( $topic ) ); ?>"><?php echo esc_html( $topic->name ); ?></a>
+								<span class="badge"><?php echo esc_html( $topic->name ); ?></span>
 							<?php endforeach; ?>
 						</div>
 					<?php endif; ?>
