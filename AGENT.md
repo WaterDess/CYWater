@@ -155,12 +155,12 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   `127.0.0.1` URL as a Lenovo-laptop preview. No Playground service is expected
   to remain running after the review task.
 
-### Temporary Staging Snapshot (2026-08-13)
+### Temporary Staging Snapshot (2026-08-16)
 
 - Hostinger staging is available at `https://staging.cywater.org/` with the
-  CYWater `0.6.8` theme, CYWater Membership `0.8.2`, CYWater Partnerships
-  `0.1.1`, CYWater Logo Call `0.2.0`, CYWater Environment `0.5.4`, CYWater Core `0.5.7`, and Event Tickets
-  `5.29.1`.
+  CYWater `0.6.17` theme, CYWater Membership `0.8.3`, CYWater Partnerships
+  `0.1.1`, CYWater Logo Call `0.2.1`, CYWater Environment `0.5.5`, CYWater
+  Forum `0.1.0`, CYWater Core `0.5.8`, and Event Tickets `5.29.1`.
 - Dedicated Hostinger SSH access from the Lenovo workstation was established
   and independently verified with public-key authentication on 2026-08-02.
   The private key remains local and must never be copied into the repository.
@@ -168,7 +168,7 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   Lenovo workspace after the profile and environment fixes. A 104-file SHA-256 comparison
   found zero missing, extra, or different staging files; all custom PHP files
   and the key account-flow HTTP routes passed post-deploy checks.
-- A live WP-CLI check confirmed WordPress `7.0.2` and PHP CLI `8.3.30` on
+- A live WP-CLI check confirmed WordPress `7.0.4` and PHP CLI `8.3.30` on
   staging. Five malformed inactive CYWater/PMPro upload directories were
   removed on 2026-08-03 after exact-path and inactive-status verification;
   active plugin directories were untouched and plugin-list warnings cleared.
@@ -225,7 +225,7 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   still creates missing policy pages as drafts. CYWater confirmed that its Stripe settlement bank account is
   present and its named representative is association-authorized; do not record
   bank, birth-date, home-address, tax-ID, or credential values in Git.
-- CYWater Logo Call `0.2.0` is an independent removable plugin attached only to
+- CYWater Logo Call `0.2.1` is an independent removable plugin attached only to
   the enabled 2026 Logo Design Call event. Submissions run August 12 through
   September 12, 2026: one original/logo-lockup set (5 MB per file) per
   registered user, and every registered user has one final vote. Accounts,
@@ -287,6 +287,86 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   keyboard arrows, touch swipes, and reduced-motion handling follow the
   interaction structure requested from the Steam reference while retaining
   CYWater typography, color, spacing, radius, and Event data ownership.
+- Theme `0.6.12` uses a stable three-slot Upcoming track instead of rebuilding
+  a two-record preview clone on every change. It removes the initial category-
+  navigation shift, keeps the initial carousel frame static, and makes the left
+  and right controls animate their corresponding previews into the centre. The
+  shorter card moves the visual divider left to give editorial details more
+  room; its mobile media no longer overflows its card. Forum cards, bylines,
+  filters, and discussion surfaces explicitly reuse the accepted global paper,
+  white, line, radius, type, spacing, focus, and hover tokens. Local desktop,
+  375px, initial-state, left/right-transition, and overflow checks passed; live
+  staging HTTP/DOM and asset checks passed after deployment, while live in-app
+  screenshot control timed out.
+- Theme `0.6.13` replaces the three-slot Upcoming track with one five-slot
+  circular buffer. A prepared off-screen card on each side now moves into the
+  newly exposed preview position during the same transform, eliminating the
+  delayed right-side appearance without duplicating Event records. A disposable
+  three-Event browser fixture passed static-entry, transition-midframe, repeated
+  forward wrap, reverse motion, indicator, and 375px no-overflow checks. Forum
+  article topics are non-interactive metadata labels on detail pages, while
+  archive filters remain navigable; the Reply textarea now uses the shared
+  CYWater large radius and teal focus treatment.
+- Theme `0.6.14` retains the five-slot Upcoming visual buffer and replaces the
+  old discarded-input queue with a single target-index state machine. Rapid
+  arrows, alternating directions, and pagination-dot changes during motion now
+  converge on the requested Event without a blank side preview or duplicate
+  active state. Desktop and 375px browser fixtures passed rapid four/three-click,
+  right-right-left, in-motion dot jump, single-active-dot, five-slot, no-overflow,
+  and zero console-error checks. The same cleanup removed the obsolete preview-
+  clone class and corrected the only two undefined theme design tokens. Build
+  validation now fails if an undefined CSS custom property or obsolete carousel
+  queue/clone marker returns. Hostinger staging reports theme `0.6.14`; all theme
+  PHP files passed server-side syntax checks and the live Events route/assets
+  expose the new state machine.
+- Theme `0.6.15` defines one reusable entrance-motion hierarchy for page Heroes,
+  section headings, featured modules, and ordinary records. News and Events use
+  those roles without page-specific animation fragments; the Logo Call form
+  remains immediately visible, and `prefers-reduced-motion` exposes every level
+  without animation. Desktop and 375px browser checks passed motion markers,
+  layout, zero overflow, and zero console warnings/errors. The Annual Gathering
+  label now reads `During the AGU Fall Meeting`, clarifying the American
+  Geophysical Union meeting as context rather than event ownership. The local
+  Playground launcher also mounts every plugin activated by the blueprint.
+  Hostinger staging reports theme `0.6.15`; the live News and Events routes
+  return HTTP 200 and expose the new entrance markers after cache purge.
+- Theme `0.6.16` preserves the requested arrow direction when the two-record
+  Upcoming carousel's previous and next controls resolve to the same Event, so
+  the controls now produce opposite track transitions instead of sharing the
+  shortest-path tie. Rapid alternating clicks and in-motion pagination still
+  converge on one active Event. The side controls now use transparent hit areas
+  and line chevrons instead of opaque navy button panels, while retaining hover,
+  keyboard-focus, disabled, touch, and mobile target states. A disposable
+  two-record browser fixture passed previous/next direction, rapid input,
+  in-motion dot-jump, single-active-dot, and final-state checks. Hostinger
+  staging reports theme `0.6.16`; live HTML contains both Upcoming Events and
+  the deployed JavaScript/CSS markers after cache purge.
+- Theme `0.6.17` reduces the Upcoming side previews to a light, low-saturation
+  background cue so they no longer compete with the active Event. Transparent
+  arrow hit areas now span the card region and center the chevrons vertically.
+  The active card keeps a soft floating shadow with negative spread, while the
+  shell clips only horizontally so the blur fades naturally instead of ending
+  in a hard baseline. CYWater Logo Call `0.2.1` removes the redundant white
+  file-input container while retaining the styled selector button and its
+  keyboard focus ring. Desktop and 390px local browser checks returned 0px
+  arrow/card centre offset, no horizontal overflow, the intended computed
+  preview/filter/shadow styles, and no console errors. Staging reports both new
+  versions; public Events and Logo Call routes return HTTP 200 and expose the
+  deployed assets. Live screenshot control timed out, so final human visual
+  review remains open.
+- On 2026-08-16 theme `0.6.13`, CYWater Environment `0.5.5`, and the independent
+  CYWater Forum `0.1.0` were deployed to Hostinger staging from the reviewed
+  integration branch. Forum articles use core WordPress posts, taxonomies,
+  media, revisions, comments, privacy tools, and the existing PMPro membership
+  state; no parallel content, discussion, member, or payment database exists.
+  The entire article card links to its canonical article. A hard-staging,
+  self-cleaning MySQL/PMPro QA passed membership, publishing, first-reply
+  moderation, later-reply approval, nonmember refusal, Forum mail-template
+  generation, public HTTP routing, and cleanup. The archive and clearly labelled
+  staging preview article return HTTP 200; the dormant AI endpoint returns 204
+  with both AI switches disabled. Board policy approval, one real Forum message
+  through Postmark, a named Editor moderation pass, authenticated second-browser
+  review, and removal of the staging preview article remain production gates.
 - Stripe Sandbox was connected through PMPro on 2026-08-02. A server-side
   presence-only check confirmed the Sandbox Connect values without reading or
   exposing them, and PMPro's own status check reports the Sandbox webhook as

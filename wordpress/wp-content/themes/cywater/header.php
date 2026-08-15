@@ -43,6 +43,13 @@ $account = function_exists( 'pmpro_url' ) ? pmpro_url( 'account' ) : wp_login_ur
 					'awards'     => array( 'Awards', '/awards/' ),
 					'contact'    => array( 'Contact', '/contact/' ),
 				);
+				// Sits next to Membership: the forum is a member activity
+				// rather than another editorial section.
+				if ( cywater_forum_enabled() ) {
+					$links = array_slice( $links, 0, 1, true )
+						+ array( 'forum' => array( 'Forum', '/forum/' ) )
+						+ array_slice( $links, 1, null, true );
+				}
 				foreach ( $links as $key => $link ) :
 					?>
 					<li><a class="nav-link" href="<?php echo esc_url( home_url( $link[1] ) ); ?>" <?php echo $key === $section ? 'aria-current="page"' : ''; ?>><span><?php echo esc_html( $link[0] ); ?></span></a></li>
@@ -61,6 +68,9 @@ $account = function_exists( 'pmpro_url' ) ? pmpro_url( 'account' ) : wp_login_ur
 	<a href="<?php echo esc_url( home_url( '/board/' ) ); ?>" class="sub-link"><?php esc_html_e( 'Board', 'cywater' ); ?></a>
 	<a href="<?php echo esc_url( home_url( '/bylaws/' ) ); ?>" class="sub-link"><?php esc_html_e( 'Bylaws', 'cywater' ); ?></a>
 	<a href="<?php echo esc_url( home_url( '/membership/' ) ); ?>"><?php esc_html_e( 'Membership', 'cywater' ); ?></a>
+	<?php if ( cywater_forum_enabled() ) : ?>
+		<a href="<?php echo esc_url( home_url( '/forum/' ) ); ?>"><?php esc_html_e( 'Forum', 'cywater' ); ?></a>
+	<?php endif; ?>
 	<a href="<?php echo esc_url( home_url( '/events/' ) ); ?>"><?php esc_html_e( 'Events', 'cywater' ); ?></a>
 	<a href="<?php echo esc_url( home_url( '/news/' ) ); ?>"><?php esc_html_e( 'News', 'cywater' ); ?></a>
 	<a href="<?php echo esc_url( home_url( '/awards/' ) ); ?>"><?php esc_html_e( 'Awards', 'cywater' ); ?></a>

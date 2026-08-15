@@ -43,6 +43,7 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 ## Document Map
 
 - `module-boundaries.md` - ownership and dependency rules
+- `forum.md` - member-authored forum, endorsement, discussion, and the AI seam
 - `member-workflow.md` - registration, profile, privacy, and status model
 - `payment-testing.md` - Stripe sandbox and refund test matrix
 - `stripe-live-verification.md` - US nonprofit Live KYC and bank-document packet
@@ -54,11 +55,25 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 - `manual-external-handoff.md` - remaining human, policy, license, and cutover work
 - `email-copy.md` - approved-content drafts, not active mail overrides
 
+## Forum (staging acceptance)
+
+CYWater Forum `0.1.0` adds a member-authored article section with arXiv-style
+author endorsement and article-scoped discussion. It was deployed and enabled
+on Hostinger staging on 2026-08-16 with one clearly labelled staging preview
+article. Its real-MySQL/PMPro self-cleaning QA passed membership, publishing,
+first-reply moderation, later-reply approval, nonmember refusal, mail-template
+generation, HTTP routing, and cleanup. The entire article card links to its
+canonical article. The per-viewer AI reaction remains a dormant contract only
+— no provider, no key, no outbound call, and the live endpoint answers 204.
+Board policy approval, one real Forum message through Postmark, a named Editor
+moderation pass, and authenticated second-browser acceptance remain open. See
+`forum.md`.
+
 ## Current State
 
-Hostinger staging is available at `https://staging.cywater.org/`. The accepted
-baseline uses the CYWater `0.6.8` theme, CYWater Membership `0.8.2`, CYWater
-Partnerships `0.1.1`, CYWater Logo Call `0.2.0`, CYWater Environment `0.5.4`, CYWater Core `0.5.7`, and Event Tickets `5.29.1`. PMPro and Stripe
+Hostinger staging is available at `https://staging.cywater.org/`. The current
+acceptance candidate uses WordPress `7.0.4`, the CYWater `0.6.17` theme, CYWater Membership `0.8.3`, CYWater
+Partnerships `0.1.1`, CYWater Logo Call `0.2.1`, CYWater Environment `0.5.5`, CYWater Forum `0.1.0`, CYWater Core `0.5.8`, and Event Tickets `5.29.1`. PMPro and Stripe
 Sandbox are active for staging acceptance; the live-payment gate remains
 closed and no production Stripe credential is configured. Postmark is connected on
 staging, its domain authentication is verified, and the user confirmed a
@@ -254,7 +269,7 @@ Stripe settlement bank account is present and that the named representative is
 authorized; no bank, birth-date, home-address, tax-ID, or credential value is
 stored in the repository.
 
-CYWater Logo Call `0.2.0` is an independent removable plugin attached only to
+CYWater Logo Call `0.2.1` is an independent removable plugin attached only to
 the enabled `CYWater Logo Design Call 2026` staging event. The review schedule
 accepts one set per registered user from August 12 through September 12, 2026;
 the set contains an original logo and a full-association-name lockup, each
@@ -297,6 +312,64 @@ its indicators map one-to-one to Upcoming Event records, and it rotates every
 6.5 seconds unless hover, keyboard focus, document visibility, or reduced-motion
 preferences pause it. Keyboard arrows and touch swipes select the same records;
 no Event data is copied into a separate slider model.
+Theme `0.6.12` replaces the two-record clone/rebuild behavior with a stable
+three-slot visual track. The initial render does not translate either the
+category navigator or the carousel, and previous/next controls now bring the
+corresponding left/right preview into the centre. The featured card uses a
+shorter horizontal proportion with more room for event details; its mobile
+media region no longer forces an oversized intrinsic width. Desktop, 375px,
+initial-state, left/right transition, no-overflow, and reduced-height checks
+passed locally; the deployed staging HTML exposes two Upcoming records and the
+new assets, while live in-app screenshot control timed out.
+Theme `0.6.13` replaces that three-slot track with a five-slot circular buffer.
+The extra off-screen card on each side is present before motion begins, so a new
+side preview enters during the same transform as the featured Event instead of
+appearing after the track recentres. Three-Event forward loops, reverse motion,
+transition midframes, the static initial state, and 375px overflow were checked
+in a disposable browser fixture. Forum article topics are now non-interactive
+labels on the article itself, while archive topic filters remain links. The
+Forum reply textarea uses the shared CYWater large radius and focus treatment.
+Theme `0.6.14` keeps that five-slot visual buffer but replaces its discarded-
+input behavior with one target-index state machine. Rapid arrow clicks,
+alternating directions, and pagination-dot changes made during a transition now
+converge on the latest requested Event without blank previews or duplicated
+active states. Desktop and 375px browser checks passed four-click, three-click,
+right-right-left, in-motion dot-jump, single-active-dot, five-slot, console, and
+no-overflow assertions. The cleanup also removes the obsolete preview-clone
+class and corrects two undefined design tokens; validation now rejects any
+undefined theme custom property or restoration of the obsolete queue/clone.
+Theme `0.6.15` defines one shared entrance-motion hierarchy instead of adding
+page-specific animation fragments: page Heroes use a short stagger, section
+headings use a restrained rise, featured modules use a shallow rise/scale, and
+ordinary records retain the existing item reveal. News and Events now use those
+roles consistently; the Logo Call body still renders immediately so its form
+is never gated by scroll position. `prefers-reduced-motion` exposes every level
+without animation. Desktop and 375px in-app-browser checks passed News and
+Events motion markers, layout, zero horizontal overflow, and zero console
+warnings/errors. The Events archive now labels the association's Annual
+Gathering context as `During the AGU Fall Meeting`, making clear that it occurs
+during the American Geophysical Union meeting rather than presenting AGU as the
+event owner. The local Playground launcher also mounts every plugin activated by
+the blueprint, preventing preview startup from drifting behind the integration.
+Theme `0.6.16` fixes the two-record direction tie in that same carousel by
+carrying the previous/next control's explicit direction into the transition.
+The controls therefore animate opposite ways even though both resolve to the
+other Event. Direct pagination keeps shortest-path behavior, and rapid input
+still converges through the existing target-index state machine. The side
+controls now use transparent hit areas and line chevrons rather than dark
+button panels. A disposable two-record browser fixture passed direction, rapid
+alternating input, in-motion dot navigation, and single-active-state checks;
+the deployed staging HTML, JavaScript, CSS markers, and theme version were read
+back after cache purge.
+Theme `0.6.17` makes the side previews lighter and less saturated, aligns both
+transparent chevron controls to the full card region, and replaces the clipped
+shadow band with a soft negative-spread shadow that can fade vertically. Logo
+Call `0.2.1` removes the redundant white file-input container while preserving
+the CYWater selector button and focus state. Desktop and 390px browser checks
+confirmed 0px control/card centre offset, no horizontal overflow, intended
+computed styles, rapid input convergence, and no console errors. Staging
+version, PHP syntax, live asset markers, and HTTP routes passed; live screenshot
+control timed out, so final human visual review remains open.
 At the user's explicit direction, staging user `grups`
 was assigned Lifetime on 2026-08-12. Verification found no expiry, zero PMPro
 orders, and both submission and voting eligibility; no payment record, invoice,
@@ -356,6 +429,14 @@ Editor capability boundary, RSVP inventory, attendee reporting, optional real
 confirmation-mail dispatch, public form, and automatic cleanup. Browser screenshot-level review of the ticket form
 remains open because both in-app attempts timed out; server-rendered HTML and
 HTTP acceptance passed.
+
+CYWater theme `0.6.16`, CYWater Environment `0.5.5`, and CYWater Forum `0.1.0` were deployed on
+2026-08-16 without running a force import or modifying the GitHub Pages source.
+The staging Forum archive and its preview article return HTTP 200, the archive
+contains the full-card article link, the four editable categories exist, and
+the disabled AI endpoint returns HTTP 204. The preview record carries
+`_cywater_staging_fixture=1` and must be removed before production content is
+opened.
 
 The remaining human/external steps and exact procedures are listed in
 `manual-external-handoff.md`. The repository contains no live Stripe key, bank credential, production SMTP

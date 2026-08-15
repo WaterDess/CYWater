@@ -12,6 +12,8 @@ const required = [
   "scripts/test-playground.mjs",
   "scripts/cywater-staging-ticketing-qa.php",
   "scripts/cywater-staging-partner-qa.php",
+  "scripts/cywater-staging-forum-qa.php",
+  "scripts/cywater-staging-forum-preview.php",
   "wordpress/wp-content/plugins/cywater-core/data/seed.json",
   "wordpress/wp-content/themes/cywater/style.css",
   "wordpress/wp-content/themes/cywater/functions.php",
@@ -39,6 +41,18 @@ const required = [
   "wordpress/wp-content/plugins/cywater-logo-call/assets/logo-call.css",
   "wordpress/wp-content/plugins/cywater-logo-call/assets/logo-call.js",
   "wordpress/wp-content/plugins/cywater-environment/cywater-environment.php",
+  "wordpress/wp-content/plugins/cywater-forum/cywater-forum.php",
+  "wordpress/wp-content/plugins/cywater-forum/includes/defaults.php",
+  "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-settings.php",
+  "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-content.php",
+  "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-roles.php",
+  "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-endorsement.php",
+  "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-comments.php",
+  "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-ai.php",
+  "wordpress/wp-content/themes/cywater/archive-cyw_forum_post.php",
+  "wordpress/wp-content/themes/cywater/single-cyw_forum_post.php",
+  "wordpress/wp-content/themes/cywater/comments.php",
+  "wordpress/wp-content/themes/cywater/author.php",
 ];
 
 for (const relativePath of required) {
@@ -49,7 +63,7 @@ const forbidden = [
   /(?:sk|rk|pk)_(?:live|test)_[A-Za-z0-9]{8,}/,
   /whsec_[A-Za-z0-9]{8,}/,
 ];
-const textExtensions = new Set([".example", ".js", ".json", ".md", ".mjs", ".php", ".yaml", ".yml"]);
+const textExtensions = new Set([".css", ".example", ".js", ".json", ".md", ".mjs", ".php", ".yaml", ".yml"]);
 
 async function findTextFiles(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
@@ -395,6 +409,212 @@ assertMarkers(
 assert(
   !themeImageEntries.includes("placeholders"),
   "Unused legacy placeholder assets must not be included in the WordPress theme."
+);
+
+const forumDirectory = path.join(root, "wordpress", "wp-content", "plugins", "cywater-forum");
+
+// The AI reaction is declared but not implemented. Keep it that way until the
+// association approves the feature: nothing in the seam may call out to a
+// provider, and the endpoint must keep answering 204 by default.
+const forumAi = await readFile(path.join(forumDirectory, "includes", "class-cywater-forum-ai.php"), "utf8");
+for (const outbound of ["wp_remote_", "curl_", "file_get_contents(", "fsockopen"]) {
+  assert(
+    !forumAi.includes(outbound),
+    `The forum AI seam must stay dormant, but it contains an outbound call: ${outbound}.`
+  );
+}
+assertMarkers(
+  forumAi,
+  ["new WP_REST_Response( null, 204 )", "cywater_forum_ai_reaction"],
+  "Forum AI seam"
+);
+
+// Discussion must stay scoped to forum articles. News, Events, Awards, and
+// Board roles have never had comments and must not acquire them by accident.
+const forumComments = await readFile(
+  path.join(forumDirectory, "includes", "class-cywater-forum-comments.php"),
+  "utf8"
+);
+
+assert(
+  /International Association of Contemporary Young Scholars in Water Sciences \(CYWater\)/.test(
+    seed.pages.home.content
+  ),
+  "WordPress home seed must preserve the accepted full association name"
+);
+assert(
+  /contact@cywater\.org[\s\S]*membership@cywater\.org[\s\S]*billing@cywater\.org/.test(
+    seed.pages.contact.content
+  ),
+  "WordPress contact seed must preserve the confirmed role addresses"
+);
+assertMarkers(
+  forumComments,
+  ["CYWater_Forum_Content::POST_TYPE !== get_post_type( $post_id )", "'comments_open'"],
+  "Forum discussion scoping"
+);
+
+const themeMainJs = await readFile(
+  path.join(root, "wordpress", "wp-content", "themes", "cywater", "assets", "js", "main.js"),
+  "utf8"
+);
+const themeBaseCss = await readFile(
+  path.join(root, "wordpress", "wp-content", "themes", "cywater", "assets", "css", "base.css"),
+  "utf8"
+);
+const themePagesCss = await readFile(
+  path.join(root, "wordpress", "wp-content", "themes", "cywater", "assets", "css", "pages.css"),
+  "utf8"
+);
+const pageHeroTemplate = await readFile(
+  path.join(root, "wordpress", "wp-content", "themes", "cywater", "template-parts", "page-hero.php"),
+  "utf8"
+);
+const eventArchiveTemplate = await readFile(
+  path.join(root, "wordpress", "wp-content", "themes", "cywater", "archive-cyw_event.php"),
+  "utf8"
+);
+assertMarkers(
+  themeBaseCss,
+  [
+    '--motion-page-duration:',
+    '[data-page-enter="hero"] > *',
+    '[data-reveal="section"]',
+    '[data-reveal="feature"]',
+    '@media (prefers-reduced-motion: reduce)',
+  ],
+  "Global page entrance hierarchy"
+);
+assertMarkers(
+  pageHeroTemplate,
+  ['data-page-enter="hero"'],
+  "Shared page hero entrance"
+);
+assertMarkers(
+  eventArchiveTemplate,
+  [
+    'data-reveal="section"',
+    'data-reveal="feature"',
+    'During the AGU Fall Meeting',
+  ],
+  "Events entrance roles and AGU context"
+);
+assert(
+  !eventArchiveTemplate.includes("AGU tradition"),
+  "Events must not restore the ambiguous AGU tradition label."
+);
+assertMarkers(
+  themeMainJs,
+  [
+    "let desiredIndex = 0;",
+    "let desiredDirection = 0;",
+    "let movingStep = 0;",
+    "const requestIndex = (index, preferredDirection = 0) =>",
+    "const requestStep = (delta) =>",
+    "const base = moving ? desiredIndex : activeIndex;",
+    "requestIndex(base + direction, direction);",
+  ],
+  "Events carousel input queue"
+);
+assert(
+  !themeMainJs.includes("queuedTarget") && !themeMainJs.includes("is-preview-clone"),
+  "Events carousel must not restore the obsolete target queue or unused preview-clone class."
+);
+assertMarkers(
+  themePagesCss,
+  [
+    ".event-carousel-arrow::before",
+    "background: transparent;",
+    "top: var(--sp-2);",
+    "bottom: var(--sp-3);",
+    "overflow-x: clip;",
+    "overflow-y: visible;",
+    "opacity: 0.24;",
+    "filter: saturate(0.3) brightness(1.02);",
+    "box-shadow: 0 18px 46px -22px rgba(8,28,45,0.28);",
+    ".event-carousel-arrow--previous::before { transform: rotate(-135deg); }",
+    ".event-carousel-arrow--next::before { transform: rotate(45deg); }",
+  ],
+  "Events directional transparent carousel controls"
+);
+const eventArrowCss = themePagesCss.slice(
+  themePagesCss.indexOf(".event-carousel-arrow {"),
+  themePagesCss.indexOf(".event-carousel-arrow::before")
+);
+assert(
+  !eventArrowCss.includes("top: 50%;") && !eventArrowCss.includes("translateY(-50%)"),
+  "Events carousel arrows must center within the full card height instead of relying on a brittle midpoint translation."
+);
+
+const logoCallCss = await readFile(
+  path.join(root, "wordpress", "wp-content", "plugins", "cywater-logo-call", "assets", "logo-call.css"),
+  "utf8"
+);
+assertMarkers(
+  logoCallCss,
+  [
+    '.cywater-logo-call__form input[type="file"]',
+    "border: 0;",
+    "background: transparent;",
+    '.cywater-logo-call__form input[type="file"]:focus-visible::file-selector-button',
+  ],
+  "Logo Call integrated file controls"
+);
+
+// WordPress adds the generic `avatar` class to comment portraits. The static
+// design system uses that same class for full-width profile tiles, so the
+// forum must pin comment avatars to the requested 48px size or they expand to
+// the article width on narrow screens.
+const wordpressCss = await readFile(
+  path.join(root, "wordpress", "wp-content", "themes", "cywater", "wordpress.css"),
+  "utf8"
+);
+
+const themeStyleFiles = (await findTextFiles(path.join(root, "wordpress", "wp-content", "themes", "cywater")))
+  .filter((file) => [".css", ".php"].includes(path.extname(file)));
+const themeStyles = (
+  await Promise.all(themeStyleFiles.map((file) => readFile(file, "utf8")))
+).join("\n");
+const customPropertyDefinitions = new Set(
+  Array.from(themeStyles.matchAll(/(--[a-zA-Z0-9-]+)\s*:/g), (match) => match[1])
+);
+const customPropertyUsages = new Set(
+  Array.from(themeStyles.matchAll(/var\(\s*(--[a-zA-Z0-9-]+)/g), (match) => match[1])
+);
+const undefinedCustomProperties = Array.from(customPropertyUsages)
+  .filter((property) => !customPropertyDefinitions.has(property))
+  .sort();
+assert(
+  undefinedCustomProperties.length === 0,
+  `Theme uses undefined CSS custom properties: ${undefinedCustomProperties.join(", ")}.`
+);
+assertMarkers(
+  wordpressCss,
+  [
+    ".forum-comments .comment-author img",
+    "flex: 0 0 48px;",
+    "width: 48px;",
+    "height: 48px;",
+    "object-fit: cover;",
+  ],
+  "Forum comment avatar sizing"
+);
+
+// Author archives are opened one account at a time. A blanket allow would undo
+// the account-enumeration protection in cywater-environment.
+const publicSurface = await readFile(
+  path.join(root, "wordpress", "wp-content", "plugins", "cywater-environment", "includes", "class-cywater-public-surface.php"),
+  "utf8"
+);
+assertMarkers(publicSurface, ["cywater_public_author_archive_allowed"], "Author archive gate");
+const forumContent = await readFile(
+  path.join(forumDirectory, "includes", "class-cywater-forum-content.php"),
+  "utf8"
+);
+assertMarkers(
+  forumContent,
+  ["cywater_public_author_archive_allowed", "return self::published_count( $author_id ) > 0;"],
+  "Forum author archive opt-in"
 );
 
 console.log(

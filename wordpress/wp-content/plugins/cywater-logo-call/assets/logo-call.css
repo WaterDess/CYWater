@@ -11,10 +11,10 @@
 .cywater-logo-call__notice { padding: .9rem 1rem; border-left: .25rem solid var(--cyw-teal, #117f78); background: rgba(17,127,120,.08); }
 .cywater-logo-call__form input[type="file"], .cywater-logo-call__form textarea { width: 100%; max-width: 46rem; }
 .cywater-logo-call__form input[type="file"] {
-	padding: var(--sp-2, .5rem);
-	border: 1px solid var(--line, #e4e1d8);
-	border-radius: var(--radius, 4px);
-	background: var(--white, #fff);
+	padding: .15rem 0;
+	border: 0;
+	border-radius: 0;
+	background: transparent;
 	color: var(--ink-soft, #2a3950);
 	font-family: var(--font-body, sans-serif);
 	font-size: var(--fs-sm, .875rem);
@@ -39,8 +39,11 @@
 	color: var(--white, #fff);
 }
 .cywater-logo-call__form input[type="file"]:focus-visible {
+	outline: 0;
+}
+.cywater-logo-call__form input[type="file"]:focus-visible::file-selector-button {
 	outline: 2px solid var(--teal, #0f766e);
-	outline-offset: 2px;
+	outline-offset: 3px;
 }
 .cywater-logo-call__form textarea {
 	padding: .8rem 1rem;

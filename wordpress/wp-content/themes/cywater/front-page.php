@@ -80,7 +80,7 @@ if ( 1 === count( $hero_title_lines ) && str_contains( $hero_title, ',' ) ) {
 	<section class="hero">
 		<div class="container">
 			<svg class="hero-watermark" viewBox="0 0 200 200" aria-hidden="true"><path d="M100 20C100 20 40 80 40 130a60 60 0 0 0 120 0C160 80 100 20 100 20Z" fill="none" stroke="#0F766E" stroke-width="2"/></svg>
-			<div class="hero-inner" data-reveal>
+			<div class="hero-inner" data-page-enter="hero">
 				<span class="eyebrow hero-identity" aria-label="<?php echo esc_attr( $association_name ); ?>">
 					<span class="hero-identity-copy" aria-hidden="true">
 						<span class="hero-identity-line">International Association of Contemporary</span>

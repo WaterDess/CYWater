@@ -48,6 +48,20 @@ const pages = {
   contact: await readPage("contact/index.html", ".contact-note"),
 };
 
+// WordPress has accepted operational copy that intentionally differs from the
+// preserved GitHub Pages prototype. Apply those overrides in the exporter so a
+// routine `npm run prepare` cannot silently restore stale public information.
+pages.home.content = pages.home.content.replace(
+  "International Association · Water Sciences",
+  "International Association of Contemporary Young Scholars in Water Sciences (CYWater)"
+);
+pages.contact.lead =
+  "Contact CYWater for general correspondence, events, partnerships, and media inquiries.";
+pages.contact.content = `<span class="eyebrow">Official contact</span>
+            <h2 style="margin-top:var(--sp-3)">How can we help?</h2>
+            <p class="lead" style="margin-top:var(--sp-4)">Use contact@cywater.org for general correspondence, events, partnerships, and media inquiries.</p>
+            <p style="margin-top:var(--sp-4)">Membership support: membership@cywater.org. Billing, renewals, and invoices: billing@cywater.org.</p>`;
+
 // WordPress treats the December 2020 virtual session as part of the Best Paper
 // Award record, not as an Annual Gathering. Keep the public static prototype
 // untouched while normalizing the editable WordPress content model.

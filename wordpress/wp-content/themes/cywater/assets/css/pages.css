@@ -424,7 +424,7 @@
   font-weight: 500;
   color: var(--ink);
 }
-.partner-contribution-amount span { color: var(--muted); }
+.partner-contribution-amount span { color: var(--ink-mute); }
 .partner-application-form { max-width: 58rem; margin-inline: auto; }
 .partner-form-grid {
   display: grid;
@@ -610,88 +610,120 @@
   padding: 0.35rem 0;
   font-size: var(--fs-sm);
   color: var(--ink-mute);
-  transition: color var(--dur) var(--ease), transform var(--dur) var(--ease);
+  transition: color var(--dur) var(--ease);
 }
-.event-index-nav a:hover,
-.event-index-nav a.is-active { color: var(--teal); transform: translateX(4px); }
+.event-index-nav a:hover { color: var(--teal); }
+.event-index-nav a.is-active { color: var(--teal); font-weight: 600; }
+.event-index-nav,
 .event-index-content { min-width: 0; }
 .event-category-section { scroll-margin-top: 104px; }
 .event-category-section + .event-category-section { margin-top: var(--sp-9); }
 .event-category-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--sp-4); }
 .event-carousel-shell {
   position: relative;
-  overflow: hidden;
+  overflow-x: clip;
+  overflow-y: visible;
   margin-inline: calc(var(--sp-5) * -1);
   padding: var(--sp-2) var(--sp-7) var(--sp-3);
 }
 .event-carousel-arrow {
   position: absolute;
-  top: 50%;
+  top: var(--sp-2);
+  bottom: var(--sp-3);
   z-index: 4;
-  width: 46px;
-  height: 86px;
+  width: 58px;
+  height: auto;
   display: grid;
   place-items: center;
   padding: 0;
-  border: 1px solid rgba(255,255,255,0.22);
-  border-radius: var(--radius);
-  background: linear-gradient(90deg, rgba(8,28,45,0.86), rgba(8,28,45,0.62));
-  color: var(--white);
-  box-shadow: 0 10px 28px rgba(8,28,45,0.18);
-  font-family: Arial, sans-serif;
-  font-size: 3rem;
-  font-weight: 300;
-  line-height: 1;
-  transform: translateY(-50%);
-  transition: background var(--dur) var(--ease), transform var(--dur) var(--ease), opacity var(--dur) var(--ease);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: rgba(8,28,45,0.62);
+  font-size: 0;
+  transition: color var(--dur) var(--ease), transform var(--dur) var(--ease), opacity var(--dur) var(--ease);
+}
+.event-carousel-arrow::before {
+  content: "";
+  width: 22px;
+  height: 22px;
+  border-top: 3px solid currentColor;
+  border-right: 3px solid currentColor;
+  filter: drop-shadow(0 1px 1px rgba(255,255,255,0.82));
 }
 .event-carousel-arrow--previous { left: var(--sp-3); }
-.event-carousel-arrow--next { right: var(--sp-3); background: linear-gradient(270deg, rgba(8,28,45,0.86), rgba(8,28,45,0.62)); }
+.event-carousel-arrow--previous::before { transform: rotate(-135deg); }
+.event-carousel-arrow--next { right: var(--sp-3); }
+.event-carousel-arrow--next::before { transform: rotate(45deg); }
 .event-carousel-arrow:hover,
-.event-carousel-arrow:focus-visible { background: var(--teal); transform: translateY(-50%) scale(1.04); }
-.event-carousel-arrow:disabled { opacity: 0.18; cursor: default; box-shadow: none; }
+.event-carousel-arrow:focus-visible { background: transparent; color: var(--teal); transform: scale(1.08); }
+.event-carousel-arrow:focus-visible { outline: 0; }
+.event-carousel-arrow:focus-visible::before { filter: drop-shadow(0 0 3px rgba(15,118,110,0.58)); }
+.event-carousel-arrow:disabled { opacity: 0.18; cursor: default; }
 .upcoming-event-carousel {
-  display: grid;
-  width: min(76%, 760px);
+  width: min(78%, 860px);
   margin-inline: auto;
   overflow: visible;
   isolation: isolate;
 }
-.upcoming-event-card {
-  grid-area: 1 / 1;
+.event-carousel-track {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(230px, 0.8fr);
+  grid-template-columns: repeat(5, 100%);
+  width: 100%;
+  transform: translateX(-200%);
+  transition: transform 560ms var(--ease);
+}
+.event-carousel-track.has-single-event {
+  grid-template-columns: minmax(0, 1fr);
+  transform: none;
+}
+.event-carousel-track.is-moving-previous { transform: translateX(-100%); }
+.event-carousel-track.is-moving-next { transform: translateX(-300%); }
+.upcoming-event-carousel.is-initializing .event-carousel-track,
+.upcoming-event-carousel.is-initializing .upcoming-event-card,
+.upcoming-event-carousel.is-resetting .event-carousel-track,
+.upcoming-event-carousel.is-resetting .upcoming-event-card { transition: none !important; }
+.upcoming-event-card {
+  display: grid;
+  grid-template-columns: minmax(185px, 0.72fr) minmax(0, 1.28fr);
   overflow: hidden;
   background: var(--white);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
-  box-shadow: 0 16px 40px rgba(8,28,45,0.14);
-  opacity: 0;
+  box-shadow: 0 18px 46px -22px rgba(8,28,45,0.28);
+  min-height: 238px;
+  opacity: 0.24;
   pointer-events: none;
   transform: scale(0.84);
-  filter: saturate(0.5) brightness(0.62);
+  filter: saturate(0.3) brightness(1.02);
   transition: transform 560ms var(--ease), opacity 560ms var(--ease), filter 560ms var(--ease), box-shadow 560ms var(--ease);
 }
 .upcoming-event-card.is-active {
-  z-index: 3;
   opacity: 1;
   pointer-events: auto;
-  transform: translateX(0) scale(1);
+  transform: scale(1);
   filter: none;
 }
-.upcoming-event-card.is-active:hover { box-shadow: 0 20px 46px rgba(8,28,45,0.2); }
-.upcoming-event-card.is-previous,
-.upcoming-event-card.is-next { z-index: 1; opacity: 0.42; }
-.upcoming-event-card.is-previous { transform: translateX(-88%) scale(0.84); }
-.upcoming-event-card.is-next { transform: translateX(88%) scale(0.84); }
-.upcoming-event-card.is-preview-clone { user-select: none; }
-.upcoming-event-media { position: relative; display: grid; place-items: center; min-height: 290px; overflow: hidden; background: var(--paper-warm); }
+.upcoming-event-card.is-active:hover { box-shadow: 0 22px 54px -22px rgba(8,28,45,0.34); }
+.event-carousel-track.is-moving-previous .upcoming-event-card.is-previous,
+.event-carousel-track.is-moving-next .upcoming-event-card.is-next {
+  opacity: 1;
+  transform: scale(1);
+  filter: none;
+}
+.event-carousel-track.is-moving-previous .upcoming-event-card.is-active,
+.event-carousel-track.is-moving-next .upcoming-event-card.is-active {
+  opacity: 0.24;
+  transform: scale(0.84);
+  filter: saturate(0.3) brightness(1.02);
+}
+.upcoming-event-media { position: relative; display: grid; place-items: center; min-height: 238px; overflow: hidden; background: var(--paper-warm); }
 .upcoming-event-media > img { width: 100%; height: 100%; object-fit: cover; }
-.upcoming-event-body { display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-3); padding: var(--sp-6); }
+.upcoming-event-body { display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-2); padding: var(--sp-5); }
 .upcoming-event-type::before { display: none; }
 .upcoming-event-body h3 { font-size: var(--fs-xl); line-height: 1.12; }
 .upcoming-event-body .meta { font-size: var(--fs-xs); color: var(--ink-mute); }
-.upcoming-event-summary { color: var(--ink-soft); font-size: var(--fs-sm); line-height: 1.6; }
+.upcoming-event-summary { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 3; color: var(--ink-soft); font-size: var(--fs-sm); line-height: 1.55; }
 .upcoming-event-body .link { margin-top: auto; padding-top: var(--sp-2); font-size: var(--fs-sm); }
 .event-carousel-pagination {
   display: flex;
@@ -1014,11 +1046,12 @@
   .event-carousel-shell { margin-inline: calc(var(--sp-4) * -1); padding-inline: var(--sp-5); }
   .upcoming-event-carousel { width: min(84%, 620px); }
   .upcoming-event-card { grid-template-columns: 1fr; }
-  .upcoming-event-media { min-height: 190px; aspect-ratio: 16 / 8; }
+  .upcoming-event-media { width: 100%; min-height: 0; aspect-ratio: 16 / 8; }
   .upcoming-event-body { padding: var(--sp-4); }
   .upcoming-event-body h3 { font-size: var(--fs-lg); }
   .upcoming-event-summary { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
-  .event-carousel-arrow { width: 40px; height: 72px; font-size: 2.5rem; }
+  .event-carousel-arrow { width: 44px; }
+  .event-carousel-arrow::before { width: 18px; height: 18px; }
   .event-carousel-arrow--previous { left: var(--sp-2); }
   .event-carousel-arrow--next { right: var(--sp-2); }
   .award-year { grid-template-columns: 1fr; gap: var(--sp-3); }

@@ -42,6 +42,9 @@
       deletion lifecycle passes with automatic QA cleanup
 - [x] Anonymous user enumeration and author archives are closed; directory
       indexing is denied and staging configuration permissions are restricted
+- [x] Forum is an independent plugin using core posts, taxonomies, comments,
+      revisions, media, privacy tools, and PMPro state rather than a parallel
+      database; real-PMPro publishing and comment lifecycle QA passes on staging
 
 ## Must Pass Before Staging Approval
 
@@ -72,12 +75,35 @@
         membership, sign-in, registration, and the logged-out checkout gate.
         Authenticated Chrome checks also pass for Account, Member Profile,
         profile-photo/privacy controls, and the administrator member record.
-        A second browser engine remains open.
+        Forum desktop/mobile cards and the Events two-record carousel also pass
+        local browser checks; live HTTP/DOM structure passes after theme 0.6.12.
+        Theme 0.6.17 retains non-interactive Forum article topic labels and the shared
+        Reply radius/focus treatment, and a five-slot circular Event buffer so
+        both incoming side previews remain present during forward/reverse motion.
+        Its target-index state machine passed rapid arrows, alternating arrows,
+        in-motion pagination-dot jumps, desktop/mobile no-overflow, and zero
+        browser-console-error checks. Theme validation also rejects undefined
+        CSS custom properties and the obsolete carousel queue/clone markers.
+        Its global Hero/section/feature/item entrance hierarchy is shared by
+        News and Events, becomes immediate under `prefers-reduced-motion`, and
+        passed desktop plus 375px layout/overflow and console checks. The Logo
+        Call form remains immediately visible rather than scroll-gated.
+        The Upcoming side previews are now light background cues, chevrons are
+        vertically centered over the full card region, and the active-card
+        shadow fades without a clipped baseline. Logo Call 0.2.1 also removes
+        the redundant white file-input container while preserving focus.
+        A second browser engine and final authenticated live visual pass remain
+        open.
 - [ ] Backup restore is performed and verified on staging
 - [ ] Paid event checkout is connected to the existing Stripe Sandbox and its
       success/decline/cancel/refund/duplicate/capacity/email matrix passes
 - [ ] Event Tickets free 2% application fee is accepted, or Event Tickets Plus
       is purchased, before charging an event fee
+- [ ] Board approves Forum authorship, endorsement, moderation, retention, and
+      mail identity; a named Editor processes the real moderation queue
+- [ ] One Forum endorsement/authorisation message is Delivered through Postmark
+      to an association-controlled inbox, and the staging preview article is
+      removed before production content opens
 
 ## Must Pass Before Production
 
