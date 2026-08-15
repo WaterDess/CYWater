@@ -44,7 +44,7 @@ get_template_part(
  * which reads as a broken layout rather than as breathing room.
  */
 ?>
-<section class="section">
+<section class="section forum-index-section">
 	<div class="container">
 		<?php if ( ! is_wp_error( $categories ) && $categories ) : ?>
 			<nav class="forum-filters" aria-label="<?php esc_attr_e( 'Forum categories', 'cywater' ); ?>" data-reveal>
@@ -57,7 +57,7 @@ get_template_part(
 			</nav>
 		<?php endif; ?>
 		<?php if ( have_posts() ) : ?>
-			<div class="grid grid-3">
+			<div class="grid grid-3 forum-grid">
 				<?php
 				while ( have_posts() ) :
 					the_post();

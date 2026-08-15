@@ -75,7 +75,10 @@
         membership, sign-in, registration, and the logged-out checkout gate.
         Authenticated Chrome checks also pass for Account, Member Profile,
         profile-photo/privacy controls, and the administrator member record.
-        A second browser engine remains open.
+        Forum desktop/mobile cards and the Events two-record carousel also pass
+        local browser checks; live HTTP/DOM structure passes after theme 0.6.12.
+        A second browser engine and final authenticated live visual pass remain
+        open.
 - [ ] Backup restore is performed and verified on staging
 - [ ] Paid event checkout is connected to the existing Stripe Sandbox and its
       success/decline/cancel/refund/duplicate/capacity/email matrix passes

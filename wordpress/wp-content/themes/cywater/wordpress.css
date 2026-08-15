@@ -244,6 +244,20 @@
 
 .forum-card {
   position: relative;
+  height: 100%;
+  overflow: hidden;
+  background: var(--white);
+  border-color: var(--line);
+  border-radius: var(--radius-lg);
+}
+
+.forum-card .card-body {
+  min-height: 100%;
+}
+
+.forum-card .card-media {
+  aspect-ratio: 16 / 9;
+  background: var(--paper-warm);
 }
 
 .forum-card .forum-card-link {
@@ -290,6 +304,16 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--sp-2);
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.forum-article-byline a {
+  color: var(--white);
+  font-weight: 600;
+}
+
+.forum-article-byline a:hover {
+  color: var(--teal-soft);
 }
 
 .forum-article-media {
@@ -405,6 +429,10 @@
   background: var(--white);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
+}
+
+.forum-discussion {
+  border-top: 1px solid var(--line);
 }
 
 .forum-comments .comment-form {

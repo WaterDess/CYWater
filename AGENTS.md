@@ -158,7 +158,7 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
 ### Temporary Staging Snapshot (2026-08-16)
 
 - Hostinger staging is available at `https://staging.cywater.org/` with the
-  CYWater `0.6.11` theme, CYWater Membership `0.8.3`, CYWater Partnerships
+  CYWater `0.6.12` theme, CYWater Membership `0.8.3`, CYWater Partnerships
   `0.1.1`, CYWater Logo Call `0.2.0`, CYWater Environment `0.5.5`, CYWater
   Forum `0.1.0`, CYWater Core `0.5.8`, and Event Tickets `5.29.1`.
 - Dedicated Hostinger SSH access from the Lenovo workstation was established
@@ -287,7 +287,18 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   keyboard arrows, touch swipes, and reduced-motion handling follow the
   interaction structure requested from the Steam reference while retaining
   CYWater typography, color, spacing, radius, and Event data ownership.
-- On 2026-08-16 theme `0.6.11`, CYWater Environment `0.5.5`, and the independent
+- Theme `0.6.12` uses a stable three-slot Upcoming track instead of rebuilding
+  a two-record preview clone on every change. It removes the initial category-
+  navigation shift, keeps the initial carousel frame static, and makes the left
+  and right controls animate their corresponding previews into the centre. The
+  shorter card moves the visual divider left to give editorial details more
+  room; its mobile media no longer overflows its card. Forum cards, bylines,
+  filters, and discussion surfaces explicitly reuse the accepted global paper,
+  white, line, radius, type, spacing, focus, and hover tokens. Local desktop,
+  375px, initial-state, left/right-transition, and overflow checks passed; live
+  staging HTTP/DOM and asset checks passed after deployment, while live in-app
+  screenshot control timed out.
+- On 2026-08-16 theme `0.6.12`, CYWater Environment `0.5.5`, and the independent
   CYWater Forum `0.1.0` were deployed to Hostinger staging from the reviewed
   integration branch. Forum articles use core WordPress posts, taxonomies,
   media, revisions, comments, privacy tools, and the existing PMPro membership

@@ -200,6 +200,10 @@ Hostinger staging acceptance on 2026-08-16 additionally passed:
   and replies;
 - local desktop and 375px browser review with no broken image or horizontal
   overflow; live anonymous HTTP/DOM acceptance passed after deployment.
+- Forum archive cards, article bylines, filters, and discussion surfaces reuse
+  the accepted CYWater paper, white, line, radius, type, spacing, focus, and
+  hover tokens; the 0.6.12 browser review confirmed the compact mobile card
+  flow without introducing a Forum-only visual system.
 
 Still required before production:
 

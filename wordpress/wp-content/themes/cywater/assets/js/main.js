@@ -111,38 +111,40 @@
     const next = section?.querySelector("[data-carousel-next]");
     const pagination = section?.querySelector("[data-carousel-pagination]");
     const cards = Array.from(carousel.querySelectorAll(".upcoming-event-card"));
+    const templates = cards.map((card) => card.cloneNode(true));
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let activeIndex = 0;
     let rotationTimer;
     let touchStartX = null;
+    let moving = false;
+    let transitionFallback;
+    let queuedTarget = null;
+    const track = document.createElement("div");
+    track.className = "event-carousel-track";
 
-    const clearPreviewClones = () => {
-      carousel.querySelectorAll(".is-preview-clone").forEach((clone) => clone.remove());
+    const normalizeIndex = (index) => (index + cards.length) % cards.length;
+
+    const createSlot = (index, position) => {
+      const card = templates[normalizeIndex(index)].cloneNode(true);
+      card.classList.remove("is-active", "is-previous", "is-next", "is-preview-clone");
+      card.classList.add(`is-${position}`);
+      card.setAttribute("aria-hidden", position === "active" ? "false" : "true");
+      card.tabIndex = position === "active" ? 0 : -1;
+      return card;
     };
 
-    const updateCarousel = () => {
-      clearPreviewClones();
-      cards.forEach((card, index) => {
-        card.classList.remove("is-active", "is-previous", "is-next");
-        card.classList.toggle("is-active", index === activeIndex);
-        card.setAttribute("aria-hidden", index === activeIndex ? "false" : "true");
-        card.tabIndex = index === activeIndex ? 0 : -1;
-      });
-
-      if (cards.length > 1) {
-        const previousIndex = (activeIndex - 1 + cards.length) % cards.length;
-        const nextIndex = (activeIndex + 1) % cards.length;
-        cards[previousIndex].classList.add("is-previous");
-        if (previousIndex === nextIndex) {
-          const clone = cards[nextIndex].cloneNode(true);
-          clone.classList.remove("is-active", "is-previous");
-          clone.classList.add("is-next", "is-preview-clone");
-          clone.setAttribute("aria-hidden", "true");
-          clone.tabIndex = -1;
-          carousel.append(clone);
-        } else {
-          cards[nextIndex].classList.add("is-next");
-        }
+    const renderSlots = () => {
+      track.classList.remove("is-moving-previous", "is-moving-next");
+      if (cards.length === 1) {
+        track.classList.add("has-single-event");
+        track.replaceChildren(createSlot(0, "active"));
+      } else {
+        track.classList.remove("has-single-event");
+        track.replaceChildren(
+          createSlot(activeIndex - 1, "previous"),
+          createSlot(activeIndex, "active"),
+          createSlot(activeIndex + 1, "next")
+        );
       }
 
       pagination?.querySelectorAll(".event-carousel-dot").forEach((dot, index) => {
@@ -154,17 +156,67 @@
       if (next) next.disabled = cards.length < 2;
     };
 
-    const showEvent = (index) => {
-      activeIndex = (index + cards.length) % cards.length;
-      updateCarousel();
-    };
-
-    const stopRotation = () => window.clearInterval(rotationTimer);
+    const stopRotation = () => window.clearTimeout(rotationTimer);
     const startRotation = () => {
       stopRotation();
       if (cards.length > 1 && !reduceMotion.matches && !document.hidden) {
-        rotationTimer = window.setInterval(() => showEvent(activeIndex + 1), 6500);
+        rotationTimer = window.setTimeout(() => moveBy(1), 6500);
       }
+    };
+
+    const finishMove = (delta) => {
+      if (!moving) return;
+      window.clearTimeout(transitionFallback);
+      activeIndex = normalizeIndex(activeIndex + delta);
+      moving = false;
+      carousel.classList.add("is-resetting");
+      renderSlots();
+      // Keep the reset frame transition-free; motion resumes only after the
+      // three stable visual slots are back in their resting positions.
+      window.requestAnimationFrame(() => window.requestAnimationFrame(() => {
+        carousel.classList.remove("is-resetting");
+        if (queuedTarget !== null && queuedTarget !== activeIndex) {
+          const forward = normalizeIndex(queuedTarget - activeIndex);
+          const backward = normalizeIndex(activeIndex - queuedTarget);
+          moveBy(forward <= backward ? 1 : -1, true);
+        } else {
+          queuedTarget = null;
+          startRotation();
+        }
+      }));
+    };
+
+    const moveBy = (delta, keepQueue = false) => {
+      if (moving || cards.length < 2) return;
+      if (!keepQueue) queuedTarget = null;
+      stopRotation();
+      if (reduceMotion.matches) {
+        activeIndex = normalizeIndex(activeIndex + delta);
+        renderSlots();
+        return;
+      }
+      moving = true;
+      const direction = delta < 0 ? "previous" : "next";
+      track.classList.add(`is-moving-${direction}`);
+      const complete = (event) => {
+        if (event.target !== track || event.propertyName !== "transform") return;
+        track.removeEventListener("transitionend", complete);
+        finishMove(delta < 0 ? -1 : 1);
+      };
+      track.addEventListener("transitionend", complete);
+      transitionFallback = window.setTimeout(() => {
+        track.removeEventListener("transitionend", complete);
+        finishMove(delta < 0 ? -1 : 1);
+      }, 700);
+    };
+
+    const moveTo = (index) => {
+      const target = normalizeIndex(index);
+      if (target === activeIndex || moving) return;
+      queuedTarget = target;
+      const forward = normalizeIndex(target - activeIndex);
+      const backward = normalizeIndex(activeIndex - target);
+      moveBy(forward <= backward ? 1 : -1, true);
     };
 
     if (pagination) {
@@ -175,29 +227,30 @@
         dot.className = "event-carousel-dot";
         dot.setAttribute("aria-label", `Show ${card.querySelector("h3")?.textContent || `upcoming event ${index + 1}`}`);
         dot.addEventListener("click", () => {
-          showEvent(index);
-          startRotation();
+          moveTo(index);
         });
         pagination.append(dot);
       });
     }
 
-    previous?.addEventListener("click", () => { showEvent(activeIndex - 1); startRotation(); });
-    next?.addEventListener("click", () => { showEvent(activeIndex + 1); startRotation(); });
+    carousel.classList.add("is-initializing");
+    carousel.replaceChildren(track);
+    renderSlots();
+
+    previous?.addEventListener("click", () => moveBy(-1));
+    next?.addEventListener("click", () => moveBy(1));
     carousel.addEventListener("keydown", (event) => {
       if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
         event.preventDefault();
-        showEvent(activeIndex + (event.key === "ArrowLeft" ? -1 : 1));
-        startRotation();
+        moveBy(event.key === "ArrowLeft" ? -1 : 1);
       }
     });
     carousel.addEventListener("touchstart", (event) => { touchStartX = event.changedTouches[0]?.clientX ?? null; }, { passive: true });
     carousel.addEventListener("touchend", (event) => {
       if (touchStartX === null) return;
       const distance = (event.changedTouches[0]?.clientX ?? touchStartX) - touchStartX;
-      if (Math.abs(distance) > 45) showEvent(activeIndex + (distance < 0 ? 1 : -1));
+      if (Math.abs(distance) > 45) moveBy(distance < 0 ? 1 : -1);
       touchStartX = null;
-      startRotation();
     }, { passive: true });
     section?.addEventListener("mouseenter", stopRotation);
     section?.addEventListener("mouseleave", startRotation);
@@ -205,8 +258,10 @@
     section?.addEventListener("focusout", startRotation);
     document.addEventListener("visibilitychange", startRotation);
     reduceMotion.addEventListener?.("change", startRotation);
-    updateCarousel();
-    startRotation();
+    window.requestAnimationFrame(() => window.requestAnimationFrame(() => {
+      carousel.classList.remove("is-initializing");
+      startRotation();
+    }));
   });
 
   /* ---------- FAQ accordion ---------- */
