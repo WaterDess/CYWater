@@ -19,6 +19,8 @@ const mounts = [
   ["./wordpress/wp-content/themes/cywater", "/wordpress/wp-content/themes/cywater"],
   ["./wordpress/wp-content/plugins/cywater-core", "/wordpress/wp-content/plugins/cywater-core"],
   ["./wordpress/wp-content/plugins/cywater-membership", "/wordpress/wp-content/plugins/cywater-membership"],
+  ["./wordpress/wp-content/plugins/cywater-partnerships", "/wordpress/wp-content/plugins/cywater-partnerships"],
+  ["./wordpress/wp-content/plugins/cywater-logo-call", "/wordpress/wp-content/plugins/cywater-logo-call"],
   ["./wordpress/wp-content/plugins/cywater-environment", "/wordpress/wp-content/plugins/cywater-environment"],
   ["./wordpress/wp-content/plugins/cywater-forum", "/wordpress/wp-content/plugins/cywater-forum"],
   ["./wordpress/runtime/vendor/paid-memberships-pro", "/wordpress/wp-content/plugins/paid-memberships-pro"],
@@ -598,6 +600,95 @@ echo wp_json_encode( $out );`);
   assert.ok(String(screens.users_column).length > 0, "The Users list column must render a value");
   assert.match(screens.shortcode_logged_out.html, /Sign in/, "Signed-out visitors must be offered sign-in");
   record("settings screen, user-editor panel, users column, and all endorsement states render");
+
+  /* ------------------------------------------------------------------
+   * 8d. Administrator deletion actually works and cleans up after itself.
+   *
+   * Custom capabilities are easy to get wrong in a way that only shows up when
+   * somebody tries to remove something: a missing delete_* primitive leaves an
+   * administrator staring at a post they cannot bin.
+   * ---------------------------------------------------------------- */
+  const deletion = await json(`
+wp_set_current_user( 1 );
+
+$post_id = wp_insert_post( array(
+    'post_type'    => 'cyw_forum_post',
+    'post_status'  => 'publish',
+    'post_title'   => 'Temporary article for deletion QA',
+    'post_content' => '<p>Created by the test and removed again.</p>',
+    'post_author'  => ${candidateId},
+) );
+$terms = get_terms( array( 'taxonomy' => 'cyw_forum_category', 'hide_empty' => false ) );
+wp_set_object_terms( $post_id, array( $terms[0]->term_id ), 'cyw_forum_category' );
+
+$comment_id = wp_new_comment( array(
+    'comment_post_ID'      => $post_id,
+    'comment_content'      => 'Temporary reply for deletion QA.',
+    'user_id'              => ${candidateId},
+    'comment_author'       => 'New Candidate',
+    'comment_author_email' => 'candidate@example.org',
+), true );
+$comment_id = is_wp_error( $comment_id ) ? 0 : $comment_id;
+
+$caps = array(
+    'admin_delete_post'  => current_user_can( 'delete_post', $post_id ),
+    'admin_edit_post'    => current_user_can( 'edit_post', $post_id ),
+    'author_delete_own'  => user_can( ${candidateId}, 'delete_post', $post_id ),
+    'other_delete_other' => user_can( ${authorId}, 'delete_post', $post_id ),
+);
+
+// Trash, confirm, restore, then delete permanently.
+wp_trash_post( $post_id );
+$trashed = get_post_status( $post_id );
+wp_untrash_post( $post_id );
+$untrashed = get_post_status( $post_id );
+
+$comment_trashed = $comment_id ? (bool) wp_trash_comment( $comment_id ) : null;
+$comment_gone_after_trash = $comment_id ? ( '1' !== (string) get_comment( $comment_id )->comment_approved ) : null;
+if ( $comment_id ) {
+    wp_delete_comment( $comment_id, true );
+}
+$comment_deleted = $comment_id ? ( null === get_comment( $comment_id ) ) : null;
+
+wp_delete_post( $post_id, true );
+$post_deleted = ( null === get_post( $post_id ) );
+
+// Deleting the article must take its comments with it, not orphan them.
+$orphans = get_comments( array( 'post_id' => $post_id, 'count' => true ) );
+
+echo wp_json_encode( array(
+    'caps'                     => $caps,
+    'trashed'                  => $trashed,
+    'untrashed'                => $untrashed,
+    'comment_trashed'          => $comment_trashed,
+    'comment_unapproved'       => $comment_gone_after_trash,
+    'comment_deleted'          => $comment_deleted,
+    'post_deleted'             => $post_deleted,
+    'orphan_comments'          => (int) $orphans,
+    'archive_count_after'      => (int) wp_count_posts( 'cyw_forum_post' )->publish,
+) );`);
+
+  assert.equal(deletion.caps.admin_delete_post, true, "An administrator must be able to delete a forum article");
+  assert.equal(deletion.caps.admin_edit_post, true, "An administrator must be able to edit a forum article");
+  assert.equal(deletion.caps.author_delete_own, true, "An author must be able to delete their own article");
+  assert.equal(deletion.caps.other_delete_other, false, "An author must not be able to delete someone else's article");
+  assert.equal(deletion.trashed, "trash", "Trashing must move the article to the bin");
+  assert.equal(deletion.untrashed, "draft", "Restoring from the bin must bring the article back");
+  assert.equal(deletion.comment_trashed, true, "An administrator must be able to trash a reply");
+  assert.equal(deletion.comment_unapproved, true, "A trashed reply must stop being approved");
+  assert.equal(deletion.comment_deleted, true, "An administrator must be able to delete a reply outright");
+  assert.equal(deletion.post_deleted, true, "Permanent deletion must remove the article");
+  assert.equal(deletion.orphan_comments, 0, "Deleting an article must not orphan its replies");
+  record("administrator can trash, restore, and permanently delete articles and replies");
+
+  // The public surfaces must not still be advertising the deleted article.
+  const archiveAfterDelete = await (await fetch(new URL("/forum/", server.serverUrl))).text();
+  assert.doesNotMatch(
+    archiveAfterDelete,
+    /Temporary article for deletion QA/,
+    "A deleted article must disappear from the archive"
+  );
+  record("deleted article leaves no trace on the public archive");
 
   /* ------------------------------------------------------------------
    * 9. The AI seam stays dormant

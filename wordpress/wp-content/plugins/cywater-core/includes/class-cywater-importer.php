@@ -36,6 +36,7 @@ final class CYWater_Importer {
 			'awards' => $this->import_awards(),
 			'board'  => $this->import_board_roles(),
 		);
+		$report['retired_events'] = $this->retire_misclassified_events();
 		return $report;
 	}
 
@@ -50,13 +51,13 @@ final class CYWater_Importer {
 	private function import_pages() {
 		$verified_pages = $this->data['pages'] ?? array();
 		$pages = array(
-			'home'       => array( 'Home', 'International Association · Water Sciences', 'Advancing water sciences, empowering young scholars.', '' ),
+			'home'       => array( 'Home', 'International Association of Contemporary Young Scholars in Water Sciences (CYWater)', 'Advancing water sciences, empowering young scholars.', '' ),
 			'about'      => array( 'About CYWater', 'Our association', 'Advancing water sciences for the public benefit.', '<p>CYWater is an international non-profit association founded in 2011 to advance education, research, and professional development in water sciences.</p>' ),
 			'board'      => array( 'Board of Directors', 'Leadership', 'The Board governs CYWater, sets strategic direction, oversees finances, appoints committees, and ensures compliance with law and mission.', '<div class="callout"><strong>Leadership update in progress.</strong><p>Current appointments will be published only after formal review.</p></div>' ),
 			'bylaws'     => array( 'Bylaws', 'Governance', 'The governing framework of the association.', '<p>The approved Bylaws document and article-by-article text will be migrated during editorial acceptance.</p>' ),
 			'membership' => array( 'Membership', 'Join CYWater', 'Join an international community advancing water sciences and supporting emerging scholars.', '<p>Membership is open worldwide to individuals professionally engaged in or interested in water sciences, water resources, or related disciplines.</p>' ),
 			'news'       => array( 'News', 'News and updates', 'Opportunities and spotlights.', '' ),
-			'contact'    => array( 'Get in touch', 'Contact', 'CYWater\'s official contact email is being confirmed.', '<h2>Official channels are being verified.</h2><p>Membership, event, partnership, and media inquiries will be accepted once the official contact channel is confirmed.</p>' ),
+			'contact'    => array( 'Get in touch', 'Contact', 'Contact CYWater for general correspondence, events, partnerships, and media inquiries.', '<h2>How can we help?</h2><p>Use contact@cywater.org for general correspondence, events, partnerships, and media inquiries.</p>' ),
 			'account'    => array( 'Member account', 'Membership', 'Manage your CYWater membership and profile.', '[pmpro_account]' ),
 			'member-profile' => array( 'Member profile', 'Membership profile', 'Complete your professional profile and choose what may appear publicly.', '[pmpro_member_profile_edit][cywater_privacy_settings]' ),
 		);
@@ -89,7 +90,7 @@ final class CYWater_Importer {
 			$this->seed_meta_if_missing( $post_id, '_cyw_eyebrow', $page[1] );
 			$this->seed_meta_if_missing( $post_id, '_cyw_lead', $page[2] );
 			if ( 'contact' === $slug ) {
-				$this->seed_meta_if_missing( $post_id, '_cyw_contact_email', '' );
+				$this->seed_meta_if_missing( $post_id, '_cyw_contact_email', 'contact@cywater.org' );
 				$this->seed_meta_if_missing( $post_id, '_cyw_mailing_address', "202 E. Green St. Suite 2\nChampaign, IL 61820, USA" );
 			}
 			$this->complete_seed_revision( $post_id );
@@ -237,19 +238,64 @@ final class CYWater_Importer {
 			$this->seed_meta_if_missing( $post_id, '_cyw_chair', sanitize_text_field( $award['chair'] ?? '' ) );
 			$this->seed_json_structure( $post_id, '_cyw_award_record', $award );
 			$this->seed_meta_if_missing( $post_id, '_cyw_article_id', sanitize_key( $award['articleId'] ?? '' ) );
+			if ( ! empty( $award['ceremony']['image'] ) ) {
+				$this->set_featured_image( $post_id, $award['ceremony']['image'], $award['ceremony']['imageAlt'] ?? $award['ceremony']['title'] ?? '' );
+			}
 			$this->complete_seed_revision( $post_id );
 			++$count;
 		}
 		return $count;
 	}
 
+	/**
+	 * Retire the duplicate 2020 ceremony from Events after it has been moved to
+	 * the corresponding Award record. Trashing keeps the operation recoverable.
+	 */
+	private function retire_misclassified_events() {
+		if ( $this->seed_revision < 5 ) {
+			return 0;
+		}
+
+		$posts = get_posts(
+			array(
+				'post_type'      => 'cyw_event',
+				'post_status'    => array( 'publish', 'future', 'draft', 'pending', 'private' ),
+				'posts_per_page' => -1,
+				'meta_key'       => '_cyw_source_id',
+				'meta_value'     => 'event:annual-gathering-2020',
+				'fields'         => 'ids',
+			)
+		);
+
+		$count = 0;
+		foreach ( $posts as $post_id ) {
+			if ( wp_trash_post( (int) $post_id ) ) {
+				++$count;
+			}
+		}
+
+		return $count;
+	}
+
 	private function import_board_roles() {
-		$roles = array( 'President', 'President-Elect', 'Treasurer', 'Directors-at-Large', 'Executive Director' );
-		foreach ( $roles as $index => $role ) {
+		$roles = $this->data['board'] ?? array(
+			array( 'role' => 'President', 'personName' => '' ),
+			array( 'role' => 'President-Elect', 'personName' => '' ),
+			array( 'role' => 'Treasurer', 'personName' => '' ),
+			array( 'role' => 'Directors-at-Large', 'personName' => '' ),
+			array( 'role' => 'Executive Director', 'personName' => '' ),
+		);
+		foreach ( $roles as $index => $record ) {
+			$role    = sanitize_text_field( $record['role'] ?? '' );
+			$person  = sanitize_text_field( $record['personName'] ?? '' );
+			if ( ! $role ) {
+				continue;
+			}
 			$post_id = $this->upsert_post( 'cyw_board_role', 'board:' . sanitize_title( $role ), array( 'post_title' => $role, 'post_status' => 'publish' ) );
-			$this->seed_meta_if_missing( $post_id, '_cyw_order', $index + 1 );
-			if ( '' === get_post_meta( $post_id, '_cyw_confirmed_public', true ) ) {
-				update_post_meta( $post_id, '_cyw_confirmed_public', 0 );
+			if ( $this->should_sync( $post_id ) ) {
+				update_post_meta( $post_id, '_cyw_order', $index + 1 );
+				update_post_meta( $post_id, '_cyw_person_name', $person );
+				update_post_meta( $post_id, '_cyw_confirmed_public', $person ? 1 : 0 );
 			}
 			$this->complete_seed_revision( $post_id );
 		}

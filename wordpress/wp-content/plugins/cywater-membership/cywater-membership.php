@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: CYWater Membership
- * Description: CYWater member profile, privacy choices, calendar-year policy, and PMPro setup integration.
- * Version: 0.8.0
+ * Description: CYWater member profile, privacy choices, rolling annual terms, and PMPro setup integration.
+ * Version: 0.8.3
  * Requires at least: 7.0
  * Requires PHP: 8.1
  * Text Domain: cywater-membership
@@ -12,7 +12,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CYWATER_MEMBERSHIP_VERSION', '0.8.0' );
+define( 'CYWATER_MEMBERSHIP_VERSION', '0.8.3' );
+define( 'CYWATER_MEMBERSHIP_FILE', __FILE__ );
 define( 'CYWATER_MEMBERSHIP_DIR', plugin_dir_path( __FILE__ ) );
 
 require_once CYWATER_MEMBERSHIP_DIR . 'includes/class-cywater-membership-fields.php';
@@ -22,6 +23,7 @@ require_once CYWATER_MEMBERSHIP_DIR . 'includes/class-cywater-membership-account
 require_once CYWATER_MEMBERSHIP_DIR . 'includes/class-cywater-membership-account-flow.php';
 require_once CYWATER_MEMBERSHIP_DIR . 'includes/class-cywater-membership-refunds.php';
 require_once CYWATER_MEMBERSHIP_DIR . 'includes/class-cywater-membership-admin.php';
+require_once CYWATER_MEMBERSHIP_DIR . 'includes/class-cywater-membership-avatars.php';
 
 function cywater_membership_boot() {
 	CYWater_Membership_Fields::register();
@@ -31,5 +33,6 @@ function cywater_membership_boot() {
 	CYWater_Membership_Account_Flow::register();
 	CYWater_Membership_Refunds::register();
 	CYWater_Membership_Admin::register();
+	CYWater_Membership_Avatars::register();
 }
 add_action( 'plugins_loaded', 'cywater_membership_boot' );

@@ -1,6 +1,6 @@
 <?php
 /**
- * PMPro levels, frontend pages, and calendar-year behavior.
+ * PMPro levels, frontend pages, and rolling annual-term behavior.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -10,7 +10,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 final class CYWater_Membership_Setup {
 	public static function register() {
 		add_action( 'cywater_after_core_setup', array( __CLASS__, 'setup' ) );
-		add_filter( 'pmpro_checkout_end_date', array( __CLASS__, 'calendar_year_end' ), 10, 4 );
+		add_filter( 'pmpro_checkout_start_date', array( __CLASS__, 'rolling_annual_start' ), 20, 3 );
+		add_filter( 'pmpro_checkout_end_date', array( __CLASS__, 'rolling_annual_end' ), 10, 4 );
 		add_action( 'admin_notices', array( __CLASS__, 'dependency_notice' ) );
 	}
 
@@ -111,7 +112,6 @@ final class CYWater_Membership_Setup {
 			'Student'      => array( 20, 'For full-time undergraduate, graduate, and Ph.D. students.', true ),
 			'Professional' => array( 70, 'For researchers and practitioners in water sciences.', true ),
 			'Lifetime'     => array( 700, 'A one-time individual lifetime membership.', false ),
-			'Partner'      => array( 1000, 'An annual partnership for institutions and organizations.', true ),
 		);
 		$existing = function_exists( 'pmpro_getAllLevels' ) ? pmpro_getAllLevels( true, true ) : array();
 		$by_name  = array();
@@ -137,19 +137,35 @@ final class CYWater_Membership_Setup {
 			$level->save();
 			$result[ sanitize_key( $name ) ] = absint( $level->id );
 		}
+		if ( isset( $by_name['Partner'] ) ) {
+			$legacy_partner               = new PMPro_Membership_Level( $by_name['Partner']->id );
+			$legacy_partner->description  = 'Legacy institutional partnership payment record. Public signup is disabled; new partnerships require Board and MOU review.';
+			$legacy_partner->allow_signups = 0;
+			$legacy_partner->save();
+			$result['partner_legacy'] = absint( $legacy_partner->id );
+		}
 		return $result;
 	}
 
-	public static function calendar_year_end( $enddate, $user_id, $level, $startdate ) {
-		if ( ! defined( 'CYWATER_ENABLE_CALENDAR_YEAR_END' ) || ! CYWATER_ENABLE_CALENDAR_YEAR_END ) {
-			return $enddate;
-		}
+	public static function rolling_annual_start( $startdate, $user_id, $level ) {
 		$ids    = (array) get_option( 'cywater_membership_level_ids', array() );
-		$annual = array_filter( array( $ids['student'] ?? 0, $ids['professional'] ?? 0, $ids['partner'] ?? 0 ) );
+		$annual = array_filter( array( $ids['student'] ?? 0, $ids['professional'] ?? 0 ) );
+		if ( ! in_array( (int) $level->id, array_map( 'intval', $annual ), true ) ) {
+			return $startdate;
+		}
+
+		return "'" . current_time( 'mysql' ) . "'";
+	}
+
+	public static function rolling_annual_end( $enddate, $user_id, $level, $startdate ) {
+		$ids    = (array) get_option( 'cywater_membership_level_ids', array() );
+		$annual = array_filter( array( $ids['student'] ?? 0, $ids['professional'] ?? 0 ) );
 		if ( ! in_array( (int) $level->id, array_map( 'intval', $annual ), true ) ) {
 			return $enddate;
 		}
-		$start = $startdate ? strtotime( $startdate ) : current_time( 'timestamp' );
-		return wp_date( 'Y-12-31', $start );
+
+		// Each paid annual term is measured from the successful checkout date.
+		$payment_date = new DateTimeImmutable( 'now', wp_timezone() );
+		return $payment_date->modify( '+1 year' )->setTime( 23, 59, 59 )->format( 'Y-m-d H:i:s' );
 	}
 }

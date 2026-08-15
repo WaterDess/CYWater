@@ -48,15 +48,54 @@ const pages = {
   contact: await readPage("contact/index.html", ".contact-note"),
 };
 
+// WordPress treats the December 2020 virtual session as part of the Best Paper
+// Award record, not as an Annual Gathering. Keep the public static prototype
+// untouched while normalizing the editable WordPress content model.
+const articles = structuredClone(content.ARTICLES);
+const events = structuredClone(content.EVENTS);
+const awards = structuredClone(content.AWARDS);
+const newsOrder = structuredClone(content.NEWS_LIST || []);
+const eventOrder = structuredClone(content.EVENT_LIST || []).filter(
+  ({ id }) => id !== "annual-gathering-2020"
+);
+
+delete events["annual-gathering-2020"];
+
+const award2020 = awards.find(({ year }) => String(year) === "2020");
+if (award2020) {
+  award2020.ceremony = {
+    title: "CYWater Best Paper Award Ceremony — Online 2020",
+    date: "December 18, 2020",
+    location: "Online",
+    image: "gatherings/2020-cover.jpg",
+    imageAlt: "Participants in the online 2020 CYWater Best Paper Award Ceremony",
+    lead: "The 2020 Best Paper Award Ceremony was held online, with the recognized authors presenting their work.",
+  };
+}
+
+const award2020News = newsOrder.find(({ id }) => id === "bpa-2020-result");
+if (award2020News?.alt) {
+  award2020News.alt = "Participants in the online 2020 CYWater Best Paper Award Ceremony";
+}
+
+const board = [
+  { role: "President", personName: "Qiuhong Tang" },
+  { role: "President-Elect", personName: "Lifeng Luo" },
+  { role: "Treasurer", personName: "Zhenxing Zhang" },
+  { role: "Directors-at-Large", personName: "Ming Pan, Chaopeng Shen" },
+  { role: "Executive Director", personName: "Vacant (N/A)" },
+];
+
 const payload = {
   schemaVersion: 1,
-  seedRevision: 4,
+  seedRevision: 6,
   generatedFrom: "assets/js/content.js",
-  articles: content.ARTICLES,
-  events: content.EVENTS,
-  awards: content.AWARDS,
-  newsOrder: content.NEWS_LIST || [],
-  eventOrder: content.EVENT_LIST || [],
+  articles,
+  events,
+  awards,
+  newsOrder,
+  eventOrder,
+  board,
   pages,
 };
 

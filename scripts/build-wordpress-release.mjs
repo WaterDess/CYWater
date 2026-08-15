@@ -31,6 +31,18 @@ const packages = [
   },
   {
     type: "plugin",
+    slug: "cywater-partnerships",
+    source: path.join(wpContent, "plugins", "cywater-partnerships"),
+    header: "cywater-partnerships.php",
+  },
+  {
+    type: "plugin",
+    slug: "cywater-logo-call",
+    source: path.join(wpContent, "plugins", "cywater-logo-call"),
+    header: "cywater-logo-call.php",
+  },
+  {
+    type: "plugin",
     slug: "cywater-environment",
     source: path.join(wpContent, "plugins", "cywater-environment"),
     header: "cywater-environment.php",

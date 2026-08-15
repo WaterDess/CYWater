@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "seedRevision": 4,
+  "seedRevision": 6,
   "generatedFrom": "assets/js/content.js",
   "articles": {
     "bpa-2025-result": {
@@ -1184,36 +1184,6 @@
       "upcoming": false,
       "category": "gathering"
     },
-    "annual-gathering-2020": {
-      "title": "CYWater Best Paper Award Gathering — Online 2020",
-      "date": "Dec 18, 2020",
-      "location": "Online",
-      "format": "Virtual award gathering",
-      "image": "gatherings/2020-cover.jpg",
-      "imageAlt": "Participants in the online 2020 CYWater Best Paper Award gathering",
-      "lead": "During the COVID-19 pandemic, CYWater continued its annual Best Paper Award tradition through an online gathering.",
-      "blocks": [
-        {
-          "type": "p",
-          "text": "The 2020 Best Paper Award gathering was held online on December 18. The virtual format allowed members and award participants to convene safely while maintaining the Association's annual recognition program."
-        },
-        {
-          "type": "gallery",
-          "items": [
-            {
-              "src": "gatherings/2020-participants.jpg",
-              "caption": "Participants in the virtual 2020 award gathering."
-            },
-            {
-              "src": "gatherings/2020-gallery.jpg",
-              "caption": "The online community assembled for the 2020 Best Paper Award."
-            }
-          ]
-        }
-      ],
-      "upcoming": false,
-      "category": "gathering"
-    },
     "annual-gathering-2017": {
       "title": "CYWater Annual Gathering — New Orleans 2017",
       "date": "December 2017",
@@ -1400,7 +1370,15 @@
       ],
       "applications": 17,
       "chair": "Ming Pan (Princeton University)",
-      "articleId": "bpa-2020-result"
+      "articleId": "bpa-2020-result",
+      "ceremony": {
+        "title": "CYWater Best Paper Award Ceremony — Online 2020",
+        "date": "December 18, 2020",
+        "location": "Online",
+        "image": "gatherings/2020-cover.jpg",
+        "imageAlt": "Participants in the online 2020 CYWater Best Paper Award Ceremony",
+        "lead": "The 2020 Best Paper Award Ceremony was held online, with the recognized authors presenting their work."
+      }
     },
     {
       "year": "2019",
@@ -1582,7 +1560,7 @@
     {
       "id": "bpa-2020-result",
       "img": "gatherings/2020-cover.jpg",
-      "alt": "Participants in the online 2020 CYWater Best Paper Award gathering"
+      "alt": "Participants in the online 2020 CYWater Best Paper Award Ceremony"
     }
   ],
   "eventOrder": [
@@ -1667,11 +1645,6 @@
       "category": "gathering"
     },
     {
-      "id": "annual-gathering-2020",
-      "status": "past",
-      "category": "gathering"
-    },
-    {
       "id": "annual-gathering-2017",
       "status": "past",
       "category": "gathering"
@@ -1680,6 +1653,28 @@
       "id": "annual-gathering-2013",
       "status": "past",
       "category": "gathering"
+    }
+  ],
+  "board": [
+    {
+      "role": "President",
+      "personName": "Qiuhong Tang"
+    },
+    {
+      "role": "President-Elect",
+      "personName": "Lifeng Luo"
+    },
+    {
+      "role": "Treasurer",
+      "personName": "Zhenxing Zhang"
+    },
+    {
+      "role": "Directors-at-Large",
+      "personName": "Ming Pan, Chaopeng Shen"
+    },
+    {
+      "role": "Executive Director",
+      "personName": "Vacant (N/A)"
     }
   ],
   "pages": {

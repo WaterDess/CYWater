@@ -66,14 +66,32 @@ $render_highlight = static function ( $highlight ) {
 	</article>
 	<?php
 };
+
+$association_name = 'International Association of Contemporary Young Scholars in Water Sciences (CYWater)';
+$hero_title       = cywater_page_field( 'hero_title', "Advancing water sciences,\nempowering young scholars." );
+$hero_title_lines = preg_split( '/\R+/', trim( $hero_title ) );
+
+if ( 1 === count( $hero_title_lines ) && str_contains( $hero_title, ',' ) ) {
+	$hero_title_parts = explode( ',', $hero_title, 2 );
+	$hero_title_lines = array( trim( $hero_title_parts[0] ) . ',', trim( $hero_title_parts[1] ) );
+}
 ?>
 <main>
 	<section class="hero">
 		<div class="container">
 			<svg class="hero-watermark" viewBox="0 0 200 200" aria-hidden="true"><path d="M100 20C100 20 40 80 40 130a60 60 0 0 0 120 0C160 80 100 20 100 20Z" fill="none" stroke="#0F766E" stroke-width="2"/></svg>
 			<div class="hero-inner" data-reveal>
-				<span class="eyebrow"><?php echo esc_html( cywater_page_field( 'eyebrow', 'International Association · Water Sciences' ) ); ?></span>
-				<h1><?php echo wp_kses_post( nl2br( esc_html( cywater_page_field( 'hero_title', "Advancing water sciences,\nempowering young scholars." ) ) ) ); ?></h1>
+				<span class="eyebrow hero-identity" aria-label="<?php echo esc_attr( $association_name ); ?>">
+					<span class="hero-identity-copy" aria-hidden="true">
+						<span class="hero-identity-line">International Association of Contemporary</span>
+						<span class="hero-identity-line">Young Scholars in Water Sciences (CYWater)</span>
+					</span>
+				</span>
+				<h1>
+					<?php foreach ( $hero_title_lines as $hero_title_line ) : ?>
+						<span class="hero-title-line"><?php echo esc_html( $hero_title_line ); ?></span>
+					<?php endforeach; ?>
+				</h1>
 				<p class="lead"><?php echo esc_html( cywater_page_field( 'lead', 'An international, non-profit association advancing water sciences education, research, and professional development — through scientific exchange, publications, and conferences.' ) ); ?></p>
 				<div class="hero-actions">
 					<a class="btn btn-accent btn-lg" href="<?php echo esc_url( home_url( '/events/' ) ); ?>">Upcoming events</a>

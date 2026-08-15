@@ -45,8 +45,8 @@
 
 ## Must Pass Before Staging Approval
 
-- [ ] Board approves legal entity, operating country, prices, calendar-year
-      proration/grace policy, recurring billing policy, refund policy, privacy
+- [ ] Board approves legal entity, operating country, prices, rolling annual
+      term policy, recurring billing policy, refund policy, privacy
       notice, terms, and retention policy
 - [x] Managed host plan and renewal price fit the budget and required features
 - [ ] Staging access controls, strict HTTPS, SMTP sandbox, and off-site backup exist

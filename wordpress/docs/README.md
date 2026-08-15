@@ -67,8 +67,8 @@ declared as a dormant contract only — no provider, no key, no outbound call, a
 ## Current State
 
 Hostinger staging is available at `https://staging.cywater.org/`. The accepted
-baseline uses the CYWater `0.5.8` theme, CYWater Membership `0.8.0`, CYWater
-Environment `0.5.4`, CYWater Core `0.5.2`, and Event Tickets `5.29.1`. PMPro and Stripe
+baseline uses the CYWater `0.6.8` theme, CYWater Membership `0.8.2`, CYWater
+Partnerships `0.1.1`, CYWater Logo Call `0.2.0`, CYWater Environment `0.5.4`, CYWater Core `0.5.7`, and Event Tickets `5.29.1`. PMPro and Stripe
 Sandbox are active for staging acceptance; the live-payment gate remains
 closed and no production Stripe credential is configured. Postmark is connected on
 staging, its domain authentication is verified, and the user confirmed a
@@ -81,9 +81,9 @@ actions; final copy/legal review and a non-Gmail delivery target remain open.
 
 Dedicated Hostinger SSH access from the Lenovo workstation was established and
 verified with public-key authentication on 2026-08-02. A live WP-CLI check
-confirmed WordPress `7.0.2`, PHP CLI `8.3.30`, the active CYWater `0.5.8` theme,
-CYWater Membership `0.8.0`, CYWater Environment `0.5.4`, and CYWater Core
-`0.5.2`. Five malformed inactive CYWater/PMPro upload directories were removed
+confirmed WordPress `7.0.2`, PHP CLI `8.3.30`, the active CYWater `0.6.2` theme,
+CYWater Membership `0.8.2`, CYWater Partnerships `0.1.0`, CYWater Environment `0.5.4`, and CYWater Core
+`0.5.5`. Five malformed inactive CYWater/PMPro upload directories were removed
 after exact-path and inactive-status verification; active components were not
 removed and the plugin-list warnings cleared.
 
@@ -93,7 +93,7 @@ files and found zero missing, extra, or different files. All custom PHP files
 passed syntax checks, and the home, membership, sign-in, registration, account,
 profile, and logged-out checkout routes passed the expected HTTP smoke results.
 
-Theme `0.5.8` connects the four membership cards to PMPro checkout and removes
+Theme `0.6.0` connects the four membership cards to PMPro checkout and removes
 the incorrect article bullet/indentation rules from PMPro order and account
 lists. The accepted typography, palette, imagery, motion, and responsive system
 are otherwise unchanged. Real-browser desktop/mobile checks passed for the
@@ -101,7 +101,33 @@ public account flow, and an authenticated administrator session verified the
 Account, Member Profile, and user-editor member-record surfaces without
 horizontal overflow.
 
-CYWater Membership `0.8.0` implements the current account-first path: logged-out
+On 2026-08-10 CYWater Core `0.5.4` and theme `0.6.0` moved the 2020 online Best
+Paper Award Ceremony out of Annual Gathering and into the 2020 Award record.
+The exact duplicate Event was moved to trash, not permanently deleted. The
+Events archive now reuses the existing title/year tile language whenever a
+verified photograph is unavailable, so the 2026 meeting displays `Annual
+Meeting` above `2026`. GitHub Pages was not modified.
+
+On 2026-08-10 theme `0.6.2` placed the complete legal association name in the
+home Hero, rendered the English mission heading as two deliberate desktop
+lines at a smaller display size, and reduced the decorative water-drop outline
+to match the tighter composition. The same release limits the PMPro Account
+avatar to `48px` and restyles the native Member Profile file selector with the
+existing CYWater control tokens without replacing its accessible upload
+behavior. Core `0.5.5` carries the updated home identity for repeatable setup.
+Live HTML, cache-busted CSS, PHP syntax and the precise PMPro selectors passed;
+both available browser-control surfaces timed out, so screenshot-level and
+authenticated visual review remain human acceptance checks.
+
+On 2026-08-10 the confirmed Board list was written to the existing editable
+Board-role records and enabled for public display: Qiuhong Tang (President),
+Lifeng Luo (President-Elect), Zhenxing Zhang (Treasurer), Ming Pan and Chaopeng
+Shen (Directors-at-Large), and `Vacant (N/A)` for Executive Director. No
+affiliations, terms, biographies, photographs, or contact details were inferred.
+The public staging route was verified to contain each record exactly once; the
+GitHub Pages original was not modified.
+
+CYWater Membership `0.8.2` implements the current account-first path: logged-out
 checkout redirects to sign-in, sign-in links to `/member-register/`, and a new
 account must complete a 24-hour one-time email-verification link before returning
 to the originally selected checkout. Verification mail uses
@@ -139,7 +165,7 @@ already processed, and created no duplicate order or membership. The recurring
 renewal/expiry queue is healthy; a manual hosted-Checkout decline click remains
 optional because the authoritative Sandbox decline result was already verified.
 
-CYWater Membership `0.8.0` also provides a read-only `CYWater member record` in the
+CYWater Membership `0.8.2` also provides a read-only `CYWater member record` in the
 WordPress user editor. It summarizes required-profile completion and directory
 privacy, account creation/last sign-in, email verification, active level and
 expiry, and account-closure requests. The Users list adds account/membership
@@ -156,6 +182,37 @@ attendee report. The view stores no duplicate account, membership, order,
 event-registration, or payment data. An authenticated administrator check verified the refunded test
 member has all five required fields, remains private, has no active membership,
 and exposes the intended PMPro Members/Orders links.
+
+CYWater Membership `0.8.2` supplies a local HTTPS default avatar for WordPress
+avatar surfaces, including the logged-in admin bar, so an external Gravatar
+failure cannot leave a broken image. A valid uploaded photo takes priority for
+the current user; another member's photo is used only when that member has opted
+into the public directory and exposed the profile-photo field. Staging
+`get_avatar_url()` and `get_avatar()` returned the local SVG, whose HTTPS request
+returned HTTP 200 with `image/svg+xml`.
+
+On 2026-08-10 institutional Partner was separated from individual membership.
+The membership page now has three PMPro cards (Student, Professional, and
+Lifetime); Partner appears only under `Sponsors and partners` with the action
+`Become Our Partner`. CYWater Partnerships `0.1.0` creates the published
+`/become-a-partner/` guide and a private expression-of-interest workflow with
+Submitted, Board review, MOU pending, Approved to pay, Declined, and Payment
+received stages. Applicant status URLs use a rotating token stored only as a
+salted hash. No payment link renders before approval; after Board/MOU approval,
+an administrator may attach an association-controlled HTTPS Stripe invoice or
+payment link. The historical PMPro Partner level and its records were preserved,
+but signup is disabled, direct checkout redirects to the guide, and it no longer
+qualifies a profile for the member directory. A self-cleaning staging QA passed
+application creation, token storage, pre-approval payment denial, approved link
+visibility, invalid-token rejection, and cleanup. Live HTML and HTTP redirects
+passed; screenshot-level browser QA timed out and remains open.
+
+On 2026-08-12 theme `0.6.4` and CYWater Partnerships `0.1.1` replaced the
+detached annual-contribution card on the Partner guide with one editorial
+recognition block. A thin divider introduces a responsive `$1,000 per year`
+information row and its Board/MOU condition; narrow screens stack the two
+parts. Existing typography, color, spacing, and motion tokens are unchanged.
+Live HTTP, version, and DOM markers passed; browser screenshot control timed out.
 
 CYWater Membership `0.6.5` also checks the actual membership end date before
 rendering an opted-in directory profile, so an expired member is hidden even
@@ -177,13 +234,13 @@ probe accepted a valid small PNG, rejected a PNG over 2 MB with
 `pmpro_upload_file_type_error`; all temporary files were removed.
 
 Event Tickets `5.29.1` is active on staging and is filtered by CYWater Core
-`0.5.2` to the existing `cyw_event` model only. It does not create a second
+`0.5.4` to the existing `cyw_event` model only. It does not create a second
 Events editor. A staging-only, self-cleaning acceptance probe created a
 temporary event, a free RSVP with capacity three, and one attendee; the public
 ticket form, capacity, attendee report, Editor content boundary, and cleanup
 all passed. A one-shot RSVP confirmation was accepted by the configured
 WordPress/Postmark transport and marked sent by Event Tickets; inbox/Postmark
-Activity confirmation remains a human check. Theme `0.5.8` scopes the third-party form to the existing body font,
+Activity confirmation remains a human check. Theme `0.6.0` scopes the third-party form to the existing body font,
 ink/teal palette, spacing, borders, and button language without changing the
 accepted public design. The temporary records were removed.
 
@@ -195,6 +252,65 @@ Stripe transactions; the association must accept that fee or buy Event Tickets
 Plus before paid-event launch. After connection, refund and duplicate-webhook
 acceptance must prove that a full event refund cancels only the matching
 registration and never an unrelated membership.
+
+On 2026-08-12 CYWater Core `0.5.7` created four non-destructive WordPress page
+drafts for Board review: Privacy Notice, Terms of Use, Billing/Cancellation/
+Refund, and Data Retention/Account Closure. Staging publishes them only as
+direct-link review surfaces with a not-approved notice and `noindex`,
+`nofollow`, and `noarchive`; they are not in navigation. Production creation
+remains draft-only. Later editorial work is preserved
+because setup creates only missing slugs. The association confirmed that its
+Stripe settlement bank account is present and that the named representative is
+authorized; no bank, birth-date, home-address, tax-ID, or credential value is
+stored in the repository.
+
+CYWater Logo Call `0.2.0` is an independent removable plugin attached only to
+the enabled `CYWater Logo Design Call 2026` staging event. The review schedule
+accepts one set per registered user from August 12 through September 12, 2026;
+the set contains an original logo and a full-association-name lockup, each
+capped at 5 MB. Every registered user has one final vote during the configured
+voting phase. Submission and voting audiences are independently configurable
+per Event as all registered users, all active individual members, or selected
+active membership levels; no permission decision changes membership state. Files
+are stored outside public uploads behind direct-access denial, and only a
+shortlisted lockup is streamable for voting. The selected-design reward is two
+years of CYWater Professional membership, recorded as a separately fulfilled
+administrator task rather than an automatic membership mutation. Non-selected
+rights remain with the entrant, while
+permanent use of a selected design requires a separate Board-approved written
+assignment or license. A self-cleaning staging QA covers registered-user and
+membership policies, one-entry/one-vote enforcement, phases, shortlisting,
+reward configuration, and protected
+storage; temporary users and entries were removed.
+
+Theme `0.6.5` renders the Call under a separate `Member Programs` Event section.
+The form shows its fields plus an eligibility explanation when unavailable; an
+eligible member receives a local lockup preview after choosing an image, before
+submission, and no file leaves the browser until submission. The Events archive
+now opens with an `Upcoming` horizontal card
+carousel and a category navigator for Upcoming, Annual Meetings, Annual
+Gathering, and Member Programs. Upcoming records also remain in their canonical
+category, so the carousel is discovery rather than a duplicate content model.
+The Logo Call detail page does not defer its explanatory content or submission
+module behind scroll-reveal animation. Its event summary is generated from the
+stored editorial content before plugin modules are appended, preventing the
+submission copy from appearing twice. File inputs, textarea, submit button,
+focus, hover, and disabled states reuse the accepted CYWater form language.
+Theme `0.6.7` keeps that same Event model but makes the Upcoming presentation
+more compact: cards use a smaller, concise layout; responsive previous/next
+controls sit at the two vertical sides of the card row; and a page indicator
+below the row tracks the current responsive group. If all Upcoming records fit,
+one active indicator remains and both arrows are disabled.
+Theme `0.6.8` supersedes the multi-card presentation with a single featured
+Event and dimmed previous/next side previews. Its arrows overlay the two sides,
+its indicators map one-to-one to Upcoming Event records, and it rotates every
+6.5 seconds unless hover, keyboard focus, document visibility, or reduced-motion
+preferences pause it. Keyboard arrows and touch swipes select the same records;
+no Event data is copied into a separate slider model.
+At the user's explicit direction, staging user `grups`
+was assigned Lifetime on 2026-08-12. Verification found no expiry, zero PMPro
+orders, and both submission and voting eligibility; no payment record, invoice,
+or receipt was fabricated.
 
 The staging administrator's notification email was corrected from the invalid
 staging-only address to `web@cywater.org` on 2026-08-03 and verified through
@@ -217,7 +333,9 @@ surface; it is not presented as an approved tax invoice. On 2026-08-09 a
 staging-only invoice QA passed six checks for the published route, exactly one
 PMPro invoice shortcode, Sandbox isolation, PMPro URL resolution, and existing
 completed/refunded order evidence. It created no order and exposed no member or
-payment identifier. A separate Stripe Billing Invoice workflow is not enabled.
+payment identifier. The local receipt sample uses the full organization name,
+`International Association of Contemporary Young Scholars in Water Sciences`,
+in its header. A separate Stripe Billing Invoice workflow is not enabled.
 
 CYWater Environment `0.5.4` is deployed on staging. It preserves configured
 SMTP sender names outside explicit local Mailpit mode, reports whether the

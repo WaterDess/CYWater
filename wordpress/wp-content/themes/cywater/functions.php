@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CYWATER_THEME_VERSION', '0.5.9' );
+define( 'CYWATER_THEME_VERSION', '0.6.11' );
 
 function cywater_theme_setup() {
 	add_theme_support( 'title-tag' );
@@ -63,9 +63,7 @@ function cywater_enqueue_assets() {
 	wp_enqueue_style( 'cywater-components', get_theme_file_uri( 'assets/css/components.css' ), array( 'cywater-base' ), cywater_asset_version( 'assets/css/components.css' ) );
 	wp_enqueue_style( 'cywater-pages', get_theme_file_uri( 'assets/css/pages.css' ), array( 'cywater-components' ), cywater_asset_version( 'assets/css/pages.css' ) );
 	wp_enqueue_style( 'cywater-wordpress', get_theme_file_uri( 'wordpress.css' ), array( 'cywater-pages' ), cywater_asset_version( 'wordpress.css' ) );
-	// Theme-owned, and deliberately outside assets/ so `npm run assets:sync`
-	// cannot overwrite it with the static site's copy. See wordpress.css.
-	wp_enqueue_script( 'cywater-main', get_theme_file_uri( 'main.js' ), array(), cywater_asset_version( 'main.js' ), true );
+	wp_enqueue_script( 'cywater-main', get_theme_file_uri( 'assets/js/main.js' ), array(), cywater_asset_version( 'assets/js/main.js' ), true );
 }
 add_action( 'wp_enqueue_scripts', 'cywater_enqueue_assets' );
 
@@ -117,6 +115,21 @@ function cywater_featured_image_url( $post_id = null, $size = 'cywater-card', $f
 		return cywater_asset_uri( 'img/' . ltrim( $legacy, '/' ) );
 	}
 	return $fallback ? cywater_asset_uri( 'img/' . ltrim( $fallback, '/' ) ) : '';
+}
+
+/**
+ * Build an event summary from stored editorial content only.
+ *
+ * Event-scoped plugins may append interactive modules through `the_content`.
+ * Those modules must never leak into archive cards or the detail-page lead.
+ */
+function cywater_event_summary( $post_id, $words = 44 ) {
+	$post = get_post( $post_id );
+	if ( ! $post ) {
+		return '';
+	}
+	$source = $post->post_excerpt ?: $post->post_content;
+	return wp_trim_words( wp_strip_all_tags( strip_shortcodes( $source ) ), $words, '…' );
 }
 
 function cywater_source_permalink( $source_id, $post_type = 'post' ) {

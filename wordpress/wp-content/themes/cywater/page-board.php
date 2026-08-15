@@ -48,8 +48,8 @@ while ( have_posts() ) :
 	<section class="section">
 		<div class="container container-narrow">
 			<div class="board-status callout" data-reveal>
-				<strong>Leadership update in progress.</strong>
-				<p>Current Board appointments have not yet been confirmed for publication. Individual names and affiliations will be added after formal review.</p>
+				<strong>Current Board leadership.</strong>
+				<p>The following appointments have been confirmed for public display. Affiliations and terms will be added only after separate confirmation.</p>
 			</div>
 			<div class="section-head" data-reveal style="margin-top:var(--sp-8)">
 				<span class="eyebrow">Bylaws structure</span>

@@ -115,8 +115,17 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
 - `plugins/cywater-core` owns public content models and initial import.
 - `plugins/cywater-membership` owns PMPro levels, profile fields, privacy, and
   the opt-in directory.
+- `plugins/cywater-partnerships` owns institutional expressions of interest,
+  Board/MOU review state, private applicant status links, and approved payment
+  handoff. A partner is not an individual member.
 - `plugins/cywater-environment` owns runtime configuration, local mail routing,
   readiness checks, and payment safety gates.
+- Every new or modified public form control—including file inputs, buttons,
+  selects, checkboxes, text fields, and textareas—must reuse the established
+  CYWater design tokens and interaction language. Do not expose an unstyled
+  browser-default or third-party control when an accepted CYWater equivalent
+  already exists; verify desktop, mobile, focus, hover, disabled, and error
+  states on staging before calling the surface complete.
 - Paid Memberships Pro owns accounts, orders, membership state, and Stripe
   gateway/webhook behavior. Do not implement a parallel transaction engine.
 - Playground on port `8890` is a disposable content/theme review environment;
@@ -146,11 +155,12 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   `127.0.0.1` URL as a Lenovo-laptop preview. No Playground service is expected
   to remain running after the review task.
 
-### Temporary Staging Snapshot (2026-08-09)
+### Temporary Staging Snapshot (2026-08-13)
 
 - Hostinger staging is available at `https://staging.cywater.org/` with the
-  CYWater `0.5.8` theme, CYWater Membership `0.8.0`, CYWater Environment
-  `0.5.4`, CYWater Core `0.5.2`, and Event Tickets `5.29.1`.
+  CYWater `0.6.8` theme, CYWater Membership `0.8.2`, CYWater Partnerships
+  `0.1.1`, CYWater Logo Call `0.2.0`, CYWater Environment `0.5.4`, CYWater Core `0.5.7`, and Event Tickets
+  `5.29.1`.
 - Dedicated Hostinger SSH access from the Lenovo workstation was established
   and independently verified with public-key authentication on 2026-08-02.
   The private key remains local and must never be copied into the repository.
@@ -162,9 +172,10 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   staging. Five malformed inactive CYWater/PMPro upload directories were
   removed on 2026-08-03 after exact-path and inactive-status verification;
   active plugin directories were untouched and plugin-list warnings cleared.
-- Theme `0.5.8` connects the existing Student, Professional, Lifetime, and
-  Partner cards to their PMPro checkout levels and prevents PMPro order/account
-  lists from inheriting the long-form article bullet and indentation rules.
+- Theme `0.6.2` connects the Student, Professional, and Lifetime cards to their
+  PMPro checkout levels and prevents PMPro order/account lists from inheriting
+  the long-form article bullet and indentation rules. Partner is no longer a
+  membership card or public PMPro checkout.
   The accepted typography, palette, imagery, motion, and responsive system are
   otherwise unchanged. It also fixes the observed 375px home-page overflow and
   gives the mobile menu and Membership FAQ standard accessible control
@@ -172,6 +183,110 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   Membership, sign-in, registration, and the logged-out checkout gate before
   the `0.5.7` typography-neutral wrapper follow-up, whose live HTML/CSS was
   verified structurally; authenticated cross-browser verification remains open.
+- Theme `0.6.2` also presents the full association name in the home Hero, keeps
+  its English mission headline to two deliberate desktop lines at a reduced
+  display size, and proportionally reduces the decorative water-drop outline.
+  It scopes the PMPro Account avatar to its requested `48px` size and styles
+  the native Member Profile file control with existing CYWater button tokens,
+  without changing avatar or upload behavior. Live HTML, asset versions, PHP
+  syntax, and CSS selectors passed; screenshot-level browser control timed out,
+  so final authenticated visual review remains open.
+- On 2026-08-10 the 2020 online Best Paper Award record was corrected from an
+  Annual Gathering to `Best Paper Award Ceremony` and rendered under the 2020
+  Award. The exact misclassified Event was moved to the WordPress trash rather
+  than permanently deleted. Events without verified photographs now use one
+  reusable two-line title/year visual, matching the accepted News/Award tile
+  language. The GitHub Pages original was not changed.
+- On 2026-08-10 the association confirmed the public Board records: President
+  Qiuhong Tang; President-Elect Lifeng Luo; Treasurer Zhenxing Zhang;
+  Directors-at-Large Ming Pan and Chaopeng Shen; Executive Director vacant.
+  Staging stores these in the existing editable Board-role model with public
+  display enabled. Affiliations and terms remain blank because they were not
+  supplied. The GitHub Pages original was not changed.
+- On 2026-08-10 institutional Partner was separated from individual membership.
+  The public `Become Our Partner` action now opens `Guide to Becoming a Partner`
+  and accepts only an expression of interest. CYWater Partnerships `0.1.0`
+  stores a private application with `Submitted`, `Board review`, `MOU pending`,
+  `Approved to pay`, `Declined`, and `Payment received` states. A salted-hash
+  access link shows the applicant only their own status; an HTTPS payment link
+  appears only after approval. The historical PMPro Partner level was preserved
+  but public signup was disabled, direct level-4 checkout redirects to the guide,
+  and Partner records are excluded from the member directory. A self-cleaning
+  staging QA passed application, token, pre-approval payment denial, approved
+  payment visibility, invalid-token rejection, and cleanup checks. Screenshot-
+  level browser QA timed out; live HTML, HTTP redirects, PHP lint, and desktop/
+  mobile CSS structure were verified instead.
+- On 2026-08-12 four editable policy pages were created and published on
+  staging solely as direct-link Board review surfaces:
+  Privacy Notice, Terms of Use, Billing/Cancellation/Refund, and Data Retention/
+  Account Closure. Each is marked `Draft for Board Review — Not approved or in
+  effect`, is absent from navigation, carries `noindex`, `nofollow`, and
+  `noarchive`, and is preserved from later setup overwrites. Production setup
+  still creates missing policy pages as drafts. CYWater confirmed that its Stripe settlement bank account is
+  present and its named representative is association-authorized; do not record
+  bank, birth-date, home-address, tax-ID, or credential values in Git.
+- CYWater Logo Call `0.2.0` is an independent removable plugin attached only to
+  the enabled 2026 Logo Design Call event. Submissions run August 12 through
+  September 12, 2026: one original/logo-lockup set (5 MB per file) per
+  registered user, and every registered user has one final vote. Accounts,
+  membership levels, Events, and participation permissions remain separate.
+  Each Event independently configures submission and voting for all registered
+  users, all active individual members, or selected active membership levels;
+  permission checks never mutate membership state. Protected files live outside
+  public uploads; only shortlisted lockups can render during voting. The
+  selected-design reward is two years of Professional membership, tracked as a
+  separate administrator fulfillment item rather than granted automatically.
+  Permanent use still requires a separate Board-approved written assignment or
+  license. A self-cleaning staging QA covers both registered-user and
+  membership-based policies and removes its temporary users and entries.
+  Disabling the plugin removes its UI without changing the theme, navigation,
+  event, or retained review records. Theme `0.6.3` gives
+  this non-conference Event a separate `Member programs` archive section.
+  The submission form remains visible with an eligibility explanation when
+  disabled, and an eligible member receives a browser-local full-name-lockup
+  preview before submitting; no file leaves the browser until submission.
+- Theme `0.6.6` makes the Logo Call's core content and submission module visible
+  without waiting for scroll-reveal animation. Its event summary now reads only
+  stored editorial content, so plugin-appended submission copy is not duplicated
+  or truncated into the lead. Logo Call file inputs, textarea, submit action,
+  focus, hover, and disabled states reuse the accepted CYWater form controls.
+  Anonymous live HTML had zero reveal markers and one invitation paragraph;
+  an authenticated, read-only Lifetime-user render exposed both required file
+  fields, local preview, and enabled submit action without uploading a file.
+- On 2026-08-12, at the user's explicit direction, staging user `grups` was
+  assigned the highest individual level, Lifetime. The server verified level
+  ID 3, no end date, zero PMPro orders, and Logo Call submit/vote eligibility.
+  No Stripe payment, PMPro order, invoice, or receipt was fabricated. Partner
+  was not assigned because institutional Partner is not a membership level.
+- Theme `0.6.4` and CYWater Partnerships `0.1.1` remove the visually detached
+  annual-contribution card from `Guide to Becoming a Partner`. Partnership
+  recognition is now one editorial block with a thin divider and a responsive
+  `$1,000 per year` information row beside the Board/MOU condition. It reuses
+  the accepted typography, spacing, line, and color tokens and becomes a simple
+  vertical flow on narrow screens. Live HTTP, version, and DOM markers passed;
+  screenshot-level browser control timed out, so final visual review remains open.
+- Theme `0.6.5` reorganizes the Events archive into Upcoming, Annual Meetings,
+  Annual Gathering, and Member Programs. A sticky desktop category navigator
+  becomes a compact horizontal navigator on narrow screens. Upcoming events use
+  a restrained multi-card horizontal carousel with touch scrolling and scroll
+  snapping, while each record remains in its
+  canonical category. This makes the removable Logo Design Call discoverable
+  without hard-coding it into permanent primary navigation. Live HTML, asset,
+  mobile CSS, PHP syntax, cache, and no-secret marker checks passed; browser
+  screenshot control timed out, so final human visual review remains open.
+- Theme `0.6.7` compacts the Upcoming cards so the archive shows as many events
+  per row as the viewport permits. Previous/next controls now sit at the
+  vertical sides of the carousel rather than in the section heading, and a
+  responsive page indicator below the cards shows the current group. One-page
+  layouts retain one active indicator and disable both arrows; narrower layouts
+  automatically expose additional groups without duplicating Event records.
+- Theme `0.6.8` replaces the multi-card Upcoming strip with one editorial
+  feature carousel: the current Event is the only fully presented card, while
+  the previous and next Events appear as dimmed side previews. Side-overlay
+  chevrons, one indicator per Event, 6.5-second rotation, hover/focus pause,
+  keyboard arrows, touch swipes, and reduced-motion handling follow the
+  interaction structure requested from the Steam reference while retaining
+  CYWater typography, color, spacing, radius, and Event data ownership.
 - Stripe Sandbox was connected through PMPro on 2026-08-02. A server-side
   presence-only check confirmed the Sandbox Connect values without reading or
   exposing them, and PMPro's own status check reports the Sandbox webhook as
@@ -195,7 +310,12 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   displayed card, Apple Pay, Google Pay, and Alipay but not WeChat Pay. Stripe
   dynamically filters methods by checkout eligibility. Live payment remains
   disabled.
-- CYWater Membership `0.8.0` implements one current account-first path. A
+- CYWater Membership `0.8.3` implements rolling annual Student and Professional
+  terms: every successful full-price payment starts a new one-year term on its
+  payment date, with no proration or December 31 boundary. Lifetime remains
+  non-expiring. Staging had no active Student or Professional membership to
+  migrate when this policy changed on 2026-08-13.
+- The same plugin retains the current account-first path: a
   logged-out checkout redirects to the PMPro sign-in page; that page links to a
   dedicated `/member-register/` account form. New accounts sign in but must
   complete a 24-hour one-time email-verification link before checkout. Mail uses
@@ -212,7 +332,7 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   intercepted and its disposable user removed. A separate real message was
   accepted by the configured WordPress/Postmark transport, but Workspace inbox
   receipt remains a human check.
-- CYWater Membership `0.8.0` adds a read-only administrator record on each
+- CYWater Membership `0.8.2` adds a read-only administrator record on each
   WordPress user profile. It summarizes account creation/last sign-in, email
   verification, required-profile completion, directory privacy, active level
   and expiry, and account-closure requests. It links to PMPro Members and Orders
@@ -227,6 +347,13 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   revoke another account's sessions, and CYWater profile/privacy metadata is
   integrated with WordPress core export/erasure while identity and transaction
   records remain retained for policy review.
+- CYWater Membership `0.8.2` supplies a local HTTPS default avatar for
+  WordPress avatar surfaces, including the logged-in admin bar, so an external
+  Gravatar failure cannot leave a broken image. The current user's valid
+  uploaded profile photo takes priority; another member's photo is used only
+  when that member has opted into the public directory and explicitly exposed
+  the profile-photo field. Staging `get_avatar_url()` and `get_avatar()` returned
+  the local SVG, whose HTTPS request returned HTTP 200 with `image/svg+xml`.
 - The protected PMPro membership-order page is the Sandbox receipt surface, not
   an approved tax invoice. A six-check staging invoice QA passed route,
   shortcode, Sandbox, PMPro URL, and completed/refunded-order evidence checks
@@ -275,11 +402,11 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   existing Administrator remain open. On 2026-08-03 MFA was explicitly
   deferred because no association-controlled phone, tablet, security key, or
   managed authenticator exists; do not make a private device the sole factor.
-- Event Tickets `5.29.1` is active and CYWater Core `0.5.2` limits it to the
+- Event Tickets `5.29.1` is active and CYWater Core `0.5.4` limits it to the
   existing `cyw_event` content model. A staging-only probe passed free RSVP,
   capacity, attendee reporting, public form output, Editor content boundaries,
   confirmation-mail handoff to the configured WordPress/Postmark transport,
-  and automatic cleanup. Theme `0.5.8` scopes its form to the accepted design
+  and automatic cleanup. Theme `0.6.0` scopes its form to the accepted design
   tokens without changing the public visual system. Paid event checkout remains
   disabled until Event Tickets is separately connected to the association's
   existing Stripe Sandbox and its success/decline/cancel/refund/duplicate/
@@ -391,7 +518,8 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
 
 - `index.html` - home
 - `about/index.html` - association purpose and history
-- `about/board.html` - governance roles; names remain unconfirmed
+- `about/board.html` - static GitHub Pages governance reference; names remain
+  unconfirmed there because the original was not changed
 - `about/bylaws.html` - full nine-article Bylaws and document download
 - `membership/index.html` - eligibility, dues, partnerships, and conference fees
 - `membership/dashboard.html` - explicitly non-functional member mockup
@@ -419,16 +547,26 @@ official CYWater records.
 Key requirements:
 
 - Mission and governance language should follow the supplied Bylaws.
-- Board names are not confirmed; publish roles and status only.
+- Board names confirmed for WordPress publication on 2026-08-10: President
+  Qiuhong Tang; President-Elect Lifeng Luo; Treasurer Zhenxing Zhang;
+  Directors-at-Large Ming Pan and Chaopeng Shen; Executive Director vacant.
 - The 2026 Annual Meeting is in Nanjing, China, October 16-18; registration is
   expected to open in August.
 - Events are separated into Annual Meetings and the Annual Gathering.
-- Annual Gathering records currently include 2013, 2017, 2020, 2022, and 2024.
+- Annual Gathering records currently include 2013, 2017, 2022, and 2024. The
+  2020 online record is a Best Paper Award Ceremony and belongs under Awards.
 - Awards replace Journal in navigation and cover records from 2012 onward.
 - News is separated into Opportunities and Spotlights.
-- Membership uses calendar-year terms and the supplied dues/fee schedules.
+- Student and Professional membership each run for one full year from the
+  successful payment date, without proration. Lifetime remains non-expiring;
+  the supplied dues/fee schedules otherwise remain authoritative.
 - Mailing address: `202 E. Green St. Suite 2, Champaign, IL 61820, USA`.
-- Contact email is pending confirmation; never invent an address.
+- The confirmed public contact email is `contact@cywater.org`. Use
+  `membership@cywater.org` for member support and `billing@cywater.org` for
+  billing, renewals, and invoices.
+- On 2026-08-14 the WordPress Contact page and its editable contact-email field
+  were updated on staging to these confirmed addresses; the former
+  `To be confirmed` and channel-verification copy was removed.
 
 Annual Gathering photo sources supplied by a CYWater teacher:
 
@@ -460,17 +598,23 @@ award/COP27 entries use title-based visuals until matching source photos are
 available. Events use the supplied year-matched Annual Meeting and Annual
 Gathering archives.
 
-Membership dues are presented with the four-card visual structure adapted from
-the original prototype. Preserve the current confirmed categories and prices:
-Professional `$70/year`, Student `$20/year`, Lifetime `$700`, and Partner
-`$1,000/year`. Display them in ascending-price order, with Professional marked
-as the Standard option in the second position. Each card has its own direct
-Join action; there is no separate selection-summary step. No card is selected
-on initial load. Activating a Join action moves the teal selection accent to
-that card and shows the preview limitation without implying that an application
-or payment was processed. Professional uses the teal accent action; the other
-plans use restrained outline actions that turn teal on hover or activation.
-Do not revert to the prototype's old categories or amounts.
+Membership dues use three individual cards adapted from the original prototype:
+Student `$20/year`, Professional `$70/year`, and Lifetime `$700`. Display them
+in ascending-price order, with Professional marked as the Standard option in the
+second position. Each card has its own direct Join action; there is no separate
+selection-summary step. No card is selected on initial load. Professional uses
+the teal accent action; the other individual plans use restrained outline
+actions that turn teal on hover or activation.
+
+Institutional Partner is not an individual membership and must not appear in
+the membership-card grid or public PMPro level list. Present the current
+`$1,000/year` contribution under `Sponsors and partners` with the action
+`Become Our Partner`. That action opens `Guide to Becoming a Partner` and an
+expression-of-interest form. Payment is forbidden until Board approval and MOU
+completion; only then may an administrator attach an association-controlled
+HTTPS Stripe invoice or payment link to the private application status page.
+Approved website/logo recognition follows the MOU and must not imply product
+endorsement.
 
 Conference fees use a four-column matrix with separate Abstract, Early, and
 Standard fee columns. Build it from the established `.table-wrap` and `.table`
@@ -562,7 +706,8 @@ describe sandbox activity as a real transaction.
 - Add a backend or build tooling to `main`/`gh-pages`
 - Replace the visual system wholesale
 - Reintroduce bilingual support
-- Publish Board names or an unverified contact email
+- Publish or change Board names without explicit association confirmation, or
+  publish an unverified contact email
 - Remove `.nojekyll`
 - Delete user-created research/source files
 - Move the `v0.1-prototype` tag

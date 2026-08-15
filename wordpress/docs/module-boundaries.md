@@ -34,6 +34,8 @@ Event Tickets                 CYWater Membership <--+
 | `plugins/cywater-core` | News import, Events, Awards, Board roles, editorial metadata | Checkout, member profiles, CSS |
 | Event Tickets | Tickets and RSVPs attached only to `cyw_event`, capacity, attendees, event-order state | Membership levels, PMPro orders, CYWater content types, duplicated event records |
 | `plugins/cywater-membership` | PMPro levels, professional profile fields, privacy opt-in, directory, read-only admin projection | Stripe SDK, webhook endpoint, theme layout, duplicate member/order storage |
+| `plugins/cywater-partnerships` | Institutional expressions of interest, private applicant status, Board/MOU workflow, approved external payment-link handoff | Individual membership, PMPro orders, Stripe credentials, automatic Board approval |
+| `plugins/cywater-logo-call` | Temporary event-scoped submissions, protected design files, shortlisting, configurable submission/voting audiences, reward-fulfillment status | Theme/navigation, account or membership state, payment state, permanent IP transfer |
 | `plugins/cywater-forum` | Forum article type, categories/topics, author endorsement, forum authorship roles, discussion scoping, forum policy parameters | Membership state, payment, secrets, core content types, theme layout |
 | `plugins/cywater-environment` | Environment reads, Mailpit routing, test/live safety gates, readiness report, conservative response headers | Membership rules, content rendering, full CSP policy |
 | Paid Memberships Pro | Registration, orders, membership activation, renewal/expiry mechanics, Stripe gateway/webhook | CYWater content and visual design |
@@ -72,17 +74,34 @@ Event Tickets                 CYWater Membership <--+
 10. Free RSVP and paid event tickets share the same event record, but paid
     checkout stays disabled until the association's existing Stripe Sandbox is
     connected to Event Tickets and the refund/duplicate-webhook matrix passes.
-11. Comments exist only on forum articles. No other post type may open
+11. Partner is not a member. New institutional partner applications live only
+    in `cywater-partnerships`; no payment link may render before Board approval
+    and MOU completion. The historical PMPro Partner level is retained only for
+    existing records with signup disabled.
+12. Logo Call is a removable event module, not a permanent theme feature.
+    WordPress accounts, PMPro membership state, Events, and participation
+    permissions remain separate. Each enabled `cyw_event` independently chooses
+    whether submission and voting are open to all registered users, all active
+    individual members, or selected active membership levels. The module reads
+    PMPro only when a membership-based rule is selected, stores no duplicate
+    account/member/order data, and never changes membership as a side effect of
+    a permission decision. Deactivation removes the UI without deleting the
+    event or review records. Selection alone does not transfer intellectual
+    property or grant the configured reward; both rights and reward fulfillment
+    remain explicit administrator-reviewed steps. These temporary Event rules
+    must not become the authority for Board elections or other governance votes;
+    governance eligibility belongs in a separately approved governance module.
+13. Comments exist only on forum articles. No other post type may open
     discussion, and the restriction is enforced by filter rather than by
     convention.
-12. Author archives stay closed by default. `cywater-environment` owns that
+14. Author archives stay closed by default. `cywater-environment` owns that
     protection and exposes `cywater_public_author_archive_allowed`; a module may
     open one account that has actually published, never the archive wholesale.
-13. The forum's AI seam is declared and dormant. No outbound call may appear in
+15. The forum's AI seam is declared and dormant. No outbound call may appear in
     it until the association approves the feature; `npm run validate` enforces
     this. When implemented, the reaction renders client-side only and must fail
     silently, leaving no visible trace of the feature.
-14. Forum authorship policy lives in versioned defaults plus one administrator
+16. Forum authorship policy lives in versioned defaults plus one administrator
     option. Publishing prerequisites are evaluated per request, not frozen into
     a role, so a lapsed membership stops new publishing without destroying an
     author's drafts or existing articles.

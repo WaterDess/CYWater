@@ -224,7 +224,12 @@ final class CYWater_Membership_Privacy {
 
 		$now    = current_time( 'timestamp' );
 		$levels = (array) pmpro_getMembershipLevelsForUser( $user_id );
+		$ids    = (array) get_option( 'cywater_membership_level_ids', array() );
+		$legacy_partner_id = absint( $ids['partner_legacy'] ?? ( $ids['partner'] ?? 0 ) );
 		foreach ( $levels as $level ) {
+			if ( $legacy_partner_id && $legacy_partner_id === (int) $level->id ) {
+				continue;
+			}
 			$enddate = isset( $level->enddate ) ? (int) $level->enddate : 0;
 			if ( 0 === $enddate || $enddate > $now ) {
 				return true;

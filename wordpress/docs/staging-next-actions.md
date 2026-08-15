@@ -1,5 +1,23 @@
 # Staging Next Actions
 
+## Board review pack added 2026-08-12
+
+The four launch-policy drafts are in WordPress under **Pages → Drafts** and are
+not active public policy. Review and approve legal copy before changing their
+status or adding footer/navigation links. The temporary Logo Call review is at
+`/events/logo-design-call-2026/`; its event dates, shortlisting, and status are
+editable in the existing Events administration. Submitted designs appear under
+**Events → Logo submissions**. Deactivating `CYWater Logo Call` removes the
+module without changing the theme.
+
+The Logo Call event editor independently controls **Who may submit** and **Who
+may vote**. Each action can target all registered users, all active individual
+members, or selected active membership levels. The 2026 Call uses all
+registered users for both actions and offers the selected entrant two years of
+Professional membership. Marking an entry selected creates a pending reward
+fulfillment record; it does not silently change PMPro membership or create a
+payment/order.
+
 The visual and content baseline is accepted at `staging.cywater.org`. Keep
 production traffic, live payment, and production mail disabled while completing
 the following gates in order.
@@ -82,15 +100,17 @@ renewal/recurring failure, and expiry paths passed. Live mode remains closed.
 
 ## 5. Membership Acceptance
 
-- Verify Student, Professional, Lifetime, and Partner levels, prices, expiry,
+- Verify Student, Professional, and Lifetime levels, prices, expiry,
   registration fields, profile privacy controls, and opt-in directory behavior.
+- Verify the separate Partner expression-of-interest, Administrator-only
+  Board/MOU stages, private status link, and approved-only payment handoff.
 - Test administrator, membership manager, editor, member, expired member, and
   anonymous-user permissions.
 - Administrator, editor, ordinary-member, active/private/expired-directory,
   field allowlist, email exclusion, and expiration action boundaries passed on
   2026-08-03. The Membership Manager role remains unavailable until the
   official licensed PMPro Premium Add On is installed.
-- Confirm the approved refund, renewal, calendar-year, privacy, and retention
+- Confirm the approved refund, renewal, rolling annual-term, privacy, and retention
   policies before treating the workflow as release-ready.
 
 ## 6. Event Registration

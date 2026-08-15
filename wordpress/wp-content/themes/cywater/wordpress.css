@@ -133,6 +133,59 @@
   margin-bottom: var(--sp-4);
 }
 
+/* PMPro account identity: keep the requested 48px avatar at its true size. */
+#pmpro_account-profile .pmpro_heading-with-avatar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+#pmpro_account-profile .pmpro_heading-with-avatar .avatar {
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Retain the native, accessible file input while matching CYWater controls. */
+#pmpro_member_profile_edit .pmpro_form_input-file {
+  width: 100%;
+  padding: var(--sp-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--white);
+  color: var(--ink-soft);
+  font-size: var(--fs-sm);
+}
+
+#pmpro_member_profile_edit .pmpro_form_input-file::file-selector-button {
+  margin-right: var(--sp-3);
+  padding: 0.7rem 1.2rem;
+  border: 1.5px solid var(--ink);
+  border-radius: 100px;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+
+#pmpro_member_profile_edit .pmpro_form_input-file:hover::file-selector-button,
+#pmpro_member_profile_edit .pmpro_form_input-file:focus-visible::file-selector-button {
+  background: var(--ink);
+  color: var(--white);
+}
+
+#pmpro_member_profile_edit .pmpro_form_input-file:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+}
+
 .cywater-register {
   max-width: 38rem;
   padding: var(--sp-6);
@@ -170,37 +223,6 @@
 .faq-a { max-height: 0; overflow: hidden; transition: max-height var(--dur) var(--ease); }
 .faq-item.is-open .faq-a { max-height: 300px; }
 .faq-a p { padding-bottom: var(--sp-4); font-size: var(--fs-sm); }
-
-/* ---------------------------------------------------------------------------
-   Rules that must survive `npm run assets:sync`.
-
-   The sync step deletes this theme's assets/css and re-copies the static site's
-   stylesheets over it, so anything WordPress-only that is written into the
-   mirrored pages.css is destroyed on the next `npm run prepare`. These rules
-   previously lived there and were lost that way. They belong here, in the one
-   theme stylesheet the sync never overwrites.
-
-   PMPro renders order and account tables as .pmpro_list lists inside .prose.
-   The article bullet and indent are wrong for them, so they are reset rather
-   than scoped out of the mirrored rule.
-   --------------------------------------------------------------------------- */
-
-.prose ul.pmpro_list li {
-  padding-left: 0;
-  margin-bottom: 0;
-  color: inherit;
-}
-
-.prose ul.pmpro_list li::before {
-  content: none;
-}
-
-@media (max-width: 720px) {
-  .latest-head {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-}
 
 /* ---------------------------------------------------------------------------
    Forum

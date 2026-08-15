@@ -68,6 +68,7 @@ $render_paper = static function ( $paper ) {
 				$best['journal'] = get_post_meta( get_the_ID(), '_cyw_journal', true ) ?: ( $best['journal'] ?? '' );
 				$article_id      = get_post_meta( get_the_ID(), '_cyw_article_id', true ) ?: ( $record['articleId'] ?? '' );
 				$article_url     = $article_id ? cywater_source_permalink( 'news:' . $article_id ) : '';
+				$ceremony        = is_array( $record['ceremony'] ?? null ) ? $record['ceremony'] : array();
 				?>
 				<article class="award-year" id="award-<?php echo esc_attr( $year ); ?>" data-reveal>
 					<div class="award-year-label"><?php echo esc_html( $year ); ?></div>
@@ -80,7 +81,22 @@ $render_paper = static function ( $paper ) {
 						<?php else : ?>
 							<p class="award-pending"><?php echo esc_html( $record['note'] ?? 'Award record pending confirmation.' ); ?></p>
 						<?php endif; ?>
-						<?php if ( $article_url ) : ?><a class="link" href="<?php echo esc_url( $article_url ); ?>">Read award announcement</a><?php endif; ?>
+						<?php if ( $ceremony ) : ?>
+							<a class="event-archive-row" href="<?php echo esc_url( $article_url ?: get_permalink() ); ?>">
+								<span class="event-archive-media">
+									<img src="<?php echo esc_url( cywater_featured_image_url( get_the_ID(), 'cywater-card', $ceremony['image'] ?? '' ) ); ?>" alt="<?php echo esc_attr( $ceremony['imageAlt'] ?? $ceremony['title'] ?? '' ); ?>">
+								</span>
+								<span class="event-archive-copy">
+									<span class="badge badge-mute">Award ceremony</span>
+									<h3><?php echo esc_html( $ceremony['title'] ?? 'Best Paper Award Ceremony' ); ?></h3>
+									<span class="meta"><?php echo esc_html( $ceremony['date'] ?? '' ); ?><?php if ( ! empty( $ceremony['location'] ) ) : ?> &middot; <?php echo esc_html( $ceremony['location'] ); ?><?php endif; ?></span>
+									<span class="event-archive-lead"><?php echo esc_html( $ceremony['lead'] ?? '' ); ?></span>
+								</span>
+								<span class="link">View details</span>
+							</a>
+						<?php elseif ( $article_url ) : ?>
+							<a class="link" href="<?php echo esc_url( $article_url ); ?>">Read award announcement</a>
+						<?php endif; ?>
 					</div>
 				</article>
 			<?php endwhile; wp_reset_postdata(); ?>

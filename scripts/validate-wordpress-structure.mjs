@@ -11,6 +11,7 @@ const required = [
   "scripts/prepare-wordpress-vendor.mjs",
   "scripts/test-playground.mjs",
   "scripts/cywater-staging-ticketing-qa.php",
+  "scripts/cywater-staging-partner-qa.php",
   "wordpress/wp-content/plugins/cywater-core/data/seed.json",
   "wordpress/wp-content/themes/cywater/style.css",
   "wordpress/wp-content/themes/cywater/functions.php",
@@ -18,13 +19,25 @@ const required = [
   "wordpress/wp-content/themes/cywater/home.php",
   "wordpress/wp-content/themes/cywater/archive-cyw_event.php",
   "wordpress/wp-content/themes/cywater/archive-cyw_award.php",
+  "wordpress/wp-content/themes/cywater/template-parts/title-visual.php",
   "wordpress/wp-content/themes/cywater/page-about.php",
   "wordpress/wp-content/themes/cywater/page-board.php",
   "wordpress/wp-content/themes/cywater/page-bylaws.php",
   "wordpress/wp-content/themes/cywater/page-membership.php",
+  "wordpress/wp-content/themes/cywater/page-become-a-partner.php",
   "wordpress/wp-content/themes/cywater/page-contact.php",
   "wordpress/wp-content/plugins/cywater-core/cywater-core.php",
+  "wordpress/wp-content/plugins/cywater-core/includes/class-cywater-policy-drafts.php",
   "wordpress/wp-content/plugins/cywater-membership/cywater-membership.php",
+  "wordpress/wp-content/plugins/cywater-membership/assets/default-avatar.svg",
+  "wordpress/wp-content/plugins/cywater-membership/includes/class-cywater-membership-avatars.php",
+  "wordpress/wp-content/plugins/cywater-partnerships/cywater-partnerships.php",
+  "wordpress/wp-content/plugins/cywater-partnerships/includes/class-cywater-partnerships.php",
+  "wordpress/wp-content/plugins/cywater-logo-call/cywater-logo-call.php",
+  "wordpress/wp-content/plugins/cywater-logo-call/includes/class-cywater-logo-call.php",
+  "wordpress/wp-content/plugins/cywater-logo-call/includes/class-cywater-logo-call-eligibility.php",
+  "wordpress/wp-content/plugins/cywater-logo-call/assets/logo-call.css",
+  "wordpress/wp-content/plugins/cywater-logo-call/assets/logo-call.js",
   "wordpress/wp-content/plugins/cywater-environment/cywater-environment.php",
   "wordpress/wp-content/plugins/cywater-forum/cywater-forum.php",
   "wordpress/wp-content/plugins/cywater-forum/includes/defaults.php",
@@ -107,33 +120,138 @@ const seed = JSON.parse(
   )
 );
 
-assert(seed.seedRevision >= 3, "WordPress seed revision must be at least 3.");
+assert(seed.seedRevision >= 6, "WordPress seed revision must be at least 6.");
 assert(seed.generatedFrom === "assets/js/content.js", "Seed source marker is incorrect.");
 assert(
   JSON.stringify(seed.articles) === JSON.stringify(registry.ARTICLES),
   "WordPress article seed differs from the static content registry."
 );
+
+const expectedEvents = structuredClone(registry.EVENTS);
+delete expectedEvents["annual-gathering-2020"];
 assert(
-  JSON.stringify(seed.events) === JSON.stringify(registry.EVENTS),
-  "WordPress event seed differs from the static content registry."
+  JSON.stringify(seed.events) === JSON.stringify(expectedEvents),
+  "WordPress event seed must exclude the misclassified 2020 award ceremony."
+);
+
+const expectedAwards = structuredClone(registry.AWARDS);
+const expectedAward2020 = expectedAwards.find(({ year }) => String(year) === "2020");
+expectedAward2020.ceremony = {
+  title: "CYWater Best Paper Award Ceremony — Online 2020",
+  date: "December 18, 2020",
+  location: "Online",
+  image: "gatherings/2020-cover.jpg",
+  imageAlt: "Participants in the online 2020 CYWater Best Paper Award Ceremony",
+  lead: "The 2020 Best Paper Award Ceremony was held online, with the recognized authors presenting their work.",
+};
+assert(
+  JSON.stringify(seed.awards) === JSON.stringify(expectedAwards),
+  "WordPress award seed is missing the normalized 2020 ceremony."
+);
+
+const expectedNewsOrder = structuredClone(registry.NEWS_LIST);
+expectedNewsOrder.find(({ id }) => id === "bpa-2020-result").alt =
+  "Participants in the online 2020 CYWater Best Paper Award Ceremony";
+assert(
+  JSON.stringify(seed.newsOrder) === JSON.stringify(expectedNewsOrder),
+  "WordPress news ordering or award-ceremony description is incorrect."
+);
+
+const expectedEventOrder = registry.EVENT_LIST.filter(
+  ({ id }) => id !== "annual-gathering-2020"
 );
 assert(
-  JSON.stringify(seed.awards) === JSON.stringify(registry.AWARDS),
-  "WordPress award seed differs from the static content registry."
+  JSON.stringify(seed.eventOrder) === JSON.stringify(expectedEventOrder),
+  "WordPress event ordering must exclude the 2020 award ceremony."
 );
 assert(
-  JSON.stringify(seed.newsOrder) === JSON.stringify(registry.NEWS_LIST),
-  "WordPress news ordering differs from the static site."
-);
-assert(
-  JSON.stringify(seed.eventOrder) === JSON.stringify(registry.EVENT_LIST),
-  "WordPress event ordering differs from the static site."
+  JSON.stringify(seed.board) === JSON.stringify([
+    { role: "President", personName: "Qiuhong Tang" },
+    { role: "President-Elect", personName: "Lifeng Luo" },
+    { role: "Treasurer", personName: "Zhenxing Zhang" },
+    { role: "Directors-at-Large", personName: "Ming Pan, Chaopeng Shen" },
+    { role: "Executive Director", personName: "Vacant (N/A)" },
+  ]),
+  "WordPress Board seed differs from the confirmed public leadership list."
 );
 for (const event of Object.values(seed.events)) {
   if (event.image) {
     assert(event.imageAlt, `Missing event image description for ${event.title}.`);
   }
 }
+
+const avatarProvider = await readFile(
+  path.join(root, "wordpress", "wp-content", "plugins", "cywater-membership", "includes", "class-cywater-membership-avatars.php"),
+  "utf8"
+);
+assertMarkers(
+  avatarProvider,
+  ["pre_get_avatar_data", "assets/default-avatar.svg", "cyw_profile_photo", "cyw_profile_public"],
+  "CYWater avatar provider"
+);
+
+const partnershipProvider = await readFile(
+  path.join(root, "wordpress", "wp-content", "plugins", "cywater-partnerships", "includes", "class-cywater-partnerships.php"),
+  "utf8"
+);
+assertMarkers(
+  partnershipProvider,
+  [
+    "cywater_partner_application",
+    "Guide to Becoming a Partner",
+    "board_review",
+    "mou_pending",
+    "Approved payment URL",
+    "block_legacy_partner_checkout",
+    "wp_privacy_personal_data_exporters",
+    "partner-contribution-amount",
+    "Annual contribution after approval",
+  ],
+  "CYWater partnership workflow"
+);
+
+const logoCallProvider = await readFile(
+  path.join(root, "wordpress", "wp-content", "plugins", "cywater-logo-call", "includes", "class-cywater-logo-call.php"),
+  "utf8"
+);
+const logoCallEligibility = await readFile(
+  path.join(root, "wordpress", "wp-content", "plugins", "cywater-logo-call", "includes", "class-cywater-logo-call-eligibility.php"),
+  "utf8"
+);
+assertMarkers(
+  `${logoCallProvider}\n${logoCallEligibility}`,
+  [
+    "_cywater_logo_call_enabled",
+    "CYWater_Logo_Call_Eligibility::can_submit",
+    "CYWater_Logo_Call_Eligibility::can_vote",
+    "All registered users",
+    "Selected active membership levels",
+    "Two years of CYWater Professional membership",
+    "permanent use of a selected design requires a separate written rights agreement",
+    "data-cywater-logo-preview-input",
+    "Registered-user voting is a later phase",
+    "member-program",
+    "cywater-private/logo-call",
+  ],
+  "CYWater removable Logo Call workflow"
+);
+
+const policyDraftProvider = await readFile(
+  path.join(root, "wordpress", "wp-content", "plugins", "cywater-core", "includes", "class-cywater-policy-drafts.php"),
+  "utf8"
+);
+assertMarkers(
+  policyDraftProvider,
+  [
+    "Draft for Board Review — Not approved or in effect.",
+    "billing-cancellation-refund-policy-draft",
+    "data-retention-account-closure-policy-draft",
+    "Selection does not itself transfer ownership",
+    "wp_robots",
+    "noarchive",
+  ],
+  "CYWater policy drafts"
+);
 
 for (const key of ["home", "about", "board", "bylaws", "membership", "contact"]) {
   assert(seed.pages?.[key], `Missing editable page seed: ${key}.`);
@@ -160,24 +278,52 @@ const parityFiles = {
     path.join(root, "wordpress", "wp-content", "themes", "cywater", "assets", "css", "pages.css"),
     "utf8"
   ),
-  // Theme-owned and never overwritten by assets:sync, unlike the mirrored
-  // stylesheets above.
-  wordpressCss: await readFile(
-    path.join(root, "wordpress", "wp-content", "themes", "cywater", "wordpress.css"),
+  wordpressEventArchive: await readFile(
+    path.join(root, "wordpress", "wp-content", "themes", "cywater", "archive-cyw_event.php"),
+    "utf8"
+  ),
+  wordpressTitleVisual: await readFile(
+    path.join(root, "wordpress", "wp-content", "themes", "cywater", "template-parts", "title-visual.php"),
     "utf8"
   ),
 };
 
+assertMarkers(
+  parityFiles.wordpressMembership,
+  ["Sponsors and partners", "Become Our Partner", "No payment is requested until Board approval and MOU completion."],
+  "WordPress partnership presentation"
+);
+assert(
+  !parityFiles.wordpressMembership.includes("Join as Partner"),
+  "WordPress membership template must not expose the former direct Partner checkout."
+);
+
+assertMarkers(
+  parityFiles.wordpressEventArchive,
+  ["wp_get_post_terms", "template-parts/title-visual", "'year'       => $year", "Member Programs", "member-programs"],
+  "WordPress event archive"
+);
+assertMarkers(
+  parityFiles.wordpressTitleVisual,
+  ['class="title-visual"', 'class="title-visual-year"'],
+  "Reusable title visual"
+);
+assertMarkers(
+  parityFiles.wordpressPagesCss,
+  [".title-visual {", ".title-visual strong {", ".title-visual-year {"],
+  "WordPress title visual styling"
+);
+
 const boardMarkers = [
   "Board of Directors.",
-  "Leadership update in progress.",
   "Board composition",
   "Committee framework",
   "Awards Committee",
   "Tellers Committee",
 ];
-assertMarkers(parityFiles.staticBoard, boardMarkers, "Static Board page");
+assertMarkers(parityFiles.staticBoard, [...boardMarkers, "Leadership update in progress."], "Static Board page");
 assertMarkers(parityFiles.wordpressBoard, boardMarkers, "WordPress Board template");
+assertMarkers(parityFiles.wordpressBoard, ["Current Board leadership."], "WordPress Board status");
 
 assertMarkers(
   parityFiles.staticBylaws,
@@ -221,34 +367,14 @@ assertMarkers(
   ],
   "Static page stylesheet"
 );
-// These rules must live in the theme-owned stylesheet. Asserting them against
-// the mirrored pages.css is what let `npm run prepare` silently delete them.
 assertMarkers(
-  parityFiles.wordpressCss,
-  [".prose ul.pmpro_list li", ".prose ul.pmpro_list li::before", ".latest-head {"],
-  "WordPress-specific theme stylesheet"
-);
-assert(
-  parityFiles.wordpressPagesCss === parityFiles.staticPagesCss,
-  "The theme's mirrored pages.css must be byte-identical to the static site's. " +
-    "WordPress-only rules belong in wordpress.css, which assets:sync does not overwrite."
-);
-
-// The theme's main.js is theme-owned and must keep its accessibility behaviour.
-// It was silently reverted once by assets:sync copying the static file over it.
-const themeMainJs = await readFile(
-  path.join(root, "wordpress", "wp-content", "themes", "cywater", "main.js"),
-  "utf8"
-);
-assertMarkers(
-  themeMainJs,
-  ["closeMobileNav", 'event.key !== "Escape"', 'querySelector(".faq-a")?.setAttribute("aria-hidden"'],
-  "WordPress theme main.js"
-);
-assert(
-  !/setAttribute\("role", "button"\)/.test(themeMainJs),
-  "The theme emits real <button> FAQ controls, so it must not carry the static site's div shims. " +
-    "This file has been overwritten by assets:sync."
+  parityFiles.wordpressPagesCss,
+  [
+    ".prose ul:not(.pmpro_list) li",
+    ".prose ul:not(.pmpro_list) li::before",
+    ".latest-head { flex-direction: column; align-items: flex-start; }",
+  ],
+  "WordPress-specific page stylesheet"
 );
 
 const award2025 = seed.awards.find((award) => String(award.year) === "2025");

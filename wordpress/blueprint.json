@@ -33,7 +33,6 @@
         "CYWATER_PAYMENT_MODE": "test",
         "CYWATER_ALLOW_LIVE_PAYMENTS": false,
         "CYWATER_MAIL_TRANSPORT": "disabled",
-        "CYWATER_ENABLE_CALENDAR_YEAR_END": true,
         "AUTOMATIC_UPDATER_DISABLED": true,
         "WP_AUTO_UPDATE_CORE": false,
         "DISALLOW_FILE_MODS": true
@@ -46,6 +45,14 @@
     {
       "step": "activatePlugin",
       "pluginPath": "cywater-membership/cywater-membership.php"
+    },
+    {
+      "step": "activatePlugin",
+      "pluginPath": "cywater-partnerships/cywater-partnerships.php"
+    },
+    {
+      "step": "activatePlugin",
+      "pluginPath": "cywater-logo-call/cywater-logo-call.php"
     },
     {
       "step": "activatePlugin",
