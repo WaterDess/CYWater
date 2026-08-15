@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>CYWater Forum — Front-end preview</title>
+  <link rel="icon" type="image/png" href="../assets/img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/components.css">
+  <link rel="stylesheet" href="../assets/css/pages.css">
+  <link rel="stylesheet" href="./preview.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="../index.html" aria-label="CYWater home">
+        <img class="brand-logo" src="../assets/img/logo.png" alt="CYWater" width="41" height="50">
+      </a>
+      <nav class="nav" aria-label="Primary">
+        <ul class="nav-list">
+          <li><a class="nav-link" href="../about/index.html"><span>About</span></a></li>
+          <li><a class="nav-link" href="../membership/index.html"><span>Membership</span></a></li>
+          <li><a class="nav-link" href="./index.html" aria-current="page"><span>Forum</span></a></li>
+          <li><a class="nav-link" href="../events/index.html"><span>Events</span></a></li>
+          <li><a class="nav-link" href="../news/index.html"><span>News</span></a></li>
+          <li><a class="nav-link" href="../awards/index.html"><span>Awards</span></a></li>
+          <li><a class="nav-link" href="../contact/index.html"><span>Contact</span></a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <span class="btn btn-ghost preview-disabled" aria-disabled="true">Sign in</span>
+        <a class="btn btn-primary" href="../membership/index.html">Join CYWater</a>
+        <button class="nav-toggle" type="button" aria-label="Menu" aria-expanded="false"><span></span></button>
+      </div>
+    </div>
+  </header>
+  <nav class="nav-mobile" aria-label="Mobile">
+    <a href="../about/index.html">About</a>
+    <a href="../membership/index.html">Membership</a>
+    <a href="./index.html" aria-current="page">Forum</a>
+    <a href="../events/index.html">Events</a>
+    <a href="../news/index.html">News</a>
+    <a href="../awards/index.html">Awards</a>
+    <a href="../contact/index.html">Contact</a>
+  </nav>
+
+  <main>
+    <section class="forum-preview-hero">
+      <div class="container forum-preview-hero__inner">
+        <span class="eyebrow">Community writing</span>
+        <h1>CYWater Forum.</h1>
+        <p class="lead">Articles written by the CYWater community on research, practice, and early-career life in the water sciences.</p>
+        <div class="preview-status" role="note"><span></span>Static front-end preview · no accounts or database</div>
+      </div>
+    </section>
+
+    <section class="section forum-index">
+      <div class="container">
+        <nav class="forum-filters" aria-label="Forum categories">
+          <span class="eyebrow">Categories</span>
+          <div class="tag-list">
+            <a class="badge badge-teal" href="#articles">Career</a>
+            <a class="badge badge-teal" href="#articles">Perspectives</a>
+            <a class="badge badge-teal" href="#articles">Research notes</a>
+          </div>
+        </nav>
+
+        <div id="articles" class="forum-grid">
+          <article class="card forum-card">
+            <a class="card-media" href="./article.html">
+              <img src="../assets/img/photos/water-river.jpg" alt="Mountain catchment under low clouds">
+            </a>
+            <div class="card-body">
+              <div class="card-meta"><span class="card-tag">Research notes</span><span>· 2026-08-14</span></div>
+              <h2 class="card-title"><a href="./article.html">What I got wrong about rainfall-runoff lag times</a></h2>
+              <p class="card-excerpt">Three seasons of catchment data, and the lag time I had assumed was a constant turned out to be nothing of the sort.</p>
+              <div class="forum-byline"><span>Dr Wen Li</span><span>1 reply</span></div>
+            </div>
+          </article>
+
+          <article class="card forum-card">
+            <div class="card-media"><img src="../assets/img/photos/books-library.jpg" alt="Shelves of research books"></div>
+            <div class="card-body">
+              <div class="card-meta"><span class="card-tag">Career</span><span>· 2026-08-13</span></div>
+              <h2 class="card-title">Reviewing for the first time: what nobody tells you</h2>
+              <p class="card-excerpt">A short account of my first year as a reviewer, and the habits I wish I had started with.</p>
+              <div class="forum-byline"><span>Amara Okafor</span></div>
+            </div>
+          </article>
+
+          <article class="card forum-card">
+            <div class="card-media"><img src="../assets/img/photos/water-aerial.jpg" alt="Aerial view of water and fields"></div>
+            <div class="card-body">
+              <div class="card-meta"><span class="card-tag">Perspectives</span><span>· 2026-08-12</span></div>
+              <h2 class="card-title">Open data is not the same as usable data</h2>
+              <p class="card-excerpt">Releasing a dataset and making it possible for somebody else to use it are separate pieces of work.</p>
+              <div class="forum-byline"><span>Dr Wen Li</span></div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-tint forum-topics">
+      <div class="container">
+        <div class="section-head center"><span class="eyebrow center">Browse</span><h2>Topics.</h2></div>
+        <div class="tag-list forum-topic-list">
+          <span class="badge">hydrology</span><span class="badge">modelling</span><span class="badge">catchments</span>
+          <span class="badge">peer-review</span><span class="badge">early-career</span><span class="badge">open-science</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a class="brand" href="../index.html"><img class="brand-logo brand-logo--footer" src="../assets/img/logo.png" alt="CYWater" width="41" height="50"></a>
+          <p class="footer-tag">A non-profit international association advancing water sciences education, research, and professional development. Founded in 2011.</p>
+        </div>
+        <div class="footer-col"><h4>Explore</h4><ul><li><a href="../about/index.html">About</a></li><li><a href="../membership/index.html">Membership</a></li><li><a href="../events/index.html">Events</a></li><li><a href="../awards/index.html">Awards</a></li></ul></div>
+        <div class="footer-col"><h4>Association</h4><ul><li><a href="../about/board.html">Board</a></li><li><a href="../about/bylaws.html">Bylaws</a></li><li><a href="../news/index.html">News</a></li><li><a href="../contact/index.html">Contact</a></li></ul></div>
+        <div class="footer-col"><h4>Mailing address</h4><p class="footer-tag">202 E. Green St. Suite 2<br>Champaign, IL 61820, USA</p><a class="link footer-contact-link" href="../contact/index.html">Contact CYWater</a></div>
+      </div>
+      <div class="footer-bottom"><span>&copy; 2011–2026 CYWater. Front-end preview.</span><a href="../index.html">Return to original preview</a></div>
+    </div>
+  </footer>
+  <script src="./preview.js"></script>
+</body>
+</html>

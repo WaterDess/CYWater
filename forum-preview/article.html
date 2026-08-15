@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Rainfall-runoff lag times — CYWater Forum preview</title>
+  <link rel="icon" type="image/png" href="../assets/img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/components.css">
+  <link rel="stylesheet" href="../assets/css/pages.css">
+  <link rel="stylesheet" href="./preview.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="../index.html" aria-label="CYWater home"><img class="brand-logo" src="../assets/img/logo.png" alt="CYWater" width="41" height="50"></a>
+      <nav class="nav" aria-label="Primary"><ul class="nav-list">
+        <li><a class="nav-link" href="../about/index.html"><span>About</span></a></li><li><a class="nav-link" href="../membership/index.html"><span>Membership</span></a></li><li><a class="nav-link" href="./index.html" aria-current="page"><span>Forum</span></a></li><li><a class="nav-link" href="../events/index.html"><span>Events</span></a></li><li><a class="nav-link" href="../news/index.html"><span>News</span></a></li><li><a class="nav-link" href="../awards/index.html"><span>Awards</span></a></li><li><a class="nav-link" href="../contact/index.html"><span>Contact</span></a></li>
+      </ul></nav>
+      <div class="header-actions"><span class="btn btn-ghost preview-disabled" aria-disabled="true">Sign in</span><a class="btn btn-primary" href="../membership/index.html">Join CYWater</a><button class="nav-toggle" type="button" aria-label="Menu" aria-expanded="false"><span></span></button></div>
+    </div>
+  </header>
+  <nav class="nav-mobile" aria-label="Mobile"><a href="../about/index.html">About</a><a href="../membership/index.html">Membership</a><a href="./index.html" aria-current="page">Forum</a><a href="../events/index.html">Events</a><a href="../news/index.html">News</a><a href="../awards/index.html">Awards</a><a href="../contact/index.html">Contact</a></nav>
+
+  <main>
+    <article>
+      <header class="forum-article-hero">
+        <div class="container forum-article-hero__inner">
+          <p class="forum-breadcrumb"><a href="./index.html">Forum</a><span>›</span><a href="./index.html#articles">Research notes</a></p>
+          <h1>What I got wrong about rainfall-runoff lag times</h1>
+          <p class="forum-article-byline">Dr Wen Li <span>·</span> August 14, 2026</p>
+          <div class="preview-status preview-status--dark" role="note"><span></span>Static front-end preview</div>
+        </div>
+      </header>
+
+      <div class="container forum-article-container">
+        <figure class="forum-article-media"><img src="../assets/img/photos/water-river.jpg" alt="Mountain catchment under low clouds"></figure>
+        <div class="forum-article-copy">
+          <p>When I started this work I treated catchment lag time as a fixed property, something you calibrate once and carry forward. Three seasons of data later, that assumption looks indefensible.</p>
+          <h2>What the data actually showed</h2>
+          <p>Across the eleven gauged sub-catchments, lag time varied by more than a factor of two between wet and dry antecedent conditions. The variation was systematic, not noise, and it tracked soil moisture closely enough that ignoring it produced consistent early bias in every forecast we issued.</p>
+          <h2>What I would do differently</h2>
+          <p>I would make antecedent wetness an explicit input rather than something the calibration quietly absorbs. It costs one more state variable and removes an entire class of error.</p>
+          <p>I am posting this partly because the failed version is more instructive than the tidy one, and papers rarely have room for it.</p>
+          <div class="tag-list forum-article-topics"><a class="badge" href="./index.html">catchments</a><a class="badge" href="./index.html">hydrology</a><a class="badge" href="./index.html">modelling</a></div>
+        </div>
+      </div>
+    </article>
+
+    <section class="section section-tint forum-discussion">
+      <div class="container forum-discussion__inner">
+        <div class="section-head"><span class="eyebrow">Discussion</span><h2>1 reply.</h2></div>
+        <article class="forum-comment">
+          <div class="forum-comment__avatar" aria-hidden="true">AO</div>
+          <div><p class="forum-comment__author">Amara Okafor</p><p class="forum-comment__date">August 15, 2026 at 10:22 am</p><p>Did the relationship hold in the two smallest sub-catchments? Those are usually where storage assumptions break down for me.</p></div>
+        </article>
+        <div class="forum-comments-gate"><p>Sign in to ask a question or reply.</p><span class="btn btn-primary preview-disabled" aria-disabled="true">Sign in</span><small>Interactive accounts and comments are available only in the WordPress implementation.</small></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer"><div class="container"><div class="footer-bottom"><span>&copy; 2011–2026 CYWater. Front-end preview.</span><a href="./index.html">Back to Forum</a><a href="../index.html">Original site preview</a></div></div></footer>
+  <script src="./preview.js"></script>
+</body>
+</html>
