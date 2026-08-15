@@ -53,7 +53,7 @@ const manifest = {
 
 const readme = `# CYWater WordPress theme ${version}
 
-This is a theme-only update. The three CYWater plugins and Paid Memberships Pro do not need to be replaced.
+This is a theme-only update. The CYWater plugins and Paid Memberships Pro do not need to be replaced.
 
 1. In WordPress, open Appearance > Themes > Add New > Upload Theme.
 2. Upload \`${filename}\` and confirm replacement of the installed CYWater theme.

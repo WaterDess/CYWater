@@ -42,6 +42,9 @@
       deletion lifecycle passes with automatic QA cleanup
 - [x] Anonymous user enumeration and author archives are closed; directory
       indexing is denied and staging configuration permissions are restricted
+- [x] Forum is an independent plugin using core posts, taxonomies, comments,
+      revisions, media, privacy tools, and PMPro state rather than a parallel
+      database; real-PMPro publishing and comment lifecycle QA passes on staging
 
 ## Must Pass Before Staging Approval
 
@@ -78,6 +81,11 @@
       success/decline/cancel/refund/duplicate/capacity/email matrix passes
 - [ ] Event Tickets free 2% application fee is accepted, or Event Tickets Plus
       is purchased, before charging an event fee
+- [ ] Board approves Forum authorship, endorsement, moderation, retention, and
+      mail identity; a named Editor processes the real moderation queue
+- [ ] One Forum endorsement/authorisation message is Delivered through Postmark
+      to an association-controlled inbox, and the staging preview article is
+      removed before production content opens
 
 ## Must Pass Before Production
 

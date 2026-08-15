@@ -155,12 +155,12 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   `127.0.0.1` URL as a Lenovo-laptop preview. No Playground service is expected
   to remain running after the review task.
 
-### Temporary Staging Snapshot (2026-08-13)
+### Temporary Staging Snapshot (2026-08-16)
 
 - Hostinger staging is available at `https://staging.cywater.org/` with the
-  CYWater `0.6.8` theme, CYWater Membership `0.8.2`, CYWater Partnerships
-  `0.1.1`, CYWater Logo Call `0.2.0`, CYWater Environment `0.5.4`, CYWater Core `0.5.7`, and Event Tickets
-  `5.29.1`.
+  CYWater `0.6.11` theme, CYWater Membership `0.8.3`, CYWater Partnerships
+  `0.1.1`, CYWater Logo Call `0.2.0`, CYWater Environment `0.5.5`, CYWater
+  Forum `0.1.0`, CYWater Core `0.5.8`, and Event Tickets `5.29.1`.
 - Dedicated Hostinger SSH access from the Lenovo workstation was established
   and independently verified with public-key authentication on 2026-08-02.
   The private key remains local and must never be copied into the repository.
@@ -168,7 +168,7 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   Lenovo workspace after the profile and environment fixes. A 104-file SHA-256 comparison
   found zero missing, extra, or different staging files; all custom PHP files
   and the key account-flow HTTP routes passed post-deploy checks.
-- A live WP-CLI check confirmed WordPress `7.0.2` and PHP CLI `8.3.30` on
+- A live WP-CLI check confirmed WordPress `7.0.4` and PHP CLI `8.3.30` on
   staging. Five malformed inactive CYWater/PMPro upload directories were
   removed on 2026-08-03 after exact-path and inactive-status verification;
   active plugin directories were untouched and plugin-list warnings cleared.
@@ -287,6 +287,19 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   keyboard arrows, touch swipes, and reduced-motion handling follow the
   interaction structure requested from the Steam reference while retaining
   CYWater typography, color, spacing, radius, and Event data ownership.
+- On 2026-08-16 theme `0.6.11`, CYWater Environment `0.5.5`, and the independent
+  CYWater Forum `0.1.0` were deployed to Hostinger staging from the reviewed
+  integration branch. Forum articles use core WordPress posts, taxonomies,
+  media, revisions, comments, privacy tools, and the existing PMPro membership
+  state; no parallel content, discussion, member, or payment database exists.
+  The entire article card links to its canonical article. A hard-staging,
+  self-cleaning MySQL/PMPro QA passed membership, publishing, first-reply
+  moderation, later-reply approval, nonmember refusal, Forum mail-template
+  generation, public HTTP routing, and cleanup. The archive and clearly labelled
+  staging preview article return HTTP 200; the dormant AI endpoint returns 204
+  with both AI switches disabled. Board policy approval, one real Forum message
+  through Postmark, a named Editor moderation pass, authenticated second-browser
+  review, and removal of the staging preview article remain production gates.
 - Stripe Sandbox was connected through PMPro on 2026-08-02. A server-side
   presence-only check confirmed the Sandbox Connect values without reading or
   exposing them, and PMPro's own status check reports the Sandbox webhook as

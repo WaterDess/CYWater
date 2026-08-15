@@ -161,3 +161,25 @@ Prepare and complete the non-secret checklist in
    acceptance check fails.
 6. Keep the GitHub Pages original unchanged until the association separately
    approves its transition or redirect plan.
+
+## 8. Forum Editorial Handoff
+
+The code, database model, PMPro gate, discussion lifecycle, and staging route
+are implemented. Before enabling the plugin in production:
+
+1. Board approves the Forum scope, endorsement threshold, member requirement,
+   reply policy, retention rules, and moderation owner.
+2. Assign a named organization Editor to the moderation queue. Do not share the
+   association Administrator password.
+3. Decide whether Forum messages continue from the verified `web@cywater.org`
+   transport or use a dedicated association-controlled role address. Send one
+   endorsement/authorisation message to a real association inbox and confirm
+   Postmark Delivered plus inbox receipt.
+4. In Firefox or Edge, sign in as an ordinary active member and verify draft,
+   Submit for Review/Publish blocker messaging, one held first reply, one later
+   approved reply, and mobile layout.
+5. Trash and then permanently delete the post whose slug is
+   `forum-staging-preview`; it is marked `_cywater_staging_fixture=1` and is not
+   production editorial content.
+6. Keep both AI switches disabled. Enabling a provider is a separate privacy,
+   budget, disclosure, and Board decision.

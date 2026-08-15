@@ -43,6 +43,7 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 ## Document Map
 
 - `module-boundaries.md` - ownership and dependency rules
+- `forum.md` - member-authored forum, endorsement, discussion, and the AI seam
 - `member-workflow.md` - registration, profile, privacy, and status model
 - `payment-testing.md` - Stripe sandbox and refund test matrix
 - `stripe-live-verification.md` - US nonprofit Live KYC and bank-document packet
@@ -54,11 +55,25 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 - `manual-external-handoff.md` - remaining human, policy, license, and cutover work
 - `email-copy.md` - approved-content drafts, not active mail overrides
 
+## Forum (staging acceptance)
+
+CYWater Forum `0.1.0` adds a member-authored article section with arXiv-style
+author endorsement and article-scoped discussion. It was deployed and enabled
+on Hostinger staging on 2026-08-16 with one clearly labelled staging preview
+article. Its real-MySQL/PMPro self-cleaning QA passed membership, publishing,
+first-reply moderation, later-reply approval, nonmember refusal, mail-template
+generation, HTTP routing, and cleanup. The entire article card links to its
+canonical article. The per-viewer AI reaction remains a dormant contract only
+— no provider, no key, no outbound call, and the live endpoint answers 204.
+Board policy approval, one real Forum message through Postmark, a named Editor
+moderation pass, and authenticated second-browser acceptance remain open. See
+`forum.md`.
+
 ## Current State
 
-Hostinger staging is available at `https://staging.cywater.org/`. The accepted
-baseline uses the CYWater `0.6.8` theme, CYWater Membership `0.8.2`, CYWater
-Partnerships `0.1.1`, CYWater Logo Call `0.2.0`, CYWater Environment `0.5.4`, CYWater Core `0.5.7`, and Event Tickets `5.29.1`. PMPro and Stripe
+Hostinger staging is available at `https://staging.cywater.org/`. The current
+acceptance candidate uses WordPress `7.0.4`, the CYWater `0.6.11` theme, CYWater Membership `0.8.3`, CYWater
+Partnerships `0.1.1`, CYWater Logo Call `0.2.0`, CYWater Environment `0.5.5`, CYWater Forum `0.1.0`, CYWater Core `0.5.8`, and Event Tickets `5.29.1`. PMPro and Stripe
 Sandbox are active for staging acceptance; the live-payment gate remains
 closed and no production Stripe credential is configured. Postmark is connected on
 staging, its domain authentication is verified, and the user confirmed a
@@ -356,6 +371,14 @@ Editor capability boundary, RSVP inventory, attendee reporting, optional real
 confirmation-mail dispatch, public form, and automatic cleanup. Browser screenshot-level review of the ticket form
 remains open because both in-app attempts timed out; server-rendered HTML and
 HTTP acceptance passed.
+
+CYWater Environment `0.5.5` and CYWater Forum `0.1.0` were deployed on
+2026-08-16 without running a force import or modifying the GitHub Pages source.
+The staging Forum archive and its preview article return HTTP 200, the archive
+contains the full-card article link, the four editable categories exist, and
+the disabled AI endpoint returns HTTP 204. The preview record carries
+`_cywater_staging_fixture=1` and must be removed before production content is
+opened.
 
 The remaining human/external steps and exact procedures are listed in
 `manual-external-handoff.md`. The repository contains no live Stripe key, bank credential, production SMTP

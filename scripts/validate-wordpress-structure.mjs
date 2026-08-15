@@ -12,6 +12,8 @@ const required = [
   "scripts/test-playground.mjs",
   "scripts/cywater-staging-ticketing-qa.php",
   "scripts/cywater-staging-partner-qa.php",
+  "scripts/cywater-staging-forum-qa.php",
+  "scripts/cywater-staging-forum-preview.php",
   "wordpress/wp-content/plugins/cywater-core/data/seed.json",
   "wordpress/wp-content/themes/cywater/style.css",
   "wordpress/wp-content/themes/cywater/functions.php",
@@ -39,6 +41,18 @@ const required = [
   "wordpress/wp-content/plugins/cywater-logo-call/assets/logo-call.css",
   "wordpress/wp-content/plugins/cywater-logo-call/assets/logo-call.js",
   "wordpress/wp-content/plugins/cywater-environment/cywater-environment.php",
+  "wordpress/wp-content/plugins/cywater-forum/cywater-forum.php",
+  "wordpress/wp-content/plugins/cywater-forum/includes/defaults.php",
+  "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-settings.php",
+  "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-content.php",
+  "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-roles.php",
+  "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-endorsement.php",
+  "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-comments.php",
+  "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-ai.php",
+  "wordpress/wp-content/themes/cywater/archive-cyw_forum_post.php",
+  "wordpress/wp-content/themes/cywater/single-cyw_forum_post.php",
+  "wordpress/wp-content/themes/cywater/comments.php",
+  "wordpress/wp-content/themes/cywater/author.php",
 ];
 
 for (const relativePath of required) {
@@ -395,6 +409,86 @@ assertMarkers(
 assert(
   !themeImageEntries.includes("placeholders"),
   "Unused legacy placeholder assets must not be included in the WordPress theme."
+);
+
+const forumDirectory = path.join(root, "wordpress", "wp-content", "plugins", "cywater-forum");
+
+// The AI reaction is declared but not implemented. Keep it that way until the
+// association approves the feature: nothing in the seam may call out to a
+// provider, and the endpoint must keep answering 204 by default.
+const forumAi = await readFile(path.join(forumDirectory, "includes", "class-cywater-forum-ai.php"), "utf8");
+for (const outbound of ["wp_remote_", "curl_", "file_get_contents(", "fsockopen"]) {
+  assert(
+    !forumAi.includes(outbound),
+    `The forum AI seam must stay dormant, but it contains an outbound call: ${outbound}.`
+  );
+}
+assertMarkers(
+  forumAi,
+  ["new WP_REST_Response( null, 204 )", "cywater_forum_ai_reaction"],
+  "Forum AI seam"
+);
+
+// Discussion must stay scoped to forum articles. News, Events, Awards, and
+// Board roles have never had comments and must not acquire them by accident.
+const forumComments = await readFile(
+  path.join(forumDirectory, "includes", "class-cywater-forum-comments.php"),
+  "utf8"
+);
+
+assert(
+  /International Association of Contemporary Young Scholars in Water Sciences \(CYWater\)/.test(
+    seed.pages.home.content
+  ),
+  "WordPress home seed must preserve the accepted full association name"
+);
+assert(
+  /contact@cywater\.org[\s\S]*membership@cywater\.org[\s\S]*billing@cywater\.org/.test(
+    seed.pages.contact.content
+  ),
+  "WordPress contact seed must preserve the confirmed role addresses"
+);
+assertMarkers(
+  forumComments,
+  ["CYWater_Forum_Content::POST_TYPE !== get_post_type( $post_id )", "'comments_open'"],
+  "Forum discussion scoping"
+);
+
+// WordPress adds the generic `avatar` class to comment portraits. The static
+// design system uses that same class for full-width profile tiles, so the
+// forum must pin comment avatars to the requested 48px size or they expand to
+// the article width on narrow screens.
+const wordpressCss = await readFile(
+  path.join(root, "wordpress", "wp-content", "themes", "cywater", "wordpress.css"),
+  "utf8"
+);
+assertMarkers(
+  wordpressCss,
+  [
+    ".forum-comments .comment-author img",
+    "flex: 0 0 48px;",
+    "width: 48px;",
+    "height: 48px;",
+    "object-fit: cover;",
+  ],
+  "Forum comment avatar sizing"
+);
+
+// Author archives are opened one account at a time. A blanket allow would undo
+// the account-enumeration protection in cywater-environment.
+const publicSurface = await readFile(
+  path.join(root, "wordpress", "wp-content", "plugins", "cywater-environment", "includes", "class-cywater-public-surface.php"),
+  "utf8"
+);
+assertMarkers(publicSurface, ["cywater_public_author_archive_allowed"], "Author archive gate");
+const forumContent = await readFile(
+  path.join(forumDirectory, "includes", "class-cywater-forum-content.php"),
+  "utf8"
+);
+assertMarkers(
+  forumContent,
+  ["cywater_public_author_archive_allowed", "return self::published_count( $author_id ) > 0;"],
+  "Forum author archive opt-in"
 );
 
 console.log(

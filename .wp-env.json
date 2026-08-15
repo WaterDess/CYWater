@@ -13,6 +13,7 @@
     "./wordpress/wp-content/plugins/cywater-partnerships",
     "./wordpress/wp-content/plugins/cywater-logo-call",
     "./wordpress/wp-content/plugins/cywater-environment",
+    "./wordpress/wp-content/plugins/cywater-forum",
     "./wordpress/runtime/vendor/paid-memberships-pro"
   ],
   "config": {
@@ -24,6 +25,8 @@
     "CYWATER_PAYMENT_MODE": "test",
     "CYWATER_ALLOW_LIVE_PAYMENTS": false,
     "CYWATER_MAIL_TRANSPORT": "mailpit",
-    "CYWATER_ENABLE_CALENDAR_YEAR_END": true
+    "CYWATER_ENABLE_CALENDAR_YEAR_END": true,
+    "AUTOMATIC_UPDATER_DISABLED": true,
+    "WP_AUTO_UPDATE_CORE": false
   }
 }
