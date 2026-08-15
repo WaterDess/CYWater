@@ -629,28 +629,36 @@
   position: absolute;
   top: 50%;
   z-index: 4;
-  width: 46px;
-  height: 86px;
+  width: 58px;
+  height: 108px;
   display: grid;
   place-items: center;
   padding: 0;
-  border: 1px solid rgba(255,255,255,0.22);
-  border-radius: var(--radius);
-  background: linear-gradient(90deg, rgba(8,28,45,0.86), rgba(8,28,45,0.62));
-  color: var(--white);
-  box-shadow: 0 10px 28px rgba(8,28,45,0.18);
-  font-family: Arial, sans-serif;
-  font-size: 3rem;
-  font-weight: 300;
-  line-height: 1;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: rgba(8,28,45,0.74);
+  font-size: 0;
   transform: translateY(-50%);
-  transition: background var(--dur) var(--ease), transform var(--dur) var(--ease), opacity var(--dur) var(--ease);
+  transition: color var(--dur) var(--ease), transform var(--dur) var(--ease), opacity var(--dur) var(--ease);
+}
+.event-carousel-arrow::before {
+  content: "";
+  width: 22px;
+  height: 22px;
+  border-top: 3px solid currentColor;
+  border-right: 3px solid currentColor;
+  filter: drop-shadow(0 1px 1px rgba(255,255,255,0.82));
 }
 .event-carousel-arrow--previous { left: var(--sp-3); }
-.event-carousel-arrow--next { right: var(--sp-3); background: linear-gradient(270deg, rgba(8,28,45,0.86), rgba(8,28,45,0.62)); }
+.event-carousel-arrow--previous::before { transform: rotate(-135deg); }
+.event-carousel-arrow--next { right: var(--sp-3); }
+.event-carousel-arrow--next::before { transform: rotate(45deg); }
 .event-carousel-arrow:hover,
-.event-carousel-arrow:focus-visible { background: var(--teal); transform: translateY(-50%) scale(1.04); }
-.event-carousel-arrow:disabled { opacity: 0.18; cursor: default; box-shadow: none; }
+.event-carousel-arrow:focus-visible { background: transparent; color: var(--teal); transform: translateY(-50%) scale(1.08); }
+.event-carousel-arrow:focus-visible { outline: 0; }
+.event-carousel-arrow:focus-visible::before { filter: drop-shadow(0 0 3px rgba(15,118,110,0.58)); }
+.event-carousel-arrow:disabled { opacity: 0.18; cursor: default; }
 .upcoming-event-carousel {
   width: min(78%, 860px);
   margin-inline: auto;
@@ -1041,7 +1049,8 @@
   .upcoming-event-body { padding: var(--sp-4); }
   .upcoming-event-body h3 { font-size: var(--fs-lg); }
   .upcoming-event-summary { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
-  .event-carousel-arrow { width: 40px; height: 72px; font-size: 2.5rem; }
+  .event-carousel-arrow { width: 44px; height: 82px; }
+  .event-carousel-arrow::before { width: 18px; height: 18px; }
   .event-carousel-arrow--previous { left: var(--sp-2); }
   .event-carousel-arrow--next { right: var(--sp-2); }
   .award-year { grid-template-columns: 1fr; gap: var(--sp-3); }

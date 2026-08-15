@@ -462,6 +462,10 @@ const themeBaseCss = await readFile(
   path.join(root, "wordpress", "wp-content", "themes", "cywater", "assets", "css", "base.css"),
   "utf8"
 );
+const themePagesCss = await readFile(
+  path.join(root, "wordpress", "wp-content", "themes", "cywater", "assets", "css", "pages.css"),
+  "utf8"
+);
 const pageHeroTemplate = await readFile(
   path.join(root, "wordpress", "wp-content", "themes", "cywater", "template-parts", "page-hero.php"),
   "utf8"
@@ -503,16 +507,28 @@ assertMarkers(
   themeMainJs,
   [
     "let desiredIndex = 0;",
+    "let desiredDirection = 0;",
     "let movingStep = 0;",
-    "const requestIndex = (index) =>",
+    "const requestIndex = (index, preferredDirection = 0) =>",
     "const requestStep = (delta) =>",
     "const base = moving ? desiredIndex : activeIndex;",
+    "requestIndex(base + direction, direction);",
   ],
   "Events carousel input queue"
 );
 assert(
   !themeMainJs.includes("queuedTarget") && !themeMainJs.includes("is-preview-clone"),
   "Events carousel must not restore the obsolete target queue or unused preview-clone class."
+);
+assertMarkers(
+  themePagesCss,
+  [
+    ".event-carousel-arrow::before",
+    "background: transparent;",
+    ".event-carousel-arrow--previous::before { transform: rotate(-135deg); }",
+    ".event-carousel-arrow--next::before { transform: rotate(45deg); }",
+  ],
+  "Events directional transparent carousel controls"
 );
 
 // WordPress adds the generic `avatar` class to comment portraits. The static

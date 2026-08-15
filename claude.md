@@ -158,7 +158,7 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
 ### Temporary Staging Snapshot (2026-08-16)
 
 - Hostinger staging is available at `https://staging.cywater.org/` with the
-  CYWater `0.6.15` theme, CYWater Membership `0.8.3`, CYWater Partnerships
+  CYWater `0.6.16` theme, CYWater Membership `0.8.3`, CYWater Partnerships
   `0.1.1`, CYWater Logo Call `0.2.0`, CYWater Environment `0.5.5`, CYWater
   Forum `0.1.0`, CYWater Core `0.5.8`, and Event Tickets `5.29.1`.
 - Dedicated Hostinger SSH access from the Lenovo workstation was established
@@ -330,6 +330,17 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   Playground launcher also mounts every plugin activated by the blueprint.
   Hostinger staging reports theme `0.6.15`; the live News and Events routes
   return HTTP 200 and expose the new entrance markers after cache purge.
+- Theme `0.6.16` preserves the requested arrow direction when the two-record
+  Upcoming carousel's previous and next controls resolve to the same Event, so
+  the controls now produce opposite track transitions instead of sharing the
+  shortest-path tie. Rapid alternating clicks and in-motion pagination still
+  converge on one active Event. The side controls now use transparent hit areas
+  and line chevrons instead of opaque navy button panels, while retaining hover,
+  keyboard-focus, disabled, touch, and mobile target states. A disposable
+  two-record browser fixture passed previous/next direction, rapid input,
+  in-motion dot-jump, single-active-dot, and final-state checks. Hostinger
+  staging reports theme `0.6.16`; live HTML contains both Upcoming Events and
+  the deployed JavaScript/CSS markers after cache purge.
 - On 2026-08-16 theme `0.6.13`, CYWater Environment `0.5.5`, and the independent
   CYWater Forum `0.1.0` were deployed to Hostinger staging from the reviewed
   integration branch. Forum articles use core WordPress posts, taxonomies,

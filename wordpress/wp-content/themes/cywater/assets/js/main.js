@@ -115,6 +115,7 @@
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let activeIndex = 0;
     let desiredIndex = 0;
+    let desiredDirection = 0;
     let rotationTimer;
     let touchStartX = null;
     let moving = false;
@@ -184,7 +185,7 @@
 
     const continueToDesired = () => {
       if (desiredIndex !== activeIndex) {
-        animateStep(directionTo(desiredIndex));
+        animateStep(desiredDirection || directionTo(desiredIndex));
       } else {
         startRotation();
       }
@@ -218,6 +219,7 @@
       }
       moving = true;
       movingStep = delta < 0 ? -1 : 1;
+      desiredDirection = 0;
       const direction = movingStep < 0 ? "previous" : "next";
       track.classList.add(`is-moving-${direction}`);
       const complete = (event) => {
@@ -232,19 +234,24 @@
       }, 700);
     };
 
-    const requestIndex = (index) => {
+    const requestIndex = (index, preferredDirection = 0) => {
       const target = normalizeIndex(index);
       desiredIndex = target;
+      desiredDirection = preferredDirection < 0 ? -1 : preferredDirection > 0 ? 1 : 0;
       stopRotation();
       if (!moving) {
         if (target === activeIndex) startRotation();
-        else animateStep(directionTo(target));
+        else animateStep(desiredDirection || directionTo(target));
       }
     };
 
     const requestStep = (delta) => {
+      const direction = delta < 0 ? -1 : 1;
       const base = moving ? desiredIndex : activeIndex;
-      requestIndex(base + (delta < 0 ? -1 : 1));
+      // Preserve the control's requested direction. With exactly two Events,
+      // previous and next resolve to the same record; deriving direction only
+      // from that target would otherwise animate both controls identically.
+      requestIndex(base + direction, direction);
     };
 
     if (pagination) {
