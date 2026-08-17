@@ -54,11 +54,15 @@ $assert = static function ( $condition, $label ) use ( &$checks ) {
 
 $extract_verification = static function ( $mail ) {
 	$message = (string) ( $mail['message'] ?? '' );
-	if ( ! preg_match( '#https://[^\s]+/verify-email/\?[^\s]+#', $message, $match ) ) {
+	if ( preg_match( '#href=["\'](https://[^"\']+/verify-email/\?[^"\']+)["\']#', $message, $match ) ) {
+		$url = html_entity_decode( $match[1], ENT_QUOTES, 'UTF-8' );
+	} elseif ( preg_match( '#https://[^\s<]+/verify-email/\?[^\s<]+#', $message, $match ) ) {
+		$url = html_entity_decode( $match[0], ENT_QUOTES, 'UTF-8' );
+	} else {
 		throw new RuntimeException( 'Verification link was not present in the intercepted message.' );
 	}
 	$query = array();
-	parse_str( (string) wp_parse_url( html_entity_decode( $match[0] ), PHP_URL_QUERY ), $query );
+	parse_str( (string) wp_parse_url( $url, PHP_URL_QUERY ), $query );
 	return $query;
 };
 
@@ -73,6 +77,9 @@ try {
 	$headers = (array) ( $captured_mail[0]['headers'] ?? array() );
 	$assert( in_array( 'From: CYWater Accounts <accounts@cywater.org>', $headers, true ), 'Verification sender is accounts@cywater.org' );
 	$assert( in_array( 'Reply-To: CYWater Membership <membership@cywater.org>', $headers, true ), 'Verification replies route to membership@cywater.org' );
+	$assert( in_array( 'Content-Type: text/html; charset=UTF-8', $headers, true ), 'Verification uses the official HTML transaction template' );
+	$assert( false !== strpos( (string) $captured_mail[0]['message'], 'International Association of Contemporary Young Scholars in Water Sciences' ), 'Verification identifies the full association name' );
+	$assert( false !== strpos( (string) $captured_mail[0]['message'], 'Verify email address' ), 'Verification includes a clear primary action' );
 
 	$query = $extract_verification( $captured_mail[0] );
 	$assert( (int) ( $query['user_id'] ?? 0 ) === (int) $user_id && ! empty( $query['token'] ), 'Verification link identifies the disposable account without exposing a stored token' );

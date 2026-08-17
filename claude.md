@@ -158,7 +158,7 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
 ### Temporary Staging Snapshot (2026-08-18)
 
 - Hostinger staging is available at `https://staging.cywater.org/` with the
-  CYWater `0.6.18` theme, CYWater Membership `0.8.3`, CYWater Partnerships
+  CYWater `0.6.18` theme, CYWater Membership `0.8.4`, CYWater Partnerships
   `0.1.2`, CYWater Logo Call `0.2.0`, CYWater Forum `0.1.2`, CYWater
   Environment `0.5.4`, CYWater Core `0.6.1`, CYWater Operations `0.1.3`, and
   Event Tickets `5.29.1`.
@@ -364,7 +364,7 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   `CYWATER_ALLOW_LIVE_PAYMENTS` remains false. No real charge or refund was
   performed. The free PMPro Stripe integration currently adds a separate 2%
   PMPro fee; activating a qualifying premium PMPro license removes that fee.
-- CYWater Membership `0.8.3` implements rolling annual Student and Professional
+- CYWater Membership `0.8.4` implements rolling annual Student and Professional
   terms: every successful full-price payment starts a new one-year term on its
   payment date, with no proration or December 31 boundary. Lifetime remains
   non-expiring. Staging had no active Student or Professional membership to
@@ -375,18 +375,27 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   dedicated `/member-register/` account form. New accounts sign in but must
   complete a 24-hour one-time email-verification link before checkout. Mail uses
   `CYWater Accounts <accounts@cywater.org>` with replies to
-  `membership@cywater.org`; resends are rate-limited, replay is rejected, and an
-  email change invalidates the prior verification. Existing accounts were
+  `membership@cywater.org`. Member-facing verification and account-closure
+  confirmation messages use a reusable, email-client-safe official CYWater HTML
+  template with the full legal association name, a clear primary action, visible
+  fallback URL, security notice, and standard Member Services footer carrying
+  the public association address, support mailbox, and website; a
+  plain-text alternative remains available. Internal administrator notices stay
+  concise and do not copy sensitive records into the branded template. Resends
+  are rate-limited, replay is rejected, and an email change invalidates the prior
+  verification. Existing accounts were
   backfilled for their current stored address during setup. General WordPress
   registration stays disabled, and checkout no longer creates an account
   inline. Verification delivery is capped at five messages per account per hour
   and valid-nonce registration submissions at twenty per salted network hash per
-  hour. A staging-only, self-cleaning test passed 37 verification, sender,
-  replay, email-change, closure, session, privacy-tool, sign-in-record, and
+  hour. A staging-only, self-cleaning test passed 40 verification, sender,
+  HTML/plain-text structure, legal-name/action, replay, email-change, closure,
+  session, privacy-tool, sign-in-record, and
   administrator-view/list checks; its mail was
-  intercepted and its disposable user removed. A separate real message was
-  accepted by the configured WordPress/Postmark transport, but Workspace inbox
-  receipt remains a human check.
+  intercepted and its disposable user removed. A separate visual-verification
+  message was accepted by the configured WordPress/Postmark transport for
+  `contact@cywater.org`; its disposable user was removed, so its link is
+  intentionally unusable. Final inbox rendering remains a human check.
 - CYWater Membership `0.8.2` adds a read-only administrator record on each
   WordPress user profile. It summarizes account creation/last sign-in, email
   verification, required-profile completion, directory privacy, active level

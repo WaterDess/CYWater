@@ -57,7 +57,7 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 ## Current State
 
 Hostinger staging is available at `https://staging.cywater.org/`. The accepted
-baseline uses the CYWater `0.6.18` theme, CYWater Membership `0.8.3`, CYWater
+baseline uses the CYWater `0.6.18` theme, CYWater Membership `0.8.4`, CYWater
 Partnerships `0.1.2`, CYWater Logo Call `0.2.0`, CYWater Forum `0.1.2`, CYWater
 Environment `0.5.4`, CYWater Core `0.6.1`, CYWater Operations `0.1.3`, and Event
 Tickets `5.29.1`.
@@ -129,24 +129,33 @@ affiliations, terms, biographies, photographs, or contact details were inferred.
 The public staging route was verified to contain each record exactly once; the
 GitHub Pages original was not modified.
 
-CYWater Membership `0.8.2` implements the current account-first path: logged-out
+CYWater Membership `0.8.4` implements the current account-first path: logged-out
 checkout redirects to sign-in, sign-in links to `/member-register/`, and a new
 account must complete a 24-hour one-time email-verification link before returning
 to the originally selected checkout. Verification mail uses
 `CYWater Accounts <accounts@cywater.org>` with replies routed to
-`membership@cywater.org`; resend is limited to once per minute, link replay is
-rejected, and an email change invalidates the earlier verification. General
+`membership@cywater.org`. Member-facing verification and account-closure
+confirmation messages use a reusable, email-client-safe CYWater HTML template
+with the full legal association name, a clear primary action, a visible fallback
+URL, a security notice, and a standard Member Services footer. A plain-text
+alternative remains available when HTML is blocked; the standard footer carries
+the public association address, support mailbox, and website. Internal administrator
+notices remain concise and do not copy sensitive records into the branded
+template. Resend is limited to once per minute, link replay is rejected, and an
+email change invalidates the earlier verification. General
 WordPress registration remains disabled. Existing staging accounts were
 backfilled for their current stored email during setup. A staging-only,
-self-cleaning test passed 37 checks covering sender/reply identity, hashed token
+self-cleaning test passed 40 checks covering sender/reply identity, HTML and
+plain-text structure, the full legal name and primary action, hashed token
 issuance, one-time verification, replay rejection, email-change invalidation,
 closure cooling-off/review state, checkout blocking, request withdrawal,
 hourly mail limits, session revocation, WordPress privacy export/erasure,
 last-sign-in recording, and administrator-record/list rendering. Intercepted test mail
 was not sent and the temporary user was removed. A separate real verification
-message was accepted by the configured WordPress/Postmark transport and its
-temporary user was removed; final Workspace inbox delivery remains a human
-check. Rolling annual Student and Professional terms also passed a separate
+visual-verification message was accepted by the configured WordPress/Postmark
+transport for `contact@cywater.org`; its temporary user was removed, so that
+message's verification link is intentionally unusable. Final inbox rendering
+remains a human check. Rolling annual Student and Professional terms also passed a separate
 nine-check staging QA: each full-price payment starts one complete year from its
 payment date, with no proration or calendar-year boundary, while Lifetime stays
 non-expiring. Stripe Sandbox was connected

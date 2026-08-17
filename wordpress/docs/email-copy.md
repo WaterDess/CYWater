@@ -1,8 +1,24 @@
 # Email Copy Drafts
 
-These are content drafts only. PMPro remains the mail sender, Mailpit captures
-local messages, and no custom override is activated until the Board approves the
-copy and required legal footer.
+These PMPro messages remain content drafts. PMPro remains their mail sender,
+Mailpit captures local messages, and no PMPro copy override is activated until
+the Board approves the copy and required legal footer.
+
+## Official Account Email Presentation
+
+CYWater Membership `0.8.4` applies a reusable official presentation to the
+member-facing email-verification and account-closure confirmation messages. The
+email-safe HTML includes the CYWater name, the association's full legal name, a
+single primary action, a visible fallback URL, a security notice, and a standard
+Member Services footer with the public association address, support mailbox, and
+website. Every message also has a plain-text alternative.
+
+These messages are sent as `CYWater Accounts <accounts@cywater.org>` and replies
+go to `membership@cywater.org`. Internal administrator notifications stay
+concise and plain so that operational records are not copied into a decorative
+template. This shared component is the approved technical foundation for later
+PMPro transactional-email styling, but it does not yet override the PMPro copy
+drafts below.
 
 ## Registration Received
 

@@ -66,16 +66,19 @@ final class CYWater_Membership_Account_Security {
 			home_url( '/verify-email/' )
 		);
 
-		$sent = wp_mail(
+		$sent = CYWater_Membership_Mail::send(
 			$user->user_email,
 			__( 'Verify your CYWater email address', 'cywater-membership' ),
-			sprintf(
-				/* translators: 1: verification URL, 2: expiration period. */
-				__( "Your CYWater account has been created.\n\nVerify this email address within %2\$s:\n%1\$s\n\nIf you did not create this account, you can ignore this message.", 'cywater-membership' ),
-				$url,
-				__( '24 hours', 'cywater-membership' )
-			),
-			self::member_mail_headers()
+			array(
+				'preheader'    => __( 'Confirm your email address to finish setting up your CYWater account.', 'cywater-membership' ),
+				'eyebrow'      => __( 'Account security', 'cywater-membership' ),
+				'title'        => __( 'Confirm your email address', 'cywater-membership' ),
+				'intro'        => __( 'Thank you for creating a CYWater account. Please confirm that this email address belongs to you before continuing to member services.', 'cywater-membership' ),
+				'body'         => __( 'This secure link expires in 24 hours and can be used only once.', 'cywater-membership' ),
+				'button_label' => __( 'Verify email address', 'cywater-membership' ),
+				'button_url'   => $url,
+				'notice'       => __( 'If you did not create this account, no action is required. For your security, do not forward this email or share the verification link.', 'cywater-membership' ),
+			)
 		);
 		if ( ! $sent ) {
 			delete_user_meta( $user->ID, self::TOKEN_SENT_META );
@@ -387,11 +390,19 @@ final class CYWater_Membership_Account_Security {
 			sprintf( __( "A member requested account closure.\n\nUser ID: %1\$d\nEmail: %2\$s\nRequested: %3\$s\nReview: %4\$s", 'cywater-membership' ), $user->ID, $user->user_email, gmdate( 'c', $requested_at ), $record_url ),
 			array( 'From: CYWater Accounts <accounts@cywater.org>', 'Reply-To: ' . $user->user_email )
 		);
-		wp_mail(
+		CYWater_Membership_Mail::send(
 			$user->user_email,
 			__( 'We received your CYWater account closure request', 'cywater-membership' ),
-			__( 'A seven-day cooling-off period has started and new checkout is paused. You may withdraw the request during that period. Membership support will then review membership, event, and accounting records; your account is not deleted until that review is complete.', 'cywater-membership' ),
-			self::member_mail_headers()
+			array(
+				'preheader'    => __( 'Your CYWater account closure request has been recorded.', 'cywater-membership' ),
+				'eyebrow'      => __( 'Account administration', 'cywater-membership' ),
+				'title'        => __( 'Account closure request received', 'cywater-membership' ),
+				'intro'        => __( 'We have recorded your request to close your CYWater account. A seven-day cooling-off period has started, and new membership checkout is paused during this period.', 'cywater-membership' ),
+				'body'         => __( 'You may withdraw the request from your account before the cooling-off period ends. Membership support will then review membership, event, and accounting records before any deletion or anonymization takes place.', 'cywater-membership' ),
+				'button_label' => __( 'Review account request', 'cywater-membership' ),
+				'button_url'   => home_url( '/close-account/' ),
+				'notice'       => __( 'This request does not immediately delete your account. Records that CYWater must retain for legal, accounting, security, or dispute-resolution purposes may be preserved under association policy.', 'cywater-membership' ),
+			)
 		);
 	}
 
@@ -409,13 +420,6 @@ final class CYWater_Membership_Account_Security {
 
 	private static function token_hash( $token ) {
 		return hash_hmac( 'sha256', (string) $token, wp_salt( 'auth' ) );
-	}
-
-	private static function member_mail_headers() {
-		return array(
-			'From: CYWater Accounts <accounts@cywater.org>',
-			'Reply-To: CYWater Membership <membership@cywater.org>',
-		);
 	}
 
 	private static function login_url( $redirect ) {
