@@ -10,8 +10,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 final class CYWater_Partnerships {
 	const POST_TYPE      = 'cyw_partner_app';
 	const META_PREFIX    = '_cyw_partner_';
-	const SETUP_VERSION  = '0.1.0';
+	const SETUP_VERSION  = '0.1.2';
 	const RATE_LIMIT_MAX = 5;
+	const CAP_REVIEW     = 'cywater_review_partnerships';
+	const CAP_APPROVE    = 'cywater_approve_partnerships';
+	const CAP_PAYMENT    = 'cywater_record_partnership_payment';
+	const CAP_DELETE     = 'cywater_delete_partnership_applications';
 
 	private static $stages = array(
 		'submitted'    => 'Submitted',
@@ -23,6 +27,7 @@ final class CYWater_Partnerships {
 	);
 
 	public static function register() {
+		self::grant_administrator_capabilities();
 		add_action( 'init', array( __CLASS__, 'register_post_type' ), 5 );
 		add_action( 'init', array( __CLASS__, 'maybe_setup' ), 20 );
 		add_shortcode( 'cywater_partner_application', array( __CLASS__, 'application_shortcode' ) );
@@ -32,12 +37,14 @@ final class CYWater_Partnerships {
 		add_action( 'save_post_' . self::POST_TYPE, array( __CLASS__, 'save_review' ), 10, 2 );
 		add_filter( 'manage_' . self::POST_TYPE . '_posts_columns', array( __CLASS__, 'admin_columns' ) );
 		add_action( 'manage_' . self::POST_TYPE . '_posts_custom_column', array( __CLASS__, 'admin_column' ), 10, 2 );
+		add_action( 'admin_notices', array( __CLASS__, 'review_admin_notice' ) );
 		add_action( 'wp', array( __CLASS__, 'block_legacy_partner_checkout' ), -100 );
 		add_filter( 'wp_privacy_personal_data_exporters', array( __CLASS__, 'register_exporter' ) );
 		add_filter( 'wp_privacy_personal_data_erasers', array( __CLASS__, 'register_eraser' ) );
 	}
 
 	public static function activate() {
+		self::grant_administrator_capabilities();
 		self::register_post_type();
 		self::setup_page();
 		update_option( 'cywater_partnerships_setup_version', self::SETUP_VERSION );
@@ -45,6 +52,7 @@ final class CYWater_Partnerships {
 	}
 
 	public static function maybe_setup() {
+		self::grant_administrator_capabilities();
 		if ( self::SETUP_VERSION === get_option( 'cywater_partnerships_setup_version' ) ) {
 			return;
 		}
@@ -53,20 +61,20 @@ final class CYWater_Partnerships {
 	}
 
 	public static function register_post_type() {
-		$administrator_caps = array(
-			'edit_post'              => 'manage_options',
-			'read_post'              => 'manage_options',
-			'delete_post'            => 'manage_options',
-			'edit_posts'             => 'manage_options',
-			'edit_others_posts'      => 'manage_options',
-			'publish_posts'          => 'manage_options',
-			'read_private_posts'     => 'manage_options',
-			'delete_posts'           => 'manage_options',
-			'delete_private_posts'   => 'manage_options',
-			'delete_published_posts' => 'manage_options',
-			'delete_others_posts'    => 'manage_options',
-			'edit_private_posts'     => 'manage_options',
-			'edit_published_posts'   => 'manage_options',
+		$review_caps = array(
+			'edit_post'              => self::CAP_REVIEW,
+			'read_post'              => self::CAP_REVIEW,
+			'delete_post'            => self::CAP_DELETE,
+			'edit_posts'             => self::CAP_REVIEW,
+			'edit_others_posts'      => self::CAP_REVIEW,
+			'publish_posts'          => self::CAP_REVIEW,
+			'read_private_posts'     => self::CAP_REVIEW,
+			'delete_posts'           => self::CAP_DELETE,
+			'delete_private_posts'   => self::CAP_DELETE,
+			'delete_published_posts' => self::CAP_DELETE,
+			'delete_others_posts'    => self::CAP_DELETE,
+			'edit_private_posts'     => self::CAP_REVIEW,
+			'edit_published_posts'   => self::CAP_REVIEW,
 			'create_posts'           => 'do_not_allow',
 		);
 		register_post_type(
@@ -83,12 +91,26 @@ final class CYWater_Partnerships {
 				'show_in_menu'        => true,
 				'menu_icon'           => 'dashicons-groups',
 				'supports'            => array( 'title' ),
-				'capabilities'        => $administrator_caps,
+				'capabilities'        => $review_caps,
 				'map_meta_cap'        => false,
 				'exclude_from_search' => true,
 				'show_in_rest'        => false,
 			)
 		);
+	}
+
+	/** Keep the recovery Administrator able to perform every workflow action. */
+	public static function grant_administrator_capabilities() {
+		$administrator = get_role( 'administrator' );
+		if ( ! $administrator instanceof WP_Role ) {
+			return;
+		}
+
+		foreach ( array( self::CAP_REVIEW, self::CAP_APPROVE, self::CAP_PAYMENT, self::CAP_DELETE ) as $capability ) {
+			if ( ! $administrator->has_cap( $capability ) ) {
+				$administrator->add_cap( $capability );
+			}
+		}
 	}
 
 	private static function setup_page() {
@@ -280,40 +302,177 @@ final class CYWater_Partnerships {
 
 	public static function review_meta_box( $post ) {
 		wp_nonce_field( 'cywater_partner_review', 'cywater_partner_review_nonce' );
-		$stage = get_post_meta( $post->ID, self::META_PREFIX . 'stage', true ) ?: 'submitted';
+		$stage            = get_post_meta( $post->ID, self::META_PREFIX . 'stage', true ) ?: 'submitted';
+		$available_stages = self::available_stage_transitions( $stage );
+		$can_approve      = current_user_can( self::CAP_APPROVE );
 		?>
 		<table class="form-table" role="presentation"><tbody>
 		<?php foreach ( array( 'organization', 'organization_type', 'website', 'country', 'contact_name', 'contact_email', 'interests', 'consent_at' ) as $key ) : ?>
 			<tr><th><?php echo esc_html( ucwords( str_replace( '_', ' ', $key ) ) ); ?></th><td><?php echo nl2br( esc_html( get_post_meta( $post->ID, self::META_PREFIX . $key, true ) ) ); ?></td></tr>
 		<?php endforeach; ?>
-		<tr><th><label for="cywater-partner-stage">Review stage</label></th><td><select id="cywater-partner-stage" name="cywater_partner_stage"><?php foreach ( self::$stages as $value => $label ) : ?><option value="<?php echo esc_attr( $value ); ?>" <?php selected( $stage, $value ); ?>><?php echo esc_html( $label ); ?></option><?php endforeach; ?></select></td></tr>
-		<tr><th><label for="cywater-partner-payment-url">Approved payment URL</label></th><td><input class="regular-text" id="cywater-partner-payment-url" type="url" name="cywater_partner_payment_url" value="<?php echo esc_attr( get_post_meta( $post->ID, self::META_PREFIX . 'payment_url', true ) ); ?>"><p class="description">Use an association-controlled HTTPS Stripe invoice or payment link. It is removed unless the stage is Approved to pay or Payment received.</p></td></tr>
-		<tr><th><label for="cywater-partner-notes">Internal review notes</label></th><td><textarea class="large-text" rows="6" id="cywater-partner-notes" name="cywater_partner_notes"><?php echo esc_textarea( get_post_meta( $post->ID, self::META_PREFIX . 'notes', true ) ); ?></textarea><p class="description">Administrator-only Board/MOU notes. Do not paste credentials or unnecessary personal information.</p></td></tr>
+		<tr><th><label for="cywater-partner-stage">Review stage</label></th><td><select id="cywater-partner-stage" name="cywater_partner_stage"><?php foreach ( $available_stages as $value => $label ) : ?><option value="<?php echo esc_attr( $value ); ?>" <?php selected( $stage, $value ); ?>><?php echo esc_html( $label ); ?></option><?php endforeach; ?></select><p class="description">Approval, rejection, and payment-record transitions appear only when the current account has the corresponding capability.</p></td></tr>
+		<tr><th><label for="cywater-partner-payment-url">Approved payment URL</label></th><td><?php if ( $can_approve ) : ?><input class="regular-text" id="cywater-partner-payment-url" type="url" name="cywater_partner_payment_url" value="<?php echo esc_attr( get_post_meta( $post->ID, self::META_PREFIX . 'payment_url', true ) ); ?>"><p class="description">Use an association-controlled HTTPS Stripe invoice or payment link. It is removed unless the stage is Approved to pay or Payment received.</p><?php else : ?><span id="cywater-partner-payment-url"><?php echo esc_html( get_post_meta( $post->ID, self::META_PREFIX . 'payment_url', true ) ?: __( 'Not issued', 'cywater-partnerships' ) ); ?></span><p class="description">Only an authorized partnership approver can issue or change the payment handoff.</p><?php endif; ?></td></tr>
+		<tr><th><label for="cywater-partner-notes">Internal review notes</label></th><td><textarea class="large-text" rows="6" id="cywater-partner-notes" name="cywater_partner_notes"><?php echo esc_textarea( get_post_meta( $post->ID, self::META_PREFIX . 'notes', true ) ); ?></textarea><p class="description">Restricted Board/MOU review notes. Do not paste credentials or unnecessary personal information.</p></td></tr>
 		</tbody></table>
 		<?php
 	}
 
 	public static function save_review( $post_id, $post ) {
-		if ( ! isset( $_POST['cywater_partner_review_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['cywater_partner_review_nonce'] ) ), 'cywater_partner_review' ) || ! current_user_can( 'manage_options' ) || wp_is_post_revision( $post_id ) ) {
+		if ( ! isset( $_POST['cywater_partner_review_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['cywater_partner_review_nonce'] ) ), 'cywater_partner_review' ) || ! current_user_can( self::CAP_REVIEW ) || wp_is_post_revision( $post_id ) || ! $post instanceof WP_Post || self::POST_TYPE !== $post->post_type ) {
 			return;
 		}
 		$old_stage = get_post_meta( $post_id, self::META_PREFIX . 'stage', true ) ?: 'submitted';
 		$old_url   = get_post_meta( $post_id, self::META_PREFIX . 'payment_url', true );
-		$stage     = sanitize_key( wp_unslash( $_POST['cywater_partner_stage'] ?? 'submitted' ) );
-		if ( ! isset( self::$stages[ $stage ] ) ) {
-			$stage = 'submitted';
+		$stage     = sanitize_key( wp_unslash( $_POST['cywater_partner_stage'] ?? $old_stage ) );
+		if ( ! isset( self::$stages[ $stage ] ) || ! self::can_transition_stage( $old_stage, $stage ) ) {
+			$stage = $old_stage;
 		}
-		$payment_url = esc_url_raw( wp_unslash( $_POST['cywater_partner_payment_url'] ?? '' ), array( 'https' ) );
+		$payment_url = $old_url;
+		if ( current_user_can( self::CAP_APPROVE ) ) {
+			$payment_url = esc_url_raw( wp_unslash( $_POST['cywater_partner_payment_url'] ?? '' ), array( 'https' ) );
+		}
 		if ( ! in_array( $stage, array( 'approved', 'paid' ), true ) ) {
 			$payment_url = '';
 		}
+		$material_change = (string) $old_stage !== (string) $stage || (string) $old_url !== (string) $payment_url;
+		$allowed         = true;
+		if ( $material_change ) {
+			// A stage or payment-handoff change is governance material. The
+			// Operations plugin must explicitly authorize it after recording the
+			// audit pre-commit; an absent adapter therefore fails closed.
+			$allowed = apply_filters(
+				'cywater_partnership_review_transition_allowed',
+				new WP_Error( 'cywater_operations_audit_adapter_unavailable', __( 'The review was not saved because the operations audit adapter is unavailable.', 'cywater-partnerships' ) ),
+				$post_id,
+				$old_stage,
+				$stage,
+				$old_url,
+				$payment_url
+			);
+		}
+		if ( is_wp_error( $allowed ) || ! $allowed ) {
+			add_filter(
+				'redirect_post_location',
+				static function ( $location ) {
+					return add_query_arg( 'cywater_partner_review', 'audit-unavailable', $location );
+				},
+				99
+			);
+			return;
+		}
+		$had_stage = metadata_exists( 'post', $post_id, self::META_PREFIX . 'stage' );
+		$had_url   = metadata_exists( 'post', $post_id, self::META_PREFIX . 'payment_url' );
 		update_post_meta( $post_id, self::META_PREFIX . 'stage', $stage );
 		update_post_meta( $post_id, self::META_PREFIX . 'payment_url', $payment_url );
-		update_post_meta( $post_id, self::META_PREFIX . 'notes', sanitize_textarea_field( wp_unslash( $_POST['cywater_partner_notes'] ?? '' ) ) );
+		$stage_saved = $stage === ( get_post_meta( $post_id, self::META_PREFIX . 'stage', true ) ?: 'submitted' );
+		$url_saved   = $payment_url === get_post_meta( $post_id, self::META_PREFIX . 'payment_url', true );
+		if ( ! $stage_saved || ! $url_saved ) {
+			self::restore_review_material( $post_id, $old_stage, $old_url, $had_stage, $had_url );
+			do_action( 'cywater_partnership_review_transition_failed', $post_id, $old_stage, $stage );
+			add_filter(
+				'redirect_post_location',
+				static function ( $location ) {
+					return add_query_arg( 'cywater_partner_review', 'write-failed', $location );
+				},
+				99
+			);
+			return;
+		}
 		if ( $stage !== $old_stage || $payment_url !== $old_url ) {
 			$token = self::rotate_access_token( $post_id );
+			// Never expose a newly approved payment handoff through the previous
+			// private status link. If token persistence cannot be read back exactly,
+			// restore the material review state and send no notification.
+			if ( ! self::valid_access_token( $post_id, $token ) ) {
+				self::restore_review_material( $post_id, $old_stage, $old_url, $had_stage, $had_url );
+				do_action( 'cywater_partnership_review_transition_failed', $post_id, $old_stage, $stage );
+				add_filter(
+					'redirect_post_location',
+					static function ( $location ) {
+						return add_query_arg( 'cywater_partner_review', 'write-failed', $location );
+					},
+					99
+				);
+				return;
+			}
 			self::send_status_mail( $post_id, $token );
 		}
+		update_post_meta( $post_id, self::META_PREFIX . 'notes', sanitize_textarea_field( wp_unslash( $_POST['cywater_partner_notes'] ?? '' ) ) );
+	}
+
+	/** Restore the pre-save stage and payment handoff after a failed material write. */
+	private static function restore_review_material( $post_id, $old_stage, $old_url, $had_stage, $had_url ) {
+		if ( $had_stage ) {
+			update_post_meta( $post_id, self::META_PREFIX . 'stage', $old_stage );
+		} else {
+			delete_post_meta( $post_id, self::META_PREFIX . 'stage' );
+		}
+		if ( $had_url ) {
+			update_post_meta( $post_id, self::META_PREFIX . 'payment_url', $old_url );
+		} else {
+			delete_post_meta( $post_id, self::META_PREFIX . 'payment_url' );
+		}
+	}
+
+	/** Explain a fail-closed audit rejection without exposing review data. */
+	public static function review_admin_notice() {
+		if ( ! current_user_can( self::CAP_REVIEW ) ) {
+			return;
+		}
+		$result = sanitize_key( wp_unslash( $_GET['cywater_partner_review'] ?? '' ) );
+		if ( ! in_array( $result, array( 'audit-unavailable', 'write-failed' ), true ) ) {
+			return;
+		}
+		?>
+		<div class="notice notice-error is-dismissible"><p>
+		<?php
+		echo esc_html(
+			'audit-unavailable' === $result
+				? __( 'The partnership change was not saved because the required audit record could not be created. No review state or payment handoff was changed. Please contact a site administrator.', 'cywater-partnerships' )
+				: __( 'The partnership change could not be stored and was rolled back. No applicant notification was sent. Please contact a site administrator.', 'cywater-partnerships' )
+		);
+		?>
+		</p></div>
+		<?php
+	}
+
+	/** Return only the workflow states the current account may select. */
+	private static function available_stage_transitions( $old_stage ) {
+		$stages = array();
+		foreach ( self::$stages as $stage => $label ) {
+			if ( self::can_transition_stage( $old_stage, $stage ) ) {
+				$stages[ $stage ] = $label;
+			}
+		}
+		return $stages;
+	}
+
+	/**
+	 * Separate ordinary review, Board approval, and payment recording. Payment
+	 * can only be recorded after approval; undoing that record returns to the
+	 * already-approved state rather than silently changing the Board decision.
+	 */
+	private static function can_transition_stage( $old_stage, $new_stage ) {
+		if ( ! current_user_can( self::CAP_REVIEW ) || ! isset( self::$stages[ $new_stage ] ) ) {
+			return false;
+		}
+		if ( $old_stage === $new_stage ) {
+			return true;
+		}
+		if ( 'approved' === $old_stage && 'paid' === $new_stage ) {
+			return current_user_can( self::CAP_PAYMENT );
+		}
+		if ( 'paid' === $old_stage ) {
+			return 'approved' === $new_stage && current_user_can( self::CAP_PAYMENT );
+		}
+		if ( in_array( $old_stage, array( 'approved', 'declined' ), true ) || in_array( $new_stage, array( 'approved', 'declined' ), true ) ) {
+			return current_user_can( self::CAP_APPROVE );
+		}
+		if ( 'paid' === $new_stage ) {
+			return false;
+		}
+
+		return true;
 	}
 
 	public static function block_legacy_partner_checkout() {

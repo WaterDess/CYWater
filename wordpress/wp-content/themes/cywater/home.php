@@ -53,7 +53,7 @@ if ( ! $spotlights->have_posts() ) {
 <section class="section">
 	<div class="container container-narrow">
 		<section id="opportunities" aria-labelledby="opportunities-title">
-			<div class="section-head">
+			<div class="section-head" data-reveal="section">
 				<span class="eyebrow">Open calls and positions</span>
 				<h2 id="opportunities-title">Opportunities</h2>
 			</div>
@@ -64,7 +64,7 @@ if ( ! $spotlights->have_posts() ) {
 		</section>
 
 		<section id="spotlights" class="news-section-block" aria-labelledby="spotlights-title">
-			<div class="section-head">
+			<div class="section-head" data-reveal="section">
 				<span class="eyebrow">Research and community</span>
 				<h2 id="spotlights-title">Spotlights</h2>
 			</div>

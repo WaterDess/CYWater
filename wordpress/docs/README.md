@@ -57,10 +57,22 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 ## Current State
 
 Hostinger staging is available at `https://staging.cywater.org/`. The accepted
-baseline uses the CYWater `0.6.8` theme, CYWater Membership `0.8.2`, CYWater
-Partnerships `0.1.1`, CYWater Logo Call `0.2.0`, CYWater Environment `0.5.4`, CYWater Core `0.5.7`, and Event Tickets `5.29.1`. PMPro and Stripe
+baseline uses the CYWater `0.6.18` theme, CYWater Membership `0.8.3`, CYWater
+Partnerships `0.1.2`, CYWater Logo Call `0.2.0`, CYWater Forum `0.1.2`, CYWater
+Environment `0.5.4`, CYWater Core `0.6.1`, CYWater Operations `0.1.3`, and Event
+Tickets `5.29.1`.
+PMPro and Stripe
 Sandbox are active for staging acceptance; the live-payment gate remains
-closed and no production Stripe credential is configured. Postmark is connected on
+closed. On 2026-08-16 the association authorized PMPro's Stripe Live OAuth
+connection. A presence-only check confirmed the production Connect
+configuration without reading credentials, and PMPro's production webhook was
+created and verified through Stripe Live as enabled, API-current, and subscribed
+to all ten event types required by the installed PMPro version. A read-only Live
+account preflight also confirmed that charges and payouts are enabled, identity
+details are submitted, and no current account requirement is due. The saved
+PMPro checkout environment remains Sandbox, the staging payment mode remains
+disabled, and no real charge or refund has been performed. The free PMPro Stripe
+integration currently adds a separate 2% PMPro fee. Postmark is connected on
 staging, its domain authentication is verified, and the user confirmed a
 successful post-rotation test message on 2026-08-02. On 2026-08-03, PMPro's
 sender and the WordPress administrator notification address were corrected to
@@ -134,7 +146,10 @@ last-sign-in recording, and administrator-record/list rendering. Intercepted tes
 was not sent and the temporary user was removed. A separate real verification
 message was accepted by the configured WordPress/Postmark transport and its
 temporary user was removed; final Workspace inbox delivery remains a human
-check. Stripe Sandbox was connected
+check. Rolling annual Student and Professional terms also passed a separate
+nine-check staging QA: each full-price payment starts one complete year from its
+payment date, with no proration or calendar-year boundary, while Lifetime stays
+non-expiring. Stripe Sandbox was connected
 through PMPro on 2026-08-02. A Student `$20` Sandbox payment and the resulting
 `checkout.session.completed` webhook were verified on 2026-08-03. The Sandbox
 configuration reports card, Apple Pay, Google Pay/Link, Alipay, and WeChat Pay
@@ -204,6 +219,10 @@ information row and its Board/MOU condition; narrow screens stack the two
 parts. Existing typography, color, spacing, and motion tokens are unchanged.
 Live HTTP, version, and DOM markers passed; browser screenshot control timed out.
 
+CYWater Partnerships `0.1.2` is now deployed on staging. Its self-cleaning
+Partner workflow QA passed all 17 checks; no temporary application or related QA
+record was retained. Board and MOU decisions remain human governance work.
+
 CYWater Membership `0.6.5` also checks the actual membership end date before
 rendering an opted-in directory profile, so an expired member is hidden even
 before PMPro's queued expiration callback changes the stored status. Staging
@@ -224,7 +243,7 @@ probe accepted a valid small PNG, rejected a PNG over 2 MB with
 `pmpro_upload_file_type_error`; all temporary files were removed.
 
 Event Tickets `5.29.1` is active on staging and is filtered by CYWater Core
-`0.5.4` to the existing `cyw_event` model only. It does not create a second
+`0.6.1` to the existing `cyw_event` model only. It does not create a second
 Events editor. A staging-only, self-cleaning acceptance probe created a
 temporary event, a free RSVP with capacity three, and one attendee; the public
 ticket form, capacity, attendee report, Editor content boundary, and cleanup
@@ -234,16 +253,26 @@ Activity confirmation remains a human check. Theme `0.6.0` scopes the third-part
 ink/teal palette, spacing, borders, and button language without changing the
 accepted public design. The temporary records were removed.
 
-Paid event checkout is intentionally still closed. Event Tickets must be
-connected separately to the association's existing Stripe Sandbox because its
-event orders and attendee/seat entitlements are independent from PMPro
-membership orders. The free plugin also adds its current application fee to
-Stripe transactions; the association must accept that fee or buy Event Tickets
-Plus before paid-event launch. After connection, refund and duplicate-webhook
-acceptance must prove that a full event refund cancels only the matching
-registration and never an unrelated membership.
+CYWater Operations `0.1.3` now supplies the Event Tickets `5.29.1` paid-provider
+adapter and fail-closed gates at the ticket UI, cart preparation/processing,
+checkout request, and final Stripe order REST endpoint. The adapter consumes the
+current approved terms/readiness snapshot; a missing or exceptional adapter,
+unreadable or mismatched fee/currency configuration, stale approval fingerprint,
+or failed strict audit keeps checkout closed.
 
-On 2026-08-12 CYWater Core `0.5.7` created four non-destructive WordPress page
+Paid event checkout is intentionally still closed in the actual staging
+configuration. Tickets Commerce and its Stripe gateway are not enabled or
+connected, checkout and success pages are not configured, and no real paid
+ticket exists. These event orders and attendee/seat entitlements remain
+independent from PMPro membership orders. Before the first paid Event, configure
+those Event Tickets surfaces in Stripe Sandbox, create a real paid ticket, and
+pass success, decline, buyer cancellation, capacity, duplicate-webhook, full
+refund, and confirmation-email acceptance. The free plugin also adds its current
+application fee to Stripe transactions; the association must accept that fee or
+buy Event Tickets Plus before paid-event launch. A full event refund must cancel
+only the matching registration and never an unrelated membership.
+
+On 2026-08-12 CYWater Core created four non-destructive WordPress page
 drafts for Board review: Privacy Notice, Terms of Use, Billing/Cancellation/
 Refund, and Data Retention/Account Closure. Staging publishes them only as
 direct-link review surfaces with a not-approved notice and `noindex`,
@@ -253,6 +282,83 @@ because setup creates only missing slugs. The association confirmed that its
 Stripe settlement bank account is present and that the named representative is
 authorized; no bank, birth-date, home-address, tax-ID, or credential value is
 stored in the repository.
+
+On 2026-08-18 the Board-review direction for the four policy drafts was reduced
+to a conservative initial rule:
+**All membership sales are final and non-refundable.** Cancelling renewal
+stops only future charges and does not refund or credit the current membership
+term. Duplicate charges, technical
+errors, unauthorized or fraudulent payments, chargebacks, processor reversals,
+and non-waivable statutory rights remain billing-correction or dispute paths;
+they are not ordinary or discretionary membership refunds. If a corrected or
+reversed membership payment no longer funds an entitlement, only that order's
+matching membership and renewal may be removed. Membership and Event charges
+remain separate: an Event refund affects only its matching registration or
+program entitlement and never an unrelated membership. Paid Event registration
+remains closed unless that Event publishes its own cancellation, refund, fee,
+transfer, capacity, and change terms. There is no routine membership-refund
+approval role. These are still unapproved Board-review drafts, not effective
+policies. CYWater Core `0.6.1` is deployed on staging, and a 42-check policy QA
+passed the four review surfaces, their direct-link/noindex safeguards, and the
+strict draft wording without making any policy effective. Board and legal
+review remain required.
+
+CYWater Operations `0.1.3` is deployed on staging as the minimal launch
+framework.
+It keeps permissions separate from user identity through four composable roles:
+**Content & Event Editor**, **Community Moderator**, **Program Reviewer**, and
+**Governance Approver**. Only a built-in Administrator can assign them. The
+first role edits public content and prepares paid Events; the second moderates
+Forum articles and comments; the third uses one review bundle to inspect and
+update Logo Call entries, record shortlisting and reward fulfillment, but
+cannot create or delete submissions or protected files; and the fourth handles
+Board records, Partner workflow, and paid-Event approval. There is no separate
+Logo reward-fulfillment capability. None manages PMPro members/orders, payment
+credentials, plugins, themes, or Administrators. Role changes and workflow
+transitions use a minimal ID/state audit that stores no copied content, email,
+application notes, payment data, or credentials.
+
+Paid Events use the explicit sequence `Draft -> Terms complete -> Pending
+approval -> Approved -> Registration open -> Closed`. An editor must provide
+fee/currency plus public cancellation deadline, refund, transfer, capacity/
+wait-list, and cancellation/postponement/format-change terms before submission.
+A Governance Approver approves the submitted fingerprint; the approval
+capability is not included in the Content & Event Editor role. For operational
+independence, production assignments should place those two bundles on
+different named accounts. The editor can open registration only while that
+approval remains current. Any material change invalidates the approval and
+closes the readiness gate. This is an approval boundary only: Event Tickets and
+Stripe continue to own attendee, order, charge, refund, and webhook state. The
+workflow state does not expose checkout by itself. The deployed Event Tickets
+adapter consumes the readiness result and fails closed when the adapter, ticket
+configuration, current approval, or matching terms fingerprint is unavailable.
+Its UI, cart, checkout, and final Stripe REST enforcement are deployed, but paid
+Event checkout remains disabled because Tickets Commerce, its Stripe gateway,
+the checkout/success pages, and a real paid ticket are not configured.
+
+A self-cleaning staging QA passed all 367 Operations checks across role
+assignment boundaries, workflow transitions, strict audit behavior, Partner and
+Logo review boundaries, and paid-Event fail-closed enforcement. It created no
+permanent staff assignment. That suite did not stand in for Forum acceptance.
+
+CYWater Forum `0.1.2` was separately deployed atomically and remains active on
+staging. Its real WordPress/MySQL self-cleaning QA passed 77/77 checks covering
+the Forum Author publication gates, verified-member requirements, first-reply
+moderation, Community Moderator and built-in role boundaries, public visibility,
+trash/untrash safeguards, and moderator restoration. It intercepted two test
+messages and removed every temporary user, article, comment, PMPro row, and mail
+intercept. The pre-deploy database and `0.1.1` plugin backup is retained at
+`/home/u111638297/cywater-release-backups/forum-0.1.2-20260817T213738Z`. The
+staging preview placeholder article remains review-only content and must be
+deleted or replaced before production cutover.
+
+There is deliberately no ordinary membership-refund or finance role. Under the
+proposed final/non-refundable membership policy, only the Administrator handles
+PMPro membership/order records and exceptional billing-correction or dispute
+reconciliation. The official PMPro Membership Manager Add On is not installed
+and does not block launch; it is needed only if this work is later delegated to
+a non-Administrator. CYWater must not create a local imitation of that licensed
+role.
 
 CYWater Logo Call `0.2.0` is an independent removable plugin attached only to
 the enabled `CYWater Logo Design Call 2026` staging event. The review schedule
@@ -297,6 +403,12 @@ its indicators map one-to-one to Upcoming Event records, and it rotates every
 6.5 seconds unless hover, keyboard focus, document visibility, or reduced-motion
 preferences pause it. Keyboard arrows and touch swipes select the same records;
 no Event data is copied into a separate slider model.
+Theme `0.6.18` is the current staging baseline. A read-only manifest comparison
+found all 92 local and staging files present and byte-identical, with manifest
+SHA-256
+`a58ce052d8b9674d44002dc527d3f573e359e55c7d3afc083b3521d094db59ff`;
+no theme redeploy was required. This is staging verification, not a production
+release.
 At the user's explicit direction, staging user `grups`
 was assigned Lifetime on 2026-08-12. Verification found no expiry, zero PMPro
 orders, and both submission and voting eligibility; no payment record, invoice,

@@ -2,10 +2,13 @@
 
 ## Scope
 
-Use a dedicated Stripe Sandbox and sandbox API keys only. The application safety
-gate rejects `sk_live_` and `pk_live_` values unless the runtime is Production
-and explicitly sets both `CYWATER_PAYMENT_MODE=live` and
-`CYWATER_ALLOW_LIVE_PAYMENTS=true`. CYWater does not store card data.
+Run checkout acceptance only in the dedicated Stripe Sandbox. A production
+Stripe OAuth connection and production webhook may be prepared on staging, but
+they must not become the active checkout environment while the application
+safety gate is closed. The gate rejects `sk_live_` and `pk_live_` values unless
+the runtime is Production and explicitly sets both
+`CYWATER_PAYMENT_MODE=live` and `CYWATER_ALLOW_LIVE_PAYMENTS=true`. CYWater does
+not store card data.
 
 PMPro owns checkout, Stripe objects, webhook verification, orders, receipts, and
 membership activation. The custom plugins supply membership policy and guard the
@@ -25,6 +28,32 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 Create the webhook through PMPro's Stripe settings and restrict it to the event
 types PMPro documents for the installed version. Use an HTTPS staging URL or the
 Stripe CLI when testing callbacks; localhost alone is not reachable by Stripe.
+
+## Live Connection Readiness
+
+On 2026-08-16 the association authorized PMPro's Stripe Live OAuth connection.
+A staging-restricted, presence-only probe confirmed the Live Connect
+configuration without reading or printing credentials. PMPro's production
+webhook was then created through PMPro's own Stripe gateway and read back from
+Stripe Live as present, enabled, current for the installed PMPro Stripe API
+version, and subscribed to all ten event types required by that version. The
+same read-only preflight confirmed that the Live account is reachable, charges
+and payouts are enabled, identity details are submitted, and there is no
+currently due account requirement.
+
+The saved PMPro gateway environment remains `sandbox`, the site remains a
+staging runtime, `CYWATER_PAYMENT_MODE` remains `disabled`, and
+`CYWATER_ALLOW_LIVE_PAYMENTS` remains false. No production charge or refund was
+performed. The final financial acceptance is a separately authorized real
+small-value payment followed by a full refund after the production cutover
+configuration has passed its preflight. The free PMPro Stripe integration also
+adds a separate 2% PMPro fee unless a qualifying premium PMPro license is
+activated.
+
+The Live connection and production webhook were verified with one-use,
+staging-restricted administrative probes. Those temporary helpers are not part
+of the repository. They did not change the saved checkout environment or print
+account identifiers, keys, webhook identifiers, or webhook secrets.
 
 ## Acceptance Matrix
 

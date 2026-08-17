@@ -12,6 +12,9 @@ const required = [
   "scripts/test-playground.mjs",
   "scripts/cywater-staging-ticketing-qa.php",
   "scripts/cywater-staging-partner-qa.php",
+  "scripts/cywater-staging-forum-qa.php",
+  "scripts/cywater-staging-policy-qa.php",
+  "scripts/cywater-staging-update-policy-drafts.php",
   "wordpress/wp-content/plugins/cywater-core/data/seed.json",
   "wordpress/wp-content/themes/cywater/style.css",
   "wordpress/wp-content/themes/cywater/functions.php",
@@ -19,6 +22,13 @@ const required = [
   "wordpress/wp-content/themes/cywater/home.php",
   "wordpress/wp-content/themes/cywater/archive-cyw_event.php",
   "wordpress/wp-content/themes/cywater/archive-cyw_award.php",
+  "wordpress/wp-content/themes/cywater/archive-cyw_forum_post.php",
+  "wordpress/wp-content/themes/cywater/author.php",
+  "wordpress/wp-content/themes/cywater/comments.php",
+  "wordpress/wp-content/themes/cywater/single-cyw_forum_post.php",
+  "wordpress/wp-content/themes/cywater/taxonomy-cyw_forum_category.php",
+  "wordpress/wp-content/themes/cywater/taxonomy-cyw_forum_topic.php",
+  "wordpress/wp-content/themes/cywater/template-parts/forum-card.php",
   "wordpress/wp-content/themes/cywater/template-parts/title-visual.php",
   "wordpress/wp-content/themes/cywater/page-about.php",
   "wordpress/wp-content/themes/cywater/page-board.php",
@@ -33,6 +43,25 @@ const required = [
   "wordpress/wp-content/plugins/cywater-membership/includes/class-cywater-membership-avatars.php",
   "wordpress/wp-content/plugins/cywater-partnerships/cywater-partnerships.php",
   "wordpress/wp-content/plugins/cywater-partnerships/includes/class-cywater-partnerships.php",
+  "wordpress/wp-content/plugins/cywater-forum/cywater-forum.php",
+  "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-admin.php",
+  "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-ai.php",
+  "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-comments.php",
+  "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-content.php",
+  "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-endorsement.php",
+  "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-roles.php",
+  "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-settings.php",
+  "wordpress/wp-content/plugins/cywater-forum/includes/defaults.php",
+  "wordpress/wp-content/plugins/cywater-forum/uninstall.php",
+  "wordpress/wp-content/plugins/cywater-operations/cywater-operations.php",
+  "wordpress/wp-content/plugins/cywater-operations/includes/class-cywater-event-tickets-paid-adapter.php",
+  "wordpress/wp-content/plugins/cywater-operations/includes/class-cywater-operations-admin.php",
+  "wordpress/wp-content/plugins/cywater-operations/includes/class-cywater-operations-audit.php",
+  "wordpress/wp-content/plugins/cywater-operations/includes/class-cywater-operations-integrations.php",
+  "wordpress/wp-content/plugins/cywater-operations/includes/class-cywater-operations-logo-review.php",
+  "wordpress/wp-content/plugins/cywater-operations/includes/class-cywater-operations-qa.php",
+  "wordpress/wp-content/plugins/cywater-operations/includes/class-cywater-operations-roles.php",
+  "wordpress/wp-content/plugins/cywater-operations/includes/class-cywater-paid-event-approval.php",
   "wordpress/wp-content/plugins/cywater-logo-call/cywater-logo-call.php",
   "wordpress/wp-content/plugins/cywater-logo-call/includes/class-cywater-logo-call.php",
   "wordpress/wp-content/plugins/cywater-logo-call/includes/class-cywater-logo-call-eligibility.php",
@@ -194,8 +223,67 @@ assertMarkers(
     "wp_privacy_personal_data_exporters",
     "partner-contribution-amount",
     "Annual contribution after approval",
+    "cywater_partnership_review_transition_allowed",
+    "cywater_delete_partnership_applications",
   ],
   "CYWater partnership workflow"
+);
+
+const operationsRoles = await readFile(
+  path.join(root, "wordpress", "wp-content", "plugins", "cywater-operations", "includes", "class-cywater-operations-roles.php"),
+  "utf8"
+);
+const operationsAudit = await readFile(
+  path.join(root, "wordpress", "wp-content", "plugins", "cywater-operations", "includes", "class-cywater-operations-audit.php"),
+  "utf8"
+);
+const operationsIntegrations = await readFile(
+  path.join(root, "wordpress", "wp-content", "plugins", "cywater-operations", "includes", "class-cywater-operations-integrations.php"),
+  "utf8"
+);
+const paidEventApproval = await readFile(
+  path.join(root, "wordpress", "wp-content", "plugins", "cywater-operations", "includes", "class-cywater-paid-event-approval.php"),
+  "utf8"
+);
+const operationsQa = await readFile(
+  path.join(root, "wordpress", "wp-content", "plugins", "cywater-operations", "includes", "class-cywater-operations-qa.php"),
+  "utf8"
+);
+assertMarkers(
+  operationsRoles,
+  [
+    "cywater_content_event_editor",
+    "cywater_community_moderator",
+    "cywater_program_reviewer",
+    "cywater_governance_approver",
+    "cywater_delete_logo_entries",
+    "cywater_delete_partnership_applications",
+    "RETIRED_CAPS",
+  ],
+  "CYWater Operations role bundles"
+);
+assert(
+  !operationsRoles.includes("cywater_membership_finance_manager"),
+  "CYWater Operations must not create an unlicensed local membership/finance-manager role."
+);
+assert(
+  !operationsRoles.match(/["']cywater_fulfill_logo_reward["']\s*=>/),
+  "CYWater Operations must not expose the retired fake Logo reward capability as a role bundle."
+);
+assertMarkers(
+  `${operationsAudit}\n${operationsIntegrations}\n${paidEventApproval}\n${operationsQa}`,
+  [
+    "cywater_operations_audit_before_insert",
+    "cywater_partnership_review_transition_allowed",
+    "cywater_operations_paid_event_adapter_snapshot",
+    "cywater_paid_event_registration_ready",
+    "transition_authorized",
+    "audit_unavailable",
+    "registration_open",
+    "checkout_ready",
+    "operations qa",
+  ],
+  "CYWater Operations audit and paid-event gates"
 );
 
 const logoCallProvider = await readFile(
@@ -234,12 +322,20 @@ assertMarkers(
     "Draft for Board Review — Not approved or in effect.",
     "billing-cancellation-refund-policy-draft",
     "data-retention-account-closure-policy-draft",
-    "Selection does not itself transfer ownership",
+    "All membership sales are final and non-refundable.",
+    "Selection does not transfer ownership",
+    "These are billing corrections or legally required remedies, not a general membership-refund entitlement.",
     "wp_robots",
     "noarchive",
   ],
   "CYWater policy drafts"
 );
+for (const obsoletePolicyText of ["30 calendar days", "mistaken purchase", "exceptional hardship"]) {
+  assert(
+    !policyDraftProvider.toLowerCase().includes(obsoletePolicyText.toLowerCase()),
+    `CYWater policy drafts retain obsolete refund wording: ${obsoletePolicyText}`
+  );
+}
 
 for (const key of ["home", "about", "board", "bylaws", "membership", "contact"]) {
   assert(seed.pages?.[key], `Missing editable page seed: ${key}.`);

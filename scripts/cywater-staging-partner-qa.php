@@ -9,6 +9,12 @@ if ( ! defined( 'WP_CLI' ) || ! WP_CLI ) {
 	exit( 1 );
 }
 
+$home_host = strtolower( (string) wp_parse_url( home_url( '/' ), PHP_URL_HOST ) );
+$site_host = strtolower( (string) wp_parse_url( site_url( '/' ), PHP_URL_HOST ) );
+if ( 'staging.cywater.org' !== $home_host || 'staging.cywater.org' !== $site_host || 'staging' !== wp_get_environment_type() ) {
+	WP_CLI::error( 'Refusing to run partnership QA outside the exact CYWater staging environment.' );
+}
+
 $assert = static function ( $condition, $message ) {
 	if ( ! $condition ) {
 		WP_CLI::error( $message );
@@ -21,8 +27,12 @@ $guide = get_page_by_path( 'become-a-partner' );
 $assert( $guide instanceof WP_Post && 'publish' === $guide->post_status, 'Partner guide page is published' );
 $assert( has_shortcode( $guide->post_content, 'cywater_partner_application' ), 'Partner guide page contains the application shortcode' );
 $post_type_object = get_post_type_object( CYWater_Partnerships::POST_TYPE );
-$assert( $post_type_object && 'manage_options' === $post_type_object->cap->edit_posts, 'Only Administrators can review partner applications' );
-$assert( get_role( 'administrator' )->has_cap( 'manage_options' ) && ! get_role( 'editor' )->has_cap( 'manage_options' ), 'Administrator and Editor partnership-review boundary is enforced' );
+$assert( $post_type_object && CYWater_Partnerships::CAP_REVIEW === $post_type_object->cap->edit_posts, 'Partner review uses its dedicated capability' );
+$assert( $post_type_object && CYWater_Partnerships::CAP_DELETE === $post_type_object->cap->delete_posts, 'Partner deletion uses its separate Administrator-only capability' );
+$administrator = get_role( 'administrator' );
+$editor        = get_role( 'editor' );
+$assert( $administrator && $administrator->has_cap( CYWater_Partnerships::CAP_REVIEW ) && $administrator->has_cap( CYWater_Partnerships::CAP_APPROVE ) && $administrator->has_cap( CYWater_Partnerships::CAP_PAYMENT ) && $administrator->has_cap( CYWater_Partnerships::CAP_DELETE ), 'Administrator retains recovery access to every partnership workflow capability' );
+$assert( $editor && ! $editor->has_cap( CYWater_Partnerships::CAP_REVIEW ) && ! $editor->has_cap( CYWater_Partnerships::CAP_APPROVE ) && ! $editor->has_cap( CYWater_Partnerships::CAP_PAYMENT ) && ! $editor->has_cap( CYWater_Partnerships::CAP_DELETE ), 'Built-in Editor receives no partnership workflow or deletion capability' );
 
 $levels  = function_exists( 'pmpro_getAllLevels' ) ? pmpro_getAllLevels( true, true ) : array();
 $partner = null;

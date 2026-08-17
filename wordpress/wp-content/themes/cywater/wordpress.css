@@ -97,7 +97,7 @@
 
 .single-cyw_event .tribe-tickets__form-field-input {
   border-color: var(--line);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius);
   font-family: var(--font-body);
 }
 
@@ -224,9 +224,262 @@
 .faq-item.is-open .faq-a { max-height: 300px; }
 .faq-a p { padding-bottom: var(--sp-4); font-size: var(--fs-sm); }
 
+/* ---------------------------------------------------------------------------
+   Forum
+
+   Reuses the accepted card, badge, and prose system. Nothing here introduces a
+   new palette, type scale, or motion rule.
+   --------------------------------------------------------------------------- */
+
+.forum-filters {
+  display: grid;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-6);
+}
+
+.forum-filters .tag-list a.badge:hover {
+  background: var(--teal);
+  color: var(--white);
+}
+
+.forum-card {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  background: var(--white);
+  border-color: var(--line);
+  border-radius: var(--radius-lg);
+}
+
+.forum-card .card-body {
+  min-height: 100%;
+}
+
+.forum-card .card-media {
+  aspect-ratio: 16 / 9;
+  background: var(--paper-warm);
+}
+
+.forum-card .forum-card-link {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.forum-card a:not(.forum-card-link) {
+  position: relative;
+  z-index: 2;
+}
+
+.forum-card:focus-within {
+  outline: 2px solid var(--teal);
+  outline-offset: 3px;
+}
+
+.forum-byline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--line);
+  font-size: var(--fs-sm);
+}
+
+.forum-byline a {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.forum-byline a:hover {
+  color: var(--teal);
+}
+
+.forum-replies {
+  color: var(--ink-soft, #5a6a6a);
+}
+
+.forum-article-byline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.forum-article-byline a {
+  color: var(--white);
+  font-weight: 600;
+}
+
+.forum-article-byline a:hover {
+  color: var(--teal-soft);
+}
+
+.forum-article-media {
+  margin-top: calc(var(--sp-7) * -1);
+  margin-bottom: var(--sp-6);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.forum-article-media img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.forum-article-topics {
+  margin-top: var(--sp-6);
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--line);
+}
+
+.forum-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--sp-2);
+  margin-top: var(--sp-7);
+}
+
+.forum-pagination .page-numbers {
+  padding: .45rem .7rem;
+  color: var(--ink);
+  border-bottom: 1px solid transparent;
+}
+
+.forum-pagination .page-numbers.current,
+.forum-pagination .page-numbers:hover {
+  color: var(--teal);
+  border-bottom-color: var(--teal);
+}
+
+.forum-endorsement-status {
+  margin: 0 0 var(--sp-5);
+  padding-left: var(--sp-5);
+  font-size: var(--fs-sm);
+}
+
+.forum-endorsement-note {
+  margin-top: var(--sp-5);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--line);
+  font-size: var(--fs-sm);
+}
+
+/* Discussion */
+
+.forum-comments .comment-list {
+  margin: var(--sp-6) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.forum-comments .comment-list ol.children {
+  margin: var(--sp-4) 0 0 var(--sp-5);
+  padding: 0;
+  list-style: none;
+  border-left: 2px solid var(--line);
+  padding-left: var(--sp-5);
+}
+
+.forum-comments .comment-body {
+  padding: var(--sp-5) 0;
+  border-top: 1px solid var(--line);
+}
+
+.forum-comments .comment-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-3);
+  font-size: var(--fs-sm);
+}
+
+.forum-comments .comment-author img {
+  display: inline-block;
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
+  max-width: 48px;
+  aspect-ratio: 1;
+  border-radius: 100px;
+  object-fit: cover;
+  vertical-align: middle;
+  margin-right: var(--sp-2);
+}
+
+.forum-comments .comment-awaiting-moderation {
+  display: block;
+  margin-top: var(--sp-2);
+  font-size: var(--fs-sm);
+  color: var(--rust);
+}
+
+.forum-comments-gate,
+.forum-comments-note {
+  margin-top: var(--sp-5);
+  font-size: var(--fs-sm);
+}
+
+.forum-comments-gate {
+  padding: var(--sp-5);
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+}
+
+.forum-discussion {
+  border-top: 1px solid var(--line);
+}
+
+.forum-comments .comment-form {
+  display: grid;
+  gap: var(--sp-4);
+  margin-top: var(--sp-6);
+}
+
+.forum-comments .comment-form label {
+  display: block;
+  margin-bottom: var(--sp-2);
+  font-weight: 600;
+  font-size: var(--fs-sm);
+}
+
+.forum-comments .comment-form textarea {
+  width: 100%;
+  background: var(--white);
+  padding: var(--sp-3);
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  resize: vertical;
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+
+.forum-comments .comment-form textarea:focus {
+  outline: none;
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px var(--teal-tint);
+}
+
 @media (max-width: 760px) {
   .entry-content .alignwide {
     margin-left: 0;
     margin-right: 0;
+  }
+
+  .forum-article-media {
+    margin-top: 0;
+    border-radius: 0;
+  }
+
+  .forum-comments .comment-list ol.children {
+    margin-left: var(--sp-3);
+    padding-left: var(--sp-3);
   }
 }

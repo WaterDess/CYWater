@@ -155,12 +155,13 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   `127.0.0.1` URL as a Lenovo-laptop preview. No Playground service is expected
   to remain running after the review task.
 
-### Temporary Staging Snapshot (2026-08-13)
+### Temporary Staging Snapshot (2026-08-18)
 
 - Hostinger staging is available at `https://staging.cywater.org/` with the
-  CYWater `0.6.8` theme, CYWater Membership `0.8.2`, CYWater Partnerships
-  `0.1.1`, CYWater Logo Call `0.2.0`, CYWater Environment `0.5.4`, CYWater Core `0.5.7`, and Event Tickets
-  `5.29.1`.
+  CYWater `0.6.18` theme, CYWater Membership `0.8.3`, CYWater Partnerships
+  `0.1.2`, CYWater Logo Call `0.2.0`, CYWater Forum `0.1.2`, CYWater
+  Environment `0.5.4`, CYWater Core `0.6.1`, CYWater Operations `0.1.3`, and
+  Event Tickets `5.29.1`.
 - Dedicated Hostinger SSH access from the Lenovo workstation was established
   and independently verified with public-key authentication on 2026-08-02.
   The private key remains local and must never be copied into the repository.
@@ -225,6 +226,38 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   still creates missing policy pages as drafts. CYWater confirmed that its Stripe settlement bank account is
   present and its named representative is association-authorized; do not record
   bank, birth-date, home-address, tax-ID, or credential values in Git.
+- On 2026-08-18 CYWater Core `0.6.1` revised all four policy review surfaces for
+  a conservative initial launch. The proposed membership rule is: **All
+  membership sales are final and non-refundable.** Cancelling renewal stops
+  future charges only and does not refund or credit the current term. Duplicate,
+  technical, unauthorized or fraudulent transactions, chargebacks, processor
+  reversals, and non-waivable rights are handled as billing corrections or
+  disputes rather than ordinary membership refunds. Membership and Event orders
+  remain separate, and every paid Event must publish its own cancellation and
+  refund terms before registration can open. The 42-check staging policy QA
+  passed, but these pages remain noindex, absent from navigation, and explicitly
+  not approved or in effect until Board and legal review.
+- CYWater Operations `0.1.3` is deployed with four composable operational role
+  bundles: Content & Event Editor, Community Moderator, Program Reviewer, and
+  Governance Approver. There is no ordinary membership-refund role. Program
+  Reviewer uses one review workflow to record Logo Call shortlist and reward-
+  fulfillment state but cannot create, publish, or delete submissions or
+  protected files; the real reward grant remains an Administrator action. The
+  paid-Event adapter and its UI, cart, checkout, and final Stripe REST gates fail
+  closed on missing or invalid readiness, configuration, approval fingerprint,
+  or strict audit. Its self-cleaning staging QA passed 367 assertions. This does
+  not assign a real staff role.
+- CYWater Forum `0.1.2` was atomically deployed and remains active on staging.
+  Its real WordPress/MySQL self-cleaning QA passed 77/77 checks covering Forum
+  Author publication gates, verified-member eligibility, first-reply
+  moderation, Community Moderator and built-in role boundaries, public
+  visibility, trash/untrash safeguards, moderator restoration, and cleanup. It
+  intercepted two test messages and removed all temporary users, articles,
+  comments, PMPro rows, and mail intercepts. The pre-deploy database and `0.1.1`
+  plugin backup is retained at
+  `/home/u111638297/cywater-release-backups/forum-0.1.2-20260817T213738Z`.
+  The staging preview placeholder article must be deleted or replaced before
+  production cutover.
 - CYWater Logo Call `0.2.0` is an independent removable plugin attached only to
   the enabled 2026 Logo Design Call event. Submissions run August 12 through
   September 12, 2026: one original/logo-lockup set (5 MB per file) per
@@ -265,6 +298,9 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   the accepted typography, spacing, line, and color tokens and becomes a simple
   vertical flow on narrow screens. Live HTTP, version, and DOM markers passed;
   screenshot-level browser control timed out, so final visual review remains open.
+- CYWater Partnerships `0.1.2` is deployed. Its self-cleaning staging QA passed
+  all 17 checks and retained no temporary application; actual Board and MOU
+  decisions remain human governance work.
 - Theme `0.6.5` reorganizes the Events archive into Upcoming, Annual Meetings,
   Annual Gathering, and Member Programs. A sticky desktop category navigator
   becomes a compact horizontal navigator on narrow screens. Upcoming events use
@@ -287,6 +323,10 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   keyboard arrows, touch swipes, and reduced-motion handling follow the
   interaction structure requested from the Steam reference while retaining
   CYWater typography, color, spacing, radius, and Event data ownership.
+- Theme `0.6.18` is the current staging baseline. A read-only comparison found
+  all 92 local and staging files byte-identical, with manifest SHA-256
+  `a58ce052d8b9674d44002dc527d3f573e359e55c7d3afc083b3521d094db59ff`, so no
+  theme redeploy was required. This does not mean production is deployed.
 - Stripe Sandbox was connected through PMPro on 2026-08-02. A server-side
   presence-only check confirmed the Sandbox Connect values without reading or
   exposing them, and PMPro's own status check reports the Sandbox webhook as
@@ -310,11 +350,26 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   displayed card, Apple Pay, Google Pay, and Alipay but not WeChat Pay. Stripe
   dynamically filters methods by checkout eligibility. Live payment remains
   disabled.
+- On 2026-08-16 PMPro's Stripe Live OAuth connection was authorized for the
+  association's CYWater Stripe account. A staging-restricted, presence-only
+  check confirmed the Live Connect configuration without reading or exposing
+  credentials. PMPro's production webhook was created through its Stripe
+  gateway and read back from Stripe Live as present, enabled, current for the
+  installed PMPro Stripe API version, and subscribed to all ten event types
+  required by that version. The same read-only Live account preflight confirmed
+  that the account is reachable, charges and payouts are enabled, identity
+  details are submitted, and no current account requirement is due. The saved
+  PMPro checkout environment remains `sandbox`; `WP_ENVIRONMENT_TYPE` remains `staging`,
+  `CYWATER_PAYMENT_MODE` remains `disabled`, and
+  `CYWATER_ALLOW_LIVE_PAYMENTS` remains false. No real charge or refund was
+  performed. The free PMPro Stripe integration currently adds a separate 2%
+  PMPro fee; activating a qualifying premium PMPro license removes that fee.
 - CYWater Membership `0.8.3` implements rolling annual Student and Professional
   terms: every successful full-price payment starts a new one-year term on its
   payment date, with no proration or December 31 boundary. Lifetime remains
   non-expiring. Staging had no active Student or Professional membership to
-  migrate when this policy changed on 2026-08-13.
+  migrate when this policy changed on 2026-08-13. A separate self-cleaning
+  nine-check staging QA passed this rolling-term behavior.
 - The same plugin retains the current account-first path: a
   logged-out checkout redirects to the PMPro sign-in page; that page links to a
   dedicated `/member-register/` account form. New accounts sign in but must
@@ -376,8 +431,10 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   expired exclusion, field allowlisting, email exclusion, ORCID rendering,
   expiration scheduling/callback, and administrator/editor/subscriber
   capability boundaries. PMPro's separate Membership Manager role is not
-  installed; its official Premium Add On and valid license remain an external
-  access-control gate. Do not create a drifting local imitation of that role.
+  installed and is not a launch blocker while the built-in Administrator handles
+  memberships and orders. Install the official Premium Add On only if that work
+  is later delegated to non-administrator staff; do not create a drifting local
+  imitation of the role.
 - CYWater Membership `0.6.5` also corrects the PMPro profile-photo field
   contract: allowed extensions use PMPro's comma-separated format and the 2 MB
   limit is expressed in megabytes. This removed the authenticated Member
@@ -402,16 +459,21 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   existing Administrator remain open. On 2026-08-03 MFA was explicitly
   deferred because no association-controlled phone, tablet, security key, or
   managed authenticator exists; do not make a private device the sole factor.
-- Event Tickets `5.29.1` is active and CYWater Core `0.5.4` limits it to the
+- Event Tickets `5.29.1` is active and CYWater Core `0.6.1` limits it to the
   existing `cyw_event` content model. A staging-only probe passed free RSVP,
   capacity, attendee reporting, public form output, Editor content boundaries,
   confirmation-mail handoff to the configured WordPress/Postmark transport,
   and automatic cleanup. Theme `0.6.0` scopes its form to the accepted design
-  tokens without changing the public visual system. Paid event checkout remains
-  disabled until Event Tickets is separately connected to the association's
-  existing Stripe Sandbox and its success/decline/cancel/refund/duplicate/
-  capacity/email matrix passes. An event refund must cancel only its matching
-  registration and must never invoke PMPro membership revocation.
+  tokens without changing the public visual system. CYWater Operations `0.1.3`
+  deploys the Event Tickets paid-provider adapter plus fail-closed gates at the
+  ticket UI, cart preparation/processing, checkout request, and final Stripe
+  order REST endpoint. Actual paid checkout remains closed because Tickets
+  Commerce and its Stripe gateway are not enabled or connected, checkout and
+  success pages are not configured, and no real paid ticket exists. Before the
+  first paid Event, configure those surfaces in Stripe Sandbox and pass the
+  success/decline/cancel/refund/duplicate/capacity/email matrix. An Event refund
+  must cancel only its matching registration and must never invoke PMPro
+  membership revocation.
 - The staging-only lifecycle QA passed real create/update/trash/delete operations
   for News, Events, Awards, and Board roles, plus temporary Subscriber
   create/delete, profile/privacy persistence, membership activation/cancellation,
@@ -419,16 +481,18 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
 - The public home, News, Events, Awards, Contact, Board, and Bylaws routes match
   the accepted static baseline. `/about/board/` and `/about/bylaws/` are
   intentional 301 compatibility redirects; `/hello-world/` returns 404.
-- PMPro and Stripe Sandbox are active for staging acceptance. The live-payment
-  gate is closed and no production Stripe credential is configured.
+- PMPro and Stripe Sandbox are active for staging acceptance. Stripe Live
+  Connect and its production webhook are configured, but the saved checkout
+  environment remains Sandbox and the live-payment gate remains closed.
 - Hostinger backups and a staging environment exist. Continue to use normal,
   revision-aware setup only; force import remains destructive and requires an
   explicit backup plus user approval.
 - Remaining release gates are external/account-level or destructive acceptance:
-  MFA/recovery for the existing association-owned WordPress Administrator, the
-  licensed Membership Manager role if required, final policy/legal copy, one non-Gmail delivery target,
+  MFA/recovery for the existing association-owned WordPress Administrator,
+  final policy/legal copy, one non-Gmail delivery target,
   authenticated cross-browser review, Hostinger access protection, and a real
-  backup restore rehearsal.
+  backup restore rehearsal. The Forum staging preview placeholder article must
+  also be deleted or replaced before production cutover.
   Exact human/external procedures are in
   `wordpress/docs/manual-external-handoff.md`.
 

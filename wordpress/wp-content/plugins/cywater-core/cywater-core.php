@@ -2,7 +2,7 @@
 /**
  * Plugin Name: CYWater Core
  * Description: Portable content models, editorial fields, and idempotent static-content import for CYWater.
- * Version: 0.5.8
+ * Version: 0.6.1
  * Requires at least: 7.0
  * Requires PHP: 8.1
  * Text Domain: cywater-core
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CYWATER_CORE_VERSION', '0.5.8' );
+define( 'CYWATER_CORE_VERSION', '0.6.1' );
 define( 'CYWATER_CORE_FILE', __FILE__ );
 define( 'CYWATER_CORE_DIR', plugin_dir_path( __FILE__ ) );
 
@@ -23,6 +23,7 @@ require_once CYWATER_CORE_DIR . 'includes/class-cywater-policy-drafts.php';
 require_once CYWATER_CORE_DIR . 'includes/class-cywater-setup.php';
 
 function cywater_core_boot() {
+	CYWater_Content_Types::grant_administrator_capabilities();
 	CYWater_Content_Types::register();
 	CYWater_Meta_Boxes::register();
 	CYWater_Policy_Drafts::register();
@@ -36,6 +37,8 @@ add_action( 'plugins_loaded', 'cywater_core_boot' );
  * Apply non-destructive data migrations after a plugin update.
  */
 function cywater_core_maybe_upgrade() {
+	CYWater_Content_Types::grant_administrator_capabilities();
+
 	if ( ! current_user_can( 'manage_options' ) ) {
 		return;
 	}
@@ -64,6 +67,7 @@ function cywater_core_maybe_flush_rewrite_rules() {
 }
 
 function cywater_core_activate() {
+	CYWater_Content_Types::grant_administrator_capabilities();
 	CYWater_Content_Types::register_content_types();
 	flush_rewrite_rules();
 	update_option( 'cywater_core_rewrite_version', CYWATER_CORE_VERSION, false );

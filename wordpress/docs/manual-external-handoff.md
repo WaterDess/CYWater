@@ -28,8 +28,11 @@ Remaining actions:
 4. If the association later decides that independent lockout recovery is more
    important than the single-Administrator policy, it may add a second named
    Administrator without changing platform ownership.
-5. If non-administrator membership staff are required, buy the official PMPro
-   Membership Manager Add On, install it on staging, assign it to a named staff
+5. The official PMPro Membership Manager Add On is not installed and is not a
+   prerequisite for collecting membership payments. The Administrator currently
+   handles membership and order operations, including billing-correction and
+   dispute records. If this work is later delegated to non-administrator staff,
+   buy the official Add On, install it on staging, assign it to a named staff
    user, and verify that the user can manage members/orders but cannot install
    plugins, edit themes, or manage administrators. Do not create a local clone
    of this licensed role.
@@ -49,6 +52,43 @@ factor merely to close the checklist. This remains an accepted security risk
 to revisit before production handover or when association-controlled hardware
 becomes available.
 
+### Operational role assignment
+
+The launch matrix uses four composable roles. They are not automatically
+assigned to a real person, and a title or membership level never grants them.
+After a named organization account is supplied, the built-in Administrator may
+assign one or more roles under **Users -> CYWater operational roles**:
+
+| Role | Permitted launch work | Explicitly excluded |
+| --- | --- | --- |
+| CYWater Content & Event Editor | Posts/News, media, Events, Awards, Event terms, Logo Call configuration, submit paid Event for approval, open/close registration after approval | Governance approval, Forum moderation, PMPro members/orders, payment settings |
+| CYWater Community Moderator | Forum articles/taxonomy and comment moderation | Other public content models, Events, membership/payment administration |
+| CYWater Program Reviewer | Inspect/update Logo entries and record shortlisting/reward fulfillment through one review bundle | Create/delete submissions or protected files, automatic membership grant, Event/Partner approval, PMPro orders |
+| CYWater Governance Approver | Board records, Partner review/approval/payment confirmation, paid-Event approval | Event editing, PMPro membership/order operations, gateway credentials |
+
+Only a built-in Administrator may assign or remove these roles. The operational
+audit records identifiers, role/workflow states, time, action, and a short reason
+only; it intentionally excludes names, email, content, application notes,
+payment data, and credentials. CYWater Operations `0.1.3` is deployed, and its
+self-cleaning staging QA passed all 367 role, workflow, strict-audit, and
+fail-closed checks. This did not assign a real staff user. CYWater Forum `0.1.2`
+was then atomically deployed and kept active; its separate real WordPress/MySQL
+self-cleaning QA passed 77/77 publication, membership/email-verification,
+first-reply moderation, role-boundary, visibility, trash/untrash, restoration,
+and cleanup checks. It intercepted two test messages and removed all temporary
+users, articles, comments, PMPro rows, and mail intercepts. The pre-deploy
+database and plugin backup is
+`/home/u111638297/cywater-release-backups/forum-0.1.2-20260817T213738Z`.
+Before assigning a real account, verify the named user's exact screens and
+listed work; do not assign broad roles merely to make a screen visible. Before
+production cutover, delete or replace the staging Forum preview placeholder
+article; do not publish it as association content.
+
+Program review deliberately has no independent reward-fulfillment capability.
+The same review bundle may record shortlist and fulfillment status, but it may
+not fabricate or delete a participant's submission or protected files and it
+never grants or changes PMPro membership automatically.
+
 ## 2. Final Mail Acceptance
 
 1. Approve the legal footer and production wording in every template listed in
@@ -60,17 +100,45 @@ becomes available.
 
 ## 3. Policy Decisions
 
-The Board must approve the privacy notice, terms, refund policy, recurring
+The Board must approve the privacy notice, terms, billing/refund policy, recurring
 billing policy, rolling annual-term rule, data-retention rule, and
-account-erasure process. Membership cancellation, a full refund, sign-out, and
-account erasure are intentionally different operations:
+account-erasure process. Membership cancellation, a billing correction or
+payment reversal, an Event refund, sign-out, and account erasure are
+intentionally different operations:
 
 - sign-out ends only the browser session;
-- cancellation removes future membership access but preserves the account and
-  financial record;
-- a full membership refund cancels only the membership funded by that order;
+- cancellation stops a future renewal or ends access under the applicable
+  membership terms but preserves the account and financial record;
+- the proposed launch rule is:
+  **All membership sales are final and non-refundable.** There is no proration,
+  unused-time credit, ordinary refund, or discretionary exception;
+- duplicate charges, technical errors, unauthorized or fraudulent payments,
+  chargebacks, processor reversals, and non-waivable statutory rights remain
+  billing-correction or dispute paths rather than ordinary membership refunds;
+- when a corrected or reversed membership payment no longer funds an
+  entitlement, only the membership funded by that order and its matching
+  renewal may be removed; the adjustment does not refund or cancel an Event
+  order;
+- an approved event refund cancels only its registration or program
+  entitlement and does not cancel individual membership;
 - deletion/anonymization of a paid account must follow the approved retention
   policy and must not silently destroy required accounting records.
+
+There is no routine membership-refund approval workflow or refund-approver
+role. The Administrator records and reconciles duplicate/technical corrections,
+unauthorized or fraudulent payment reports, chargebacks, processor reversals,
+and legally required remedies; this authority does not permit discretionary
+membership refunds. Each paid Event must separately publish its cancellation
+deadline, refund schedule, non-refundable fees, transfer/substitution rule,
+capacity rule, and response to cancellation, postponement, or format changes.
+If those terms are absent, paid registration must remain closed. Automatic
+membership renewal also remains disabled unless the Board approves recurring
+billing language and checkout records affirmative consent.
+
+CYWater Core `0.6.1` and all four direct-link review surfaces are deployed. A
+42-check staging QA passed their review-only/noindex safeguards and current
+draft wording. This is technical validation only; the pages remain explicitly
+not approved or in effect until Board and legal review.
 
 Engineering now treats an account-closure request as a seven-day cooling-off
 period measured from the request timestamp, not from inactivity. New membership
@@ -86,6 +154,10 @@ The public application and approval gate are implemented. A partner is not a
 member: it submits an expression of interest, and the WordPress Administrator
 tracks Board review and MOU completion under **Partner applications**. No
 payment action is available before **Approved to pay**.
+
+CYWater Partnerships `0.1.2` is deployed, and its self-cleaning staging QA
+passed all 17 Partner workflow checks. No temporary application was retained;
+actual Board/MOU decisions and settlement confirmation remain human work.
 
 For each approved organization:
 
@@ -105,11 +177,16 @@ cannot accept new public signups.
 
 ## 5. Paid Event Or Conference Registration
 
-The reusable framework is installed: Event Tickets `5.29.1` attaches tickets,
-capacity, attendees, and event-order state only to the existing `cyw_event`
-record. A free RSVP lifecycle passed on staging and left no QA data. Paid
-checkout remains closed because connecting this second Stripe integration is an
-external account authorization, not a code task.
+The reusable ticket framework is installed: Event Tickets `5.29.1` attaches
+tickets, capacity, attendees, and event-order state only to the existing
+`cyw_event` record. A free RSVP lifecycle passed on staging and left no QA data.
+CYWater Operations `0.1.3`, its paid-provider adapter, and fail-closed ticket UI,
+cart, checkout-request, and final Stripe REST gates are deployed and included in
+the 367-check Operations QA.
+
+Paid checkout nevertheless remains closed in the actual staging configuration:
+Tickets Commerce is disabled, its Stripe gateway is not enabled or connected,
+checkout and success pages are not configured, and there is no real paid ticket.
 
 Before opening the first paid event, provide or approve:
 
@@ -120,13 +197,44 @@ Before opening the first paid event, provide or approve:
 - required attendee/abstract fields;
 - cancellation, transfer, refund, tax, and invoice rules.
 
-Then, while signed into the association's existing Stripe Sandbox, open
-WordPress **Tickets → Settings → Payments**, connect Stripe in test mode, and
-leave Live disabled. Do not paste or disclose PMPro API keys. Run the paid-event
-matrix: success, decline, buyer cancellation, capacity exhaustion, duplicate
-webhook, full refund, and confirmation email. The Event Tickets order and
-attendee report must agree after each case, and a full refund must cancel only
-the matching registration/seat.
+The operational approval gate then follows this sequence:
+
+1. A Content & Event Editor saves the Event as **Draft**, supplies every
+   required public term, and marks it **Terms complete**.
+2. The editor submits the exact terms fingerprint as **Pending approval**.
+3. A different named account holding Governance Approver either returns it for
+   revision or records **Approved**. The software keeps the approval capability
+   out of the Content & Event Editor role, but because role bundles are
+   composable, the Administrator must not combine both bundles on the same
+   production account when independent approval is required.
+4. The editor may then set the workflow state to **Registration open**, but
+   that state alone does not expose checkout. The deployed Event Tickets adapter
+   must consume a current, matching readiness snapshot before it renders or
+   accepts paid registration.
+5. The editor closes registration as **Closed**. Any material edit after
+   submission or approval invalidates the fingerprint and closes the readiness
+   gate until the terms are resubmitted and reapproved.
+
+This workflow does not process money. Event Tickets and Stripe remain the
+authorities for attendee, order, charge, refund, and webhook state. It also does
+not create a membership refund path: the Board-review membership rule remains
+**All membership sales are final and non-refundable.**
+
+The deployed adapter fails closed when it is absent, throws an error, cannot
+read authoritative ticket configuration, sees fee/currency mismatch, receives a
+false readiness result, sees a changed/missing approval fingerprint, or cannot
+commit the required strict audit. Its enforcement covers presentation, cart,
+checkout, and the final Stripe order REST request. Do not infer payment
+readiness merely from a visible **Registration open** state.
+
+Then enable Tickets Commerce, configure its checkout and success pages, and,
+while signed into the association's existing Stripe Sandbox, open WordPress
+**Tickets → Settings → Payments**, connect Stripe in test mode, and leave Live
+disabled. Do not paste or disclose PMPro API keys. Create one real paid ticket
+with matching fee/currency and run the paid-event matrix: success, decline,
+buyer cancellation, capacity exhaustion, duplicate webhook, full refund, and
+confirmation email. The Event Tickets order and attendee report must agree after
+each case, and a full refund must cancel only the matching registration/seat.
 
 The free plugin adds a 2% application fee to Stripe transactions. Before paid
 event launch, the association must either accept that fee or purchase Event
@@ -154,6 +262,10 @@ Prepare and complete the non-secret checklist in
 2. Approve a DNS change window and create a fresh production backup.
 3. Deploy the exact accepted theme/plugin artifacts; install live secrets only
    through the host environment, never Git or chat.
+   The accepted staging theme is `0.6.18`; a 92/92-file local/staging manifest
+   comparison was byte-identical with SHA-256
+   `a58ce052d8b9674d44002dc527d3f573e359e55c7d3afc083b3521d094db59ff`.
+   This staging match is not evidence that production has already been updated.
 4. Perform one small live payment and full refund, reconcile Stripe, PMPro,
    Postmark, and the association bank record, and confirm entitlement removal.
 5. Monitor errors, email, webhooks, and payment activity during the change

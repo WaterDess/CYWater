@@ -1,0 +1,60 @@
+<?php
+/**
+ * Plugin Name: CYWater Forum
+ * Description: Member-authored forum articles, arXiv-style author endorsement, scoped discussion, and the dormant per-viewer AI reaction seam.
+ * Version: 0.1.2
+ * Requires at least: 7.0
+ * Requires PHP: 8.1
+ * Text Domain: cywater-forum
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+define( 'CYWATER_FORUM_VERSION', '0.1.2' );
+define( 'CYWATER_FORUM_DIR', plugin_dir_path( __FILE__ ) );
+
+require_once CYWATER_FORUM_DIR . 'includes/class-cywater-forum-settings.php';
+require_once CYWATER_FORUM_DIR . 'includes/class-cywater-forum-content.php';
+require_once CYWATER_FORUM_DIR . 'includes/class-cywater-forum-roles.php';
+require_once CYWATER_FORUM_DIR . 'includes/class-cywater-forum-endorsement.php';
+require_once CYWATER_FORUM_DIR . 'includes/class-cywater-forum-comments.php';
+require_once CYWATER_FORUM_DIR . 'includes/class-cywater-forum-ai.php';
+require_once CYWATER_FORUM_DIR . 'includes/class-cywater-forum-admin.php';
+
+function cywater_forum_boot() {
+	CYWater_Forum_Settings::register();
+	CYWater_Forum_Content::register();
+	CYWater_Forum_Roles::register();
+	CYWater_Forum_Endorsement::register();
+	CYWater_Forum_Comments::register();
+	CYWater_Forum_AI::register();
+	CYWater_Forum_Admin::register();
+}
+add_action( 'plugins_loaded', 'cywater_forum_boot' );
+
+/**
+ * Everything the forum needs to be usable is created here as well as during
+ * `wp cywater setup`.
+ *
+ * Activation alone must leave a working section. Creating only roles and
+ * rewrite rules produced a Forum archive whose "Become an author" button
+ * pointed at an endorsement page that did not exist, with no categories and no
+ * discussion settings — a 404 for anyone who activated the plugin without also
+ * running setup, which is the normal path on an existing site.
+ */
+function cywater_forum_activate() {
+	CYWater_Forum_Content::register_content_types();
+	CYWater_Forum_Roles::install_roles();
+	CYWater_Forum_Endorsement::setup_page();
+	CYWater_Forum_Content::seed_categories();
+	CYWater_Forum_Comments::apply_discussion_defaults();
+	flush_rewrite_rules();
+}
+register_activation_hook( __FILE__, 'cywater_forum_activate' );
+
+function cywater_forum_deactivate() {
+	flush_rewrite_rules();
+}
+register_deactivation_hook( __FILE__, 'cywater_forum_deactivate' );

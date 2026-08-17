@@ -2,7 +2,7 @@
 /**
  * Plugin Name: CYWater Partnerships
  * Description: Board-reviewed institutional partnership applications and approved payment handoff.
- * Version: 0.1.1
+ * Version: 0.1.2
  * Requires at least: 7.0
  * Requires PHP: 8.1
  * Text Domain: cywater-partnerships
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CYWATER_PARTNERSHIPS_VERSION', '0.1.1' );
+define( 'CYWATER_PARTNERSHIPS_VERSION', '0.1.2' );
 define( 'CYWATER_PARTNERSHIPS_DIR', plugin_dir_path( __FILE__ ) );
 
 require_once CYWATER_PARTNERSHIPS_DIR . 'includes/class-cywater-partnerships.php';
