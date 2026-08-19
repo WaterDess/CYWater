@@ -66,6 +66,17 @@ git push origin main:gh-pages
 The original bilingual prototype remains preserved at the immutable
 `v0.1-prototype` tag. Do not move or overwrite that tag.
 
+## WordPress Integration
+
+The production candidate is developed separately on the
+`wordpress-integration` branch. It contains a custom WordPress theme, modular
+content/membership/environment plugins, Paid Memberships Pro integration,
+Stripe sandbox safeguards, Mailpit support, CI, and deployment documentation.
+It does not replace this GitHub Pages preview until staging acceptance.
+
+Start with `wordpress/docs/README.md` when working on hosting, member accounts,
+payments, email, DNS, backups, or production deployment.
+
 ## QA
 
 Before publishing, check JavaScript syntax, all local links and images, desktop

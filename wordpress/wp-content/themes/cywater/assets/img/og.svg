@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <rect width="1200" height="630" fill="#0E1B2C"/>
+  <rect width="1200" height="630" fill="url(#g)"/>
+  <defs>
+    <radialGradient id="g" cx="80%" cy="0%" r="80%">
+      <stop offset="0%" stop-color="#0F766E" stop-opacity="0.55"/>
+      <stop offset="60%" stop-color="#0F766E" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- 新 logo：水滴+圆，放大居左 -->
+  <g transform="translate(90,90) scale(2.3)">
+    <path d="M24 4 C 15 14, 14 19, 24 22 C 34 19, 33 14, 24 4 Z" fill="#FFFFFF"/>
+    <circle cx="24" cy="28" r="13" fill="#FFFFFF"/>
+    <path d="M13 31 Q 18 27, 23 31 T 33 31" stroke="#0E1B2C" stroke-width="2.3" fill="none" stroke-linecap="round"/>
+    <path d="M15 36 Q 20 33, 24 36 T 33 36" stroke="#0E1B2C" stroke-width="2.3" fill="none" stroke-linecap="round"/>
+  </g>
+  <text x="250" y="180" font-family="Georgia, serif" font-size="52" fill="#FFFFFF" font-weight="500">CYWater</text>
+  <text x="250" y="214" font-family="Arial, sans-serif" font-size="16" fill="#9FB3C8" letter-spacing="3">CHINA · YOUTH · WATER ASSOCIATION</text>
+
+  <text x="90" y="400" font-family="Georgia, serif" font-size="76" fill="#FFFFFF" font-weight="500">Advancing water</text>
+  <text x="90" y="488" font-family="Georgia, serif" font-size="76" fill="#0F766E" font-weight="500">science &amp; community.</text>
+  <text x="90" y="552" font-family="Arial, sans-serif" font-size="22" fill="#9FB3C8">A bilingual association for researchers, practitioners and students.</text>
+</svg>
