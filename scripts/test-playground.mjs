@@ -16,6 +16,8 @@ const mounts = [
   ["./wordpress/wp-content/plugins/cywater-partnerships", "/wordpress/wp-content/plugins/cywater-partnerships"],
   ["./wordpress/wp-content/plugins/cywater-logo-call", "/wordpress/wp-content/plugins/cywater-logo-call"],
   ["./wordpress/wp-content/plugins/cywater-environment", "/wordpress/wp-content/plugins/cywater-environment"],
+  ["./wordpress/wp-content/plugins/cywater-forum", "/wordpress/wp-content/plugins/cywater-forum"],
+  ["./wordpress/wp-content/plugins/cywater-operations", "/wordpress/wp-content/plugins/cywater-operations"],
   ["./wordpress/runtime/vendor/paid-memberships-pro", "/wordpress/wp-content/plugins/paid-memberships-pro"],
 ].map(([hostPath, vfsPath]) => ({ hostPath, vfsPath }));
 

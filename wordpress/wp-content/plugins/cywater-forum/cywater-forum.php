@@ -2,7 +2,7 @@
 /**
  * Plugin Name: CYWater Forum
  * Description: Member-authored forum articles, arXiv-style author endorsement, scoped discussion, and the dormant per-viewer AI reaction seam.
- * Version: 0.1.2
+ * Version: 0.1.3
  * Requires at least: 7.0
  * Requires PHP: 8.1
  * Text Domain: cywater-forum
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CYWATER_FORUM_VERSION', '0.1.2' );
+define( 'CYWATER_FORUM_VERSION', '0.1.3' );
 define( 'CYWATER_FORUM_DIR', plugin_dir_path( __FILE__ ) );
 
 require_once CYWATER_FORUM_DIR . 'includes/class-cywater-forum-settings.php';

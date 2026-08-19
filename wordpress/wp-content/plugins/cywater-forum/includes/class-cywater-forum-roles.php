@@ -27,6 +27,7 @@ final class CYWater_Forum_Roles {
 		add_action( 'cywater_after_core_setup', array( __CLASS__, 'install_roles' ), 10 );
 		add_action( 'init', array( __CLASS__, 'maybe_migrate_roles' ), 1 );
 		add_filter( 'map_meta_cap', array( __CLASS__, 'gate_publishing' ), 10, 4 );
+		add_filter( 'user_has_cap', array( __CLASS__, 'grant_open_publishing' ), 10, 4 );
 	}
 
 	/**
@@ -152,7 +153,10 @@ final class CYWater_Forum_Roles {
 
 		$blockers = array();
 
-		if ( ! CYWater_Forum_Endorsement::is_endorsed( $user_id ) ) {
+		if (
+			CYWater_Forum_Settings::is_enabled( 'endorsement_required' )
+			&& ! CYWater_Forum_Endorsement::is_endorsed( $user_id )
+		) {
 			$blockers[] = 'not_endorsed';
 		}
 
@@ -180,6 +184,53 @@ final class CYWater_Forum_Roles {
 			return false;
 		}
 		return (bool) pmpro_hasMembershipLevel( null, absint( $user_id ) );
+	}
+
+	/**
+	 * Grant the author capabilities to any eligible member while endorsement is
+	 * switched off.
+	 *
+	 * The `cyw_forum_author` role is handed out by the endorsement flow, so with
+	 * endorsement disabled nothing would ever grant it: `publish_blockers()`
+	 * would come back empty while the member still held no publishing
+	 * capability, and the forum would look open while being shut. Rather than
+	 * writing roles onto every paying member — which then has to be unwound when
+	 * membership lapses — eligibility is answered live, so it follows membership
+	 * and email verification automatically.
+	 *
+	 * `can_publish()` calls `user_can()` internally, which re-enters this filter;
+	 * the reentry guard keeps that from recursing.
+	 *
+	 * @param array<string, bool> $allcaps Capabilities the user already has.
+	 * @param array<int, string>  $caps    Primitive capabilities being tested.
+	 * @param array<int, mixed>   $args    Context.
+	 * @param WP_User             $user    User under test.
+	 * @return array<string, bool>
+	 */
+	public static function grant_open_publishing( $allcaps, $caps, $args, $user ) {
+		static $checking = false;
+
+		if ( $checking || ! $user instanceof WP_User || ! $user->ID ) {
+			return $allcaps;
+		}
+		if ( CYWater_Forum_Settings::is_enabled( 'endorsement_required' ) ) {
+			return $allcaps;
+		}
+		if ( ! array_intersect( (array) $caps, self::author_capabilities() ) ) {
+			return $allcaps;
+		}
+
+		$checking = true;
+		$eligible = self::can_publish( $user->ID );
+		$checking = false;
+
+		if ( $eligible ) {
+			foreach ( self::author_capabilities() as $cap ) {
+				$allcaps[ $cap ] = true;
+			}
+		}
+
+		return $allcaps;
 	}
 
 	/**

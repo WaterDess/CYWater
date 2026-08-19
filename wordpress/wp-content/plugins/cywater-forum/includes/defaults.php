@@ -35,6 +35,26 @@ return array(
 	 * membership_required - whether an active PMPro membership is a
 	 *   prerequisite for publishing.
 	 */
+	/*
+	 * endorsement_required - the master switch for the whole endorsement chain.
+	 *
+	 * Off for launch, deliberately. Endorsement has no origin on a fresh site:
+	 * a qualified endorser must already be endorsed AND have published, so with
+	 * nobody endorsed the chain can never start and every author would depend on
+	 * an administrator granting authorship by hand. The association chose to
+	 * open publishing to paying members instead, to encourage participation.
+	 *
+	 * With this off, publishing requires an active membership and a verified
+	 * email address and nothing else. The machinery below stays in place and is
+	 * re-enabled by turning this back on, at which point the members who have
+	 * published in the meantime are the pool of qualified endorsers, so the
+	 * bootstrap problem does not recur.
+	 *
+	 * Board members are exempt from dues rather than from membership: an
+	 * administrator assigns them a complimentary PMPro level with no order and
+	 * no fabricated payment record. See wordpress/docs/forum.md.
+	 */
+	'endorsement_required'          => false,
 	'endorsement_articles_required' => 1,
 	'endorsements_required'         => 1,
 	'admin_override'                => true,

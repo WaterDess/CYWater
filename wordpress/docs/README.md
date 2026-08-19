@@ -361,6 +361,45 @@ intercept. The pre-deploy database and `0.1.1` plugin backup is retained at
 staging preview placeholder article remains review-only content and must be
 deleted or replaced before production cutover.
 
+CYWater Forum `0.1.3` opens publishing to members. The association decided to
+set endorsement aside for launch to encourage participation, so publishing now
+requires an active membership and a verified email address and nothing else.
+
+Endorsement had no origin: a qualified endorser must already be endorsed *and*
+have published, so on a site where nobody is endorsed the chain can never start
+and every author would depend on an administrator granting authorship by hand.
+The machinery is retained and is re-enabled by the new `endorsement_required`
+setting under Settings > CYWater Forum. Turning it on later does not recreate
+the bootstrap problem, because the members who published in the meantime are
+themselves qualified endorsers.
+
+Board members are exempt from dues, not from membership. An administrator
+assigns them a complimentary PMPro level with no order, the same approach
+already recorded for the staging Lifetime assignment; no Stripe payment, PMPro
+order, invoice, or receipt is fabricated. The publishing gate cannot distinguish
+a complimentary level from a paid one, so no separate exemption flag exists and
+PMPro remains the sole authority on membership state.
+
+Two integration defects were found and fixed while making this change:
+
+- The forum author capability was only ever granted by the endorsement flow, so
+  disabling endorsement would have left `publish_blockers()` empty while the
+  member still held no publishing capability — the forum would have looked open
+  and been shut. Eligibility is now answered live through `user_has_cap`, so it
+  follows membership and verification without writing roles onto every paying
+  member and unwinding them when membership lapses.
+- `cywater-environment` had lost its half of the `cywater_public_author_archive_allowed`
+  contract, so the forum's per-account opt-in was dead code and every author
+  archive returned 404. Browsing by author, a stated requirement, was broken on
+  `wordpress-integration` and is presumably still broken on staging until this
+  is deployed.
+
+`cywater-forum` and `cywater-operations` were also absent from every local
+environment — `.wp-env.json`, the Playground blueprint, and `test-playground.mjs`
+— so a local stack ran without them and no local test could have caught either
+defect. All three now include both plugins, and the Playground forum suite and
+preview are restored as `npm run test:forum` and `npm run forum:preview`.
+
 There is deliberately no ordinary membership-refund or finance role. Under the
 proposed final/non-refundable membership policy, only the Administrator handles
 PMPro membership/order records and exceptional billing-correction or dispute

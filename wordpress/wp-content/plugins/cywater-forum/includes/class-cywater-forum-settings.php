@@ -163,6 +163,7 @@ final class CYWater_Forum_Settings {
 				<h2><?php esc_html_e( 'Authorship', 'cywater-forum' ); ?></h2>
 				<table class="form-table" role="presentation">
 					<?php
+					self::checkbox_row( 'endorsement_required', __( 'Require endorsement', 'cywater-forum' ), __( 'Off for launch: any member with an active membership and a verified email address may publish. Turning this on requires a new author to be endorsed by an existing one; the members who have published in the meantime become the first qualified endorsers.', 'cywater-forum' ), $values, $disabled );
 					self::number_row( 'endorsement_articles_required', __( 'Articles required to endorse', 'cywater-forum' ), __( 'Published forum articles an author needs before they may endorse someone else.', 'cywater-forum' ), $values, $disabled );
 					self::number_row( 'endorsements_required', __( 'Endorsements required to publish', 'cywater-forum' ), __( 'Endorsements a new author must collect before their first article can be published.', 'cywater-forum' ), $values, $disabled );
 					self::checkbox_row( 'admin_override', __( 'Administrator override', 'cywater-forum' ), __( 'Allow an administrator to grant or revoke authorship directly from the user editor.', 'cywater-forum' ), $values, $disabled );

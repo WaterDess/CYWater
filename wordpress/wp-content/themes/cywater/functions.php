@@ -212,8 +212,25 @@ function cywater_forum_hero_actions() {
 	if ( CYWater_Forum_Roles::can_publish( get_current_user_id() ) ) {
 		return '<a class="btn btn-accent" href="' . esc_url( admin_url( 'post-new.php?post_type=cyw_forum_post' ) ) . '">' . esc_html__( 'Write an article', 'cywater' ) . '</a>';
 	}
-	$endorsement = class_exists( 'CYWater_Forum_Endorsement' ) ? CYWater_Forum_Endorsement::page_url() : home_url( '/forum-endorsement/' );
-	return '<a class="btn btn-accent" href="' . esc_url( $endorsement ) . '">' . esc_html__( 'Become an author', 'cywater' ) . '</a>';
+	// Send people to the thing that is actually blocking them. While
+	// endorsement is switched off, that is membership or email verification;
+	// pointing at the endorsement page would be a dead end.
+	$blockers = CYWater_Forum_Roles::publish_blockers( get_current_user_id() );
+
+	if ( in_array( 'membership_inactive', $blockers, true ) ) {
+		return '<a class="btn btn-accent" href="' . esc_url( home_url( '/membership/' ) ) . '">' . esc_html__( 'Join to write', 'cywater' ) . '</a>';
+	}
+
+	if ( in_array( 'email_unverified', $blockers, true ) && get_page_by_path( 'verify-email' ) ) {
+		return '<a class="btn btn-accent" href="' . esc_url( home_url( '/verify-email/' ) ) . '">' . esc_html__( 'Verify your email', 'cywater' ) . '</a>';
+	}
+
+	if ( in_array( 'not_endorsed', $blockers, true ) ) {
+		$endorsement = class_exists( 'CYWater_Forum_Endorsement' ) ? CYWater_Forum_Endorsement::page_url() : home_url( '/forum-endorsement/' );
+		return '<a class="btn btn-accent" href="' . esc_url( $endorsement ) . '">' . esc_html__( 'Become an author', 'cywater' ) . '</a>';
+	}
+
+	return '';
 }
 
 function cywater_forum_pagination() {

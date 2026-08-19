@@ -433,9 +433,15 @@ final class CYWater_Forum_Endorsement {
 				<p><?php esc_html_e( 'You are able to publish forum articles.', 'cywater-forum' ); ?></p>
 				<a class="btn btn-primary" href="<?php echo esc_url( (string) get_post_type_archive_link( CYWater_Forum_Content::POST_TYPE ) ); ?>"><?php esc_html_e( 'Go to the forum', 'cywater-forum' ); ?></a>
 			<?php else : ?>
-				<p><?php esc_html_e( 'CYWater forum authors are endorsed by an existing author, in the way arXiv endorsement works. Ask someone who knows your work.', 'cywater-forum' ); ?></p>
+				<?php if ( CYWater_Forum_Settings::is_enabled( 'endorsement_required' ) ) : ?>
+					<p><?php esc_html_e( 'CYWater forum authors are endorsed by an existing author, in the way arXiv endorsement works. Ask someone who knows your work.', 'cywater-forum' ); ?></p>
+				<?php else : ?>
+					<p><?php esc_html_e( 'Endorsement is not currently required. Any member with an active membership and a verified email address may publish.', 'cywater-forum' ); ?></p>
+				<?php endif; ?>
 				<ul class="forum-endorsement-status">
-					<li><?php echo esc_html( sprintf( /* translators: 1: endorsements held, 2: endorsements required. */ __( 'Endorsements: %1$d of %2$d', 'cywater-forum' ), $have, $required ) ); ?></li>
+					<?php if ( CYWater_Forum_Settings::is_enabled( 'endorsement_required' ) ) : ?>
+						<li><?php echo esc_html( sprintf( /* translators: 1: endorsements held, 2: endorsements required. */ __( 'Endorsements: %1$d of %2$d', 'cywater-forum' ), $have, $required ) ); ?></li>
+					<?php endif; ?>
 					<?php if ( in_array( 'membership_inactive', $blockers, true ) ) : ?>
 						<li><?php esc_html_e( 'An active membership is required.', 'cywater-forum' ); ?> <a href="<?php echo esc_url( home_url( '/membership/' ) ); ?>"><?php esc_html_e( 'View membership', 'cywater-forum' ); ?></a></li>
 					<?php endif; ?>
