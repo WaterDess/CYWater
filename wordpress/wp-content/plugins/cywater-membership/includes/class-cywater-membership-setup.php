@@ -30,6 +30,9 @@ final class CYWater_Membership_Setup {
 		$page_ids = self::setup_pages();
 		$page_ids['member_directory'] = $directory_id;
 		$level_ids = self::setup_levels();
+		update_option( 'pmpro_from_email', 'membership@cywater.org' );
+		update_option( 'pmpro_from_name', 'CYWater Membership' );
+		update_option( 'pmpro_only_filter_pmpro_emails', 1 );
 		if ( ! get_option( 'cywater_membership_setup_version' ) ) {
 			update_option( 'pmpro_gateway', 'stripe' );
 			update_option( 'pmpro_gateway_environment', 'sandbox' );
@@ -67,7 +70,7 @@ final class CYWater_Membership_Setup {
 			'confirmation'        => array( 'Membership confirmation', 'membership-confirmation', '[pmpro_confirmation]', 'pmpro_confirmation_page_id' ),
 			'invoice'             => array( 'Membership order', 'membership-order', '[pmpro_invoice]', 'pmpro_invoice_page_id' ),
 			'levels'              => array( 'Membership', 'membership', '', 'pmpro_levels_page_id' ),
-			'login'               => array( 'Member sign in', 'member-login', '[cywater_member_login]', 'pmpro_login_page_id' ),
+			'login'               => array( 'Member sign in', 'member-login', '[cywater_member_login]', 'pmpro_login_page_id', array( 'pmpro_login' ) ),
 			'register'            => array( 'Create member account', 'member-register', '[cywater_member_register]', '' ),
 			'verify_email'        => array( 'Verify email', 'verify-email', '[cywater_email_verification]', '' ),
 			'close_account'       => array( 'Close account', 'close-account', '[cywater_account_closure]', '' ),
@@ -80,16 +83,11 @@ final class CYWater_Membership_Setup {
 				$page_id = $existing->ID;
 				$content = $existing->post_content;
 				if ( $page[2] && preg_match_all( '/\[([a-zA-Z0-9_-]+)/', $page[2], $matches ) ) {
-					foreach ( array_unique( $matches[1] ) as $shortcode ) {
-						if ( ! has_shortcode( $content, $shortcode ) ) {
-							$content .= '[' . $shortcode . ']';
-						}
-						$content = preg_replace(
-							'/(?:\[' . preg_quote( $shortcode, '/' ) . '\]\s*){2,}/',
-							'[' . $shortcode . ']',
-							$content
-						);
-					}
+					$content = self::reconcile_managed_shortcodes(
+						$content,
+						array_unique( $matches[1] ),
+						(array) ( $page[4] ?? array() )
+					);
 					if ( $content !== $existing->post_content ) {
 						wp_update_post( array( 'ID' => $page_id, 'post_content' => $content ) );
 					}
@@ -110,7 +108,7 @@ final class CYWater_Membership_Setup {
 	private static function setup_levels() {
 		$definitions = array(
 			'Student'      => array( 20, 'For full-time undergraduate, graduate, and Ph.D. students.', true ),
-			'Professional' => array( 70, 'For researchers and practitioners in water sciences.', true ),
+			'Professional' => array( 50, 'For researchers and practitioners in water sciences.', true ),
 			'Lifetime'     => array( 700, 'A one-time individual lifetime membership.', false ),
 		);
 		$existing = function_exists( 'pmpro_getAllLevels' ) ? pmpro_getAllLevels( true, true ) : array();
@@ -144,7 +142,111 @@ final class CYWater_Membership_Setup {
 			$legacy_partner->save();
 			$result['partner_legacy'] = absint( $legacy_partner->id );
 		}
+
+		$sandbox_test_id = self::setup_sandbox_test_level( $by_name );
+		if ( $sandbox_test_id ) {
+			$result['sandbox_test'] = $sandbox_test_id;
+		}
 		return $result;
+	}
+
+	/**
+	 * Reconcile a plugin-managed page without overwriting editorial copy.
+	 *
+	 * CYWater's login wrapper renders the PMPro login shortcode internally.
+	 * Earlier installations used `[pmpro_login]` directly, so retaining both
+	 * shortcodes renders two complete forms. Remove superseded aliases, retain
+	 * the first canonical shortcode, and append it only when it is missing.
+	 *
+	 * @param string   $content           Existing page content.
+	 * @param string[] $required          Canonical managed shortcodes.
+	 * @param string[] $legacy_shortcodes Superseded shortcodes to remove.
+	 * @return string
+	 */
+	public static function reconcile_managed_shortcodes( $content, $required, $legacy_shortcodes = array() ) {
+		$content = (string) $content;
+		foreach ( array_unique( array_filter( array_map( 'sanitize_key', (array) $legacy_shortcodes ) ) ) as $shortcode ) {
+			$tag     = preg_quote( $shortcode, '/' );
+			$content = (string) preg_replace( '/\[' . $tag . '(?:\s[^\]]*)?\](?:.*?\[\/' . $tag . '\])?/is', '', $content );
+		}
+
+		foreach ( array_unique( array_filter( array_map( 'sanitize_key', (array) $required ) ) ) as $shortcode ) {
+			$tag   = preg_quote( $shortcode, '/' );
+			$count = 0;
+			$content = (string) preg_replace_callback(
+				'/\[' . $tag . '(?:\s[^\]]*)?\]/i',
+				static function ( $match ) use ( &$count ) {
+					++$count;
+					return 1 === $count ? $match[0] : '';
+				},
+				$content
+			);
+			if ( 0 === $count ) {
+				$content .= '[' . $shortcode . ']';
+			}
+		}
+
+		return trim( $content );
+	}
+
+	/**
+	 * Create a staging-only Stripe Sandbox checkout fixture.
+	 *
+	 * The fixture lives in its own PMPro level group so completing a test
+	 * checkout cannot replace Student, Professional, or Lifetime membership.
+	 * It is deliberately absent from every CYWater benefit/eligibility allowlist.
+	 */
+	private static function setup_sandbox_test_level( $by_name ) {
+		$name    = 'Sandbox Payment Test';
+		$level   = isset( $by_name[ $name ] ) ? new PMPro_Membership_Level( $by_name[ $name ]->id ) : new PMPro_Membership_Level();
+		$enabled = 'staging' === wp_get_environment_type()
+			&& 'sandbox' === get_option( 'pmpro_gateway_environment' )
+			&& class_exists( 'CYWater_Config' )
+			&& 'test' === CYWater_Config::payment_mode();
+
+		if ( ! $enabled ) {
+			if ( ! empty( $level->id ) && ! empty( $level->allow_signups ) ) {
+				$level->allow_signups = 0;
+				$level->save();
+			}
+			return 0;
+		}
+
+		$level->name              = $name;
+		$level->description       = 'Staging-only one-time Stripe Sandbox checkout and refund test. It grants no CYWater membership benefits.';
+		$level->confirmation      = 'Stripe Sandbox checkout completed. No real funds moved and no CYWater membership benefit was granted.';
+		$level->initial_payment   = 0.50;
+		$level->billing_amount    = 0;
+		$level->cycle_number      = 0;
+		$level->cycle_period      = 'Day';
+		$level->billing_limit     = 0;
+		$level->trial_amount      = 0;
+		$level->trial_limit       = 0;
+		$level->allow_signups     = 1;
+		$level->expiration_number = 1;
+		$level->expiration_period = 'Day';
+		$level->save();
+
+		$group_id = self::sandbox_test_group_id();
+		if ( $group_id && function_exists( 'pmpro_add_level_to_group' ) ) {
+			pmpro_add_level_to_group( $level->id, $group_id );
+		}
+
+		return absint( $level->id );
+	}
+
+	private static function sandbox_test_group_id() {
+		if ( ! function_exists( 'pmpro_get_level_groups' ) || ! function_exists( 'pmpro_create_level_group' ) ) {
+			return 0;
+		}
+
+		foreach ( pmpro_get_level_groups() as $group ) {
+			if ( 'Staging payment QA' === $group->name ) {
+				return absint( $group->id );
+			}
+		}
+
+		return absint( pmpro_create_level_group( 'Staging payment QA', false ) );
 	}
 
 	public static function rolling_annual_start( $startdate, $user_id, $level ) {

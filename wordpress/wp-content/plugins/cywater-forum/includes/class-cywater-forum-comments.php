@@ -54,17 +54,30 @@ final class CYWater_Forum_Comments {
 	}
 
 	public static function may_comment( $user_id ) {
+		return array() === self::participation_blockers( $user_id );
+	}
+
+	/**
+	 * Forum discussion uses the same verified, active-individual-member boundary
+	 * as article submission. Operational moderation access does not create a
+	 * membership or waive the participation rule.
+	 *
+	 * @return array<int, string>
+	 */
+	public static function participation_blockers( $user_id ) {
 		$user_id = absint( $user_id );
 		if ( ! $user_id ) {
-			return false;
+			return array( 'signed_out' );
 		}
-		if ( ! CYWater_Forum_Settings::is_enabled( 'comments_require_membership' ) ) {
-			return true;
+
+		$blockers = array();
+		if ( CYWater_Forum_Settings::is_enabled( 'comments_require_membership' ) && ! CYWater_Forum_Roles::has_active_membership( $user_id ) ) {
+			$blockers[] = 'membership_inactive';
 		}
-		if ( CYWater_Forum_Roles::is_staff( $user_id ) ) {
-			return true;
+		if ( ! class_exists( 'CYWater_Membership_Account_Security' ) || ! CYWater_Membership_Account_Security::is_verified( $user_id ) ) {
+			$blockers[] = 'email_unverified';
 		}
-		return CYWater_Forum_Roles::has_active_membership( $user_id );
+		return $blockers;
 	}
 
 	/**
@@ -80,10 +93,8 @@ final class CYWater_Forum_Comments {
 	 * wp_handle_comment_submission fills in from the session rather than from
 	 * the request body, so it cannot be forged by posting a user id.
 	 *
-	 * Moderation then holds a member's first reply and lets them through
-	 * afterwards. Pre-moderating every reply on a volunteer-run association site
-	 * produces a queue nobody drains, and silence reads as a broken feature.
-	 * Turning `comments_hold_first` off restores full pre-moderation.
+	 * Eligible-member replies follow the configured mode. The accepted staging
+	 * policy is `auto`, so their first and later replies are immediately public.
 	 *
 	 * @param int|string|WP_Error  $approved
 	 * @param array<string, mixed> $commentdata
@@ -111,22 +122,29 @@ final class CYWater_Forum_Comments {
 			);
 		}
 
-		if ( ! self::may_comment( $user_id ) ) {
+		$blockers = self::participation_blockers( $user_id );
+		if ( $blockers ) {
+			if ( in_array( 'email_unverified', $blockers, true ) ) {
+				return new WP_Error(
+					'cywater_forum_verification_required',
+					__( 'Verify your email address before replying to a Forum article.', 'cywater-forum' ),
+					array( 'status' => 403 )
+				);
+			}
 			return new WP_Error(
 				'cywater_forum_membership_required',
-				__( 'An active CYWater membership is required to reply.', 'cywater-forum' ),
+				__( 'An active CYWater Student, Professional or Lifetime membership is required to reply.', 'cywater-forum' ),
 				array( 'status' => 403 )
 			);
 		}
 
-		if ( CYWater_Forum_Roles::is_staff( $user_id ) ) {
+		$mode = CYWater_Forum_Settings::get_string( 'comments_moderation_mode' );
+		if ( 'auto' === $mode ) {
 			return 1;
 		}
-
-		if ( ! CYWater_Forum_Settings::is_enabled( 'comments_hold_first' ) ) {
+		if ( 'all' === $mode ) {
 			return 0;
 		}
-
 		return self::approved_comment_count( $user_id ) > 0 ? 1 : 0;
 	}
 
@@ -311,13 +329,14 @@ final class CYWater_Forum_Comments {
 	 * enforced on every request.
 	 */
 	public static function apply_discussion_defaults() {
+		$mode = CYWater_Forum_Settings::get_string( 'comments_moderation_mode' );
 		update_option( 'comment_registration', 1 );
 		update_option( 'require_name_email', 0 );
 		update_option( 'close_comments_for_old_posts', 0 );
 		update_option( 'thread_comments', 1 );
 		update_option( 'thread_comments_depth', 3 );
-		update_option( 'comment_moderation', CYWater_Forum_Settings::is_enabled( 'comments_hold_first' ) ? 0 : 1 );
-		update_option( 'comment_previously_approved', CYWater_Forum_Settings::is_enabled( 'comments_hold_first' ) ? 1 : 0 );
+		update_option( 'comment_moderation', 'all' === $mode ? 1 : 0 );
+		update_option( 'comment_previously_approved', 'first' === $mode ? 1 : 0 );
 	}
 
 	/**

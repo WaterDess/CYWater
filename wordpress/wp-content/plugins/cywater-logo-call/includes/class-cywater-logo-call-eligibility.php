@@ -93,7 +93,7 @@ final class CYWater_Logo_Call_Eligibility {
 
 	public static function can( $action, $event_id, $user_id ) {
 		$user_id = absint( $user_id );
-		if ( ! $user_id || ! get_userdata( $user_id ) ) {
+		if ( ! $user_id || ! get_userdata( $user_id ) || ! self::has_verified_email( $user_id ) ) {
 			return false;
 		}
 
@@ -118,10 +118,19 @@ final class CYWater_Logo_Call_Eligibility {
 		return self::can( 'vote', $event_id, $user_id );
 	}
 
+	/**
+	 * Email ownership is an account-safety prerequisite, not a membership level.
+	 * Fail closed if the Membership account-security authority is unavailable.
+	 */
+	public static function has_verified_email( $user_id ) {
+		return class_exists( 'CYWater_Membership_Account_Security' )
+			&& CYWater_Membership_Account_Security::is_verified( absint( $user_id ) );
+	}
+
 	public static function public_label( $event_id, $action ) {
 		$policy = self::policy( $event_id, $action );
 		if ( self::AUDIENCE_REGISTERED === $policy['audience'] ) {
-			return __( 'registered user', 'cywater-logo-call' );
+			return __( 'verified registered user', 'cywater-logo-call' );
 		}
 		if ( self::AUDIENCE_ACTIVE_INDIVIDUAL === $policy['audience'] ) {
 			return __( 'active Student, Professional or Lifetime member', 'cywater-logo-call' );

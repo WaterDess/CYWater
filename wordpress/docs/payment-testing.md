@@ -42,13 +42,30 @@ and payouts are enabled, identity details are submitted, and there is no
 currently due account requirement.
 
 The saved PMPro gateway environment remains `sandbox`, the site remains a
-staging runtime, `CYWATER_PAYMENT_MODE` remains `disabled`, and
-`CYWATER_ALLOW_LIVE_PAYMENTS` remains false. No production charge or refund was
+staging runtime, `CYWATER_PAYMENT_MODE` is temporarily `test` for the explicit
+small-value Sandbox acceptance, and `CYWATER_ALLOW_LIVE_PAYMENTS` remains
+false. No production charge or refund was
 performed. The final financial acceptance is a separately authorized real
 small-value payment followed by a full refund after the production cutover
 configuration has passed its preflight. The free PMPro Stripe integration also
 adds a separate 2% PMPro fee unless a qualifying premium PMPro license is
 activated.
+
+The manual acceptance fixture is the staging-only `Sandbox Payment Test` PMPro
+level. It charges `$0.50` once, expires after one day, lives in a separate level
+group, and is excluded from every Student/Professional/Lifetime benefit and
+directory allowlist. `$0.50` is Stripe's minimum USD charge; do not reduce it to
+`$0.10`. Complete it only with Stripe test payment data. After success, verify
+the PMPro order and `checkout.session.completed` webhook before issuing a full
+Sandbox refund and confirming that only the fixture entitlement is removed.
+
+On 2026-08-20 that complete manual path passed. The `$0.50` order reached
+`success`, stored a Stripe Checkout Session and payment reference, received
+`checkout.session.completed`, and created no subscription. The fixture remained
+independent of the account's Student membership. After explicit approval, the
+full Sandbox refund changed the order to `refunded`; `charge.refunded` was
+received, the CYWater full-refund hook removed only the fixture entitlement, and
+Student remained active.
 
 The Live connection and production webhook were verified with one-use,
 staging-restricted administrative probes. Those temporary helpers are not part

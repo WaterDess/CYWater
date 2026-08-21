@@ -15,9 +15,11 @@ const required = [
   "scripts/cywater-staging-forum-qa.php",
   "scripts/cywater-staging-policy-qa.php",
   "scripts/cywater-staging-update-policy-drafts.php",
+  "scripts/cywater-production-purity-audit.php",
   "wordpress/wp-content/plugins/cywater-core/data/seed.json",
   "wordpress/wp-content/themes/cywater/style.css",
   "wordpress/wp-content/themes/cywater/functions.php",
+  "wordpress/wp-content/themes/cywater/header.php",
   "wordpress/wp-content/themes/cywater/front-page.php",
   "wordpress/wp-content/themes/cywater/home.php",
   "wordpress/wp-content/themes/cywater/archive-cyw_event.php",
@@ -34,6 +36,7 @@ const required = [
   "wordpress/wp-content/themes/cywater/page-board.php",
   "wordpress/wp-content/themes/cywater/page-bylaws.php",
   "wordpress/wp-content/themes/cywater/page-membership.php",
+  "wordpress/wp-content/themes/cywater/page-forum-workspace.php",
   "wordpress/wp-content/themes/cywater/page-become-a-partner.php",
   "wordpress/wp-content/themes/cywater/page-contact.php",
   "wordpress/wp-content/plugins/cywater-core/cywater-core.php",
@@ -41,6 +44,9 @@ const required = [
   "wordpress/wp-content/plugins/cywater-membership/cywater-membership.php",
   "wordpress/wp-content/plugins/cywater-membership/assets/default-avatar.svg",
   "wordpress/wp-content/plugins/cywater-membership/includes/class-cywater-membership-avatars.php",
+  "wordpress/wp-content/plugins/cywater-membership/includes/class-cywater-membership-email-routing.php",
+  "wordpress/wp-content/plugins/cywater-membership/includes/class-cywater-membership-countries.php",
+  "wordpress/wp-content/plugins/cywater-membership/includes/class-cywater-membership-setup.php",
   "wordpress/wp-content/plugins/cywater-partnerships/cywater-partnerships.php",
   "wordpress/wp-content/plugins/cywater-partnerships/includes/class-cywater-partnerships.php",
   "wordpress/wp-content/plugins/cywater-forum/cywater-forum.php",
@@ -48,9 +54,11 @@ const required = [
   "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-ai.php",
   "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-comments.php",
   "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-content.php",
+  "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-covers.php",
   "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-endorsement.php",
   "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-roles.php",
   "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-settings.php",
+  "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-workspace.php",
   "wordpress/wp-content/plugins/cywater-forum/includes/defaults.php",
   "wordpress/wp-content/plugins/cywater-forum/uninstall.php",
   "wordpress/wp-content/plugins/cywater-operations/cywater-operations.php",
@@ -201,10 +209,62 @@ const avatarProvider = await readFile(
   path.join(root, "wordpress", "wp-content", "plugins", "cywater-membership", "includes", "class-cywater-membership-avatars.php"),
   "utf8"
 );
+
+const membershipAccountFlow = await readFile(
+  path.join(root, "wordpress", "wp-content", "plugins", "cywater-membership", "includes", "class-cywater-membership-account-flow.php"),
+  "utf8"
+);
+const membershipAccountSecurity = await readFile(
+  path.join(root, "wordpress", "wp-content", "plugins", "cywater-membership", "includes", "class-cywater-membership-account-security.php"),
+  "utf8"
+);
+const membershipPrivacy = await readFile(
+  path.join(root, "wordpress", "wp-content", "plugins", "cywater-membership", "includes", "class-cywater-membership-privacy.php"),
+  "utf8"
+);
+const membershipEmailRouting = await readFile(
+  path.join(root, "wordpress", "wp-content", "plugins", "cywater-membership", "includes", "class-cywater-membership-email-routing.php"),
+  "utf8"
+);
+assertMarkers(
+  membershipAccountFlow,
+  ["account_unavailable", "Sign in or use account recovery"],
+  "CYWater registration identity privacy"
+);
+assert(
+  !membershipAccountFlow.includes("That username is already in use") &&
+    !membershipAccountFlow.includes("An account already uses that email address"),
+  "Registration must not expose distinct username or email collision messages."
+);
+assertMarkers(
+  `${membershipAccountSecurity}\n${membershipPrivacy}`,
+  ["update_user_meta( $user->ID, 'cyw_profile_public', 0 )", "CYWater_Membership_Account_Security::is_verified"],
+  "CYWater verified member-directory gate"
+);
 assertMarkers(
   avatarProvider,
   ["pre_get_avatar_data", "assets/default-avatar.svg", "cyw_profile_photo", "cyw_profile_public"],
   "CYWater avatar provider"
+);
+assertMarkers(
+  membershipEmailRouting,
+  [
+    "retrieve_password_notification_email",
+    "pmpro_email_sender",
+    "pmpro_email_sender_name",
+    "pmpro_email_headers",
+    "pmpro_email_data",
+    "accounts@cywater.org",
+    "membership@cywater.org",
+    "billing@cywater.org",
+    "checkout_paid",
+    "membership_expiring",
+  ],
+  "CYWater role-based transactional email routing"
+);
+assert(
+  !membershipEmailRouting.includes("web@cywater.org"),
+  "Member and account transactional email routing must not use the web-platform owner identity."
 );
 
 const partnershipProvider = await readFile(
@@ -225,8 +285,44 @@ assertMarkers(
     "Annual contribution after approval",
     "cywater_partnership_review_transition_allowed",
     "cywater_delete_partnership_applications",
+    "sanitize_payment_url",
+    "revoke_inactive_access",
   ],
   "CYWater partnership workflow"
+);
+
+const forumCoverProvider = await readFile(
+  path.join(root, "wordpress", "wp-content", "plugins", "cywater-forum", "includes", "class-cywater-forum-covers.php"),
+  "utf8"
+);
+const forumEndorsementProvider = await readFile(
+  path.join(root, "wordpress", "wp-content", "plugins", "cywater-forum", "includes", "class-cywater-forum-endorsement.php"),
+  "utf8"
+);
+assertMarkers(
+  forumCoverProvider,
+  [
+    "cywater-private/forum-covers",
+    "admin_post_nopriv_",
+    "MAX_USER_BYTES",
+    "RATE_LIMIT_MAX",
+    "maybe_migrate_legacy_covers",
+    "before_delete_post",
+  ],
+  "CYWater protected Forum covers"
+);
+assert(
+  !forumCoverProvider.includes("wp_upload_dir"),
+  "Draft Forum covers must not use the public WordPress uploads directory."
+);
+assertMarkers(
+  forumEndorsementProvider,
+  ["CYWater Community <membership@cywater.org>", "CYWater Membership <membership@cywater.org>"],
+  "Paused Forum email identity"
+);
+assert(
+  !forumEndorsementProvider.includes("CYWater Forum <web@cywater.org>"),
+  "Forum participation mail must not use the web-platform owner identity."
 );
 
 const operationsRoles = await readFile(
@@ -249,6 +345,10 @@ const operationsQa = await readFile(
   path.join(root, "wordpress", "wp-content", "plugins", "cywater-operations", "includes", "class-cywater-operations-qa.php"),
   "utf8"
 );
+const operationsLogoReview = await readFile(
+  path.join(root, "wordpress", "wp-content", "plugins", "cywater-operations", "includes", "class-cywater-operations-logo-review.php"),
+  "utf8"
+);
 assertMarkers(
   operationsRoles,
   [
@@ -258,6 +358,9 @@ assertMarkers(
     "cywater_governance_approver",
     "cywater_delete_logo_entries",
     "cywater_delete_partnership_applications",
+    "cywater_select_logo_finalists",
+    "cywater_select_official_logo",
+    "cywater_manage_logo_fulfillment",
     "RETIRED_CAPS",
   ],
   "CYWater Operations role bundles"
@@ -271,7 +374,7 @@ assert(
   "CYWater Operations must not expose the retired fake Logo reward capability as a role bundle."
 );
 assertMarkers(
-  `${operationsAudit}\n${operationsIntegrations}\n${paidEventApproval}\n${operationsQa}`,
+  `${operationsAudit}\n${operationsIntegrations}\n${paidEventApproval}\n${operationsQa}\n${operationsLogoReview}`,
   [
     "cywater_operations_audit_before_insert",
     "cywater_partnership_review_transition_allowed",
@@ -282,6 +385,10 @@ assertMarkers(
     "registration_open",
     "checkout_ready",
     "operations qa",
+    "Export ZIP + CSV",
+    "finalize_finalists",
+    "select_official",
+    "Signed rights assignment",
   ],
   "CYWater Operations audit and paid-event gates"
 );
@@ -294,6 +401,24 @@ const logoCallEligibility = await readFile(
   path.join(root, "wordpress", "wp-content", "plugins", "cywater-logo-call", "includes", "class-cywater-logo-call-eligibility.php"),
   "utf8"
 );
+
+const productionPurityAudit = await readFile(
+  path.join(root, "scripts", "cywater-production-purity-audit.php"),
+  "utf8"
+);
+assertMarkers(
+  productionPurityAudit,
+  [
+    "wp_get_environment_type",
+    "cywater-logo-call/cywater-logo-call.php",
+    "Sandbox Payment Test",
+    "gateway_environment",
+    "staging.cywater.org",
+    "Production purity audit passed",
+    "No data was changed",
+  ],
+  "read-only production purity gate"
+);
 assertMarkers(
   `${logoCallProvider}\n${logoCallEligibility}`,
   [
@@ -303,11 +428,27 @@ assertMarkers(
     "All registered users",
     "Selected active membership levels",
     "Two years of CYWater Professional membership",
-    "permanent use of a selected design requires a separate written rights agreement",
-    "data-cywater-logo-preview-input",
-    "Registered-user voting is a later phase",
+    "winning-design rights assignment",
+    "cywater_logo_legal_name",
+    "A separate voting activity opens after submissions close",
+    "three highest-ranked eligible designs become finalists",
     "member-program",
     "cywater-private/logo-call",
+    "has_verified_email",
+    "MAX_USER_STORAGE_BYTES",
+    "MAX_EVENT_STORAGE_BYTES",
+    "MAX_EVENT_SUBMISSIONS",
+    "MAX_TOTAL_STORAGE_BYTES",
+    "STORAGE_LOCK_OPTION",
+    "storage_capacity",
+    "public_asset_allowed",
+    "is_active_event",
+    "return 'shortlisted' === $status;",
+    "return 'selected' === $status;",
+    "Concurrent upload cannot bypass the serialized quota check",
+    "Finalist remains private during Board review",
+    "CYWater Member Programs <membership@cywater.org>",
+    "CYWater Membership <membership@cywater.org>",
   ],
   "CYWater removable Logo Call workflow"
 );
@@ -362,6 +503,14 @@ const parityFiles = {
     path.join(root, "wordpress", "wp-content", "themes", "cywater", "assets", "css", "pages.css"),
     "utf8"
   ),
+  wordpressHeader: await readFile(
+    path.join(root, "wordpress", "wp-content", "themes", "cywater", "header.php"),
+    "utf8"
+  ),
+  wordpressComponentsCss: await readFile(
+    path.join(root, "wordpress", "wp-content", "themes", "cywater", "assets", "css", "components.css"),
+    "utf8"
+  ),
   wordpressEventArchive: await readFile(
     path.join(root, "wordpress", "wp-content", "themes", "cywater", "archive-cyw_event.php"),
     "utf8"
@@ -380,6 +529,23 @@ assertMarkers(
 assert(
   !parityFiles.wordpressMembership.includes("Join as Partner"),
   "WordPress membership template must not expose the former direct Partner checkout."
+);
+
+assertMarkers(
+  parityFiles.wordpressHeader,
+  [
+    "if ( ! has_site_icon() )",
+    "img/logo.png",
+    '<span class="brand-name" aria-hidden="true">CYWater</span>',
+    "nav-mobile-account",
+    "esc_html__( 'Sign in', 'cywater' )",
+  ],
+  "WordPress header branding and mobile account entry"
+);
+assertMarkers(
+  parityFiles.wordpressComponentsCss,
+  [".brand {", "gap: 0.7rem;", ".brand-name { line-height: 1; }"],
+  "WordPress header brand styling"
 );
 
 assertMarkers(
@@ -407,7 +573,11 @@ const boardMarkers = [
 ];
 assertMarkers(parityFiles.staticBoard, [...boardMarkers, "Leadership update in progress."], "Static Board page");
 assertMarkers(parityFiles.wordpressBoard, boardMarkers, "WordPress Board template");
-assertMarkers(parityFiles.wordpressBoard, ["Current Board leadership."], "WordPress Board status");
+assert(
+  !parityFiles.wordpressBoard.includes("Current Board leadership.") &&
+    !parityFiles.wordpressBoard.includes("confirmed for public display"),
+  "WordPress Board must not expose internal publication notes."
+);
 
 assertMarkers(
   parityFiles.staticBylaws,
@@ -457,8 +627,41 @@ assertMarkers(
     ".prose ul:not(.pmpro_list) li",
     ".prose ul:not(.pmpro_list) li::before",
     ".latest-head { flex-direction: column; align-items: flex-start; }",
+    ".event-carousel-track.is-moving-previous .upcoming-event-card.is-previous,\n.event-carousel-track.is-moving-next .upcoming-event-card.is-next {\n  opacity: 1;\n  transform: scale(1);\n  filter: none;\n  box-shadow: 0 18px 46px -24px rgba(8,28,45,0.28);",
+    ".event-carousel-track.is-moving-previous .upcoming-event-card.is-active,\n.event-carousel-track.is-moving-next .upcoming-event-card.is-active {\n  opacity: 1;\n  transform: scale(0.84);\n  filter: none;\n  box-shadow: none;",
+    ".nav-mobile .btn-outline { border-color: var(--ink); color: var(--ink); }",
+    ".nav-mobile .btn-primary { border-color: var(--ink); color: var(--white); }",
   ],
   "WordPress-specific page stylesheet"
+);
+
+const membershipSetup = await readFile(
+  path.join(root, "wordpress", "wp-content", "plugins", "cywater-membership", "includes", "class-cywater-membership-setup.php"),
+  "utf8"
+);
+assertMarkers(
+  membershipSetup,
+  [
+    "'[cywater_member_login]', 'pmpro_login_page_id', array( 'pmpro_login' )",
+    "public static function reconcile_managed_shortcodes",
+    "array_unique( $matches[1] )",
+  ],
+  "Managed member-login migration"
+);
+
+const membershipCountries = await readFile(
+  path.join(root, "wordpress", "wp-content", "plugins", "cywater-membership", "includes", "class-cywater-membership-countries.php"),
+  "utf8"
+);
+assertMarkers(
+  membershipCountries,
+  [
+    "'CN' => __( 'China (Chinese mainland)'",
+    "'HK' => __( 'Hong Kong SAR, China'",
+    "'MO' => __( 'Macao SAR, China'",
+    "'TW' => __( 'Taiwan, China'",
+  ],
+  "Membership country and region labels"
 );
 
 const award2025 = seed.awards.find((award) => String(award.year) === "2025");

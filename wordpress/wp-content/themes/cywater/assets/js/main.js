@@ -149,6 +149,15 @@
       return card;
     };
 
+    const updatePagination = (index) => {
+      const normalized = normalizeIndex(index);
+      pagination?.querySelectorAll(".event-carousel-dot").forEach((dot, dotIndex) => {
+        const isActive = dotIndex === normalized;
+        dot.classList.toggle("is-active", isActive);
+        dot.setAttribute("aria-current", isActive ? "true" : "false");
+      });
+    };
+
     const renderSlots = () => {
       track.classList.remove("is-moving-previous", "is-moving-next");
       if (sourceCards.length === 1) {
@@ -165,11 +174,7 @@
         );
       }
 
-      pagination?.querySelectorAll(".event-carousel-dot").forEach((dot, index) => {
-        const isActive = index === activeIndex;
-        dot.classList.toggle("is-active", isActive);
-        dot.setAttribute("aria-current", isActive ? "true" : "false");
-      });
+      updatePagination(activeIndex);
       if (previous) previous.disabled = sourceCards.length < 2;
       if (next) next.disabled = sourceCards.length < 2;
     };
@@ -221,6 +226,7 @@
       movingStep = delta < 0 ? -1 : 1;
       desiredDirection = 0;
       const direction = movingStep < 0 ? "previous" : "next";
+      updatePagination(activeIndex + movingStep);
       track.classList.add(`is-moving-${direction}`);
       const complete = (event) => {
         if (event.target !== track || event.propertyName !== "transform") return;

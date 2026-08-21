@@ -40,7 +40,13 @@
 		</div>
 		<div class="footer-bottom">
 			<span>&copy; 2011&ndash;<?php echo esc_html( gmdate( 'Y' ) ); ?> CYWater. All rights reserved.</span>
-			<a href="<?php echo esc_url( home_url( '/bylaws/' ) ); ?>">Bylaws</a>
+			<span>
+				<a href="<?php echo esc_url( home_url( '/privacy-notice/' ) ); ?>">Privacy</a>
+				<a href="<?php echo esc_url( home_url( '/terms-of-use/' ) ); ?>">Terms</a>
+				<a href="<?php echo esc_url( home_url( '/billing-cancellation-refund-policy/' ) ); ?>">Billing &amp; refunds</a>
+				<a href="<?php echo esc_url( home_url( '/data-retention-account-closure-policy/' ) ); ?>">Data retention</a>
+				<a href="<?php echo esc_url( home_url( '/bylaws/' ) ); ?>">Bylaws</a>
+			</span>
 		</div>
 	</div>
 </footer>

@@ -64,29 +64,86 @@ archives, removes Pingback/generator hints, and disables XML-RPC publishing and
 authentication methods. Keep `wp-config.php` at mode `600` on the current
 Hostinger account unless Hostinger changes the PHP ownership model.
 
-## Transactional SMTP Phase
+## Transactional Postmark Phase
 
-Google Workspace continues to receive human mail for `cywater.org`. A separate
-transactional provider should send WordPress password resets, membership
-messages, and receipts from an approved sender subdomain. Do not replace the
-Google Workspace MX records.
+Google Workspace continues to receive human mail for `cywater.org`. Postmark is
+the transactional transport for WordPress account, membership, billing, program,
+and contact messages. Do not replace the Google Workspace MX records: Postmark
+sends mail, while the Workspace role addresses remain the human reply and
+support destinations.
 
-Install and configure the selected SMTP plugin/provider through its protected
+Install and configure the Postmark transport plugin through its protected
 settings or Hostinger secret facility. The CYWater environment plugin does not
-implement production SMTP itself. After the provider is configured, change only
-the readiness marker:
+implement the production mail transport itself. After the provider is
+configured, change only the readiness marker:
 
 ```php
 define( 'CYWATER_MAIL_TRANSPORT', 'smtp' );
 ```
 
-Keep all SMTP credentials outside Git. Test Gmail and a non-Gmail recipient
-before enabling membership mail.
+Keep all transport credentials outside Git. Test Gmail and a non-Gmail
+recipient before enabling production mail.
 
-PMPro must use `CYWater` as its sender name and `web@cywater.org` as its sender
-email. The WordPress administrator notification email also uses
-`web@cywater.org`. These are non-secret association identities; do not replace
-them with a Hostinger default sender or a nonexistent staging-only mailbox.
+Configure the ActiveCampaign Postmark plugin with Message Stream `outbound` and
+the verified `web@cywater.org` **Sender Email** as the platform fallback for a
+message that has no more specific CYWater identity. Leave **Force Sender Email**
+off. Turning it on would overwrite the explicit `From` selected by the account,
+membership, billing, program, and contact routes below. The Server API Token is
+a secret and must remain only in the protected plugin/host setting.
+
+Use the following functional identities:
+
+| Identity | Responsibility |
+| --- | --- |
+| `accounts@cywater.org` | Account verification and security, password reset, password/email-change notices, and account-closure confirmation. Member replies go to `membership@cywater.org`. |
+| `membership@cywater.org` | Membership state and lifecycle, member support, Forum, Logo Call, and other member-program messages. |
+| `billing@cywater.org` | Paid checkout, orders and receipts, recurring charges, payment failure/action, billing corrections, and refunds. |
+| `contact@cywater.org` | Public contact, Partnership, free Event/RSVP, and media inquiries. |
+| `web@cywater.org` | WordPress/Hostinger/Postmark/Stripe platform ownership, service recovery, technical alerts, and the Postmark fallback only. |
+
+PMPro is not assigned one uniform sender. With
+`pmpro_only_filter_pmpro_emails=1`, paid checkout/order/receipt, recurring
+payment, payment-failure/action, card-expiry, scheduled-cancellation, invoice,
+and refund templates use `billing@cywater.org`; free checkout, membership
+change/cancellation, expiration and expiration-warning templates use
+`membership@cywater.org`. Unknown future PMPro templates fail to the safer
+membership identity until reviewed. Administrator copies retain their intended
+recipient; the template category changes only their sender/reply identity.
+
+The installed PMPro template routing is exact:
+
+- Billing: `billing`, `billing_admin`, `billing_failure`,
+  `billing_failure_admin`, `cancel_on_next_payment_date`,
+  `cancel_on_next_payment_date_admin`, `checkout_check`,
+  `checkout_check_admin`, `checkout_paid`, `checkout_paid_admin`,
+  `credit_card_expiring`, `invoice`, `membership_recurring`, `payment_action`,
+  `payment_action_admin`, `refund`, and `refund_admin`.
+- Membership: `admin_change`, `admin_change_admin`, `cancel`, `cancel_admin`,
+  `checkout_free`, `checkout_free_admin`, `membership_expired`, and
+  `membership_expiring`.
+
+The WordPress administrator notification address remains `web@cywater.org`.
+Before production mail is accepted, confirm in Google Workspace that
+`accounts@cywater.org` exists as a receive-capable alias or group, is not merely
+a Postmark-verified outbound identity, and has at least two authorized
+association custodians. These are non-secret association identities; do not
+replace them with a Hostinger default sender or a nonexistent staging-only
+mailbox.
+
+At the corrected 2026-08-21 post-deploy presence-only check, production
+Postmark had a saved Server API Token, Message Stream `outbound`, Sender Email
+`web@cywater.org`, logs enabled, and Force Sender Email/HTML/open/link tracking
+off. Production **Enabled** remained off pending the controlled delivery test;
+the user then enabled it. One controlled account-route message
+(`CYW-MAIL-20260820183111`) returned Postmark ErrorCode `0` / `OK` and was
+visibly received in Gmail from `CYWater Accounts <accounts@cywater.org>` at
+`web@cywater.org`; the application supplied `membership@cywater.org` as the
+reply destination. It changed no account, membership, order, or payment data,
+and no second test was sent. The production readiness marker is now
+`CYWATER_MAIL_TRANSPORT=smtp`; the pre-change `wp-config.php` is retained under
+`/home/u111638297/cywater-release-backups/postmark-production-enable-20260820T183420Z`.
+Staging remains enabled with the same non-secret flags. Never copy the token
+into a task, screenshot, shell command, log, or Git.
 
 ## Stripe Sandbox Phase
 

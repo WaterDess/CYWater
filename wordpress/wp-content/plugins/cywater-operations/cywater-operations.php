@@ -2,7 +2,7 @@
 /**
  * Plugin Name: CYWater Operations
  * Description: Auditable operational roles and paid-event approval gates for CYWater.
- * Version: 0.1.3
+ * Version: 0.2.1
  * Requires at least: 7.0
  * Requires PHP: 8.1
  * Text Domain: cywater-operations
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CYWATER_OPERATIONS_VERSION', '0.1.3' );
+define( 'CYWATER_OPERATIONS_VERSION', '0.2.1' );
 define( 'CYWATER_OPERATIONS_FILE', __FILE__ );
 define( 'CYWATER_OPERATIONS_DIR', plugin_dir_path( __FILE__ ) );
 
@@ -23,6 +23,7 @@ require_once CYWATER_OPERATIONS_DIR . 'includes/class-cywater-operations-logo-re
 require_once CYWATER_OPERATIONS_DIR . 'includes/class-cywater-paid-event-approval.php';
 require_once CYWATER_OPERATIONS_DIR . 'includes/class-cywater-event-tickets-paid-adapter.php';
 require_once CYWATER_OPERATIONS_DIR . 'includes/class-cywater-operations-admin.php';
+require_once CYWATER_OPERATIONS_DIR . 'includes/class-cywater-operations-admin-navigation.php';
 require_once CYWATER_OPERATIONS_DIR . 'includes/class-cywater-operations-qa.php';
 
 /**
@@ -46,6 +47,7 @@ function cywater_operations_boot() {
 	CYWater_Paid_Event_Approval::register();
 	CYWater_Event_Tickets_Paid_Adapter::register();
 	CYWater_Operations_Admin::register();
+	CYWater_Operations_Admin_Navigation::register();
 	CYWater_Operations_QA::register();
 }
 add_action( 'plugins_loaded', 'cywater_operations_boot', 100 );

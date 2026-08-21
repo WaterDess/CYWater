@@ -15,7 +15,7 @@ final class CYWater_Membership_Privacy {
 		'cyw_professional_title' => 'Current title or role',
 		'cyw_career_stage'       => 'Career stage',
 		'cyw_orcid'              => 'ORCID iD',
-		'cyw_research_interests' => 'Research interests',
+		'cyw_research_interests' => 'About yourself',
 		'cyw_profile_photo'      => 'Profile photograph',
 	);
 
@@ -159,6 +159,9 @@ final class CYWater_Membership_Privacy {
 		check_admin_referer( 'cywater_save_privacy' );
 		$user_id = get_current_user_id();
 		$public  = isset( $_POST['cyw_profile_public'] ) ? 1 : 0;
+		if ( $public && ( ! class_exists( 'CYWater_Membership_Account_Security' ) || ! CYWater_Membership_Account_Security::is_verified( $user_id ) ) ) {
+			$public = 0;
+		}
 		$fields  = isset( $_POST['cyw_public_fields'] ) ? array_map( 'sanitize_key', (array) wp_unslash( $_POST['cyw_public_fields'] ) ) : array();
 		$fields  = array_values( array_intersect( $fields, array_keys( self::$public_fields ) ) );
 		update_user_meta( $user_id, 'cyw_profile_public', $public );
@@ -181,7 +184,11 @@ final class CYWater_Membership_Privacy {
 		ob_start();
 		echo '<div class="member-directory grid grid-3">';
 		foreach ( $users as $user ) {
-			if ( ! self::has_current_membership( $user->ID ) ) {
+			if (
+				! self::has_current_membership( $user->ID )
+				|| ! class_exists( 'CYWater_Membership_Account_Security' )
+				|| ! CYWater_Membership_Account_Security::is_verified( $user->ID )
+			) {
 				continue;
 			}
 			$fields = (array) get_user_meta( $user->ID, 'cyw_public_fields', true );
@@ -225,9 +232,18 @@ final class CYWater_Membership_Privacy {
 		$now    = current_time( 'timestamp' );
 		$levels = (array) pmpro_getMembershipLevelsForUser( $user_id );
 		$ids    = (array) get_option( 'cywater_membership_level_ids', array() );
-		$legacy_partner_id = absint( $ids['partner_legacy'] ?? ( $ids['partner'] ?? 0 ) );
+		$individual_level_ids = array_filter(
+			array_map(
+				'absint',
+				array(
+					$ids['student'] ?? 0,
+					$ids['professional'] ?? 0,
+					$ids['lifetime'] ?? 0,
+				)
+			)
+		);
 		foreach ( $levels as $level ) {
-			if ( $legacy_partner_id && $legacy_partner_id === (int) $level->id ) {
+			if ( ! in_array( (int) $level->id, $individual_level_ids, true ) ) {
 				continue;
 			}
 			$enddate = isset( $level->enddate ) ? (int) $level->enddate : 0;

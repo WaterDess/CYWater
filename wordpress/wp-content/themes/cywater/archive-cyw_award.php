@@ -19,15 +19,30 @@ get_template_part(
 	)
 );
 
-$awards = new WP_Query(
+$awards = get_posts(
 	array(
 		'post_type'      => 'cyw_award',
 		'post_status'    => 'publish',
 		'posts_per_page' => -1,
-		'meta_key'       => '_cyw_year',
-		'orderby'        => 'meta_value_num',
+		'orderby'        => 'date',
 		'order'          => 'DESC',
 	)
+);
+
+// Editorial fields control presentation, never whether a published record exists.
+// Keep dated records in yearbook order and leave incomplete records visible for
+// correction instead of silently dropping them from the public archive.
+usort(
+	$awards,
+	static function ( $left, $right ) {
+		$left_year  = (int) get_post_meta( $left->ID, '_cyw_year', true );
+		$right_year = (int) get_post_meta( $right->ID, '_cyw_year', true );
+		if ( $left_year !== $right_year ) {
+			return $right_year <=> $left_year;
+		}
+
+		return strcmp( $right->post_date_gmt, $left->post_date_gmt );
+	}
 );
 
 $render_paper = static function ( $paper ) {
@@ -57,11 +72,13 @@ $render_paper = static function ( $paper ) {
 		<div class="section-head" data-reveal><span class="eyebrow">2012&ndash;2025</span><h2>Award yearbook.</h2></div>
 		<div id="awards-yearbook" class="awards-yearbook">
 			<?php
-			while ( $awards->have_posts() ) :
-				$awards->the_post();
+			foreach ( $awards as $award ) :
+				setup_postdata( $award );
 				$record = json_decode( (string) get_post_meta( get_the_ID(), '_cyw_award_record', true ), true );
 				$record = is_array( $record ) ? $record : array();
-				$year   = get_post_meta( get_the_ID(), '_cyw_year', true );
+				$year   = (string) get_post_meta( get_the_ID(), '_cyw_year', true );
+				$year_label  = $year ?: 'Year pending';
+				$year_anchor = $year ? 'award-' . $year : 'award-record-' . get_the_ID();
 				$best   = $record['bestPaper'] ?? array();
 				$best['author']  = get_post_meta( get_the_ID(), '_cyw_recipient', true ) ?: ( $best['author'] ?? '' );
 				$best['title']   = get_post_meta( get_the_ID(), '_cyw_paper_title', true ) ?: ( $best['title'] ?? '' );
@@ -70,8 +87,8 @@ $render_paper = static function ( $paper ) {
 				$article_url     = $article_id ? cywater_source_permalink( 'news:' . $article_id ) : '';
 				$ceremony        = is_array( $record['ceremony'] ?? null ) ? $record['ceremony'] : array();
 				?>
-				<article class="award-year" id="award-<?php echo esc_attr( $year ); ?>" data-reveal>
-					<div class="award-year-label"><?php echo esc_html( $year ); ?></div>
+				<article class="award-year" id="<?php echo esc_attr( $year_anchor ); ?>" data-reveal>
+					<div class="award-year-label"><?php echo esc_html( $year_label ); ?></div>
 					<div class="award-year-content">
 						<?php if ( ! empty( $best['author'] ) || ! empty( $best['title'] ) ) : ?>
 							<div class="award-group"><h3>Best Paper Award</h3><?php $render_paper( $best ); ?></div>
@@ -99,7 +116,7 @@ $render_paper = static function ( $paper ) {
 						<?php endif; ?>
 					</div>
 				</article>
-			<?php endwhile; wp_reset_postdata(); ?>
+			<?php endforeach; wp_reset_postdata(); ?>
 		</div>
 	</div>
 </section>

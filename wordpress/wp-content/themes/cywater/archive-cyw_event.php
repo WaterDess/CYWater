@@ -20,20 +20,7 @@ $events = get_posts(
 	)
 );
 
-usort(
-	$events,
-	static function ( $left, $right ) {
-		$left_order  = metadata_exists( 'post', $left->ID, '_cyw_event_order' ) ? (int) get_post_meta( $left->ID, '_cyw_event_order', true ) : 10000;
-		$right_order = metadata_exists( 'post', $right->ID, '_cyw_event_order' ) ? (int) get_post_meta( $right->ID, '_cyw_event_order', true ) : 10000;
-		if ( $left_order !== $right_order ) {
-			return $left_order <=> $right_order;
-		}
-
-		$left_date  = (string) get_post_meta( $left->ID, '_cyw_start_date', true );
-		$right_date = (string) get_post_meta( $right->ID, '_cyw_start_date', true );
-		return strcmp( $right_date, $left_date );
-	}
-);
+$events = cywater_sort_events_for_archive( $events );
 
 $is_gathering = static function ( $event ) {
 	$source_id = (string) get_post_meta( $event->ID, '_cyw_source_id', true );
@@ -135,6 +122,7 @@ $render_upcoming = static function ( $items ) {
 	foreach ( $items as $event ) {
 		$event_id    = $event->ID;
 		$image       = cywater_featured_image_url( $event_id, 'cywater-card' );
+		$image_alt   = (string) ( get_post_meta( $event_id, '_cyw_image_alt', true ) ?: get_the_title( $event ) );
 		$date        = (string) ( get_post_meta( $event_id, '_cyw_date_label', true ) ?: get_post_meta( $event_id, '_cyw_start_date', true ) );
 		$location    = (string) get_post_meta( $event_id, '_cyw_location', true );
 		$event_types = wp_get_post_terms( $event_id, 'cyw_event_type' );
@@ -144,7 +132,7 @@ $render_upcoming = static function ( $items ) {
 		<a class="upcoming-event-card<?php echo 0 === $index ? ' is-active' : ''; ?>" href="<?php echo esc_url( get_permalink( $event ) ); ?>" aria-hidden="<?php echo 0 === $index ? 'false' : 'true'; ?>" tabindex="<?php echo 0 === $index ? '0' : '-1'; ?>">
 			<span class="upcoming-event-media">
 				<?php if ( $image ) : ?>
-					<img src="<?php echo esc_url( $image ); ?>" alt="<?php echo esc_attr( get_the_title( $event ) ); ?>" loading="lazy">
+					<img src="<?php echo esc_url( $image ); ?>" alt="<?php echo esc_attr( $image_alt ); ?>" loading="lazy">
 				<?php else : ?>
 					<?php
 					get_template_part(

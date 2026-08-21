@@ -12,7 +12,9 @@ $account = function_exists( 'pmpro_url' ) ? pmpro_url( 'account' ) : wp_login_ur
 <head>
 	<meta charset="<?php bloginfo( 'charset' ); ?>">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta name="robots" content="noindex, nofollow">
+	<?php if ( ! has_site_icon() ) : ?>
+		<link rel="icon" type="image/png" href="<?php echo esc_url( cywater_asset_uri( 'img/logo.png' ) ); ?>">
+	<?php endif; ?>
 	<?php wp_head(); ?>
 </head>
 <body <?php body_class(); ?> data-page="<?php echo esc_attr( $section ); ?>">
@@ -20,7 +22,8 @@ $account = function_exists( 'pmpro_url' ) ? pmpro_url( 'account' ) : wp_login_ur
 <header class="site-header">
 	<div class="header-inner">
 		<a class="brand" href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="<?php esc_attr_e( 'CYWater home', 'cywater' ); ?>">
-			<img class="brand-logo" src="<?php echo esc_url( cywater_asset_uri( 'img/logo.png' ) ); ?>" alt="CYWater" width="41" height="50">
+			<img class="brand-logo" src="<?php echo esc_url( cywater_asset_uri( 'img/logo.png' ) ); ?>" alt="" width="41" height="50">
+			<span class="brand-name" aria-hidden="true">CYWater</span>
 		</a>
 		<nav class="nav" aria-label="<?php esc_attr_e( 'Primary', 'cywater' ); ?>">
 			<ul class="nav-list">
@@ -75,5 +78,6 @@ $account = function_exists( 'pmpro_url' ) ? pmpro_url( 'account' ) : wp_login_ur
 	<a href="<?php echo esc_url( home_url( '/news/' ) ); ?>"><?php esc_html_e( 'News', 'cywater' ); ?></a>
 	<a href="<?php echo esc_url( home_url( '/awards/' ) ); ?>"><?php esc_html_e( 'Awards', 'cywater' ); ?></a>
 	<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>"><?php esc_html_e( 'Contact', 'cywater' ); ?></a>
+	<a class="btn btn-outline btn-block nav-mobile-account" href="<?php echo esc_url( $account ); ?>"><?php echo is_user_logged_in() ? esc_html__( 'Account', 'cywater' ) : esc_html__( 'Sign in', 'cywater' ); ?></a>
 	<a class="btn btn-primary btn-block" href="<?php echo esc_url( home_url( '/membership/' ) ); ?>"><?php esc_html_e( 'Join CYWater', 'cywater' ); ?></a>
 </nav>

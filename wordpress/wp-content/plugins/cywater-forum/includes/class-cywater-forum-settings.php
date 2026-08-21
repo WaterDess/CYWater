@@ -71,6 +71,10 @@ final class CYWater_Forum_Settings {
 		return (int) self::get( $key );
 	}
 
+	public static function get_string( $key ) {
+		return (string) self::get( $key );
+	}
+
 	/**
 	 * Deploy-only mode. When the runtime defines this constant the settings
 	 * screen becomes read-only and the versioned defaults are authoritative.
@@ -130,6 +134,10 @@ final class CYWater_Forum_Settings {
 		$clean['endorsement_articles_required'] = max( 1, $clean['endorsement_articles_required'] );
 		$clean['endorsement_token_ttl_hours']   = max( 1, $clean['endorsement_token_ttl_hours'] );
 		$clean['endorsement_requests_per_day']  = max( 1, $clean['endorsement_requests_per_day'] );
+		$allowed_moderation_modes = array( 'auto', 'first', 'all' );
+		if ( ! in_array( $clean['comments_moderation_mode'], $allowed_moderation_modes, true ) ) {
+			$clean['comments_moderation_mode'] = 'auto';
+		}
 
 		return $clean;
 	}
@@ -156,19 +164,22 @@ final class CYWater_Forum_Settings {
 			<?php if ( self::is_locked() ) : ?>
 				<div class="notice notice-info"><p><?php esc_html_e( 'Policy is locked to the deployed defaults by CYWATER_FORUM_LOCK_SETTINGS. These values are read-only.', 'cywater-forum' ); ?></p></div>
 			<?php endif; ?>
-			<p><?php esc_html_e( 'Authorship and discussion policy. Defaults are versioned in the plugin; values saved here override them.', 'cywater-forum' ); ?></p>
+			<p><?php esc_html_e( 'Article submission and discussion policy. Defaults are versioned in the plugin; values saved here override them.', 'cywater-forum' ); ?></p>
 			<form method="post" action="options.php">
 				<?php settings_fields( 'cywater_forum' ); ?>
 
-				<h2><?php esc_html_e( 'Authorship', 'cywater-forum' ); ?></h2>
+				<h2><?php esc_html_e( 'Article participation', 'cywater-forum' ); ?></h2>
 				<table class="form-table" role="presentation">
 					<?php
-					self::number_row( 'endorsement_articles_required', __( 'Articles required to endorse', 'cywater-forum' ), __( 'Published forum articles an author needs before they may endorse someone else.', 'cywater-forum' ), $values, $disabled );
-					self::number_row( 'endorsements_required', __( 'Endorsements required to publish', 'cywater-forum' ), __( 'Endorsements a new author must collect before their first article can be published.', 'cywater-forum' ), $values, $disabled );
-					self::checkbox_row( 'admin_override', __( 'Administrator override', 'cywater-forum' ), __( 'Allow an administrator to grant or revoke authorship directly from the user editor.', 'cywater-forum' ), $values, $disabled );
-					self::checkbox_row( 'membership_required', __( 'Require active membership', 'cywater-forum' ), __( 'Publishing requires an active membership as well as an endorsement.', 'cywater-forum' ), $values, $disabled );
-					self::number_row( 'endorsement_requests_per_day', __( 'Endorsement requests per day', 'cywater-forum' ), __( 'Requests one candidate may send in 24 hours.', 'cywater-forum' ), $values, $disabled );
-					self::number_row( 'endorsement_token_ttl_hours', __( 'Endorsement link lifetime (hours)', 'cywater-forum' ), __( 'How long an endorsement link stays valid. It is single-use regardless.', 'cywater-forum' ), $values, $disabled );
+					self::checkbox_row( 'membership_required', __( 'Require active individual membership', 'cywater-forum' ), __( 'Only a verified account with an active Student, Professional or Lifetime membership may submit an article for moderator review.', 'cywater-forum' ), $values, $disabled );
+					self::checkbox_row( 'endorsements_enabled', __( 'Enable legacy endorsement workflow', 'cywater-forum' ), __( 'Currently paused. When disabled, no invitation request or link is processed; historical records and implementation are retained.', 'cywater-forum' ), $values, $disabled );
+					if ( ! empty( $values['endorsements_enabled'] ) ) {
+						self::number_row( 'endorsement_articles_required', __( 'Articles required to endorse', 'cywater-forum' ), __( 'Published forum articles an author needs before they may endorse someone else.', 'cywater-forum' ), $values, $disabled );
+						self::number_row( 'endorsements_required', __( 'Endorsements required to submit', 'cywater-forum' ), __( 'Endorsements a member must collect before submitting an article for moderator review.', 'cywater-forum' ), $values, $disabled );
+						self::checkbox_row( 'admin_override', __( 'Administrator override', 'cywater-forum' ), __( 'Allow an administrator to grant or revoke legacy endorsement status from the user editor.', 'cywater-forum' ), $values, $disabled );
+						self::number_row( 'endorsement_requests_per_day', __( 'Endorsement requests per day', 'cywater-forum' ), __( 'Requests one candidate may send in 24 hours.', 'cywater-forum' ), $values, $disabled );
+						self::number_row( 'endorsement_token_ttl_hours', __( 'Endorsement link lifetime (hours)', 'cywater-forum' ), __( 'How long an endorsement link stays valid. It is single-use regardless.', 'cywater-forum' ), $values, $disabled );
+					}
 					?>
 				</table>
 
@@ -177,7 +188,18 @@ final class CYWater_Forum_Settings {
 					<?php
 					self::checkbox_row( 'comments_enabled', __( 'Enable questions and replies', 'cywater-forum' ), __( 'Global switch. Individual articles also carry the standard WordPress discussion checkbox, and both must be open.', 'cywater-forum' ), $values, $disabled );
 					self::checkbox_row( 'comments_require_membership', __( 'Members only', 'cywater-forum' ), __( 'Restrict replies to signed-in members with an active membership.', 'cywater-forum' ), $values, $disabled );
-					self::checkbox_row( 'comments_hold_first', __( 'Hold first reply only', 'cywater-forum' ), __( 'Moderate a member’s first reply, then auto-approve. Turn off to pre-moderate every reply.', 'cywater-forum' ), $values, $disabled );
+					self::select_row(
+						'comments_moderation_mode',
+						__( 'Eligible member replies', 'cywater-forum' ),
+						array(
+							'auto'  => __( 'Publish immediately', 'cywater-forum' ),
+							'first' => __( 'Hold the first reply', 'cywater-forum' ),
+							'all'   => __( 'Hold every reply', 'cywater-forum' ),
+						),
+						__( 'The current policy publishes replies immediately after membership and email-verification checks.', 'cywater-forum' ),
+						$values,
+						$disabled
+					);
 					?>
 				</table>
 
@@ -223,6 +245,22 @@ final class CYWater_Forum_Settings {
 			<th scope="row"><label for="cywater-forum-<?php echo esc_attr( $key ); ?>"><?php echo esc_html( $label ); ?></label></th>
 			<td>
 				<input type="number" min="0" step="1" class="small-text" id="cywater-forum-<?php echo esc_attr( $key ); ?>" name="<?php echo esc_attr( self::field_name( $key ) ); ?>" value="<?php echo esc_attr( (string) ( $values[ $key ] ?? 0 ) ); ?>"<?php echo esc_attr( $disabled ); ?> />
+				<p class="description"><?php echo esc_html( $description ); ?></p>
+			</td>
+		</tr>
+		<?php
+	}
+
+	private static function select_row( $key, $label, $options, $description, $values, $disabled ) {
+		?>
+		<tr>
+			<th scope="row"><label for="cywater-forum-<?php echo esc_attr( $key ); ?>"><?php echo esc_html( $label ); ?></label></th>
+			<td>
+				<select id="cywater-forum-<?php echo esc_attr( $key ); ?>" name="<?php echo esc_attr( self::field_name( $key ) ); ?>"<?php echo esc_attr( $disabled ); ?>>
+					<?php foreach ( $options as $value => $option_label ) : ?>
+						<option value="<?php echo esc_attr( $value ); ?>" <?php selected( (string) ( $values[ $key ] ?? '' ), $value ); ?>><?php echo esc_html( $option_label ); ?></option>
+					<?php endforeach; ?>
+				</select>
 				<p class="description"><?php echo esc_html( $description ); ?></p>
 			</td>
 		</tr>

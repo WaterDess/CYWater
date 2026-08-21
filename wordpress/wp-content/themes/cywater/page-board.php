@@ -18,9 +18,21 @@ while ( have_posts() ) :
 			'post_type'      => 'cyw_board_role',
 			'post_status'    => 'publish',
 			'posts_per_page' => -1,
-			'meta_key'       => '_cyw_order',
-			'orderby'        => array( 'meta_value_num' => 'ASC', 'title' => 'ASC' ),
+			'orderby'        => 'title',
+			'order'          => 'ASC',
 		)
+	);
+	usort(
+		$role_posts,
+		static function ( $left, $right ) {
+			$left_order  = metadata_exists( 'post', $left->ID, '_cyw_order' ) ? (int) get_post_meta( $left->ID, '_cyw_order', true ) : 10000;
+			$right_order = metadata_exists( 'post', $right->ID, '_cyw_order' ) ? (int) get_post_meta( $right->ID, '_cyw_order', true ) : 10000;
+			if ( $left_order !== $right_order ) {
+				return $left_order <=> $right_order;
+			}
+
+			return strcasecmp( $left->post_title, $right->post_title );
+		}
 	);
 	$roles_by_title = array();
 	foreach ( $role_posts as $role_post ) {
@@ -47,11 +59,7 @@ while ( have_posts() ) :
 	?>
 	<section class="section">
 		<div class="container container-narrow">
-			<div class="board-status callout" data-reveal>
-				<strong>Current Board leadership.</strong>
-				<p>The following appointments have been confirmed for public display. Affiliations and terms will be added only after separate confirmation.</p>
-			</div>
-			<div class="section-head" data-reveal style="margin-top:var(--sp-8)">
+			<div class="section-head" data-reveal>
 				<span class="eyebrow">Bylaws structure</span>
 				<h2>Board composition</h2>
 				<p class="lead">The Bylaws define the following positions. The Executive Director, if appointed, serves ex officio and does not vote.</p>

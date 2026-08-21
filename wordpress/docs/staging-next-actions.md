@@ -18,9 +18,11 @@ Professional membership. Marking an entry selected creates a pending reward
 fulfillment record; it does not silently change PMPro membership or create a
 payment/order.
 
-The visual and content baseline is accepted at `staging.cywater.org`. Keep
-production traffic, live payment, and production mail disabled while completing
-the following gates in order.
+The visual and content baseline is accepted at `staging.cywater.org`, and
+production traffic is live at `cywater.org`. Keep live payment disabled while
+completing the remaining gates. Production transactional mail was enabled only
+after the controlled Accounts-route test described below; the broader mail
+matrix remains open.
 
 ## 1. Access And Recovery
 
@@ -71,15 +73,42 @@ Hostinger staging access protection remains an account-level release gate.
   post-rotation test were user-confirmed on 2026-08-02; do not record the token.
 - Preserve Google Workspace MX records and review SPF, DKIM, Return-Path, and
   DMARC alignment before completing this gate.
+- In Postmark settings keep Message Stream `outbound`, use
+  `web@cywater.org` only as the verified platform fallback **Sender Email**, and
+  leave **Force Sender Email** off so the application can retain each
+  message's explicit role identity.
 - Route WordPress password reset, registration, receipt, failure, renewal, and
   expiry messages through that provider on staging.
 - Registration and password-reset requests plus PMPro checkout, refund,
   recurring-failure, renewal-invoice, cancellation, expiration-warning, and
   expiration templates were Delivered through Postmark on 2026-08-03 after
-  correcting the PMPro sender to `CYWater <web@cywater.org>`. PMPro's recurring
-  quarter-hourly, hourly, and daily Action Scheduler jobs are pending normally
-  with zero failed actions. Final approved production copy and a non-Gmail
-  delivery target remain open.
+  correcting the then-invalid sender to `CYWater <web@cywater.org>`. This is a
+  historical transport test, not the production identity policy. Production
+  routes account-security mail through `accounts@cywater.org` with replies to
+  `membership@cywater.org`; membership lifecycle, Forum, Logo Call, and other
+  member-program mail through `membership@cywater.org`; paid checkout, orders,
+  receipts, payment failure/action, renewals, and refunds through
+  `billing@cywater.org`; and public contact, Partnership, free Event/RSVP, and
+  media mail through `contact@cywater.org`. `web@cywater.org` remains the
+  platform owner/admin and transport fallback identity.
+- PMPro filters only PMPro mail but routes by template rather than using one
+  uniform address: paid/billing templates use `billing@cywater.org`; free
+  checkout and membership change/cancellation/expiration templates use
+  `membership@cywater.org`. Unknown future PMPro templates default to
+  `membership@cywater.org` until reviewed. PMPro's
+  recurring quarter-hourly, hourly, and daily Action Scheduler jobs are pending
+  normally with zero failed actions. Final approved production copy and a
+  non-Gmail delivery target remain open.
+- On 2026-08-21 the user enabled production Postmark and the single controlled
+  message `CYW-MAIL-20260820183111` returned Postmark ErrorCode `0` / `OK` and
+  was visibly received in Gmail from `accounts@cywater.org` at
+  `web@cywater.org`. The application supplied `membership@cywater.org` as the
+  reply destination. No account, membership, order, or payment data changed,
+  and no second test was sent. The production readiness marker is now
+  `CYWATER_MAIL_TRANSPORT=smtp`.
+- Confirm that `accounts@cywater.org` exists in Google Workspace as a
+  receive-capable alias or group with at least two authorized custodians;
+  Postmark sender verification alone does not create an inbox or reply path.
 - Test delivery to at least Gmail and one non-Gmail mailbox. Record message IDs
   and results without recording credentials.
 

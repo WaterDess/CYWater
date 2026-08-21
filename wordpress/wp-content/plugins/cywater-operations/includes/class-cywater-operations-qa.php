@@ -72,6 +72,7 @@ final class CYWater_Operations_QA {
 			$editor = self::create_user( 'cyw_ops_editor_' . $suffix, 'cyw-ops-editor-' . $suffix . '@example.invalid', $created_user_ids );
 			$governance = self::create_user( 'cyw_ops_governance_' . $suffix, 'cyw-ops-governance-' . $suffix . '@example.invalid', $created_user_ids );
 			$program = self::create_user( 'cyw_ops_program_' . $suffix, 'cyw-ops-program-' . $suffix . '@example.invalid', $created_user_ids );
+			$moderator = self::create_user( 'cyw_ops_moderator_' . $suffix, 'cyw-ops-moderator-' . $suffix . '@example.invalid', $created_user_ids );
 			self::test_atomic_role_assignment( $program );
 
 			// update_user_operational_roles() deliberately reads and writes through
@@ -98,7 +99,12 @@ final class CYWater_Operations_QA {
 			self::assert_true( $editor instanceof WP_User && ! user_can( $editor, 'cywater_approve_paid_event' ), 'Revoking governance removes its approval capability.' );
 
 			$governance->add_role( CYWater_Operations_Roles::GOVERNANCE_APPROVER );
+			$moderator->add_role( CYWater_Operations_Roles::COMMUNITY_MODERATOR );
+			self::test_governance_dashboard_links( $governance );
+			self::test_admin_navigation( $moderator );
+			self::test_logo_event_panel_scope( $editor, $created_post_ids, $suffix );
 			self::test_logo_review_workflow( $program, $editor, $created_post_ids, $suffix );
+			self::test_logo_governance_workflow( $program, $governance, $editor, $moderator, $created_user_ids, $created_post_ids, $suffix );
 			self::test_partnership_audit_failure( $governance, $created_post_ids, $suffix );
 			self::test_paid_event_workflow( $editor, $governance, $created_post_ids, $suffix );
 			self::test_audit_redaction( $context, $suffix );
@@ -186,7 +192,7 @@ final class CYWater_Operations_QA {
 			CYWater_Operations_Roles::CONTENT_EDITOR      => array( 'edit_cyw_events', 'cywater_submit_paid_event_approval', 'cywater_open_paid_event_registration' ),
 			CYWater_Operations_Roles::COMMUNITY_MODERATOR => array( 'moderate_comments', 'edit_cyw_forum_posts' ),
 			CYWater_Operations_Roles::PROGRAM_REVIEWER    => array( 'cywater_review_logo_entries' ),
-			CYWater_Operations_Roles::GOVERNANCE_APPROVER => array( 'edit_cyw_board_roles', 'cywater_approve_partnerships', 'cywater_approve_paid_event' ),
+			CYWater_Operations_Roles::GOVERNANCE_APPROVER => array( 'edit_cyw_board_roles', 'cywater_approve_partnerships', 'cywater_approve_paid_event', 'cywater_review_logo_entries', 'cywater_select_logo_finalists', 'cywater_select_official_logo' ),
 		);
 		$negative = array(
 			CYWater_Operations_Roles::CONTENT_EDITOR      => array( 'cywater_approve_paid_event', 'cywater_approve_partnerships', 'cywater_review_logo_entries', 'moderate_comments', 'edit_cyw_board_roles' ),
@@ -198,6 +204,9 @@ final class CYWater_Operations_QA {
 				'cywater_approve_paid_event',
 				'cywater_approve_partnerships',
 				'cywater_fulfill_logo_reward',
+				'cywater_select_logo_finalists',
+				'cywater_select_official_logo',
+				'cywater_manage_logo_fulfillment',
 				'edit_cyw_logo_entries',
 				'edit_others_cyw_logo_entries',
 				'read_private_cyw_logo_entries',
@@ -210,7 +219,7 @@ final class CYWater_Operations_QA {
 				'delete_published_cyw_logo_entries',
 				'delete_others_cyw_logo_entries',
 			),
-			CYWater_Operations_Roles::GOVERNANCE_APPROVER => array( 'edit_cyw_events', 'cywater_open_paid_event_registration', 'moderate_comments', 'cywater_review_logo_entries' ),
+			CYWater_Operations_Roles::GOVERNANCE_APPROVER => array( 'edit_cyw_events', 'cywater_open_paid_event_registration', 'moderate_comments', 'cywater_manage_logo_fulfillment' ),
 		);
 
 		foreach ( $positive as $slug => $capabilities ) {
@@ -241,6 +250,150 @@ final class CYWater_Operations_QA {
 			self::assert_true( ! preg_match( '/finance|refund|pmpro|membership_manager/', $slug ), 'Managed role ' . $slug . ' is not a dormant finance/refund/PMPro role.' );
 		}
 		self::assert_true( ! in_array( 'cywater_fulfill_logo_reward', CYWater_Operations_Roles::all_capabilities(), true ), 'No obsolete standalone Logo reward-fulfillment capability is managed.' );
+	}
+
+	/**
+	 * Keep the Governance dashboard shortcut aligned with the post type that
+	 * Partnerships actually registers. This catches stale route slugs without
+	 * requiring a browser or changing an application record.
+	 */
+	private static function test_governance_dashboard_links( $governance ) {
+		self::assert_true( $governance instanceof WP_User, 'A Governance Approver is available for the dashboard-link probe.' );
+		if ( ! $governance instanceof WP_User ) {
+			return;
+		}
+
+		$previous_user_id = get_current_user_id();
+		wp_set_current_user( $governance->ID );
+		ob_start();
+		try {
+			CYWater_Operations_Admin_Navigation::render_dashboard_widget();
+			$html = (string) ob_get_contents();
+		} finally {
+			ob_end_clean();
+			wp_set_current_user( $previous_user_id );
+		}
+
+		self::assert_true( false !== strpos( $html, 'edit.php?post_type=cyw_partner_app' ), 'Governance dashboard links to the registered Partner application post type.' );
+		self::assert_true( false === strpos( $html, 'cyw_partner_application' ), 'Governance dashboard contains no retired Partner application route slug.' );
+	}
+
+	/**
+	 * The navigation layer may simplify presentation but must preserve every
+	 * nonce-bearing action and must never turn menu visibility into authority.
+	 */
+	private static function test_admin_navigation( $moderator ) {
+		$administrators = get_users(
+			array(
+				'role'   => 'administrator',
+				'number' => 1,
+			)
+		);
+		self::assert_true( $moderator instanceof WP_User && ! empty( $administrators ) && $administrators[0] instanceof WP_User, 'An Administrator and Community Moderator are available for navigation QA.' );
+		if ( ! $moderator instanceof WP_User || empty( $administrators ) || ! $administrators[0] instanceof WP_User ) {
+			return;
+		}
+
+		global $menu;
+		$previous_user_id = get_current_user_id();
+		$previous_menu    = $menu;
+		$seed_actions     = array(
+			'edit'                   => '<a href="edit-account">Edit</a>',
+			'delete'                 => '<a href="delete-account&amp;nonce=keep-me">Delete</a>',
+			'view'                   => '<a href="view-account">View</a>',
+			'resetpassword'          => '<a href="reset-account&amp;nonce=keep-me">Send password reset</a>',
+			'editmember'             => '<a href="edit-member">Edit Member</a>',
+			'cywater_staff_access'   => '<a href="staff-access">Manage CYWater access</a>',
+			'cywater_member_record'  => '<a href="member-record">CYWater record</a>',
+		);
+
+		try {
+			wp_set_current_user( $administrators[0]->ID );
+			$organized = CYWater_Operations_Admin::organize_user_row_actions( $seed_actions, $moderator );
+			$html      = (string) ( $organized['cywater_manage'] ?? '' );
+			self::assert_true( array( 'cywater_manage' ) === array_keys( $organized ), 'Administrator user actions render as one compact action group without pipe separators.' );
+			self::assert_true( false !== strpos( $html, '>Account<' ) && false !== strpos( $html, '>Member record<' ) && false !== strpos( $html, '>Staff access<' ), 'The compact action group keeps the three daily account actions visible.' );
+			self::assert_true( false !== strpos( $html, '>More<' ) && false !== strpos( $html, 'nonce=keep-me' ), 'The overflow menu preserves original nonce-bearing low-frequency actions.' );
+			self::assert_true( false !== strpos( $html, 'cywater-user-action-menu__item--danger' ), 'The destructive account action is visually distinguished in the overflow menu.' );
+			$columns = CYWater_Operations_Admin::organize_users_columns(
+				array(
+					'cb'                         => 'Select',
+					'username'                   => 'Username',
+					'name'                       => 'Name',
+					'email'                      => 'Email',
+					'role'                       => 'Role',
+					'posts'                      => 'Posts',
+					'pmpro_membership_level'     => 'Membership Level',
+					'cyw_forum'                  => 'Forum',
+					'cywater_account'            => 'CYWater account',
+					'cywater_membership'         => 'Membership',
+					'cywater_operational_access' => 'CYWater staff access',
+					'future_plugin_column'       => 'Future plugin',
+				)
+			);
+			self::assert_true( ! isset( $columns['posts'], $columns['pmpro_membership_level'] ), 'Users table removes the irrelevant Posts count and duplicate PMPro membership summary.' );
+			self::assert_true( array( 'cb', 'username', 'name', 'email', 'cywater_account', 'cywater_membership', 'cyw_forum', 'cywater_operational_access', 'role', 'future_plugin_column' ) === array_keys( $columns ), 'Users table keeps account, membership, Forum and staff access in a predictable order without dropping future columns.' );
+
+			$menu = self::navigation_seed_menu();
+			CYWater_Operations_Admin_Navigation::organize_menu();
+			$admin_slugs = array_values( array_map( static fn( $item ) => (string) $item[2], $menu ) );
+			$news_item   = self::find_menu_item( $menu, 'edit.php' );
+			$unknown     = self::find_menu_item( $menu, 'third-party-tool' );
+			self::assert_true( 'index.php' === ( $admin_slugs[0] ?? '' ) && array_search( 'edit.php', $admin_slugs, true ) < array_search( 'edit.php?post_type=cyw_forum_post', $admin_slugs, true ), 'Administrator menu orders Dashboard, content, and community work predictably.' );
+			self::assert_true( is_array( $news_item ) && 'News' === $news_item[0] && false !== strpos( (string) $news_item[4], 'cywater-menu-group-content' ), 'Administrator content menu labels Posts as News and marks its section.' );
+			self::assert_true( is_array( $news_item ) && false !== strpos( (string) $news_item[4], 'cywater-menu-group-start' ), 'Administrator content menu has a server-backed section start when JavaScript enhancement is unavailable.' );
+			$critical_css = CYWater_Operations_Admin_Navigation::critical_stylesheet();
+			self::assert_true( '' !== $critical_css && false !== strpos( $critical_css, 'cywater-menu-group-content' ) && false !== strpos( $critical_css, 'cywater-work-areas' ), 'Critical menu grouping and dashboard work-area styles are available inline without a separate plugin asset request.' );
+			$navigation_script = CYWater_Operations_Admin_Navigation::navigation_script();
+			self::assert_true( '' !== $navigation_script && false !== strpos( $navigation_script, 'cywater-admin-menu-section' ) && false !== strpos( $navigation_script, 'aria-expanded' ), 'Menu grouping and collapse behavior are available inline without a separate plugin asset request.' );
+			self::assert_true( is_array( $unknown ) && false !== strpos( (string) $unknown[4], 'cywater-menu-group-system' ), 'Unknown Administrator tools are retained inside Site system instead of being silently removed.' );
+
+			wp_set_current_user( $moderator->ID );
+			self::assert_true( $seed_actions === CYWater_Operations_Admin::organize_user_row_actions( $seed_actions, $moderator ), 'A delegated Moderator cannot receive Administrator account-management actions.' );
+			$menu = self::navigation_seed_menu();
+			CYWater_Operations_Admin_Navigation::organize_menu();
+			$moderator_slugs = array_values( array_map( static fn( $item ) => (string) $item[2], $menu ) );
+			$expected = array( 'index.php', 'upload.php', 'edit.php?post_type=cyw_forum_post', 'edit-comments.php', 'profile.php' );
+			self::assert_true( $expected === $moderator_slugs, 'Community Moderator menu contains only Dashboard, Media, Forum, Comments, and Profile.' );
+			$moderator_work = self::find_menu_item( $menu, 'upload.php' );
+			self::assert_true( is_array( $moderator_work ) && false !== strpos( (string) $moderator_work[4], 'cywater-menu-group-start' ), 'Delegated staff menu has a server-backed My work section start.' );
+			foreach ( array( 'users.php', 'plugins.php', 'pmpro-dashboard', 'edit.php?post_type=cyw_event', 'cywater-logo-reviews', 'third-party-tool' ) as $forbidden_slug ) {
+				self::assert_true( ! in_array( $forbidden_slug, $moderator_slugs, true ), 'Community Moderator menu excludes ' . $forbidden_slug . '.' );
+			}
+			self::assert_true( ! user_can( $moderator, 'list_users' ) && ! user_can( $moderator, 'manage_options' ) && ! user_can( $moderator, 'edit_cyw_events' ), 'Community Moderator retains no user, site-setting, or Event authority behind the simplified menu.' );
+		} finally {
+			$menu = $previous_menu;
+			wp_set_current_user( $previous_user_id );
+		}
+	}
+
+	/** @return array<int,array<int,mixed>> */
+	private static function navigation_seed_menu() {
+		return array(
+			array( 'Dashboard', 'read', 'index.php', '', 'menu-top' ),
+			array( 'Posts', 'edit_posts', 'edit.php', '', 'menu-top' ),
+			array( 'Media', 'upload_files', 'upload.php', '', 'menu-top' ),
+			array( 'Forum articles', 'edit_cyw_forum_posts', 'edit.php?post_type=cyw_forum_post', '', 'menu-top' ),
+			array( 'Comments', 'moderate_comments', 'edit-comments.php', '', 'menu-top' ),
+			array( 'Events', 'edit_cyw_events', 'edit.php?post_type=cyw_event', '', 'menu-top' ),
+			array( 'Logo reviews', 'cywater_review_logo_entries', 'cywater-logo-reviews', '', 'menu-top' ),
+			array( 'Memberships', 'manage_options', 'pmpro-dashboard', '', 'menu-top' ),
+			array( 'Users', 'list_users', 'users.php', '', 'menu-top' ),
+			array( 'Plugins', 'activate_plugins', 'plugins.php', '', 'menu-top' ),
+			array( 'Third party', 'manage_options', 'third-party-tool', '', 'menu-top' ),
+			array( 'Profile', 'read', 'profile.php', '', 'menu-top' ),
+			array( '', 'read', 'separator1', '', 'wp-menu-separator' ),
+		);
+	}
+
+	/** @return array<int,mixed>|null */
+	private static function find_menu_item( $items, $slug ) {
+		foreach ( $items as $item ) {
+			if ( $slug === (string) ( $item[2] ?? '' ) ) {
+				return $item;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -399,10 +552,72 @@ final class CYWater_Operations_QA {
 	}
 
 	/**
+	 * Logo Call configuration belongs only to its already-enabled host Event.
+	 *
+	 * @param WP_User        $editor           Content editor account.
+	 * @param array<int,int> $created_post_ids Cleanup list.
+	 * @param string         $suffix           Unique QA suffix.
+	 */
+	private static function test_logo_event_panel_scope( $editor, &$created_post_ids, $suffix ) {
+		$ordinary_id = wp_insert_post(
+			array(
+				'post_type'   => 'cyw_event',
+				'post_status' => 'draft',
+				'post_title'  => 'Operations QA ordinary Event ' . $suffix,
+			),
+			true
+		);
+		self::assert_true( ! is_wp_error( $ordinary_id ) && $ordinary_id > 0, 'Temporary ordinary Event was created for Logo Call panel scoping.' );
+		if ( is_wp_error( $ordinary_id ) ) {
+			throw new RuntimeException( $ordinary_id->get_error_message() );
+		}
+		$created_post_ids[] = (int) $ordinary_id;
+
+		$host_id = wp_insert_post(
+			array(
+				'post_type'   => 'cyw_event',
+				'post_status' => 'draft',
+				'post_title'  => 'Operations QA Logo Call host Event ' . $suffix,
+			),
+			true
+		);
+		self::assert_true( ! is_wp_error( $host_id ) && $host_id > 0, 'Temporary Logo Call host Event was created for panel scoping.' );
+		if ( is_wp_error( $host_id ) ) {
+			throw new RuntimeException( $host_id->get_error_message() );
+		}
+		$created_post_ids[] = (int) $host_id;
+		update_post_meta( $host_id, '_cywater_logo_call_enabled', '1' );
+
+		self::assert_true( ! CYWater_Operations_Integrations::is_logo_call_host_event( $ordinary_id ), 'An ordinary Event is not treated as a Logo Call host.' );
+		self::assert_true( CYWater_Operations_Integrations::is_logo_call_host_event( get_post( $host_id ) ), 'An enabled Logo Call Event is recognized as the module host.' );
+
+		global $wp_meta_boxes;
+		$had_meta_boxes      = isset( $wp_meta_boxes );
+		$original_meta_boxes = $had_meta_boxes ? $wp_meta_boxes : null;
+		$original_user_id    = get_current_user_id();
+		try {
+			wp_set_current_user( $editor->ID );
+			$wp_meta_boxes = array();
+			CYWater_Operations_Integrations::add_logo_event_box( get_post( $ordinary_id ) );
+			self::assert_true( empty( $wp_meta_boxes['cyw_event']['side']['default']['cywater-logo-call'] ), 'An ordinary Event editor does not expose Logo Call configuration.' );
+
+			CYWater_Operations_Integrations::add_logo_event_box( get_post( $host_id ) );
+			self::assert_true( ! empty( $wp_meta_boxes['cyw_event']['side']['default']['cywater-logo-call'] ), 'The enabled Logo Call host retains its configuration panel.' );
+		} finally {
+			wp_set_current_user( $original_user_id );
+			if ( $had_meta_boxes ) {
+				$wp_meta_boxes = $original_meta_boxes;
+			} else {
+				unset( $wp_meta_boxes );
+			}
+		}
+	}
+
+	/**
 	 * The Program Reviewer has one nonce-bound review workflow and no native
 	 * Logo-entry edit primitives. WordPress may map edit_post to the dedicated
 	 * review capability only for the exact private entry named by that request,
-	 * or for the matching protected source/lockup asset request.
+	 * or for the matching protected source asset request.
 	 *
 	 * @param WP_User        $program          Program reviewer account.
 	 * @param WP_User        $author           Different entry author.
@@ -520,14 +735,14 @@ final class CYWater_Operations_QA {
 			);
 
 			$result = CYWater_Operations_Logo_Review::transition( $entry_id, 'selected', 'fulfilled' );
-			self::assert_true( true === $result, 'The dedicated Logo review transition accepts a selected decision and its fulfillment state.' );
-			self::assert_true( 'selected' === get_post_meta( $entry_id, '_cywater_logo_status', true ) && 'fulfilled' === get_post_meta( $entry_id, '_cywater_logo_reward_status', true ), 'The same review workflow records selection and reward fulfillment without a separate capability.' );
+			self::assert_true( is_wp_error( $result ) && 'cywater_logo_review_status' === $result->get_error_code(), 'Program review cannot record the Board selection or reward fulfillment.' );
+			self::assert_true( 'shortlisted' === get_post_meta( $entry_id, '_cywater_logo_status', true ) && 'not_applicable' === get_post_meta( $entry_id, '_cywater_logo_reward_status', true ), 'The rejected selection attempt leaves eligibility and reward state unchanged.' );
 
 			$result = CYWater_Operations_Logo_Review::transition( $entry_id, 'forged_status', 'fulfilled' );
 			self::assert_true( is_wp_error( $result ) && 'cywater_logo_review_status' === $result->get_error_code(), 'The dedicated review transition rejects a forged status value.' );
-			self::assert_true( 'selected' === get_post_meta( $entry_id, '_cywater_logo_status', true ) && 'fulfilled' === get_post_meta( $entry_id, '_cywater_logo_reward_status', true ), 'A forged review status leaves both allowlisted review fields unchanged.' );
+			self::assert_true( 'shortlisted' === get_post_meta( $entry_id, '_cywater_logo_status', true ) && 'not_applicable' === get_post_meta( $entry_id, '_cywater_logo_reward_status', true ), 'A forged review status leaves both allowlisted review fields unchanged.' );
 
-			$result = CYWater_Operations_Logo_Review::transition( $wrong_type_id, 'selected', 'fulfilled' );
+			$result = CYWater_Operations_Logo_Review::transition( $wrong_type_id, 'not_selected', 'not_applicable' );
 			self::assert_true( is_wp_error( $result ) && 'cywater_logo_review_unavailable' === $result->get_error_code(), 'The dedicated review transition rejects a non-Logo post type.' );
 
 			$audit_before  = self::audit_context_count();
@@ -546,7 +761,7 @@ final class CYWater_Operations_QA {
 				remove_filter( 'cywater_operations_audit_before_insert', $fail_audit, 10 );
 			}
 			self::assert_true( is_wp_error( $result ) && 'cywater_logo_review_audit' === $result->get_error_code(), 'Logo review fails closed when its strict pre-commit audit insert is unavailable.' );
-			self::assert_true( 'selected' === get_post_meta( $entry_id, '_cywater_logo_status', true ) && 'fulfilled' === get_post_meta( $entry_id, '_cywater_logo_reward_status', true ), 'Logo review audit failure leaves both review fields unchanged.' );
+			self::assert_true( 'shortlisted' === get_post_meta( $entry_id, '_cywater_logo_status', true ) && 'not_applicable' === get_post_meta( $entry_id, '_cywater_logo_reward_status', true ), 'Logo review audit failure leaves both review fields unchanged.' );
 			self::assert_true( $audit_before === self::audit_context_count(), 'Logo review audit failure inserts no partial audit row.' );
 			$captured = wp_json_encode( $captured_rows );
 			self::assert_true( false === stripos( $captured, 'Operations QA Logo entry ' . $suffix ) && false === stripos( $captured, 'forged-title-' . $suffix ) && false === stripos( $captured, '@example.invalid' ), 'The failed Logo review audit request contains only redacted IDs, action and states.' );
@@ -633,8 +848,8 @@ final class CYWater_Operations_QA {
 			);
 			self::assert_true( ! $mapped, 'An unsupported protected-asset kind cannot map edit_post.' );
 
-			$_GET['kind']     = 'lockup';
-			$_GET['_wpnonce'] = wp_create_nonce( 'cywater_logo_asset_' . $entry_id . '_lockup' );
+			$_GET['kind']     = 'legacy-lockup';
+			$_GET['_wpnonce'] = wp_create_nonce( 'cywater_logo_asset_' . $entry_id . '_legacy-lockup' );
 			$mapped = $probe_action_capability(
 				$asset_hook,
 				$asset_handler,
@@ -642,7 +857,7 @@ final class CYWater_Operations_QA {
 					return user_can( $program, 'edit_post', $entry_id );
 				}
 			);
-			self::assert_true( $mapped, 'The exact nonce-bound protected lockup action maps only its target entry.' );
+			self::assert_true( ! $mapped, 'The removed two-file lockup asset kind cannot map edit_post.' );
 
 			$_GET['entry'] = $entry_id + 1;
 			$mapped = $probe_action_capability(
@@ -675,6 +890,83 @@ final class CYWater_Operations_QA {
 			}
 			self::assert_true( ! $post_type->show_in_rest, 'Private Logo entries have no REST collection or deletion route.' );
 		}
+	}
+
+	/**
+	 * Voting rank, finalist confirmation, Board selection and fulfillment are
+	 * independent capabilities and must remain self-cleaning.
+	 */
+	private static function test_logo_governance_workflow( $program, $governance, $editor, $moderator, &$created_user_ids, &$created_post_ids, $suffix ) {
+		$event_id = wp_insert_post(
+			array(
+				'post_type'   => 'cyw_event',
+				'post_status' => 'publish',
+				'post_title'  => 'Operations QA Logo governance ' . $suffix,
+			),
+			true
+		);
+		self::assert_true( ! is_wp_error( $event_id ) && $event_id > 0, 'Temporary Logo governance Event was created.' );
+		if ( is_wp_error( $event_id ) ) {
+			throw new RuntimeException( $event_id->get_error_message() );
+		}
+		$created_post_ids[] = (int) $event_id;
+		update_post_meta( $event_id, '_cywater_logo_call_enabled', '1' );
+		update_post_meta( $event_id, '_cywater_logo_call_open_at', wp_date( 'Y-m-d H:i', current_time( 'timestamp' ) - 4 * DAY_IN_SECONDS ) );
+		update_post_meta( $event_id, '_cywater_logo_call_close_at', wp_date( 'Y-m-d H:i', current_time( 'timestamp' ) - 3 * DAY_IN_SECONDS ) );
+		update_post_meta( $event_id, '_cywater_logo_call_vote_open', wp_date( 'Y-m-d H:i', current_time( 'timestamp' ) - 2 * DAY_IN_SECONDS ) );
+		update_post_meta( $event_id, '_cywater_logo_call_vote_close', wp_date( 'Y-m-d H:i', current_time( 'timestamp' ) - DAY_IN_SECONDS ) );
+		self::assert_true( 'results' === CYWater_Logo_Call::current_phase( $event_id ), 'Governance probe starts only after voting closes.' );
+
+		$entries = array();
+		foreach ( range( 1, 4 ) as $index ) {
+			$entry_id = wp_insert_post(
+				array(
+					'post_type'   => 'cyw_logo_entry',
+					'post_status' => 'private',
+					'post_title'  => 'Operations QA Logo finalist ' . $index . ' ' . $suffix,
+					'post_author' => $editor->ID,
+				),
+				true
+			);
+			if ( is_wp_error( $entry_id ) ) {
+				throw new RuntimeException( $entry_id->get_error_message() );
+			}
+			$entries[]          = (int) $entry_id;
+			$created_post_ids[] = (int) $entry_id;
+			update_post_meta( $entry_id, '_cywater_logo_event_id', $event_id );
+			update_post_meta( $entry_id, '_cywater_logo_status', 'shortlisted' );
+		}
+
+		update_user_meta( $program->ID, CYWater_Logo_Call::VOTE_META . $event_id, $entries[0] );
+		update_user_meta( $governance->ID, CYWater_Logo_Call::VOTE_META . $event_id, $entries[0] );
+		update_user_meta( $editor->ID, CYWater_Logo_Call::VOTE_META . $event_id, $entries[1] );
+		update_user_meta( $moderator->ID, CYWater_Logo_Call::VOTE_META . $event_id, $entries[2] );
+		self::assert_true( array( 2, 1, 1, 0 ) === array_map( array( 'CYWater_Logo_Call', 'vote_count' ), $entries ), 'Vote ranking is derived from one-vote account records.' );
+
+		wp_set_current_user( $program->ID );
+		$result = CYWater_Operations_Logo_Review::finalize_finalists( $event_id, array_slice( $entries, 0, 3 ) );
+		self::assert_true( is_wp_error( $result ) && 'cywater_logo_finalists_forbidden' === $result->get_error_code(), 'Program Reviewer cannot confirm voting finalists.' );
+		$result = CYWater_Operations_Logo_Review::transition( $entries[0], 'not_selected' );
+		self::assert_true( is_wp_error( $result ) && 'cywater_logo_review_locked' === $result->get_error_code(), 'Eligibility review locks once voting has opened.' );
+
+		wp_set_current_user( $governance->ID );
+		$result = CYWater_Operations_Logo_Review::finalize_finalists( $event_id, array_slice( $entries, 0, 3 ) );
+		self::assert_true( true === $result && 3 === count( CYWater_Logo_Call::finalists( $event_id ) ), 'Governance confirms exactly three highest-ranked finalists.' );
+		self::assert_true( 'not_selected' === get_post_meta( $entries[3], '_cywater_logo_status', true ), 'Non-finalist voting entry closes as not selected.' );
+		$result = CYWater_Operations_Logo_Review::select_official( $event_id, $entries[0] );
+		self::assert_true( true === $result && 'selected' === get_post_meta( $entries[0], '_cywater_logo_status', true ), 'Governance records the Board-selected design from the three finalists.' );
+		self::assert_true( 'pending' === get_post_meta( $entries[0], '_cywater_logo_rights_status', true ) && 'requested' === get_post_meta( $entries[0], '_cywater_logo_final_files_status', true ) && 'pending' === get_post_meta( $entries[0], '_cywater_logo_reward_status', true ), 'Board selection opens independent rights, final-file and reward gates.' );
+		$result = CYWater_Operations_Logo_Review::fulfill( $entries[0], 'accepted', 'accepted', 'fulfilled' );
+		self::assert_true( is_wp_error( $result ) && 'cywater_logo_fulfillment_forbidden' === $result->get_error_code(), 'Governance cannot self-complete selected-design fulfillment.' );
+
+		$administrator = self::create_user( 'cyw_ops_logo_admin_' . $suffix, 'cyw-ops-logo-admin-' . $suffix . '@example.invalid', $created_user_ids );
+		$administrator->set_role( 'administrator' );
+		wp_set_current_user( $administrator->ID );
+		$result = CYWater_Operations_Logo_Review::fulfill( $entries[0], 'pending', 'received', 'fulfilled' );
+		self::assert_true( is_wp_error( $result ) && 'cywater_logo_fulfillment_gate' === $result->get_error_code(), 'Reward fulfillment fails closed until rights and final files are both accepted.' );
+		$result = CYWater_Operations_Logo_Review::fulfill( $entries[0], 'accepted', 'accepted', 'fulfilled' );
+		self::assert_true( true === $result, 'Recovery Administrator records verified rights, final files and reward completion together.' );
+		self::assert_true( 'accepted' === get_post_meta( $entries[0], '_cywater_logo_rights_status', true ) && 'accepted' === get_post_meta( $entries[0], '_cywater_logo_final_files_status', true ) && 'fulfilled' === get_post_meta( $entries[0], '_cywater_logo_reward_status', true ), 'Completed selected-design handoff reads back exactly.' );
 	}
 
 	/**
@@ -840,6 +1132,26 @@ final class CYWater_Operations_QA {
 
 		$default_adapter = CYWater_Paid_Event_Approval::adapter_snapshot( $event_id );
 		self::assert_true( is_wp_error( $default_adapter ), 'Paid Events fail closed while the real ticket adapter cannot prove a ready Commerce configuration.' );
+		self::assert_true( is_wp_error( $default_adapter ) && 'cywater_event_tickets_live_not_allowed' === $default_adapter->get_error_code(), 'Staging rejects the paid-Event adapter at the authoritative Live-payment gate before inspecting Commerce configuration.' );
+
+		$closed_cart = CYWater_Event_Tickets_Paid_Adapter::guard_cart_preparation(
+			array(
+				'tickets' => array(
+					array(
+						'ticket_id' => 1,
+						'quantity'  => 1,
+					),
+				),
+			)
+		);
+		self::assert_true( array() === $closed_cart, 'Staging removes a paid Commerce cart before checkout while the Live-payment gate is closed.' );
+		self::assert_true( CYWater_Event_Tickets_Paid_Adapter::skip_unready_checkout_item( false, array( 'ticket_id' => 1, 'quantity' => 1 ) ), 'Staging skips a paid Commerce checkout item while the Live-payment gate is closed.' );
+
+		$order_request = new WP_REST_Request( 'POST', '/tribe/tickets/v1/commerce/stripe/order' );
+		$order_guard   = CYWater_Event_Tickets_Paid_Adapter::guard_stripe_order_request( null, null, $order_request );
+		$order_data    = is_wp_error( $order_guard ) ? $order_guard->get_error_data() : array();
+		self::assert_true( is_wp_error( $order_guard ) && 'cywater_paid_event_checkout_closed' === $order_guard->get_error_code() && 403 === (int) ( $order_data['status'] ?? 0 ), 'Staging rejects the final Stripe order REST route with HTTP 403 before an order can be created.' );
+
 		$result = CYWater_Paid_Event_Approval::editor_transition( $event_id, 'submit', $editor->ID );
 		self::assert_true( is_wp_error( $result ) && is_wp_error( $default_adapter ) && $default_adapter->get_error_code() === $result->get_error_code(), 'Submission is refused with the adapter fail-closed reason until a verified snapshot is available.' );
 		self::assert_true( CYWater_Paid_Event_Approval::STATE_TERMS_COMPLETE === CYWater_Paid_Event_Approval::state( $event_id ), 'A missing adapter leaves the paid-Event state at terms complete.' );

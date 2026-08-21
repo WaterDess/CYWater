@@ -216,7 +216,7 @@ final class CYWater_Forum_Content {
 				'rewrite'         => array( 'slug' => 'forum', 'with_front' => false ),
 				'menu_icon'       => 'dashicons-format-aside',
 				'menu_position'   => 6,
-				'supports'        => array( 'title', 'editor', 'excerpt', 'thumbnail', 'revisions', 'author', 'comments' ),
+				'supports'        => array( 'title', 'editor', 'excerpt', 'revisions', 'author', 'comments' ),
 				'capability_type' => array( 'cyw_forum_post', 'cyw_forum_posts' ),
 				'map_meta_cap'    => true,
 				'taxonomies'      => array( self::CATEGORY, self::TOPIC ),

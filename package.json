@@ -1,14 +1,16 @@
 {
   "name": "cywater-wordpress",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "private": true,
   "description": "Local WordPress integration tooling for CYWater.",
   "scripts": {
     "assets:sync": "node scripts/sync-wordpress-assets.mjs",
     "content:export": "node scripts/export-wordpress-content.mjs",
     "vendor:prepare": "node scripts/prepare-wordpress-vendor.mjs",
-    "validate": "node scripts/validate-wordpress-structure.mjs",
+    "validate": "node scripts/validate-wordpress-structure.mjs && node scripts/test-operations-paid-event-gate.mjs",
+    "test:operations-payment-gate": "node scripts/test-operations-paid-event-gate.mjs",
     "release:build": "npm run prepare && npm run validate && node scripts/build-wordpress-release.mjs",
+    "release:production-clean": "npm run prepare && npm run validate && node scripts/build-wordpress-release.mjs --production-clean",
     "release:theme": "npm run assets:sync && npm run validate && node scripts/build-wordpress-theme-release.mjs",
     "wp:config": "node scripts/build-wp-env-config.mjs",
     "wp:start": "npm run vendor:prepare && npm run wp:config && wp-env --config wordpress/runtime/wp-env.local.json start --update",

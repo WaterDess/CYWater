@@ -227,6 +227,11 @@ body.nav-open .nav-toggle span::after { transform: translateY(-6px) rotate(-45de
   color: rgba(255,255,255,0.45);
   flex-wrap: wrap;
 }
+.footer-bottom > span:last-child {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-4);
+}
 .footer-social { display: flex; gap: 0.6rem; }
 .footer-social a {
   width: 34px; height: 34px;
@@ -563,4 +568,9 @@ html[lang="en"] .hero h1 {
   font-size: 2rem;
   color: var(--teal-deep);
   background: var(--teal-tint);
+}
+.tier-action.is-disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+  pointer-events: none;
 }

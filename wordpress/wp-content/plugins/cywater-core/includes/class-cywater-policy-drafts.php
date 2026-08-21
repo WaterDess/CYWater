@@ -10,6 +10,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 final class CYWater_Policy_Drafts {
 	const META_KEY = '_cywater_board_review_policy';
 	const VERSION_META_KEY = '_cywater_board_review_policy_version';
+	const APPROVED_FROM_META_KEY = '_cywater_policy_approved_from';
+	const APPROVED_AT_META_KEY = '_cywater_policy_approved_at';
 	const CONTENT_VERSION  = '2026-08-18-nonrefundable';
 
 	/** Keep staging review drafts out of search-engine indexes. */
@@ -35,6 +37,18 @@ final class CYWater_Policy_Drafts {
 		$ids = array();
 		foreach ( self::definitions() as $slug => $definition ) {
 			$existing = get_page_by_path( $slug, OBJECT, 'page' );
+			if ( ! $existing instanceof WP_Post ) {
+				$approved = get_posts(
+					array(
+						'post_type'      => 'page',
+						'post_status'    => array( 'publish', 'draft', 'private' ),
+						'posts_per_page' => 1,
+						'meta_key'       => self::APPROVED_FROM_META_KEY,
+						'meta_value'     => $slug,
+					)
+				);
+				$existing = $approved ? $approved[0] : null;
+			}
 			if ( $existing instanceof WP_Post ) {
 				$ids[ $slug ] = (int) $existing->ID;
 				continue;

@@ -165,6 +165,9 @@ final class CYWater_Event_Tickets_Paid_Adapter {
 		}
 
 		try {
+			if ( ! self::live_payments_allowed() ) {
+				return self::rest_error();
+			}
 			if ( ! class_exists( 'TEC\\Tickets\\Commerce\\Cart' ) || ! function_exists( 'tribe' ) ) {
 				return self::rest_error();
 			}
@@ -219,6 +222,9 @@ final class CYWater_Event_Tickets_Paid_Adapter {
 
 	/** @return array<string, mixed>|WP_Error */
 	private static function runtime_preflight() {
+		if ( ! self::live_payments_allowed() ) {
+			return self::error( 'cywater_event_tickets_live_not_allowed' );
+		}
 		$required_classes = array(
 			'Tribe__Tickets__Main',
 			'TEC\\Tickets\\Commerce\\Ticket',
@@ -413,6 +419,9 @@ final class CYWater_Event_Tickets_Paid_Adapter {
 
 	/** @return true|WP_Error */
 	private static function validate_purchase( $ticket_id, $quantity ) {
+		if ( ! self::live_payments_allowed() ) {
+			return self::error( 'cywater_event_tickets_live_not_allowed' );
+		}
 		$ticket_id = absint( $ticket_id );
 		$quantity  = self::positive_integer( $quantity );
 		if ( ! $ticket_id || ! $quantity ) {
@@ -494,6 +503,16 @@ final class CYWater_Event_Tickets_Paid_Adapter {
 		return is_string( $url ) && wp_http_validate_url( $url ) && 'https' === strtolower( (string) wp_parse_url( $url, PHP_URL_SCHEME ) );
 	}
 
+	/**
+	 * Compose Event Tickets with CYWater's one authoritative Live-payment gate.
+	 * Missing or older Environment code is closed rather than guessed.
+	 */
+	private static function live_payments_allowed() {
+		return class_exists( 'CYWater_Config' )
+			&& is_callable( array( 'CYWater_Config', 'live_payments_allowed' ) )
+			&& true === CYWater_Config::live_payments_allowed();
+	}
+
 	private static function rest_error() {
 		return new WP_Error(
 			'cywater_paid_event_checkout_closed',
@@ -508,6 +527,7 @@ final class CYWater_Event_Tickets_Paid_Adapter {
 
 	private static function admin_error_message( $code ) {
 		$messages = array(
+			'cywater_event_tickets_live_not_allowed'            => __( 'Live Event payments require the production environment, Live payment mode, and the explicit CYWater Live-payment authorization.', 'cywater-operations' ),
 			'adapter_terms_mismatch'                         => __( 'The ticket amount or currency does not match the Event terms.', 'cywater-operations' ),
 			'cywater_event_tickets_ticket_count'             => __( 'Create exactly one published Event Tickets Commerce ticket for this paid Event.', 'cywater-operations' ),
 			'cywater_event_tickets_capacity_invalid'         => __( 'Use a finite managed ticket capacity greater than zero and keep enough capacity for the requested cart.', 'cywater-operations' ),

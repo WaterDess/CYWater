@@ -11,9 +11,16 @@ final class CYWater_Operations_Integrations {
 	public static function register_runtime_adapters() {
 		add_filter( 'register_post_type_args', array( __CLASS__, 'post_type_args' ), 20, 2 );
 		add_filter( 'register_taxonomy_args', array( __CLASS__, 'taxonomy_args' ), 20, 3 );
+		add_filter( 'postbox_classes_cyw_event_cywater-logo-call', array( __CLASS__, 'logo_event_box_classes' ) );
 
 		self::wrap_logo_call_hooks();
 		self::wrap_partnership_hooks();
+	}
+
+	/** Keep the optional program policy compact until an editor opens it. */
+	public static function logo_event_box_classes( $classes ) {
+		$classes[] = 'closed';
+		return array_values( array_unique( $classes ) );
 	}
 
 	/**
@@ -39,7 +46,10 @@ final class CYWater_Operations_Integrations {
 		if ( 'cyw_logo_entry' === $post_type ) {
 			// Submissions are created only by the protected public workflow. A
 			// reviewer can inspect and update them but cannot fabricate an entry.
-			$args['show_in_menu']                              = true;
+			// The dedicated Logo reviews workspace is the only daily operational
+			// entry. Keep the private CPT UI addressable for recovery Administrators
+			// without exposing a duplicate "Logo submissions" menu.
+			$args['show_in_menu']                              = false;
 			$args['capabilities']['create_posts']              = 'do_not_allow';
 			$args['capabilities']['publish_posts']             = 'do_not_allow';
 			$args['capabilities']['delete_post']               = 'cywater_delete_logo_entries';
@@ -109,14 +119,45 @@ final class CYWater_Operations_Integrations {
 		add_action( 'save_post_cyw_event', array( __CLASS__, 'save_logo_event' ) );
 	}
 
-	public static function add_logo_event_box() {
-		if ( current_user_can( 'cywater_configure_logo_call' ) ) {
-			CYWater_Logo_Call::add_event_box();
+	/**
+	 * Return whether an Event already owns the removable Logo Call module.
+	 *
+	 * The Logo Call is an exceptional program workflow, not a generic Event
+	 * option. New host Events are created or enabled by the Logo Call module's
+	 * own setup path; ordinary Event editors must not be invited to configure it.
+	 *
+	 * @param int|WP_Post $post Event ID or object.
+	 * @return bool
+	 */
+	public static function is_logo_call_host_event( $post ) {
+		if ( ! $post instanceof WP_Post ) {
+			$post = get_post( absint( $post ) );
+		}
+
+		return $post instanceof WP_Post
+			&& 'cyw_event' === $post->post_type
+			&& '1' === (string) get_post_meta( $post->ID, '_cywater_logo_call_enabled', true );
+	}
+
+	/** Show Logo Call controls only on the Event that already hosts the module. */
+	public static function add_logo_event_box( $post ) {
+		if ( current_user_can( 'cywater_configure_logo_call' ) && self::is_logo_call_host_event( $post ) ) {
+			// Participation is an Event setting, not part of the public narrative.
+			// Keep the Logo module's own renderer and save path, but place its
+			// audience controls beside the document instead of below the canvas.
+			add_meta_box(
+				'cywater-logo-call',
+				__( 'Program participation — Logo Design Call', 'cywater-operations' ),
+				array( 'CYWater_Logo_Call', 'render_event_box' ),
+				'cyw_event',
+				'side',
+				'default'
+			);
 		}
 	}
 
 	public static function save_logo_event( $post_id ) {
-		if ( current_user_can( 'cywater_configure_logo_call' ) ) {
+		if ( current_user_can( 'cywater_configure_logo_call' ) && self::is_logo_call_host_event( $post_id ) ) {
 			CYWater_Logo_Call::save_event( $post_id );
 		}
 	}

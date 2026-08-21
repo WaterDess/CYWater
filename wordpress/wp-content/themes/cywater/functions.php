@@ -12,12 +12,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CYWATER_THEME_VERSION', '0.6.18' );
+define( 'CYWATER_THEME_VERSION', '0.6.35' );
 
 function cywater_theme_setup() {
 	add_theme_support( 'title-tag' );
 	add_theme_support( 'post-thumbnails' );
 	add_theme_support( 'responsive-embeds' );
+	add_theme_support( 'editor-styles' );
+	add_editor_style( 'assets/css/editor.css' );
 	add_theme_support(
 		'html5',
 		array( 'search-form', 'comment-form', 'comment-list', 'gallery', 'caption', 'style', 'script' )
@@ -81,7 +83,7 @@ function cywater_current_section() {
 	if ( is_post_type_archive( 'cyw_award' ) || is_singular( 'cyw_award' ) ) {
 		return 'awards';
 	}
-	if ( is_post_type_archive( 'cyw_forum_post' ) || is_singular( 'cyw_forum_post' ) || is_tax( array( 'cyw_forum_category', 'cyw_forum_topic' ) ) || is_author() || is_page( 'forum-endorsement' ) ) {
+	if ( is_post_type_archive( 'cyw_forum_post' ) || is_singular( 'cyw_forum_post' ) || is_tax( array( 'cyw_forum_category', 'cyw_forum_topic' ) ) || is_author() || is_page( array( 'forum-endorsement', 'forum-workspace' ) ) ) {
 		return 'forum';
 	}
 	if ( is_home() || is_singular( 'post' ) || is_category() ) {
@@ -106,6 +108,12 @@ function cywater_page_field( $key, $fallback = '' ) {
 
 function cywater_featured_image_url( $post_id = null, $size = 'cywater-card', $fallback = '' ) {
 	$post_id = $post_id ?: get_the_ID();
+	if ( 'cyw_forum_post' === get_post_type( $post_id ) && class_exists( 'CYWater_Forum_Covers' ) ) {
+		$protected_cover = CYWater_Forum_Covers::url( $post_id );
+		if ( $protected_cover ) {
+			return $protected_cover;
+		}
+	}
 	$url     = get_the_post_thumbnail_url( $post_id, $size );
 	if ( $url ) {
 		return $url;
@@ -130,6 +138,47 @@ function cywater_event_summary( $post_id, $words = 44 ) {
 	}
 	$source = $post->post_excerpt ?: $post->post_content;
 	return wp_trim_words( wp_strip_all_tags( strip_shortcodes( $source ) ), $words, '…' );
+}
+
+/**
+ * Order Events for every archive section.
+ *
+ * Upcoming records lead each category and run from the nearest start date
+ * forward. Archive records follow from newest to oldest. Empty dates stay at
+ * the end of their placement group, and old manual-order metadata is retained
+ * but deliberately ignored so the visible Start date remains authoritative.
+ *
+ * @param WP_Post[] $events Event posts.
+ * @return WP_Post[]
+ */
+function cywater_sort_events_for_archive( $events ) {
+	$events = array_values( array_filter( (array) $events, static fn( $event ) => $event instanceof WP_Post ) );
+	usort(
+		$events,
+		static function ( $left, $right ) {
+			$left_upcoming  = 'upcoming' === (string) get_post_meta( $left->ID, '_cyw_status', true );
+			$right_upcoming = 'upcoming' === (string) get_post_meta( $right->ID, '_cyw_status', true );
+			if ( $left_upcoming !== $right_upcoming ) {
+				return $left_upcoming ? -1 : 1;
+			}
+
+			$left_date  = (string) get_post_meta( $left->ID, '_cyw_start_date', true );
+			$right_date = (string) get_post_meta( $right->ID, '_cyw_start_date', true );
+			if ( $left_date !== $right_date ) {
+				if ( '' === $left_date ) {
+					return 1;
+				}
+				if ( '' === $right_date ) {
+					return -1;
+				}
+				return $left_upcoming ? strcmp( $left_date, $right_date ) : strcmp( $right_date, $left_date );
+			}
+
+			$published = strcmp( (string) $right->post_date_gmt, (string) $left->post_date_gmt );
+			return 0 !== $published ? $published : ( $right->ID <=> $left->ID );
+		}
+	);
+	return $events;
 }
 
 function cywater_source_permalink( $source_id, $post_type = 'post' ) {
@@ -207,13 +256,28 @@ function cywater_forum_hero_actions() {
 		return '';
 	}
 	if ( ! is_user_logged_in() ) {
-		return '<a class="btn btn-accent" href="' . esc_url( cywater_login_url( get_post_type_archive_link( 'cyw_forum_post' ) ) ) . '">' . esc_html__( 'Sign in', 'cywater' ) . '</a>';
+		$workspace_url = class_exists( 'CYWater_Forum_Workspace' ) ? CYWater_Forum_Workspace::url() : home_url( '/forum-workspace/' );
+		return '<a class="btn btn-accent" href="' . esc_url( cywater_login_url( $workspace_url ) ) . '">' . esc_html__( 'Sign in', 'cywater' ) . '</a>';
 	}
-	if ( CYWater_Forum_Roles::can_publish( get_current_user_id() ) ) {
-		return '<a class="btn btn-accent" href="' . esc_url( admin_url( 'post-new.php?post_type=cyw_forum_post' ) ) . '">' . esc_html__( 'Write an article', 'cywater' ) . '</a>';
+	$user_id  = get_current_user_id();
+	$blockers = CYWater_Forum_Roles::submission_blockers( $user_id );
+	if ( CYWater_Forum_Roles::is_staff( $user_id ) ) {
+		return '<a class="btn btn-accent" href="' . esc_url( admin_url( 'edit.php?post_type=cyw_forum_post' ) ) . '">' . esc_html__( 'Manage Forum', 'cywater' ) . '</a>';
 	}
-	$endorsement = class_exists( 'CYWater_Forum_Endorsement' ) ? CYWater_Forum_Endorsement::page_url() : home_url( '/forum-endorsement/' );
-	return '<a class="btn btn-accent" href="' . esc_url( $endorsement ) . '">' . esc_html__( 'Become an author', 'cywater' ) . '</a>';
+	if ( ! $blockers ) {
+		$url = class_exists( 'CYWater_Forum_Workspace' ) ? CYWater_Forum_Workspace::url() : home_url( '/forum-workspace/' );
+		return '<a class="btn btn-accent" href="' . esc_url( $url ) . '">' . esc_html__( 'Submit an article', 'cywater' ) . '</a>';
+	}
+	if ( in_array( 'email_unverified', $blockers, true ) ) {
+		return '<a class="btn btn-accent" href="' . esc_url( home_url( '/verify-email/' ) ) . '">' . esc_html__( 'Verify email', 'cywater' ) . '</a>';
+	}
+	if ( in_array( 'membership_inactive', $blockers, true ) ) {
+		return '<a class="btn btn-accent" href="' . esc_url( home_url( '/membership/' ) ) . '">' . esc_html__( 'View membership', 'cywater' ) . '</a>';
+	}
+	if ( in_array( 'not_endorsed', $blockers, true ) && class_exists( 'CYWater_Forum_Endorsement' ) ) {
+		return '<a class="btn btn-accent" href="' . esc_url( CYWater_Forum_Endorsement::page_url() ) . '">' . esc_html__( 'Request endorsement', 'cywater' ) . '</a>';
+	}
+	return '';
 }
 
 function cywater_forum_pagination() {

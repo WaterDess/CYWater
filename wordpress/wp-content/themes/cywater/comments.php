@@ -13,15 +13,21 @@ if ( post_password_required() ) {
 	return;
 }
 
+$reply_blockers = is_user_logged_in() && class_exists( 'CYWater_Forum_Comments' )
+	? CYWater_Forum_Comments::participation_blockers( get_current_user_id() )
+	: array( 'signed_out' );
 $may_reply = is_user_logged_in()
 	&& class_exists( 'CYWater_Forum_Comments' )
-	&& CYWater_Forum_Comments::may_comment( get_current_user_id() );
+	&& ! $reply_blockers;
 
 // Say what actually happens, so nobody wonders where their reply went.
-$hold_first     = class_exists( 'CYWater_Forum_Settings' ) && CYWater_Forum_Settings::is_enabled( 'comments_hold_first' );
-$moderation_note = $hold_first
-	? __( 'Your first reply is checked by a moderator. Once it has been approved, your later replies appear immediately.', 'cywater' )
-	: __( 'Replies are reviewed by a moderator before they appear.', 'cywater' );
+$moderation_mode = class_exists( 'CYWater_Forum_Settings' ) ? CYWater_Forum_Settings::get_string( 'comments_moderation_mode' ) : 'all';
+$moderation_notes = array(
+	'auto'  => __( 'Replies from eligible members appear immediately.', 'cywater' ),
+	'first' => __( 'Your first reply is checked by a moderator. Once it has been approved, your later replies appear immediately.', 'cywater' ),
+	'all'   => __( 'Replies are reviewed by a moderator before they appear.', 'cywater' ),
+);
+$moderation_note = $moderation_notes[ $moderation_mode ] ?? $moderation_notes['all'];
 ?>
 <div id="comments" class="forum-comments">
 	<div class="section-head" data-reveal>
@@ -73,8 +79,13 @@ $moderation_note = $hold_first
 		</div>
 	<?php elseif ( ! $may_reply ) : ?>
 		<div class="forum-comments-gate">
-			<p><?php esc_html_e( 'An active CYWater membership is required to take part in the discussion.', 'cywater' ); ?></p>
-			<a class="btn btn-primary" href="<?php echo esc_url( home_url( '/membership/' ) ); ?>"><?php esc_html_e( 'View membership', 'cywater' ); ?></a>
+			<?php if ( in_array( 'email_unverified', $reply_blockers, true ) ) : ?>
+				<p><?php esc_html_e( 'Verify your email address before taking part in the discussion.', 'cywater' ); ?></p>
+				<a class="btn btn-primary" href="<?php echo esc_url( home_url( '/verify-email/' ) ); ?>"><?php esc_html_e( 'Verify email', 'cywater' ); ?></a>
+			<?php else : ?>
+				<p><?php esc_html_e( 'An active CYWater Student, Professional or Lifetime membership is required to take part in the discussion.', 'cywater' ); ?></p>
+				<a class="btn btn-primary" href="<?php echo esc_url( home_url( '/membership/' ) ); ?>"><?php esc_html_e( 'View membership', 'cywater' ); ?></a>
+			<?php endif; ?>
 		</div>
 	<?php else : ?>
 		<?php

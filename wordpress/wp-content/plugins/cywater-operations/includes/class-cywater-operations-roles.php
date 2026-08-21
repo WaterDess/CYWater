@@ -118,6 +118,9 @@ final class CYWater_Operations_Roles {
 		$governance_caps = array_merge(
 			array(
 				'read',
+				'cywater_review_logo_entries',
+				'cywater_select_logo_finalists',
+				'cywater_select_official_logo',
 				'cywater_review_partnerships',
 				'cywater_approve_partnerships',
 				'cywater_record_partnership_payment',
@@ -146,6 +149,7 @@ final class CYWater_Operations_Roles {
 					$all,
 					array(
 						'cywater_delete_logo_entries',
+						'cywater_manage_logo_fulfillment',
 						'cywater_delete_partnership_applications',
 						// Recovery Administrators retain the native entry editor. Program
 						// Reviewers use the dedicated, allowlisted review workflow only.

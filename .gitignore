@@ -18,6 +18,10 @@ wordpress/artifacts/
 
 # Local visual QA output
 /artifacts/
+/tmp/
+/output/pdf/
+/output/*.tar.gz
+/output/*.tgz
 
 # Generated release packages
 dist/

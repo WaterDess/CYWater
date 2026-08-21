@@ -23,6 +23,7 @@ $assert = static function ( $condition, $message ) {
 };
 
 $assert( class_exists( 'CYWater_Partnerships' ), 'CYWater Partnerships plugin is active' );
+$assert( defined( 'CYWATER_PARTNERSHIPS_VERSION' ) && '0.1.5' === CYWATER_PARTNERSHIPS_VERSION, 'CYWater Partnerships 0.1.5 is active' );
 $guide = get_page_by_path( 'become-a-partner' );
 $assert( $guide instanceof WP_Post && 'publish' === $guide->post_status, 'Partner guide page is published' );
 $assert( has_shortcode( $guide->post_content, 'cywater_partner_application' ), 'Partner guide page contains the application shortcode' );
@@ -60,6 +61,12 @@ $result = CYWater_Partnerships::create_application(
 $assert( ! is_wp_error( $result ), 'Partner application can be created without a member account or payment' );
 $post_id = absint( $result['id'] ?? 0 );
 $token   = (string) ( $result['token'] ?? '' );
+$intercepted_mail = array();
+$mail_interceptor = static function ( $return, $atts ) use ( &$intercepted_mail ) {
+	$intercepted_mail[] = $atts;
+	return true;
+};
+add_filter( 'pre_wp_mail', $mail_interceptor, 999, 2 );
 
 try {
 	$assert( 'submitted' === get_post_meta( $post_id, '_cyw_partner_stage', true ), 'New application starts in Submitted stage' );
@@ -73,15 +80,63 @@ try {
 	$assert( false === strpos( $submitted_html, 'Pay approved partnership contribution' ), 'Payment action is hidden before approval' );
 
 	update_post_meta( $post_id, '_cyw_partner_stage', 'approved' );
-	update_post_meta( $post_id, '_cyw_partner_payment_url', 'https://example.org/approved-payment' );
-	$approved_html = do_shortcode( '[cywater_partner_application]' );
-	$assert( false !== strpos( $approved_html, 'Pay approved partnership contribution' ), 'Payment action appears after Board/MOU approval' );
-	$assert( false !== strpos( $approved_html, 'https://example.org/approved-payment' ), 'Approved application exposes only its configured payment URL' );
+	$valid_payment_urls = array(
+		'https://buy.stripe.com/test_qa_handoff',
+		'https://invoice.stripe.com/i/acct_12345678/test_1234567890123456?s=em',
+		'https://checkout.stripe.com/c/pay/cs_test_1234567890123456#1234567890123456',
+	);
+	foreach ( $valid_payment_urls as $valid_payment_url ) {
+		update_post_meta( $post_id, '_cyw_partner_payment_url', $valid_payment_url );
+		$approved_html = do_shortcode( '[cywater_partner_application]' );
+		$assert( false !== strpos( $approved_html, 'Pay approved partnership contribution' ), 'A documented Stripe hosted-payment URL is accepted: ' . $valid_payment_url );
+	}
+
+	$invalid_payment_urls = array(
+		'https://example.org/approved-payment',
+		'http://buy.stripe.com/test_qa_handoff',
+		'https://user@buy.stripe.com/test_qa_handoff',
+		'https://buy.stripe.com:443/test_qa_handoff',
+		'https://buy.stripe.com.evil.example/test_qa_handoff',
+		'https://evil.example/?next=https://buy.stripe.com/test_qa_handoff',
+		'https://buy.stripe.com/redirect/test_qa_handoff',
+		'https://buy.stripe.com/test_qa_handoff?redirect=https://evil.example/',
+		'https://invoice.stripe.com/i/acct_12345678/test_1234567890123456?next=evil',
+		'https://checkout.stripe.com/c/pay/cs_test_1234567890123456',
+	);
+	foreach ( $invalid_payment_urls as $invalid_payment_url ) {
+		update_post_meta( $post_id, '_cyw_partner_payment_url', $invalid_payment_url );
+		$untrusted_html = do_shortcode( '[cywater_partner_application]' );
+		$assert( false === strpos( $untrusted_html, 'Pay approved partnership contribution' ), 'An unsafe or non-Stripe payment URL is rejected: ' . $invalid_payment_url );
+	}
+
+	update_post_meta( $post_id, '_cyw_partner_payment_url', $valid_payment_urls[0] );
 
 	$_GET['access_key'] = 'invalid';
 	$invalid_html       = do_shortcode( '[cywater_partner_application]' );
 	$assert( false !== strpos( $invalid_html, 'invalid or has been replaced' ), 'Invalid application access token is rejected' );
+
+	$_GET['access_key'] = $token;
+	$trashed             = wp_trash_post( $post_id );
+	$assert( $trashed instanceof WP_Post && ! get_post_meta( $post_id, '_cyw_partner_access_hash', true ) && ! get_post_meta( $post_id, '_cyw_partner_payment_url', true ), 'Trashing an application revokes its bearer token and payment handoff' );
+	$trashed_html = do_shortcode( '[cywater_partner_application]' );
+	$assert( false !== strpos( $trashed_html, 'invalid or has been replaced' ), 'A trashed application cannot be opened with its former token' );
+	wp_untrash_post( $post_id );
+	$assert( 'private' === get_post_status( $post_id ), 'Restoring an application returns it to the private workflow' );
+	$restored_html = do_shortcode( '[cywater_partner_application]' );
+	$assert( false !== strpos( $restored_html, 'invalid or has been replaced' ), 'Restoring an application does not revive its former bearer token' );
+	$new_hash = (string) get_post_meta( $post_id, '_cyw_partner_access_hash', true );
+	$assert( $new_hash && $new_hash !== $stored_hash, 'Restoring an application stores a fresh bearer-token hash' );
+	$assert( ! get_post_meta( $post_id, '_cyw_partner_payment_url', true ), 'Restoring an application does not revive its former payment handoff' );
+	$restore_mail = end( $intercepted_mail );
+	$restore_body = is_array( $restore_mail ) ? (string) ( $restore_mail['message'] ?? '' ) : '';
+	$new_token    = preg_match( '/access_key=([a-f0-9]{48})/', $restore_body, $token_match ) ? $token_match[1] : '';
+	$assert( $new_token && $new_token !== $token, 'Restore issues a fresh bearer token only through the intercepted status message' );
+	$_GET['access_key'] = $new_token;
+	$fresh_html         = do_shortcode( '[cywater_partner_application]' );
+	$assert( false === strpos( $fresh_html, 'invalid or has been replaced' ), 'The newly issued restore token opens the active private application' );
+	$assert( false === strpos( $fresh_html, 'Pay approved partnership contribution' ), 'The newly issued restore token cannot expose the revoked payment handoff' );
 } finally {
+	remove_filter( 'pre_wp_mail', $mail_interceptor, 999 );
 	unset( $_GET['partner_application'], $_GET['access_key'] );
 	wp_delete_post( $post_id, true );
 }

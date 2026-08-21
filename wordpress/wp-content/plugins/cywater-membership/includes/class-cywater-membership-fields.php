@@ -40,10 +40,21 @@ final class CYWater_Membership_Fields {
 			return;
 		}
 
-		pmpro_add_field_group( 'cywater_essentials', 'Professional information', 'A short set of fields used for membership statistics and regional programming.' );
+		pmpro_add_field_group( 'cywater_essentials', 'Professional information', 'Required information used to understand CYWater\'s professional community and regional reach.' );
 		$essential_fields = array(
 			new PMPro_Field( 'cyw_institution_name', 'text', array( 'label' => 'Institution or employer', 'required' => true, 'profile' => true, 'memberslistcsv' => true ) ),
-			new PMPro_Field( 'cyw_country', 'text', array( 'label' => 'Country or region of institution', 'required' => true, 'profile' => true, 'memberslistcsv' => true ) ),
+			new PMPro_Field(
+				'cyw_country',
+				'select',
+				array(
+					'label'          => 'Country or region of institution',
+					'required'       => true,
+					'profile'        => true,
+					'memberslistcsv' => true,
+					'options'        => CYWater_Membership_Countries::options( true ),
+					'hint'           => 'Start typing to search the complete country and region list.',
+				)
+			),
 			new PMPro_Field(
 				'cyw_institution_type',
 				'select',
@@ -52,7 +63,7 @@ final class CYWater_Membership_Fields {
 					'required'       => true,
 					'profile'        => true,
 					'memberslistcsv' => true,
-					'options'        => array( '' => 'Select one', 'university' => 'University', 'research_institute' => 'Research institute', 'government' => 'Government', 'company' => 'Company', 'other' => 'Other' ),
+					'options'        => array( '' => 'Select one' ) + self::institution_types(),
 				)
 			),
 			new PMPro_Field( 'cyw_professional_title', 'text', array( 'label' => 'Current title or role', 'required' => true, 'profile' => true, 'memberslistcsv' => true, 'hint' => 'Examples: Ph.D. student, postdoctoral researcher, professor, engineer.' ) ),
@@ -64,7 +75,7 @@ final class CYWater_Membership_Fields {
 					'required'       => true,
 					'profile'        => true,
 					'memberslistcsv' => true,
-					'options'        => array( '' => 'Select one', 'undergraduate' => 'Undergraduate student', 'graduate' => 'Graduate student', 'phd' => 'Ph.D. student', 'early_career' => 'Early-career professional', 'professional' => 'Professional', 'other' => 'Other' ),
+					'options'        => array( '' => 'Select one' ) + self::career_stages(),
 				)
 			),
 		);
@@ -72,10 +83,10 @@ final class CYWater_Membership_Fields {
 			pmpro_add_user_field( 'cywater_essentials', $field );
 		}
 
-		pmpro_add_field_group( 'just_profile', 'Optional member profile', 'These fields may be completed after registration.' );
+		pmpro_add_field_group( 'just_profile', 'Optional member profile', 'These details are optional and may be completed or changed later.' );
 		$profile_fields = array(
 			new PMPro_Field( 'cyw_orcid', 'text', array( 'label' => 'ORCID iD', 'required' => false, 'profile' => 'only', 'memberslistcsv' => true, 'hint' => 'Use the form 0000-0000-0000-0000.' ) ),
-			new PMPro_Field( 'cyw_research_interests', 'textarea', array( 'label' => 'Research interests', 'required' => false, 'profile' => 'only', 'memberslistcsv' => true ) ),
+			new PMPro_Field( 'cyw_research_interests', 'textarea', array( 'label' => 'About yourself', 'required' => false, 'profile' => 'only', 'memberslistcsv' => true, 'hint' => 'Optional. You may briefly describe your work or research interests.' ) ),
 			new PMPro_Field(
 				'cyw_profile_photo',
 				'file',
@@ -97,5 +108,32 @@ final class CYWater_Membership_Fields {
 
 	public static function field_keys() {
 		return array( 'cyw_institution_name', 'cyw_country', 'cyw_institution_type', 'cyw_professional_title', 'cyw_career_stage', 'cyw_orcid', 'cyw_research_interests', 'cyw_profile_photo' );
+	}
+
+	public static function required_professional_keys() {
+		return array( 'cyw_institution_name', 'cyw_country', 'cyw_institution_type', 'cyw_professional_title', 'cyw_career_stage' );
+	}
+
+	/** @return array<string, string> */
+	public static function institution_types() {
+		return array(
+			'university'         => __( 'University', 'cywater-membership' ),
+			'research_institute' => __( 'Research institute', 'cywater-membership' ),
+			'government'         => __( 'Government', 'cywater-membership' ),
+			'company'            => __( 'Company', 'cywater-membership' ),
+			'other'              => __( 'Other', 'cywater-membership' ),
+		);
+	}
+
+	/** @return array<string, string> */
+	public static function career_stages() {
+		return array(
+			'undergraduate' => __( 'Undergraduate student', 'cywater-membership' ),
+			'graduate'      => __( 'Graduate student', 'cywater-membership' ),
+			'phd'           => __( 'Ph.D. student', 'cywater-membership' ),
+			'early_career'  => __( 'Early-career professional', 'cywater-membership' ),
+			'professional'  => __( 'Professional', 'cywater-membership' ),
+			'other'         => __( 'Other', 'cywater-membership' ),
+		);
 	}
 }

@@ -1682,7 +1682,7 @@
       "title": "",
       "eyebrow": "",
       "lead": "",
-      "content": "<div class=\"container\">\n        <svg class=\"hero-watermark\" viewBox=\"0 0 200 200\" aria-hidden=\"true\">\n          <path d=\"M100 20C100 20 40 80 40 130a60 60 0 0 0 120 0C160 80 100 20 100 20Z\" fill=\"none\" stroke=\"#0F766E\" stroke-width=\"2\"></path>\n        </svg>\n        <div class=\"hero-inner\" data-reveal=\"\">\n          <span class=\"eyebrow\">International Association of Contemporary Young Scholars in Water Sciences (CYWater)</span>\n          <h1>Advancing water sciences,<br>empowering young scholars.</h1>\n          <p class=\"lead\">An international, non-profit association advancing water sciences education, research, and professional development — through scientific exchange, publications, and conferences.</p>\n          <div class=\"hero-actions\">\n            <a class=\"btn btn-accent btn-lg\" href=\"./events/index.html\">Upcoming events</a>\n            <a class=\"btn btn-outline btn-lg\" href=\"./about/index.html\">About CYWater</a>\n          </div>\n        </div>\n      </div>"
+      "content": "<div class=\"container\">\n        <svg class=\"hero-watermark\" viewBox=\"0 0 200 200\" aria-hidden=\"true\">\n          <path d=\"M100 20C100 20 40 80 40 130a60 60 0 0 0 120 0C160 80 100 20 100 20Z\" fill=\"none\" stroke=\"#0F766E\" stroke-width=\"2\"></path>\n        </svg>\n        <div class=\"hero-inner\" data-reveal=\"\">\n          <span class=\"eyebrow\">International Association · Water Sciences</span>\n          <h1>Advancing water sciences,<br>empowering young scholars.</h1>\n          <p class=\"lead\">An international, non-profit association advancing water sciences education, research, and professional development — through scientific exchange, publications, and conferences.</p>\n          <div class=\"hero-actions\">\n            <a class=\"btn btn-accent btn-lg\" href=\"./events/index.html\">Upcoming events</a>\n            <a class=\"btn btn-outline btn-lg\" href=\"./about/index.html\">About CYWater</a>\n          </div>\n        </div>\n      </div>"
     },
     "about": {
       "title": "Advancing water sciences, empowering young scholars.",
@@ -1711,8 +1711,8 @@
     "contact": {
       "title": "Get in touch.",
       "eyebrow": "Contact",
-      "lead": "Contact CYWater for general correspondence, events, partnerships, and media inquiries.",
-      "content": "<span class=\"eyebrow\">Official contact</span>\n            <h2 style=\"margin-top:var(--sp-3)\">How can we help?</h2>\n            <p class=\"lead\" style=\"margin-top:var(--sp-4)\">Use contact@cywater.org for general correspondence, events, partnerships, and media inquiries.</p>\n            <p style=\"margin-top:var(--sp-4)\">Membership support: membership@cywater.org. Billing, renewals, and invoices: billing@cywater.org.</p>"
+      "lead": "CYWater's official contact email is being confirmed. The mailing address below may be used for formal correspondence.",
+      "content": "<span class=\"eyebrow\">Contact status</span>\n            <h2 style=\"margin-top:var(--sp-3)\">Official channels are being verified.</h2>\n            <p class=\"lead\" style=\"margin-top:var(--sp-4)\">To avoid publishing an unconfirmed email address or a non-functional form, direct online messaging is temporarily unavailable on this preview.</p>\n            <p style=\"margin-top:var(--sp-4)\">Membership, event, partnership, and media inquiries will be accepted once the official contact channel is confirmed.</p>"
     }
   }
 }

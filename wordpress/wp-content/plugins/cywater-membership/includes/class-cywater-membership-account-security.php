@@ -21,8 +21,11 @@ final class CYWater_Membership_Account_Security {
 	private const RESEND_WINDOW       = HOUR_IN_SECONDS;
 	private const RESEND_MAX          = 5;
 	private const CLOSURE_COOLING_OFF = 7 * DAY_IN_SECONDS;
+	private const PASSWORD_MIN_LENGTH = 12;
 
 	public static function register() {
+		add_action( 'init', array( __CLASS__, 'enforce_frontend_password_policy' ), 9 );
+		add_action( 'validate_password_reset', array( __CLASS__, 'validate_password_reset' ), 10, 2 );
 		add_action( 'template_redirect', array( __CLASS__, 'process_request' ), 4 );
 		add_shortcode( 'cywater_email_verification', array( __CLASS__, 'verification_shortcode' ) );
 		add_shortcode( 'cywater_account_security', array( __CLASS__, 'account_security_shortcode' ) );
@@ -30,6 +33,40 @@ final class CYWater_Membership_Account_Security {
 		add_action( 'profile_update', array( __CLASS__, 'handle_email_change' ), 10, 3 );
 		add_action( 'wp_login', array( __CLASS__, 'record_last_login' ), 10, 2 );
 		add_action( 'cywater_after_core_setup', array( __CLASS__, 'backfill_existing_accounts' ), 20 );
+	}
+
+	/** Keep PMPro's front-end password change aligned with registration policy. */
+	public static function enforce_frontend_password_policy() {
+		if ( empty( $_POST['action'] ) || 'change-password' !== sanitize_key( wp_unslash( $_POST['action'] ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			return true;
+		}
+		$user_id = get_current_user_id();
+		$nonce   = isset( $_POST['change_password_user_nonce'] ) ? sanitize_key( wp_unslash( $_POST['change_password_user_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( ! $user_id || absint( $_POST['user_id'] ?? 0 ) !== $user_id || ! wp_verify_nonce( $nonce, 'change-password-user_' . $user_id ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			return true;
+		}
+		$password = isset( $_POST['pass1'] ) ? (string) wp_unslash( $_POST['pass1'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( '' === $password || self::password_length( $password ) >= self::PASSWORD_MIN_LENGTH ) {
+			return true;
+		}
+
+		remove_action( 'init', 'pmpro_change_password_process' );
+		if ( function_exists( 'pmpro_setMessage' ) ) {
+			pmpro_setMessage( __( 'Use a password with at least 12 characters.', 'cywater-membership' ), 'pmpro_error' );
+		}
+		return false;
+	}
+
+	/** Enforce the same rule on WordPress lost-password resets. */
+	public static function validate_password_reset( $errors, $user ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+		$password = isset( $_POST['pass1'] ) ? (string) wp_unslash( $_POST['pass1'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( '' !== $password && self::password_length( $password ) < self::PASSWORD_MIN_LENGTH ) {
+			$errors->add( 'password_too_short', __( 'Use a password with at least 12 characters.', 'cywater-membership' ) );
+		}
+	}
+
+	private static function password_length( $password ) {
+		return function_exists( 'mb_strlen' ) ? mb_strlen( $password, 'UTF-8' ) : strlen( $password );
 	}
 
 	public static function is_verified( $user_id ) {
@@ -287,6 +324,7 @@ final class CYWater_Membership_Account_Security {
 		$user = get_user_by( 'id', absint( $user_id ) );
 		if ( $user && strtolower( $old_user_data->user_email ) !== strtolower( $user->user_email ) ) {
 			delete_user_meta( $user->ID, self::VERIFIED_EMAIL_META );
+			update_user_meta( $user->ID, 'cyw_profile_public', 0 );
 			self::issue_verification( $user->ID, home_url( '/account/' ) );
 		}
 	}

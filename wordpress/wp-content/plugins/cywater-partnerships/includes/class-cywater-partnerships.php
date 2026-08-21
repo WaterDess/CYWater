@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 final class CYWater_Partnerships {
 	const POST_TYPE      = 'cyw_partner_app';
 	const META_PREFIX    = '_cyw_partner_';
-	const SETUP_VERSION  = '0.1.2';
+	const SETUP_VERSION  = '0.1.5';
 	const RATE_LIMIT_MAX = 5;
 	const CAP_REVIEW     = 'cywater_review_partnerships';
 	const CAP_APPROVE    = 'cywater_approve_partnerships';
@@ -35,12 +35,19 @@ final class CYWater_Partnerships {
 		add_action( 'admin_post_cywater_submit_partner_application', array( __CLASS__, 'handle_submission' ) );
 		add_action( 'add_meta_boxes_' . self::POST_TYPE, array( __CLASS__, 'add_meta_box' ) );
 		add_action( 'save_post_' . self::POST_TYPE, array( __CLASS__, 'save_review' ), 10, 2 );
+		add_filter( 'wp_untrash_post_status', array( __CLASS__, 'restore_private_status' ), 10, 3 );
+		add_action( 'transition_post_status', array( __CLASS__, 'revoke_inactive_access' ), 20, 3 );
 		add_filter( 'manage_' . self::POST_TYPE . '_posts_columns', array( __CLASS__, 'admin_columns' ) );
 		add_action( 'manage_' . self::POST_TYPE . '_posts_custom_column', array( __CLASS__, 'admin_column' ), 10, 2 );
 		add_action( 'admin_notices', array( __CLASS__, 'review_admin_notice' ) );
 		add_action( 'wp', array( __CLASS__, 'block_legacy_partner_checkout' ), -100 );
 		add_filter( 'wp_privacy_personal_data_exporters', array( __CLASS__, 'register_exporter' ) );
 		add_filter( 'wp_privacy_personal_data_erasers', array( __CLASS__, 'register_eraser' ) );
+	}
+
+	/** Keep restored applications inside the private workflow boundary. */
+	public static function restore_private_status( $new_status, $post_id, $previous_status ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+		return self::POST_TYPE === get_post_type( absint( $post_id ) ) ? 'private' : $new_status;
 	}
 
 	public static function activate() {
@@ -254,6 +261,10 @@ final class CYWater_Partnerships {
 		update_post_meta( $post_id, self::META_PREFIX . 'consent_at', current_time( 'mysql', true ) );
 		update_post_meta( $post_id, self::META_PREFIX . 'stage', 'submitted' );
 		$token = self::rotate_access_token( $post_id );
+		if ( is_wp_error( $token ) ) {
+			wp_delete_post( $post_id, true );
+			return $token;
+		}
 		if ( $send_mail ) {
 			self::send_submission_mail( $post_id, $token );
 		}
@@ -262,11 +273,14 @@ final class CYWater_Partnerships {
 
 	private static function status_view( $post_id, $token ) {
 		$post = get_post( $post_id );
-		if ( ! $post || self::POST_TYPE !== $post->post_type || ! self::valid_access_token( $post_id, $token ) ) {
+		if ( ! $post || self::POST_TYPE !== $post->post_type || 'private' !== $post->post_status || ! self::valid_access_token( $post_id, $token ) ) {
 			return '<div class="pmpro_message pmpro_error" role="alert">This partnership application link is invalid or has been replaced. Please use the newest link sent by CYWater.</div>';
 		}
+		if ( ! headers_sent() ) {
+			nocache_headers();
+		}
 		$stage       = get_post_meta( $post_id, self::META_PREFIX . 'stage', true ) ?: 'submitted';
-		$payment_url = get_post_meta( $post_id, self::META_PREFIX . 'payment_url', true );
+		$payment_url = self::sanitize_payment_url( get_post_meta( $post_id, self::META_PREFIX . 'payment_url', true ) );
 		$reference   = self::reference( $post_id );
 		$messages    = array(
 			'submitted'    => 'Your expression of interest has been received. No payment is due.',
@@ -321,15 +335,16 @@ final class CYWater_Partnerships {
 		if ( ! isset( $_POST['cywater_partner_review_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['cywater_partner_review_nonce'] ) ), 'cywater_partner_review' ) || ! current_user_can( self::CAP_REVIEW ) || wp_is_post_revision( $post_id ) || ! $post instanceof WP_Post || self::POST_TYPE !== $post->post_type ) {
 			return;
 		}
-		$old_stage = get_post_meta( $post_id, self::META_PREFIX . 'stage', true ) ?: 'submitted';
-		$old_url   = get_post_meta( $post_id, self::META_PREFIX . 'payment_url', true );
+		$old_stage       = get_post_meta( $post_id, self::META_PREFIX . 'stage', true ) ?: 'submitted';
+		$old_url         = get_post_meta( $post_id, self::META_PREFIX . 'payment_url', true );
+		$old_access_hash = get_post_meta( $post_id, self::META_PREFIX . 'access_hash', true );
 		$stage     = sanitize_key( wp_unslash( $_POST['cywater_partner_stage'] ?? $old_stage ) );
 		if ( ! isset( self::$stages[ $stage ] ) || ! self::can_transition_stage( $old_stage, $stage ) ) {
 			$stage = $old_stage;
 		}
 		$payment_url = $old_url;
 		if ( current_user_can( self::CAP_APPROVE ) ) {
-			$payment_url = esc_url_raw( wp_unslash( $_POST['cywater_partner_payment_url'] ?? '' ), array( 'https' ) );
+			$payment_url = self::sanitize_payment_url( wp_unslash( $_POST['cywater_partner_payment_url'] ?? '' ) );
 		}
 		if ( ! in_array( $stage, array( 'approved', 'paid' ), true ) ) {
 			$payment_url = '';
@@ -383,8 +398,13 @@ final class CYWater_Partnerships {
 			// Never expose a newly approved payment handoff through the previous
 			// private status link. If token persistence cannot be read back exactly,
 			// restore the material review state and send no notification.
-			if ( ! self::valid_access_token( $post_id, $token ) ) {
+			if ( is_wp_error( $token ) || ! self::valid_access_token( $post_id, $token ) ) {
 				self::restore_review_material( $post_id, $old_stage, $old_url, $had_stage, $had_url );
+				if ( $old_access_hash ) {
+					update_post_meta( $post_id, self::META_PREFIX . 'access_hash', $old_access_hash );
+				} else {
+					delete_post_meta( $post_id, self::META_PREFIX . 'access_hash' );
+				}
 				do_action( 'cywater_partnership_review_transition_failed', $post_id, $old_stage, $stage );
 				add_filter(
 					'redirect_post_location',
@@ -398,6 +418,71 @@ final class CYWater_Partnerships {
 			self::send_status_mail( $post_id, $token );
 		}
 		update_post_meta( $post_id, self::META_PREFIX . 'notes', sanitize_textarea_field( wp_unslash( $_POST['cywater_partner_notes'] ?? '' ) ) );
+	}
+
+	/** Restrict money handoffs to exact hosted Stripe surfaces. */
+	private static function sanitize_payment_url( $value ) {
+		$value = trim( (string) $value );
+		if ( '' === $value || strlen( $value ) > 4096 || preg_match( '/[\x00-\x20\x7f]/', $value ) ) {
+			return '';
+		}
+		$url = esc_url_raw( $value, array( 'https' ) );
+		if ( ! $url || ! wp_http_validate_url( $url ) ) {
+			return '';
+		}
+
+		$parts = wp_parse_url( $url );
+		if ( ! is_array( $parts ) ) {
+			return '';
+		}
+		$host  = strtolower( (string) ( $parts['host'] ?? '' ) );
+		if (
+			'https' !== strtolower( (string) ( $parts['scheme'] ?? '' ) )
+			|| isset( $parts['user'] )
+			|| isset( $parts['pass'] )
+			|| isset( $parts['port'] )
+		) {
+			return '';
+		}
+
+		$path     = (string) ( $parts['path'] ?? '' );
+		$query    = (string) ( $parts['query'] ?? '' );
+		$fragment = (string) ( $parts['fragment'] ?? '' );
+		if ( 'buy.stripe.com' === $host ) {
+			return preg_match( '/\A\/[A-Za-z0-9_]{8,255}\z/D', $path ) && '' === $query && '' === $fragment ? $url : '';
+		}
+		if ( 'invoice.stripe.com' === $host ) {
+			$invoice_path = preg_match( '/\A\/i\/acct_[A-Za-z0-9]{8,64}\/(?:test_)?[A-Za-z0-9_-]{16,1024}\z/D', $path );
+			return $invoice_path && in_array( $query, array( '', 's=em' ), true ) && '' === $fragment ? $url : '';
+		}
+		if ( 'checkout.stripe.com' === $host ) {
+			$checkout_path = preg_match( '/\A\/c\/pay\/cs_(?:test|live)_[A-Za-z0-9]{16,1024}\z/D', $path );
+			$checkout_hash = preg_match( '/\A[A-Za-z0-9_%=-]{16,4096}\z/D', $fragment ) && ! preg_match( '/%(?![0-9A-Fa-f]{2})/', $fragment );
+			return $checkout_path && '' === $query && $checkout_hash ? $url : '';
+		}
+
+		return '';
+	}
+
+	/** Trash/inactive states revoke access; a restore issues a fresh bearer link. */
+	public static function revoke_inactive_access( $new_status, $old_status, $post ) {
+		if ( ! $post instanceof WP_Post || self::POST_TYPE !== $post->post_type || $new_status === $old_status ) {
+			return;
+		}
+		if ( 'private' === $new_status ) {
+			if ( in_array( $old_status, array( 'new', 'auto-draft', 'private' ), true ) ) {
+				return;
+			}
+			$token = self::rotate_access_token( $post->ID );
+			if ( is_wp_error( $token ) || ! self::valid_access_token( $post->ID, $token ) || ! self::send_status_mail( $post->ID, $token ) ) {
+				// An undisclosed token is not a usable restore. Fail closed so a
+				// later authorized stage update can issue a new link deliberately.
+				delete_post_meta( $post->ID, self::META_PREFIX . 'access_hash' );
+			}
+			return;
+		}
+		delete_post_meta( $post->ID, self::META_PREFIX . 'access_hash' );
+		delete_post_meta( $post->ID, self::META_PREFIX . 'payment_url' );
 	}
 
 	/** Restore the pre-save stage and payment handoff after a failed material write. */
@@ -576,8 +661,16 @@ final class CYWater_Partnerships {
 	}
 
 	private static function rotate_access_token( $post_id ) {
-		$token = bin2hex( random_bytes( 24 ) );
-		update_post_meta( $post_id, self::META_PREFIX . 'access_hash', self::token_hash( $token ) );
+		try {
+			$token = bin2hex( random_bytes( 24 ) );
+		} catch ( Throwable $error ) {
+			return new WP_Error( 'partner_token_unavailable', __( 'A secure application link could not be created.', 'cywater-partnerships' ) );
+		}
+		$hash = self::token_hash( $token );
+		update_post_meta( $post_id, self::META_PREFIX . 'access_hash', $hash );
+		if ( ! hash_equals( $hash, (string) get_post_meta( $post_id, self::META_PREFIX . 'access_hash', true ) ) ) {
+			return new WP_Error( 'partner_token_unavailable', __( 'A secure application link could not be stored.', 'cywater-partnerships' ) );
+		}
 		return $token;
 	}
 
@@ -606,7 +699,7 @@ final class CYWater_Partnerships {
 		$reference = self::reference( $post_id );
 		$url       = self::status_url( $post_id, $token );
 		$headers   = array( 'From: CYWater Partnerships <contact@cywater.org>', 'Reply-To: CYWater Contact <contact@cywater.org>' );
-		wp_mail( $email, 'CYWater partnership application update — ' . $reference, "The application status is now: " . ( self::$stages[ $stage ] ?? $stage ) . ".\n\nUse this newest secure link to review the status and, only if approved, any authorized payment instructions:\n{$url}\n", $headers );
+		return wp_mail( $email, 'CYWater partnership application update — ' . $reference, "The application status is now: " . ( self::$stages[ $stage ] ?? $stage ) . ".\n\nUse this newest secure link to review the status and, only if approved, any authorized payment instructions:\n{$url}\n", $headers );
 	}
 
 	private static function guide_url() {

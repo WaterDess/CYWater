@@ -1,0 +1,64 @@
+.cywater-editor-help {
+	margin: 0 0 16px;
+	color: #50575e;
+	font-size: 12px;
+	line-height: 1.55;
+}
+
+.cywater-editor-visibility {
+	margin: 0 0 16px;
+	padding: 12px;
+	border-left: 3px solid #0f766e;
+	background: #e8f1ef;
+	color: #0e1b2c;
+}
+
+.cywater-editor-visibility p {
+	margin: 4px 0 0;
+	color: #2a3950;
+	font-size: 12px;
+	line-height: 1.5;
+}
+
+/* The Logo module owns these controls and intentionally remains removable.
+ * Fit its legacy renderer into the document sidebar without duplicating data. */
+#cywater-logo-call .inside {
+	min-width: 0;
+	overflow: hidden;
+}
+
+#cywater-logo-call fieldset {
+	min-width: 0;
+	margin: 12px 0 !important;
+	padding: 10px !important;
+}
+
+#cywater-logo-call select,
+#cywater-logo-call input[type="text"],
+#cywater-logo-call input[type="datetime-local"] {
+	width: 100%;
+	max-width: 100%;
+	box-sizing: border-box;
+}
+
+#cywater-logo-call fieldset label {
+	display: block;
+	margin: 7px 0 0 !important;
+}
+
+#cywater-logo-call p,
+#cywater-logo-call label,
+#cywater-logo-call legend {
+	overflow-wrap: anywhere;
+}
+
+.editor-styles-wrapper {
+	background: #f6f3ec;
+}
+
+/* The compatibility drawer is retained only where a module still owns a
+ * legacy workflow. Do not reserve empty vertical space for public Posts. */
+.post-type-post .edit-post-layout__metaboxes:empty,
+.post-type-cyw_award .edit-post-layout__metaboxes:empty {
+	display: none;
+}

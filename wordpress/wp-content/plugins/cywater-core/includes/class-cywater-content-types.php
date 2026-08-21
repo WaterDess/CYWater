@@ -44,7 +44,7 @@ final class CYWater_Content_Types {
 				'has_archive'     => 'events',
 				'rewrite'         => array( 'slug' => 'events' ),
 				'menu_icon'       => 'dashicons-calendar-alt',
-				'supports'        => array( 'title', 'editor', 'excerpt', 'thumbnail', 'revisions' ),
+				'supports'        => array( 'title', 'editor', 'excerpt', 'thumbnail', 'revisions', 'custom-fields' ),
 				'capability_type' => self::CAPABILITY_TYPES['cyw_event'],
 				'map_meta_cap'    => true,
 			)
@@ -72,7 +72,7 @@ final class CYWater_Content_Types {
 				'has_archive'     => 'awards',
 				'rewrite'         => array( 'slug' => 'awards' ),
 				'menu_icon'       => 'dashicons-awards',
-				'supports'        => array( 'title', 'editor', 'excerpt', 'thumbnail', 'revisions' ),
+				'supports'        => array( 'title', 'editor', 'excerpt', 'thumbnail', 'revisions', 'custom-fields' ),
 				'capability_type' => self::CAPABILITY_TYPES['cyw_award'],
 				'map_meta_cap'    => true,
 			)
@@ -219,14 +219,12 @@ final class CYWater_Content_Types {
 			return;
 		}
 		if ( $query->is_post_type_archive( 'cyw_event' ) ) {
-			$query->set( 'meta_key', '_cyw_start_date' );
-			$query->set( 'orderby', 'meta_value' );
+			$query->set( 'orderby', 'date' );
 			$query->set( 'order', 'DESC' );
 			$query->set( 'posts_per_page', 20 );
 		}
 		if ( $query->is_post_type_archive( 'cyw_award' ) ) {
-			$query->set( 'meta_key', '_cyw_year' );
-			$query->set( 'orderby', 'meta_value_num' );
+			$query->set( 'orderby', 'date' );
 			$query->set( 'order', 'DESC' );
 			$query->set( 'posts_per_page', 30 );
 		}

@@ -15,6 +15,8 @@ const mounts = [
   ["./wordpress/wp-content/plugins/cywater-membership", "/wordpress/wp-content/plugins/cywater-membership"],
   ["./wordpress/wp-content/plugins/cywater-partnerships", "/wordpress/wp-content/plugins/cywater-partnerships"],
   ["./wordpress/wp-content/plugins/cywater-logo-call", "/wordpress/wp-content/plugins/cywater-logo-call"],
+  ["./wordpress/wp-content/plugins/cywater-operations", "/wordpress/wp-content/plugins/cywater-operations"],
+  ["./wordpress/wp-content/plugins/cywater-forum", "/wordpress/wp-content/plugins/cywater-forum"],
   ["./wordpress/wp-content/plugins/cywater-environment", "/wordpress/wp-content/plugins/cywater-environment"],
   ["./wordpress/runtime/vendor/paid-memberships-pro", "/wordpress/wp-content/plugins/paid-memberships-pro"],
 ].map(([hostPath, vfsPath]) => ({ hostPath, vfsPath }));
@@ -30,14 +32,14 @@ const server = await runCLI({
 });
 
 try {
-  for (const route of ["/", "/about/", "/board/", "/bylaws/", "/news/", "/events/", "/awards/", "/membership/", "/contact/", "/members/"]) {
+  for (const route of ["/forum/", "/forum-workspace/", "/", "/about/", "/board/", "/bylaws/", "/news/", "/events/", "/awards/", "/membership/", "/contact/", "/members/"]) {
     const response = await fetch(new URL(route, server.serverUrl));
     assert.equal(response.status, 200, `${route} should return HTTP 200`);
     const html = await response.text();
     assert.doesNotMatch(html, /Fatal error|Parse error|Warning:/, `${route} should not expose a PHP error`);
     if (route === "/events/") {
       assert.match(html, /CYWater Annual Meeting 2026/, "Events archive must publish the upcoming 2026 meeting");
-      assert.equal((html.match(/class="event-archive-row"/g) || []).length, 19, "Events archive must render all verified event rows");
+      assert.equal((html.match(/class="event-archive-row"/g) || []).length, 18, "Events archive must render all standard Event rows");
       assert.match(html, /id="annual-meetings-title"/, "Events archive must retain the Annual Meetings section");
       assert.match(html, /id="annual-gathering-title"/, "Events archive must retain the Annual Gathering section");
     }
@@ -46,8 +48,9 @@ try {
       assert.match(html, /id="opportunities-title"/, "News must retain the Opportunities section");
       assert.match(html, /id="spotlights-title"/, "News must retain the Spotlights section");
       assert.equal((html.match(/class="news-feature"/g) || []).length, 1, "News must render one featured spotlight");
-      assert.equal((html.match(/class="news-item"/g) || []).length, 14, "News must render all remaining spotlights as rows");
-      assert.doesNotMatch(html, /class="news-row"|Hello world/i, "News must not use the obsolete generic archive row or default post");
+      assert.equal((html.match(/class="news-item"/g) || []).length, 15, "News must render every remaining published Post as a row");
+      assert.match(html, /Hello world/i, "A normal published Post must remain visible without importer metadata");
+      assert.doesNotMatch(html, /class="news-row"/, "News must not use the obsolete generic archive row");
     }
     if (route === "/awards/") {
       assert.match(html, /Recognizing early-career research/, "Awards must retain its eligibility introduction");
@@ -63,6 +66,15 @@ try {
       assert.match(html, /membership-partner-head/, "Membership partners must use the centered shared section heading");
       assert.match(html, /membership-partner-copy/, "Membership partner copy must retain its constrained centered layout");
       assert.match(html, /membership-fees/, "Conference fees must retain its dedicated shared-layout hook");
+    }
+    if (route === "/forum/") {
+      assert.match(html, /CYWater Forum\./, "Forum archive must retain its public member-writing introduction");
+      assert.match(html, /Sign in/, "Signed-out Forum visitors must receive a front-end sign-in action");
+    }
+    if (route === "/forum-workspace/") {
+      assert.match(html, /Write for the CYWater Forum\./, "Forum workspace must use the dedicated front-end template");
+      assert.match(html, /Submission unavailable/, "Signed-out Forum workspace must explain its eligibility gate");
+      assert.doesNotMatch(html, /wp-admin\/post-new\.php/, "Forum workspace must not send ordinary members to the WordPress editor");
     }
     if (route === "/board/") {
       assert.match(html, /Board of Directors\./, "Board hero must match the static preview");
@@ -122,7 +134,7 @@ echo wp_json_encode(
   assert.equal(report.members_page, true, "Member directory page must exist");
   assert.equal(Number(report.bylaws_articles), 9, "All nine Bylaws articles must be seeded");
   assert.match(report.contact_address, /202 E\. Green St\./, "Verified mailing address must be editable page metadata");
-  assert.equal(Number(report.event_count), 19);
+  assert.equal(Number(report.event_count), 18);
   assert.equal(Number(report.award_count), 14);
   assert.equal(Number(report.news_count), 16);
   assert.equal(report.news_order_meta, true, "Normal setup must add missing News ordering metadata");
@@ -162,8 +174,8 @@ echo 'prepared';`,
   const fallbackResponse = await fetch(new URL("/news/", server.serverUrl));
   const fallbackHtml = await fallbackResponse.text();
   assert.equal((fallbackHtml.match(/class="news-feature"/g) || []).length, 1, "News fallback must retain its featured story");
-  assert.equal((fallbackHtml.match(/class="news-item"/g) || []).length, 14, "News fallback must render every imported story");
-  assert.doesNotMatch(fallbackHtml, /Hello world/i, "News fallback must exclude unrelated posts");
+  assert.equal((fallbackHtml.match(/class="news-item"/g) || []).length, 15, "News fallback must render every remaining published Post");
+  assert.match(fallbackHtml, /Hello world/i, "News fallback must retain a normal published Post without importer metadata");
 
   result = await server.playground.run({
     code: `<?php
@@ -192,11 +204,85 @@ echo wp_json_encode(
 
   const upgradedNewsHtml = await (await fetch(new URL("/news/", server.serverUrl))).text();
   assert.equal((upgradedNewsHtml.match(/class="news-feature"/g) || []).length, 1, "Upgraded News must retain its featured story");
-  assert.equal((upgradedNewsHtml.match(/class="news-item"/g) || []).length, 14, "Upgraded News must render every imported story");
+  assert.equal((upgradedNewsHtml.match(/class="news-item"/g) || []).length, 15, "Upgraded News must render every remaining published Post");
   const upgradedAwardsHtml = await (await fetch(new URL("/awards/", server.serverUrl))).text();
   assert.match(upgradedAwardsHtml, /Outstanding Papers/, "Upgraded Awards must render restored Outstanding Paper records");
   assert.match(upgradedAwardsHtml, /10\.1073\/pnas\.2421046122/, "Upgraded Awards must render restored DOI data");
   assert.match(upgradedAwardsHtml, /Read award announcement/, "Upgraded Awards must render restored announcement links");
+
+  result = await server.playground.run({
+    code: `<?php
+define( 'CYWATER_FORUM_COVER_QA', true );
+require '/wordpress/wp-load.php';
+try {
+wp_set_current_user( 1 );
+require_once ABSPATH . 'wp-admin/includes/file.php';
+$post_id = wp_insert_post(
+    array(
+        'post_type' => CYWater_Forum_Content::POST_TYPE,
+        'post_status' => 'draft',
+        'post_author' => 1,
+        'post_title' => 'Protected cover runtime QA',
+        'post_content' => 'Temporary runtime QA record.',
+    ),
+    true
+);
+if ( is_wp_error( $post_id ) ) {
+    throw new RuntimeException( $post_id->get_error_message() );
+}
+$source = wp_tempnam( 'forum-cover-runtime.png' );
+file_put_contents( $source, base64_decode( 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=' ) );
+$cover = CYWater_Forum_Covers::import_file_for_qa( $source, 'forum-cover-runtime.png', 1 );
+if ( is_wp_error( $cover ) ) {
+    throw new RuntimeException( $cover->get_error_message() );
+}
+$attached = CYWater_Forum_Covers::replace( $post_id, $cover, 1 );
+if ( is_wp_error( $attached ) ) {
+    throw new RuntimeException( $attached->get_error_message() );
+}
+$record = CYWater_Forum_Covers::get( $post_id );
+$stored_path = CYWater_Forum_Covers::path_for_qa( $record );
+$native_thumbnail = get_post_thumbnail_id( $post_id );
+$url = CYWater_Forum_Covers::url( $post_id );
+$query = array();
+parse_str( (string) wp_parse_url( $url, PHP_URL_QUERY ), $query );
+$draft_anonymous = CYWater_Forum_Covers::can_stream( $post_id, 0, '' );
+$draft_owner = CYWater_Forum_Covers::can_stream( $post_id, 1, (string) ( $query['_wpnonce'] ?? '' ) );
+$referenced_file_preserved = ( CYWater_Forum_Covers::discard( $record ) === null && file_exists( $stored_path ) );
+wp_update_post( array( 'ID' => $post_id, 'post_status' => 'publish' ) );
+$published_anonymous = CYWater_Forum_Covers::can_stream( $post_id, 0, '' );
+wp_trash_post( $post_id );
+$trashed_anonymous = CYWater_Forum_Covers::can_stream( $post_id, 0, '' );
+wp_delete_post( $post_id, true );
+$deleted_file = ! file_exists( $stored_path );
+wp_delete_file( $source );
+echo wp_json_encode(
+    array(
+        'stored' => file_exists( dirname( $stored_path ) ),
+		'referenced_file_preserved' => $referenced_file_preserved,
+        'native_thumbnail' => $native_thumbnail,
+        'draft_anonymous' => $draft_anonymous,
+        'draft_owner' => $draft_owner,
+        'published_anonymous' => $published_anonymous,
+        'trashed_anonymous' => $trashed_anonymous,
+        'deleted_file' => $deleted_file,
+    )
+);
+} catch ( Throwable $error ) {
+    echo wp_json_encode( array( 'runtime_error' => get_class( $error ) . ': ' . $error->getMessage() ) );
+}`,
+  });
+  assert.equal(result.exitCode, 0, result.errors);
+  const forumCover = JSON.parse(result.text);
+  assert.equal(forumCover.runtime_error, undefined, forumCover.runtime_error);
+  assert.equal(forumCover.stored, true, "Protected Forum cover directory must exist");
+  assert.equal(forumCover.referenced_file_preserved, true, "Cleanup must not delete a still-referenced Forum cover");
+  assert.equal(Number(forumCover.native_thumbnail), 0, "Forum covers must not use public Media attachments");
+  assert.equal(forumCover.draft_anonymous, false, "Anonymous visitors must not stream draft Forum covers");
+  assert.equal(forumCover.draft_owner, true, "The owner must be able to preview a nonce-bound draft cover");
+  assert.equal(forumCover.published_anonymous, true, "Published Forum covers must be publicly streamable");
+  assert.equal(forumCover.trashed_anonymous, false, "Taking down an article must revoke anonymous cover access");
+  assert.equal(forumCover.deleted_file, true, "Deleting an article must remove its protected cover file");
 
   result = await server.playground.run({
     code: `<?php
@@ -239,11 +325,11 @@ echo wp_json_encode(
   assert.equal(result.exitCode, 0, result.errors);
   const membership = JSON.parse(result.text);
   assert.equal(membership.status, "ready");
-  assert.deepEqual(Object.keys(membership.configured_level_ids).sort(), ["lifetime", "partner", "professional", "student"]);
+  assert.deepEqual(Object.keys(membership.configured_level_ids).sort(), ["lifetime", "professional", "student"]);
   if (Object.keys(membership.levels).length) {
     assert.deepEqual(
       Object.fromEntries(Object.entries(membership.levels).map(([name, data]) => [name, data.price])),
-      { Student: 20, Professional: 70, Lifetime: 700, Partner: 1000 },
+      { Student: 20, Professional: 50, Lifetime: 700 },
     );
     assert.equal(membership.levels.Lifetime.expires, 0);
     assert.equal(membership.levels.Student.expires, 1);

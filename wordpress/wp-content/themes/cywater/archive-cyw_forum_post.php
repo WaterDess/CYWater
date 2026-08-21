@@ -31,7 +31,7 @@ get_template_part(
 	array(
 		'eyebrow' => 'Community writing',
 		'title'   => 'CYWater Forum.',
-		'lead'    => 'Articles written by CYWater members on research, practice, and early-career life in the water sciences.',
+		'lead'    => 'Verified CYWater members with an active individual membership may submit articles on research, practice, and early-career life for Community Moderator review.',
 		'actions' => cywater_forum_hero_actions(),
 	)
 );

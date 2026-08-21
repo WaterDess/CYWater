@@ -53,6 +53,14 @@
     },
     {
       "step": "activatePlugin",
+      "pluginPath": "cywater-operations/cywater-operations.php"
+    },
+    {
+      "step": "activatePlugin",
+      "pluginPath": "cywater-forum/cywater-forum.php"
+    },
+    {
+      "step": "activatePlugin",
       "pluginPath": "cywater-environment/cywater-environment.php"
     },
     {

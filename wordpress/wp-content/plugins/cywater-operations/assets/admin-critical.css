@@ -1,0 +1,140 @@
+/* Critical navigation is inlined into WordPress' core admin stylesheet.
+ * The work areas therefore remain legible even when a separate plugin asset
+ * request is delayed or rejected by the hosting transport. */
+#adminmenu > .cywater-menu-group-start::before {
+	display: block;
+	box-sizing: border-box;
+	width: 100%;
+	padding: 12px 12px 5px;
+	color: #a7aaad;
+	font-size: 10px;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	line-height: 1.4;
+	text-transform: uppercase;
+}
+
+#adminmenu > .cywater-menu-group-content.cywater-menu-group-start::before {
+	content: "Content";
+}
+
+#adminmenu > .cywater-menu-group-community.cywater-menu-group-start::before {
+	content: "Community & programs";
+}
+
+#adminmenu > .cywater-menu-group-membership.cywater-menu-group-start::before {
+	content: "Membership & accounts";
+}
+
+#adminmenu > .cywater-menu-group-system.cywater-menu-group-start::before {
+	content: "Site system";
+}
+
+#adminmenu > .cywater-menu-group-work.cywater-menu-group-start::before {
+	content: "My work";
+}
+
+#adminmenu.cywater-menu-enhanced > .cywater-menu-group-start::before {
+	display: none;
+}
+
+#adminmenu .cywater-admin-menu-section {
+	margin: 10px 0 2px;
+	padding: 0;
+}
+
+#adminmenu .cywater-admin-menu-section__toggle {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	padding: 7px 12px;
+	border: 0;
+	background: transparent;
+	color: #a7aaad;
+	font-size: 10px;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	line-height: 1.4;
+	text-align: left;
+	text-transform: uppercase;
+	cursor: pointer;
+}
+
+#adminmenu .cywater-admin-menu-section__toggle::after {
+	content: "\f347";
+	font: 14px/1 dashicons;
+}
+
+#adminmenu .cywater-admin-menu-section__toggle[aria-expanded="false"]::after {
+	content: "\f345";
+}
+
+#adminmenu .cywater-admin-menu-section__toggle:hover,
+#adminmenu .cywater-admin-menu-section__toggle:focus {
+	background: #2c3338;
+	color: #fff;
+	outline: 0;
+}
+
+#adminmenu .cywater-menu-item--collapsed {
+	display: none !important;
+}
+
+.folded #adminmenu .cywater-admin-menu-section,
+.folded #adminmenu > .cywater-menu-group-start::before {
+	display: none;
+}
+
+.folded #adminmenu .cywater-menu-item--collapsed {
+	display: list-item !important;
+}
+
+.cywater-work-areas {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 10px;
+}
+
+.cywater-work-area {
+	display: block;
+	padding: 12px 14px;
+	border: 1px solid #dcdcde;
+	border-radius: 6px;
+	background: #fff;
+	text-decoration: none;
+}
+
+.cywater-work-area:hover,
+.cywater-work-area:focus {
+	border-color: #2271b1;
+	box-shadow: 0 0 0 1px #2271b1;
+}
+
+.cywater-work-area strong,
+.cywater-work-area span {
+	display: block;
+}
+
+.cywater-work-area span {
+	margin-top: 4px;
+	color: #50575e;
+	line-height: 1.4;
+}
+
+@media (max-width: 782px) {
+	.cywater-work-areas {
+		grid-template-columns: 1fr;
+	}
+}
+
+@media (min-width: 783px) and (max-width: 960px) {
+	.auto-fold #adminmenu .cywater-admin-menu-section,
+	.auto-fold #adminmenu > .cywater-menu-group-start::before {
+		display: none;
+	}
+
+	.auto-fold #adminmenu .cywater-menu-item--collapsed {
+		display: list-item !important;
+	}
+}

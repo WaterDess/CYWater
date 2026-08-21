@@ -1,0 +1,289 @@
+.cywater-access-search {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	max-width: 720px;
+	margin: 20px 0 8px;
+}
+
+.cywater-access-search input[type="search"] {
+	flex: 1 1 360px;
+	min-height: 36px;
+}
+
+.cywater-access-table {
+	margin-top: 16px;
+}
+
+.cywater-access-table th:last-child,
+.cywater-access-table td:last-child {
+	width: 140px;
+}
+
+.cywater-access-badge {
+	display: inline-block;
+	margin: 0 4px 4px 0;
+	padding: 2px 7px;
+	border: 1px solid #c3c4c7;
+	border-radius: 999px;
+	background: #f6f7f7;
+	font-size: 12px;
+	line-height: 1.6;
+}
+
+.cywater-access-none {
+	color: #646970;
+}
+
+/* Keep the Users table scannable when WordPress and membership plugins add
+ * several independent row actions. */
+.cywater-user-actions {
+	display: inline-flex;
+	position: relative;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 5px;
+	margin-top: 4px;
+}
+
+.cywater-user-action,
+.cywater-user-actions-more__toggle {
+	display: inline-flex;
+	align-items: center;
+	min-height: 26px;
+	box-sizing: border-box;
+	padding: 2px 8px;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	background: #fff;
+	color: #2271b1;
+	font-size: 12px;
+	line-height: 1.5;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+.cywater-user-action:hover,
+.cywater-user-action:focus,
+.cywater-user-actions-more__toggle:hover,
+.cywater-user-actions-more__toggle:focus {
+	border-color: #2271b1;
+	color: #135e96;
+	box-shadow: 0 0 0 1px #2271b1;
+	outline: 0;
+}
+
+.cywater-user-action--primary {
+	border-color: #2271b1;
+	background: #2271b1;
+	color: #fff;
+}
+
+.cywater-user-action--primary:hover,
+.cywater-user-action--primary:focus {
+	background: #135e96;
+	color: #fff;
+}
+
+.cywater-user-actions-more {
+	display: inline-flex;
+	position: relative;
+}
+
+.cywater-user-action-menu {
+	display: none;
+	position: absolute;
+	z-index: 1000;
+	top: calc(100% + 4px);
+	left: 0;
+	min-width: 190px;
+	padding: 5px;
+	border: 1px solid #c3c4c7;
+	border-radius: 5px;
+	background: #fff;
+	box-shadow: 0 5px 18px rgba(0, 0, 0, 0.16);
+}
+
+.cywater-user-actions-more.is-open .cywater-user-action-menu,
+.cywater-user-actions-more:focus-within .cywater-user-action-menu {
+	display: block;
+}
+
+.cywater-user-action-menu__item,
+.cywater-user-action-menu__item a {
+	display: block;
+}
+
+.cywater-user-action-menu__item a {
+	padding: 7px 9px;
+	border-radius: 3px;
+	text-decoration: none;
+}
+
+.cywater-user-action-menu__item a:hover,
+.cywater-user-action-menu__item a:focus {
+	background: #f0f6fc;
+	outline: 0;
+}
+
+.cywater-user-action-menu__item--danger a {
+	color: #b32d2e;
+}
+
+.cywater-access-person {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 24px;
+	max-width: 1040px;
+	margin: 16px 0 20px;
+	padding: 20px 24px;
+	border: 1px solid #c3c4c7;
+	border-radius: 8px;
+	background: #fff;
+}
+
+.cywater-access-person h2 {
+	margin-top: 0;
+}
+
+.cywater-access-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 14px;
+	max-width: 1040px;
+	margin: 0 0 12px;
+}
+
+.cywater-access-card {
+	display: block;
+	padding: 18px 20px;
+	border: 1px solid #c3c4c7;
+	border-radius: 8px;
+	background: #fff;
+	cursor: pointer;
+}
+
+.cywater-access-card:hover {
+	border-color: #8c8f94;
+}
+
+.cywater-access-card:focus-within {
+	border-color: #2271b1;
+	box-shadow: 0 0 0 1px #2271b1;
+}
+
+.cywater-access-card__control {
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+	margin-bottom: 8px;
+}
+
+.cywater-access-card > span:last-child {
+	display: block;
+	padding-left: 28px;
+	color: #50575e;
+	line-height: 1.5;
+}
+
+.cywater-audit {
+	margin-top: 28px;
+}
+
+.cywater-audit summary {
+	cursor: pointer;
+	font-size: 18px;
+	font-weight: 600;
+}
+
+.cywater-audit table {
+	margin-top: 12px;
+}
+
+@media (max-width: 782px) {
+	.cywater-access-search,
+	.cywater-access-person {
+		align-items: stretch;
+		flex-direction: column;
+	}
+
+	.cywater-access-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.cywater-access-table th:nth-child(3),
+	.cywater-access-table td:nth-child(3) {
+		display: none;
+	}
+
+	.cywater-user-action-menu {
+		left: auto;
+		right: 0;
+	}
+}
+
+.cywater-logo-review__toolbar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 12px;
+	margin: 20px 0;
+}
+
+.cywater-logo-review__toolbar form {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.cywater-logo-review__table {
+	margin: 16px 0 24px;
+}
+
+.cywater-logo-review__thumb {
+	display: block;
+	width: 96px;
+	height: 72px;
+	object-fit: contain;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	background: #fff;
+}
+
+.cywater-logo-review__panel {
+	max-width: 1040px;
+	margin: 20px 0;
+	padding: 20px 24px;
+	border: 1px solid #c3c4c7;
+	border-radius: 8px;
+	background: #fff;
+}
+
+.cywater-logo-review__panel h2:first-child,
+.cywater-logo-review__panel h3:first-child {
+	margin-top: 0;
+}
+
+.cywater-logo-review__choice {
+	display: block;
+	margin: 10px 0;
+	padding: 10px 12px;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	background: #f6f7f7;
+}
+
+@media (max-width: 782px) {
+	.cywater-logo-review__toolbar {
+		align-items: stretch;
+		flex-direction: column;
+	}
+
+	.cywater-logo-review__table {
+		display: block;
+		overflow-x: auto;
+	}
+}

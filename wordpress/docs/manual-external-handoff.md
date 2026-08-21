@@ -1,9 +1,23 @@
 # Manual And External Handoff
 
-All engineering work that can be completed safely from the repository and the
-current staging access is complete. The items below require an association
-decision, a named human identity, a paid license, a second browser/account, or
-a destructive host operation. They are not application-code defects.
+The public production site is live; only payment activation remains **No-Go**.
+Repository remediation is implemented on staging and production and passes the
+real WordPress/MySQL automation suites. The final open production gate is the
+association-owned Stripe Live connection followed by one real charge, receipt,
+balance/payout observation and full-refund reconciliation.
+Hostinger File Manager
+recovered and archived the former Logo Call `0.2.3` and Environment `0.5.5`
+trees before the current staging work. Logo Call `0.3.2` is independently
+accepted and deployed on staging and production with the reviewed Event
+configuration and no staging entries, votes, identities, or protected files.
+Membership `0.9.4`, Partnerships `0.1.5`, Forum `0.4.2`, Operations `0.2.1`,
+and Environment `0.5.5` are the verified staging candidate versions. See
+`production-checklist.md` for the authoritative order.
+
+The items below additionally require an association decision, a named human
+identity, a paid license, a second browser/account, or a destructive host
+operation. They are not all application-code defects, but each applicable item
+remains a launch gate until accepted or explicitly deferred by the association.
 
 ## 1. Identity, Recovery, And Staff Access
 
@@ -44,6 +58,10 @@ Remaining actions:
    organization users as authorized members/delegates of `contact@cywater.org`
    in Google Workspace. Do not give them WordPress Administrator access merely
    to answer mail.
+8. Confirm that `accounts@cywater.org` is a real receive-capable Google
+   Workspace alias or group, not only an outbound address verified by Postmark.
+   Assign at least two association-authorized custodians and test receipt. Keep
+   account-support replies routed to `membership@cywater.org`.
 
 Status recorded on 2026-08-03: MFA is **deferred** because CYWater currently
 has no association-controlled phone, tablet, security key, or equivalent
@@ -57,32 +75,47 @@ becomes available.
 The launch matrix uses four composable roles. They are not automatically
 assigned to a real person, and a title or membership level never grants them.
 After a named organization account is supplied, the built-in Administrator may
-assign one or more roles under **Users -> CYWater operational roles**:
+assign one or more roles under **Users -> CYWater staff access**:
 
 | Role | Permitted launch work | Explicitly excluded |
 | --- | --- | --- |
 | CYWater Content & Event Editor | Posts/News, media, Events, Awards, Event terms, Logo Call configuration, submit paid Event for approval, open/close registration after approval | Governance approval, Forum moderation, PMPro members/orders, payment settings |
 | CYWater Community Moderator | Forum articles/taxonomy and comment moderation | Other public content models, Events, membership/payment administration |
-| CYWater Program Reviewer | Inspect/update Logo entries and record shortlisting/reward fulfillment through one review bundle | Create/delete submissions or protected files, automatic membership grant, Event/Partner approval, PMPro orders |
-| CYWater Governance Approver | Board records, Partner review/approval/payment confirmation, paid-Event approval | Event editing, PMPro membership/order operations, gateway credentials |
+| CYWater Program Reviewer | Inspect Logo entries and record eligibility for voting | Confirm finalists, select the official logo, delete submissions or protected files, fulfill rewards, Event/Partner approval, PMPro orders |
+| CYWater Governance Approver | Board records, Partner review/approval/payment confirmation, paid-Event approval, confirm the three Logo finalists and select the official design from those three | Event editing, Logo reward/final-file fulfillment, PMPro membership/order operations, gateway credentials |
 
 Only a built-in Administrator may assign or remove these roles. The operational
 audit records identifiers, role/workflow states, time, action, and a short reason
 only; it intentionally excludes names, email, content, application notes,
-payment data, and credentials. CYWater Operations `0.1.3` is deployed, and its
-self-cleaning staging QA passed all 367 role, workflow, strict-audit, and
-fail-closed checks. This did not assign a real staff user. CYWater Forum `0.1.2`
-was then atomically deployed and kept active; its separate real WordPress/MySQL
-self-cleaning QA passed 77/77 publication, membership/email-verification,
-first-reply moderation, role-boundary, visibility, trash/untrash, restoration,
-and cleanup checks. It intercepted two test messages and removed all temporary
-users, articles, comments, PMPro rows, and mail intercepts. The pre-deploy
-database and plugin backup is
-`/home/u111638297/cywater-release-backups/forum-0.1.2-20260817T213738Z`.
+payment data, and credentials. CYWater Operations `0.2.0` is deployed, and its
+self-cleaning staging QA passed all 431 role, workflow, strict-audit, navigation, and
+fail-closed checks. This did not assign a real staff user. CYWater Forum `0.2.0`
+and theme `0.6.19` were then atomically deployed and kept active; the separate
+real WordPress/MySQL self-cleaning QA passed 100 assertions for paused legacy
+endorsements, verified active-individual-member submission, member draft/pending
+only access, moderator publication, immediate eligible-member replies,
+non-member/unverified denial, role/REST boundaries, visibility, trash/untrash,
+Logo Call separation and cleanup. It intercepted three verification messages
+and removed all temporary users, articles, comments, PMPro rows and mail
+intercepts. The pre-deploy database, plugin/theme archives and live rollback
+trees are retained at
+`/home/u111638297/cywater-release-backups/forum-0.2.0-20260818T195836`.
 Before assigning a real account, verify the named user's exact screens and
 listed work; do not assign broad roles merely to make a screen visible. Before
 production cutover, delete or replace the staging Forum preview placeholder
 article; do not publish it as association content.
+
+To grant access, search by the staff member's name, login, or email, select
+**Manage access** for exactly one account, confirm the displayed username,
+email, user ID, and base WordPress role, select only the needed operational
+bundle or bundles, and save. The default directory intentionally shows only
+accounts that already have operational access; it does not render every member
+as a large checkbox matrix. The standard Users list also exposes access badges
+and the same per-account management action. After saving, ask the staff member
+to sign in and use **Dashboard -> CYWater work areas** or the capability-filtered
+left menu. The full Administrator's menu remains broad by design. Removing all
+bundles returns the account to its non-operational WordPress role, and every
+assignment change remains subject to the strict audit.
 
 Program review deliberately has no independent reward-fulfillment capability.
 The same review bundle may record shortlist and fulfillment status, but it may
@@ -91,12 +124,40 @@ never grants or changes PMPro membership automatically.
 
 ## 2. Final Mail Acceptance
 
-1. Approve the legal footer and production wording in every template listed in
+Base production transport and the Accounts identity route passed on 2026-08-21:
+the single controlled message `CYW-MAIL-20260820183111` returned Postmark
+ErrorCode `0` / `OK` and was visibly received in Gmail from
+`CYWater Accounts <accounts@cywater.org>` at `web@cywater.org`. The application
+supplied `membership@cywater.org` as Reply-To. It changed no account,
+membership, order, or payment data. Production Postmark and the
+`CYWATER_MAIL_TRANSPORT=smtp` readiness marker are enabled. The remaining steps
+below complete the wider template and recipient matrix.
+
+1. In ActiveCampaign Postmark, set Message Stream to `outbound` and Sender Email
+   to verified `web@cywater.org` as the platform fallback. Keep **Force Sender
+   Email** off; otherwise Postmark will erase the functional `From` identities
+   selected by CYWater.
+2. Verify the production responsibility split: `accounts@cywater.org` for
+   account verification/security and password or account changes (Reply-To
+   `membership@cywater.org`); `membership@cywater.org` for membership lifecycle,
+   member support, Forum, Logo Call and member programs; `billing@cywater.org`
+   for paid checkout, orders/receipts, recurring payments, failures/actions and
+   refunds; `contact@cywater.org` for public contact, Partnership, free
+   Event/RSVP and media; and `web@cywater.org` only for platform
+   ownership/recovery, technical/admin alerts and fallback transport.
+3. Confirm that PMPro routes paid/billing templates through
+   `billing@cywater.org` and free checkout plus membership
+   change/cancellation/expiration templates through `membership@cywater.org`.
+   It must not use one uniform PMPro sender.
+4. Approve the legal footer and production wording in every template listed in
    `email-copy.md`.
-2. Use an association-controlled non-Gmail recipient and request one password
-   reset plus one Sandbox membership receipt and one event RSVP confirmation.
-3. Confirm both messages in the recipient inbox and confirm **Delivered** in
-   Postmark Activity. Record message IDs and dates, never the Server API Token.
+5. Complete the remaining matrix with an association-controlled non-Gmail
+   recipient: request one password reset, one free membership lifecycle
+   message, one Sandbox paid-membership receipt, and one event RSVP
+   confirmation.
+6. Confirm every message in the recipient inbox and as **Delivered** in Postmark
+   Activity. Verify the expected `From` and `Reply-To`, and record message IDs
+   and dates, never the Server API Token.
 
 ## 3. Policy Decisions
 
@@ -180,9 +241,9 @@ cannot accept new public signups.
 The reusable ticket framework is installed: Event Tickets `5.29.1` attaches
 tickets, capacity, attendees, and event-order state only to the existing
 `cyw_event` record. A free RSVP lifecycle passed on staging and left no QA data.
-CYWater Operations `0.1.3`, its paid-provider adapter, and fail-closed ticket UI,
+CYWater Operations `0.2.0`, its paid-provider adapter, and fail-closed ticket UI,
 cart, checkout-request, and final Stripe REST gates are deployed and included in
-the 367-check Operations QA.
+the 431-check Operations QA.
 
 Paid checkout nevertheless remains closed in the actual staging configuration:
 Tickets Commerce is disabled, its Stripe gateway is not enabled or connected,
@@ -260,16 +321,19 @@ Prepare and complete the non-secret checklist in
    while keeping platform ownership, recovery, and the payout bank account
    association-controlled. Use `billing@cywater.org` for billing notices.
 2. Approve a DNS change window and create a fresh production backup.
-3. Deploy the exact accepted theme/plugin artifacts; install live secrets only
+3. Restore/deploy into the production target, remove or resolve every staging
+   fixture and run `wp eval-file cywater-production-purity-audit.php`. It is
+   read-only and must pass before DNS cutover.
+4. Deploy the exact accepted theme/plugin artifacts; install live secrets only
    through the host environment, never Git or chat.
-   The accepted staging theme is `0.6.18`; a 92/92-file local/staging manifest
+   The accepted staging theme is `0.6.19`; a 92/92-file local/staging manifest
    comparison was byte-identical with SHA-256
-   `a58ce052d8b9674d44002dc527d3f573e359e55c7d3afc083b3521d094db59ff`.
+   `efacb24c6557ad42a51c6bbe9ded4e79b12f6eb959403cbee1f1c1df3942afaa`.
    This staging match is not evidence that production has already been updated.
-4. Perform one small live payment and full refund, reconcile Stripe, PMPro,
+5. Perform one small live payment and full refund, reconcile Stripe, PMPro,
    Postmark, and the association bank record, and confirm entitlement removal.
-5. Monitor errors, email, webhooks, and payment activity during the change
+6. Monitor errors, email, webhooks, and payment activity during the change
    window. Roll back the artifact and DNS according to `deployment.md` if the
    acceptance check fails.
-6. Keep the GitHub Pages original unchanged until the association separately
+7. Keep the GitHub Pages original unchanged until the association separately
    approves its transition or redirect plan.

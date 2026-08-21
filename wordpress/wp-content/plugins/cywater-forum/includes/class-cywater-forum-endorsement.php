@@ -32,6 +32,29 @@ final class CYWater_Forum_Endorsement {
 		add_action( 'cywater_after_core_setup', array( __CLASS__, 'setup_page' ), 15 );
 	}
 
+	/**
+	 * Keep the historical page renderable while the workflow is paused.
+	 *
+	 * No request handler is registered, so old invitation links and request
+	 * forms cannot create, consume, or send anything. Existing user metadata and
+	 * all legacy implementation remain intact for a later reviewed policy change.
+	 */
+	public static function register_paused() {
+		add_shortcode( 'cywater_forum_endorsement', array( __CLASS__, 'paused_shortcode' ) );
+	}
+
+	public static function paused_shortcode() {
+		return '<div class="cywater-register forum-endorsement"><h2>'
+			. esc_html__( 'Forum participation', 'cywater-forum' )
+			. '</h2><p>'
+			. esc_html__( 'Invitations and endorsements are currently paused. Verified CYWater members with an active individual membership may submit articles directly for moderator review.', 'cywater-forum' )
+			. '</p><a class="btn btn-primary" href="'
+			. esc_url( get_post_type_archive_link( CYWater_Forum_Content::POST_TYPE ) )
+			. '">'
+			. esc_html__( 'Visit the Forum', 'cywater-forum' )
+			. '</a></div>';
+	}
+
 	public static function page_url() {
 		return home_url( '/' . self::PAGE_SLUG . '/' );
 	}
@@ -509,17 +532,16 @@ final class CYWater_Forum_Endorsement {
 		/**
 		 * Filter the forum's outgoing mail identity.
 		 *
-		 * The association-controlled `web@cywater.org` identity is already
-		 * verified with the transactional provider. A dedicated forum mailbox
-		 * can be swapped in here once one exists, without touching this code.
+		 * Forum participation is a member-program responsibility. Keep its
+		 * replies with Membership rather than the web-platform owner identity.
 		 *
 		 * @param array<int, string> $headers
 		 */
 		return apply_filters(
 			'cywater_forum_mail_headers',
 			array(
-				'From: CYWater Forum <web@cywater.org>',
-				'Reply-To: CYWater <web@cywater.org>',
+				'From: CYWater Community <membership@cywater.org>',
+				'Reply-To: CYWater Membership <membership@cywater.org>',
 			)
 		);
 	}

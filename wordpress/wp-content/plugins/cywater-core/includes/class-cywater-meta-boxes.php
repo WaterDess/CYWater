@@ -22,15 +22,23 @@ final class CYWater_Meta_Boxes {
 			'source_url'   => array( 'label' => 'Source URL', 'type' => 'url' ),
 		),
 		'cyw_event' => array(
-			'start_date' => array( 'label' => 'Start date', 'type' => 'date' ),
-			'end_date'   => array( 'label' => 'End date', 'type' => 'date' ),
-			'date_label' => array( 'label' => 'Public date label', 'type' => 'text' ),
-			'location'   => array( 'label' => 'Location', 'type' => 'text' ),
-			'format'     => array( 'label' => 'Format', 'type' => 'text' ),
-			'attendees'  => array( 'label' => 'Attendance/registration note', 'type' => 'text' ),
-			'image_alt'  => array( 'label' => 'Featured image description', 'type' => 'text' ),
-			'status'     => array( 'label' => 'Status', 'type' => 'select', 'options' => array( 'upcoming' => 'Upcoming', 'past' => 'Past' ) ),
-			'source_url' => array( 'label' => 'Source URL', 'type' => 'url' ),
+			'start_date' => array( 'label' => 'Start date', 'type' => 'date', 'help' => 'Required for chronological Event-list ordering.' ),
+			'end_date'   => array( 'label' => 'End date', 'type' => 'date', 'help' => 'Optional for single-day Events.' ),
+			'date_label' => array( 'label' => 'Public date label', 'type' => 'text', 'help' => 'Optional display override, for example “October 16–18, 2026”.' ),
+			'location'   => array( 'label' => 'Location', 'type' => 'text', 'help' => 'Optional public venue, city, or online location.' ),
+			'format'     => array( 'label' => 'Format', 'type' => 'text', 'help' => 'Optional badge on the Event page, for example In person, Online, or Hybrid. Blank displays “Event”.' ),
+			'attendees'  => array( 'label' => 'Attendance/registration note', 'type' => 'text', 'help' => 'Optional short registration or attendance note shown with the Event facts.' ),
+			'image_alt'  => array( 'label' => 'Cover image description', 'type' => 'text', 'help' => 'Describe the cover image for accessibility. Blank falls back to the Event title.' ),
+			'status'     => array(
+				'label'   => 'Event placement',
+				'type'    => 'select',
+				'help'    => 'Archive is the default. Choose Upcoming only to also place this Event in the top carousel.',
+				'options' => array(
+					'past'     => 'Archive — category list (default)',
+					'upcoming' => 'Upcoming — top carousel and category list',
+				),
+			),
+			'source_url' => array( 'label' => 'Source URL', 'type' => 'url', 'help' => 'Internal editorial provenance; not shown publicly.' ),
 		),
 		'cyw_award' => array(
 			'year'         => array( 'label' => 'Award year', 'type' => 'number' ),
@@ -56,8 +64,18 @@ final class CYWater_Meta_Boxes {
 
 	public static function add_boxes() {
 		foreach ( self::$fields as $post_type => $fields ) {
+			// Public editorial types use the native block-editor document sidebar.
+			// Keep the classic box only for Pages and the non-REST Board model.
+			if ( in_array( $post_type, array( 'post', 'cyw_event', 'cyw_award' ), true ) && use_block_editor_for_post_type( $post_type ) ) {
+				continue;
+			}
 			add_meta_box( 'cywater-details', 'CYWater details', array( __CLASS__, 'render' ), $post_type, 'normal', 'high', array( 'fields' => $fields ) );
 		}
+	}
+
+	/** @return array<string,array<string,mixed>> */
+	public static function fields_for( $post_type ) {
+		return self::$fields[ $post_type ] ?? array();
 	}
 
 	public static function render( $post, $box ) {
@@ -77,6 +95,9 @@ final class CYWater_Meta_Boxes {
 				echo '<input type="checkbox" id="cyw_' . esc_attr( $key ) . '" name="cyw_' . esc_attr( $key ) . '" value="1" ' . checked( $value, 1, false ) . '>';
 			} else {
 				echo '<input class="widefat" type="' . esc_attr( $field['type'] ) . '" id="cyw_' . esc_attr( $key ) . '" name="cyw_' . esc_attr( $key ) . '" value="' . esc_attr( $value ) . '">';
+			}
+			if ( ! empty( $field['help'] ) ) {
+				echo '<span class="description">' . esc_html( $field['help'] ) . '</span>';
 			}
 			echo '</p>';
 		}

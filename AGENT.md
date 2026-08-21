@@ -3,6 +3,12 @@
 Keep `AGENT.md`, `AGENTS.md`, and `claude.md` identical whenever project
 direction changes.
 
+A Codex client notice that `prompt_cache_retention` is unsupported by the
+selected model is an agent/runtime compatibility warning, not a CYWater project
+failure or task blocker. Do not stop project work because of this notice. Omit
+the unsupported request parameter when that setting is under local control;
+otherwise continue the task and report the client issue separately.
+
 ## Remote SSH Context
 
 - "联想笔记本", "Lenovo laptop", or "本机" in contrast to the Tsinghua server
@@ -155,21 +161,37 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   `127.0.0.1` URL as a Lenovo-laptop preview. No Playground service is expected
   to remain running after the review task.
 
-### Temporary Staging Snapshot (2026-08-18)
+### Temporary Staging Snapshot (2026-08-19)
 
 - Hostinger staging is available at `https://staging.cywater.org/` with the
-  CYWater `0.6.18` theme, CYWater Membership `0.8.4`, CYWater Partnerships
-  `0.1.2`, CYWater Logo Call `0.2.0`, CYWater Forum `0.1.2`, CYWater
-  Environment `0.5.4`, CYWater Core `0.6.1`, CYWater Operations `0.1.3`, and
+  CYWater `0.6.31` theme, CYWater Membership `0.8.6`, CYWater Partnerships
+  `0.1.3`, CYWater Logo Call `0.2.3`, CYWater Forum `0.4.0`, CYWater
+  Environment `0.5.5`, CYWater Core `0.6.5`, CYWater Operations `0.1.13`, and
   Event Tickets `5.29.1`.
+- On 2026-08-20 the non-Logo production-clean candidate was atomically deployed
+  to staging after a fresh database and complete custom-code backup at
+  `/home/u111638297/cywater-release-backups/production-clean-predeploy-20260820T011800Z`.
+  All seven deployed theme/plugin manifests match the reviewed artifact.
+  Account-security (45), membership-term (24), Forum (140), Operations (402),
+  editor (38), publishing (21), and policy (42) assertions passed; Partner,
+  ticketing, lifecycle, invoice, and cleanup suites also passed. Logo Call
+  remains unchanged at `0.2.3` on staging and is omitted from the production-
+  clean artifact. The Forum staging-preview article was moved to trash after
+  the backup. Production remains No-Go until the production-data purity gate,
+  policy/email approval, final browser/multi-network checks, restore rehearsal,
+  DNS/SSL, and controlled payment gates are complete.
 - Dedicated Hostinger SSH access from the Lenovo workstation was established
   and independently verified with public-key authentication on 2026-08-02.
   The private key remains local and must never be copied into the repository.
+  Hostinger uses the non-default endpoint `45.130.228.213:65002` for user
+  `u111638297`; port 22 times out and must not be used as a health signal. On
+  2026-08-20 hPanel reported SSH `ACTIVE`, and an explicit
+  `cywater-hostinger-ed25519` identity connection on port 65002 succeeded.
 - The theme and all three CYWater plugin trees were fully redeployed from the
   Lenovo workspace after the profile and environment fixes. A 104-file SHA-256 comparison
   found zero missing, extra, or different staging files; all custom PHP files
   and the key account-flow HTTP routes passed post-deploy checks.
-- A live WP-CLI check confirmed WordPress `7.0.2` and PHP CLI `8.3.30` on
+- A live WP-CLI check confirmed WordPress `7.0.4` and PHP CLI `8.3.30` on
   staging. Five malformed inactive CYWater/PMPro upload directories were
   removed on 2026-08-03 after exact-path and inactive-status verification;
   active plugin directories were untouched and plugin-list warnings cleared.
@@ -237,7 +259,7 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   refund terms before registration can open. The 42-check staging policy QA
   passed, but these pages remain noindex, absent from navigation, and explicitly
   not approved or in effect until Board and legal review.
-- CYWater Operations `0.1.3` is deployed with four composable operational role
+- CYWater Operations `0.1.12` is deployed with four composable operational role
   bundles: Content & Event Editor, Community Moderator, Program Reviewer, and
   Governance Approver. There is no ordinary membership-refund role. Program
   Reviewer uses one review workflow to record Logo Call shortlist and reward-
@@ -245,20 +267,205 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   protected files; the real reward grant remains an Administrator action. The
   paid-Event adapter and its UI, cart, checkout, and final Stripe REST gates fail
   closed on missing or invalid readiness, configuration, approval fingerprint,
-  or strict audit. Its self-cleaning staging QA passed 367 assertions. This does
+  or strict audit. Its self-cleaning staging QA passed 402 assertions. This does
   not assign a real staff role.
-- CYWater Forum `0.1.2` was atomically deployed and remains active on staging.
-  Its real WordPress/MySQL self-cleaning QA passed 77/77 checks covering Forum
-  Author publication gates, verified-member eligibility, first-reply
-  moderation, Community Moderator and built-in role boundaries, public
-  visibility, trash/untrash safeguards, moderator restoration, and cleanup. It
-  intercepted two test messages and removed all temporary users, articles,
-  comments, PMPro rows, and mail intercepts. The pre-deploy database and `0.1.1`
-  plugin backup is retained at
-  `/home/u111638297/cywater-release-backups/forum-0.1.2-20260817T213738Z`.
+  The Administrator assigns access one account at a time under **Users ->
+  CYWater staff access**: the default directory shows only already-authorized
+  staff, search locates any account by name/login/email, the account editor
+  exposes identity and base-role context, and the Users list shows access badges
+  plus a direct management action. The Users row now keeps Account, Member
+  record and Staff access visible and preserves low-frequency nonce-bearing
+  actions inside an accessible More menu. Delegated staff use the capability-
+  filtered menu or Dashboard **CYWater work areas** widget; a Community
+  Moderator sees only Dashboard, Media, Forum, Comments and Profile. The full
+  Administrator retains every route but the sidebar is grouped into Content,
+  Community & programs, Membership & accounts, and a collapsed Site system
+  section. The irrelevant Posts count and duplicate PMPro membership-level
+  column are removed while CYWater's authoritative account, membership, Forum,
+  staff-access and WordPress role columns remain. Operations `0.1.11` also corrects the Governance
+  Approver Dashboard shortcut so **Partner applications** opens the registered
+  `cyw_partner_app` work area instead of the retired route slug. The staging
+  list/search UI was visually checked. Version `0.1.9` makes each Administrator
+  and delegated-staff work-area heading a server-rendered fallback, so Content,
+  Community & programs, Membership & accounts, Site system, and My work remain
+  visible when the optional collapse script is delayed or unavailable. The
+  script now also initializes after an already-fired DOM-ready event, and the
+  version bump invalidates the prior seven-day static asset URL. Version
+  `0.1.10` additionally attaches the critical menu-group and Dashboard work-area
+  styles inline to WordPress' required core admin stylesheet. Version `0.1.11`
+  also inlines the grouping and collapse script into the required core admin
+  script, eliminating a separate navigation request. Fresh and no-cache
+  sessions therefore use the same grouping and collapse logic whenever the
+  admin page itself loads. Version `0.1.12` confines the removable Logo Call
+  participation panel to the Event that is already enabled as the Logo Call
+  host. Ordinary Events neither display nor accept those exceptional settings;
+  the enabled host can still be disabled without changing Logo Call data
+  ownership. The 402-check suite passed, and
+  independent marker queries returned zero temporary Operations users, posts,
+  or audit rows. All 13 active Operations files match the local candidate with
+  manifest SHA-256 `4e79fd88b7ddf1baf9f1f38ebfcf2993b933692003fdfd6d08fe31cab4c56564`.
+  A full database export and the complete pre-release `0.1.11` plugin tree are
+  retained under
+  `/home/u111638297/cywater-release-backups/operations-0.1.11-pre-0.1.12-20260819T045140Z`.
+  Hostinger disables the PHP process functions required by `wp db export`, so
+  the database backup used `mysqldump` without exposing configuration values.
+  Unused Hostinger AI Assistant, Easy Onboarding, and Reach plugins are inactive
+  but retained for reversible recovery; their obsolete AI-theme cron was removed.
+- On 2026-08-19 Core `0.6.2`, Operations `0.1.11`, and theme `0.6.20`
+  introduced a focused CYWater content workspace on staging. The Gutenberg
+  canvas now uses the public Fraunces/Inter typography, warm-paper palette,
+  article width, image, quotation, link, and button language. News, Event, and
+  Award facts use native document-sidebar panels backed by their existing post
+  metadata; no parallel content store was added. Public CYWater records do not
+  expose the unrelated LiteSpeed per-post panel or PMPro content restriction.
+  Event page visibility remains public and separate from ticket, submission,
+  voting, and payment eligibility. The removable Logo module keeps ownership of
+  its data but its submit/vote audiences now appear in a compact Event sidebar
+  panel. Advanced paid-ticket readiness remains a separate capability-gated
+  workflow. Browser checks confirmed the News and Event layouts and the current
+  Logo audiences; a self-cleaning 29-check REST/meta-box QA created and removed
+  one temporary Event. The 396-check Operations suite also passed with complete
+  cleanup. All active Core 11/11, Operations 13/13, and theme 93/93 files match
+  the local candidates, with manifest SHA-256 values
+  `d41841c84b36acb8b8bbccd6dd571f8b6130a902f94f19a56209ba23731fa5bb`,
+  `59ea6dbbf28c499d88ef7aac86d217f868cd530de10fc8e25aa229615184b4e7`, and
+  `cffb06d79a970a01cace0f213ee96004fe882b9250f2d9edfafb5109e0b0e7b3`.
+  The database and three pre-release code trees are retained under
+  `/home/u111638297/cywater-release-backups/editor-workspace-20260819T005000`.
+- On 2026-08-19 theme `0.6.21` and Core `0.6.3` corrected public
+  publishing visibility on staging. News now lists every published WordPress
+  Post by publication date instead of requiring import-only
+  `_cyw_news_order` or `_cyw_source_id` metadata; published post ID 447
+  (`Test`) is visible on `/news/`. Event and Award main queries no longer
+  require presentation metadata to exist. The Awards yearbook retains year
+  ordering when supplied and visibly flags an incomplete published record
+  instead of dropping it. Board ordering metadata is likewise optional, while
+  the existing `confirmed_public` governance gate remains mandatory for a
+  person's name. Ordinary published Pages remain directly queryable but are
+  added to the fixed association navigation only by deliberate editorial
+  change. Forum moderator publication, Partner private application status, Logo
+  shortlist/selection, ticket readiness, membership and payment gates remain
+  unchanged. A self-cleaning publishing QA passed 21 assertions twice for a
+  metadata-free News post, Event, Award and ordinary Page; editor QA passed 29,
+  Operations passed 402, Forum passed 100, Partner passed 17, and Logo Call
+  passed 13 with all temporary records,
+  users, comments, membership rows and intercepted messages removed. Active
+  Core 11/11 and theme 93/93 files are byte-identical to local, with manifest
+  SHA-256 values
+  `735dee36adb16e5569c7f14d90a44fc2d245bf2a0a21500b7de34c88673c8e94`
+  and
+  `7dd70613d2c1890ffc809a44a71370be7ede20129d89d14cd45d7a0bf930bb32`.
+  The pre-release files are retained under
+  `/home/u111638297/cywater-release-backups/publishing-visibility-20260819T023500`;
+  Hostinger still prevents a fresh WP-CLI database export, and this release
+  performs no persistent database migration.
+- On 2026-08-19 the user traced the intermittent Lenovo-side HTTP 429 failures
+  to the local Magic Ring VPN route. They are no longer treated as a Hostinger
+  incident, a WordPress defect, or a reason to pause unrelated staging work.
+  A direct staging media REST probe returned HTTP 201 JSON and removed its
+  temporary attachment, user and application password; prior authenticated
+  draft REST and static-asset checks also passed with complete cleanup. Keep
+  the sanitized historical evidence under
+  `output/hostinger-429-major-incident-20260819.md`, but reopen provider
+  investigation only if the failure reproduces with the VPN disabled. Ordinary
+  direct-network and final multi-network connectivity remain launch acceptance
+  checks. Staging retains the reversible `CONCATENATE_SCRIPTS=false` setting so
+  the admin does not depend on one concatenated core asset response; its prior
+  configuration remains backed up under
+  `/home/u111638297/cywater-release-backups/admin-assets-config-20260819T020500Z`.
+- CYWater Core `0.6.4` keeps WordPress' native Featured image as the single
+  cover-image source and labels it explicitly for News, Events and Awards; no
+  parallel image field or automatic first-content-image fallback was added.
+  Selecting a cover uses it on the corresponding public listing/card, while
+  leaving it empty preserves the existing text-tile fallback. Event placement
+  now reads `Upcoming — top carousel` or `Past — category archive`. Upcoming
+  Events feed the upper carousel and intentionally remain visible in their
+  lower subject category as well. Ten read-only staging checks passed and found
+  two published Upcoming Events. The three changed Core files match local
+  SHA-256 values, and the rollback tree is retained under
+  `/home/u111638297/cywater-release-backups/core-0.6.4-20260819T110508`.
+- Theme `0.6.22` keeps the Event cover image as archive/card presentation data
+  and no longer inserts it automatically above the Event story. Editors may
+  still place any image deliberately in the Gutenberg body. The explicit
+  `Event placement` field remains authoritative: `Upcoming — top carousel`
+  feeds the upper carousel, while the Event also remains in its lower subject
+  category. Staging verified zero automatic `event-photo` wrappers on the
+  Event detail, one occurrence of the selected cover on the Events archive,
+  matching SHA-256 values for all three deployed files, and PHP syntax success.
+  The full pre-release theme is retained under
+  `/home/u111638297/cywater-release-backups/event-cover-0.6.22-20260819T043426Z`.
+- CYWater Core `0.6.5` and theme `0.6.23` make the Event editor and archive
+  ordering explicit. An untouched placement is Archive; only an explicit
+  `Upcoming — top carousel and category list` choice adds the Event to the
+  carousel, and it intentionally remains in its subject category. Within every
+  category Upcoming records appear before Archive records. Upcoming sorts by
+  Event start time ascending, Archive sorts by Event start time descending, and
+  missing dates remain last in their placement group. Optional Format is only a
+  public badge override and falls back to `Event`; the internal source URL is
+  retained but removed from the daily editor panel. Carousel pagination changes
+  state when the card transition starts instead of after it finishes. The live
+  Events page confirmed the expected order, the self-cleaning staging editor QA
+  passed 38 checks, zero temporary Events remained, and all active Core 11/11
+  and theme 93/93 files match local. The database and pre-release trees are
+  retained under
+  `/home/u111638297/cywater-release-backups/event-ordering-20260819T131538`.
+- Theme `0.6.25` supersedes the unaccepted `0.6.24` pagination overlay, which
+  changed the accepted indicator spacing. The compact centered flex geometry is
+  restored exactly: inactive markers are 17 px, the active marker is 30 px, and
+  the gap is 6 px. The old marker now contracts while the new marker expands and
+  changes color with the same 560 ms duration and easing as the Event window;
+  both start together. Reduced-motion behavior remains intact. The self-cleaning
+  editor QA passed 38 checks, zero temporary Events remained, and all active
+  theme 93/93 files match local by SHA-256. The pre-release database and theme
+  are retained under `/home/u111638297/cywater-release-backups/event-indicator-alignment-20260819T154140`.
+- Theme `0.6.26` removes the staging-only Membership registration notice,
+  replaces the obsolete Newsletter archive benefit with the actual verified-
+  member Forum submission and moderation path, and starts every Membership FAQ
+  collapsed. Checkout links and membership rules are unchanged. Public-page
+  assertions passed, all active theme 93/93 files match local by SHA-256, and
+  the database plus pre-release theme are retained under
+  `/home/u111638297/cywater-release-backups/membership-page-0.6.26-20260819T160632`.
+- CYWater Forum `0.2.0` and theme `0.6.19` were atomically deployed to staging
+  after a database plus full plugin/theme backup. Invitations and endorsements
+  are paused without deleting their code, page, or historical metadata. A
+  verified active Student, Professional, or Lifetime member may save a draft or
+  submit it for review but cannot publish or edit published Forum articles;
+  Community Moderators publish, take down, and restore them. Eligible member
+  replies publish immediately. Non-members, unverified accounts, and ordinary
+  registered accounts cannot post or reply. Built-in Editor, REST mutation, and
+  restoration protections remain. The real WordPress/MySQL self-cleaning QA
+  passed 100 assertions, intercepted three verification messages, and removed
+  all temporary users, articles, comments, PMPro rows, and mail intercepts.
+  Independent marker queries returned zero temporary users, posts, or comments.
+  The active Forum 10/10 files and theme 92/92 files match the local candidates;
+  their manifest SHA-256 values are
+  `7c29a44f24c551338836524238e920417b47679de82ccfa04032a4d8366821b6` and
+  `efacb24c6557ad42a51c6bbe9ded4e79b12f6eb959403cbee1f1c1df3942afaa`.
+  The database, archives, and live rollback trees are retained at
+  `/home/u111638297/cywater-release-backups/forum-0.2.0-20260818T195836`.
   The staging preview placeholder article must be deleted or replaced before
   production cutover.
-- CYWater Logo Call `0.2.0` is an independent removable plugin attached only to
+- CYWater Forum `0.3.2` adds the front-end `/forum-workspace/` for eligible
+  members to create and revise their own draft or pending articles without
+  entering WordPress administration. It does not repurpose `/wp-admin/` as a
+  workspace route: a signed-in account without an Administrator or assigned
+  CYWater Operations role now receives WordPress' direct HTTP 403 permission
+  denial at the requested admin URL, with no redirect or specialized login
+  destination. Administrator and assigned staff access, front-end submission,
+  infrastructure endpoints, PMPro checkout returns, REST gates, and publication
+  ownership are unchanged. The staging Forum suite passed 134 assertions with
+  complete cleanup, and all active Forum 11/11 files match local with manifest
+  SHA-256 `7fd4bac189da75cf4fc0d37eec02125fc2be00875b7fde558435e7cb04499af9`.
+  The pre-release database and full plugin tree are retained under
+  `/home/u111638297/cywater-release-backups/forum-admin-denial-0.3.2-20260819T183205`.
+  A 2026-08-20 read-only check against the active Student account used for the
+  Sandbox payment confirmed the separation directly: the verified member may
+  submit an article for review and reply, but cannot publish, edit other Forum
+  articles, manage Forum terms, moderate comments, access `/wp-admin/`, or gain
+  any Operations staff role. The Community Moderator bundle separately retains
+  publication, cross-author editing and comment-moderation capabilities. The
+  admin denial is based on Administrator/Operations roles, not membership.
+- CYWater Logo Call `0.2.3` is an independent removable plugin attached only to
   the enabled 2026 Logo Design Call event. Submissions run August 12 through
   September 12, 2026: one original/logo-lockup set (5 MB per file) per
   registered user, and every registered user has one final vote. Accounts,
@@ -323,10 +530,20 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   keyboard arrows, touch swipes, and reduced-motion handling follow the
   interaction structure requested from the Steam reference while retaining
   CYWater typography, color, spacing, radius, and Event data ownership.
-- Theme `0.6.18` is the current staging baseline. A read-only comparison found
-  all 92 local and staging files byte-identical, with manifest SHA-256
-  `a58ce052d8b9674d44002dc527d3f573e359e55c7d3afc083b3521d094db59ff`, so no
-  theme redeploy was required. This does not mean production is deployed.
+- Theme `0.6.19` was the verified Forum release baseline. All 92 local and staging files
+  are byte-identical, with manifest SHA-256
+  `efacb24c6557ad42a51c6bbe9ded4e79b12f6eb959403cbee1f1c1df3942afaa`. The
+  release changes only Forum participation copy and actions; it preserves the
+  typography, palette, spacing, motion, and overall visual system. This does not
+  mean production is deployed.
+- A read-only post-deploy check found existing source drift outside Forum:
+  staging Logo Call `0.2.3` and Environment `0.5.5` differ from the clean local
+  `0.2.0` and `0.5.4` trees. Forum deployment did not touch either plugin. The
+  Logo directory kept its earlier modification time, both participation
+  audiences remain `registered`, and Forum QA confirmed a registered non-member
+  can still submit and vote. Reconcile the deployed source before any future
+  Logo or Environment deployment; do not overwrite staging from the older local
+  tree.
 - Stripe Sandbox was connected through PMPro on 2026-08-02. A server-side
   presence-only check confirmed the Sandbox Connect values without reading or
   exposing them, and PMPro's own status check reports the Sandbox webhook as
@@ -360,16 +577,69 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   that the account is reachable, charges and payouts are enabled, identity
   details are submitted, and no current account requirement is due. The saved
   PMPro checkout environment remains `sandbox`; `WP_ENVIRONMENT_TYPE` remains `staging`,
-  `CYWATER_PAYMENT_MODE` remains `disabled`, and
+  `CYWATER_PAYMENT_MODE` is temporarily `test` for the explicit small-value
+  Sandbox checkout acceptance, and
   `CYWATER_ALLOW_LIVE_PAYMENTS` remains false. No real charge or refund was
   performed. The free PMPro Stripe integration currently adds a separate 2%
   PMPro fee; activating a qualifying premium PMPro license removes that fee.
-- CYWater Membership `0.8.4` implements rolling annual Student and Professional
+- CYWater Membership `0.8.5` implements rolling annual Student and Professional
   terms: every successful full-price payment starts a new one-year term on its
   payment date, with no proration or December 31 boundary. Lifetime remains
   non-expiring. Staging had no active Student or Professional membership to
   migrate when this policy changed on 2026-08-13. A separate self-cleaning
   nine-check staging QA passed this rolling-term behavior.
+- On 2026-08-20 Professional dues were corrected to `$50/year`. A staging-only
+  `$0.50` one-time `Sandbox Payment Test` level was added in a separate PMPro
+  level group for checkout, webhook, order and refund acceptance. It expires
+  after one day, grants no CYWater membership benefits, and cannot replace an
+  existing Student, Professional or Lifetime level. Its public card and signup
+  are available only when WordPress is staging, PMPro is in Sandbox, and
+  `CYWATER_PAYMENT_MODE=test`; the production/live-payment gate remains closed.
+  Membership QA passed 24 assertions and the Forum regression suite passed 134
+  assertions with complete cleanup. Desktop and mobile browser checks passed,
+  including a single-column 375px layout. The active Membership 11/11 and theme
+  94/94 files match local with manifest SHA-256 values
+  `16e51889297fd621904314a2727a5cb8bcfd075ef09deb674986fa327f645275` and
+  `e04637db49a4e4e6daa9e700a2486dc5d7d47f9e8ecfc6baffc72e1f15ca7c2d`.
+  The database/config/full pre-release trees are retained under
+  `/home/u111638297/cywater-release-backups/membership-sandbox-test-20260820T061037`,
+  and the mobile-fix theme tree under
+  `/home/u111638297/cywater-release-backups/membership-mobile-0.6.30-20260820T062133`.
+  The first manual `$0.50` Checkout then completed successfully: PMPro recorded
+  a successful Sandbox Stripe order, a Checkout Session and payment reference,
+  and the `checkout.session.completed` webhook without creating a subscription.
+  The test level coexisted with the account's Student level. After explicit user
+  approval, a full Sandbox refund changed the order to `refunded`, the
+  `charge.refunded` webhook arrived, the refund hook removed only the test
+  entitlement, and Student remained active.
+- Theme `0.6.31` synchronizes the Upcoming Events carousel shadow with its
+  existing 560 ms slide and scale transition. The arriving card now fades into
+  the final shadow while the departing card fades out, removing the visible
+  post-transition shadow pop. An isolated live-Chrome sample confirmed
+  continuous old-card fade-out and new-card fade-in at transition start, about
+  180 ms, about 360 ms, and settled state. The release artifact, PHP lint,
+  structure validation, 38-check editor QA and staging deployment passed; the
+  previous live tree is retained under `/home/u111638297/cywater-release-backups/event-shadow-0.6.31-predeploy-20260820T021000Z`.
+- On 2026-08-20 a standard repository security audit produced a **No-Go**
+  decision for production cutover until a new candidate passes real Hostinger
+  staging acceptance. Seven validated findings are remediated in local
+  candidates: Membership `0.8.6`, Partnerships `0.1.3`, Forum `0.4.0`, and
+  Operations `0.1.13`. These changes add generic registration-collision
+  responses, verified-email composition for public member-directory opt-in,
+  exact Stripe-host validation and private-status-token revocation, protected
+  Forum cover storage with quota/lifecycle cleanup, and a global fail-closed
+  Live-payment gate for Event Tickets. Local structure validation, PHP 8.3
+  WordPress Playground lifecycle testing, and `npm audit` pass. Hostinger File
+  Manager recovered and archived the exact active Logo Call `0.2.3` and
+  Environment `0.5.5` trees; normalized comparison matched 5/5 and 7/7 files.
+  At the user's direction, Logo Call is deferred for a later independent update.
+  The production-clean profile omits that plugin and requires it to be inactive
+  on production while preserving its staging source and data. The generated
+  profile contains the theme plus Core, Membership, Partnerships, Forum,
+  Operations, and Environment, records the exclusion in its manifest, and
+  contains no secret-like or placeholder files. Obsolete local release and
+  diagnostic artifacts were moved into the ignored, recoverable
+  `local/obsolete/2026-08-20/` archive.
 - The same plugin retains the current account-first path: a
   logged-out checkout redirects to the PMPro sign-in page; that page links to a
   dedicated `/member-register/` account form. New accounts sign in but must
@@ -452,7 +722,7 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   PMPro validation probe accepted a valid small PNG and rejected both a PNG
   over 2 MB and a GIF with the expected error codes; all test files were removed.
 - Staging now defines `DISALLOW_FILE_EDIT=true` and `WP_DEBUG_DISPLAY=false`.
-  CYWater Environment `0.5.4` preserves configured SMTP identities unless the
+  CYWater Environment `0.5.5` preserves configured SMTP identities unless the
   explicit local Mailpit mode is active and sends conservative HSTS, nosniff,
   same-origin framing, referrer, and camera/microphone/geolocation policy
   headers while removing the PHP version header. HTTPS, staging environment,
@@ -473,7 +743,7 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   capacity, attendee reporting, public form output, Editor content boundaries,
   confirmation-mail handoff to the configured WordPress/Postmark transport,
   and automatic cleanup. Theme `0.6.0` scopes its form to the accepted design
-  tokens without changing the public visual system. CYWater Operations `0.1.3`
+  tokens without changing the public visual system. CYWater Operations `0.1.11`
   deploys the Event Tickets paid-provider adapter plus fail-closed gates at the
   ticket UI, cart preparation/processing, checkout request, and final Stripe
   order REST endpoint. Actual paid checkout remains closed because Tickets
@@ -567,8 +837,10 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
 - Google Workspace is active with named human users and role groups `web@`,
   `billing@`, `contact@`, and `membership@`.
 - Paid Memberships Pro is active with Student `$20/year`, Professional
-  `$70/year`, Lifetime `$700`, and Partner `$1,000/year`. Live payment remains
-  disabled.
+  `$50/year`, and Lifetime `$700`. The historical Partner level is retained
+  with public signup disabled because institutional partnership is a separate
+  workflow. Staging also exposes a non-benefit `$0.50` Sandbox-only test level
+  while payment mode is `test`; live payment remains disabled.
 - Postmark is approved. `cywater.org` DKIM and Return-Path are verified, and the
   WordPress Postmark plugin has delivered a test email successfully.
 - A password-reset test was previously addressed to
@@ -671,13 +943,112 @@ award/COP27 entries use title-based visuals until matching source photos are
 available. Events use the supplied year-matched Annual Meeting and Annual
 Gathering archives.
 
+- On 2026-08-20 CYWater Membership `0.9.1`, Logo Call `0.3.0`, and Operations
+  `0.2.0` were deployed to staging after the complete database and plugin backup
+  at `/home/u111638297/cywater-release-backups/profile-logo-workflow-20260820T143926Z`.
+  Registration and Member Profile require first/last name plus institution,
+  canonical country/region, institution type, current role and career stage;
+  About yourself remains optional. Country/region is a keyboard-accessible
+  searchable single-select backed by PMPro's complete canonical list, and the
+  server rejects free-text or unknown values. Membership also applies the same
+  12-character minimum to PMPro's authenticated Change Password form and the
+  WordPress lost-password reset. The account-security suite passed 69 checks,
+  including wrong-current-password, short-password, old-password invalidation,
+  reset-message, tampered/one-time reset-key and new-login cases. Logo Call
+  accepts one protected PNG/JPEG/WebP design of at most 5
+  MB, grants only the review/display/voting license for entries, produces three
+  ranked finalists after voting, and reserves the official choice among those
+  three to the Board. Selected-design rights assignment plus accepted scalable
+  or high-resolution files must be recorded before an Administrator may fulfill
+  the reward. **Logo reviews** is the sole backend entry and exposes protected
+  thumbnails, work number, entrant identity/email/profile context, votes,
+  handoff states and audited ZIP/CSV export. Program Reviewer controls voting
+  eligibility only; Governance confirms finalists and the official design;
+  reward/final-file fulfillment remains Administrator-only. Self-cleaning Logo,
+  Operations and Forum suites passed 28, 431 and 141 assertions with no fixture
+  residue. The staging Event's obsolete two-file lockup paragraph was replaced
+  with the one-file, separate-vote, three-finalist and Board-selection flow.
+  Logo Call remains an independently removable plugin. The association later
+  directed that accepted `0.3.0` and the reviewed Event configuration be included
+  in the first production-clean cutover, without staging entries, votes,
+  identities, or protected files. Production membership payments are intended
+  to use Stripe Live only after HTTPS, Live webhook/readiness, policy, and an
+  explicitly authorized small-value payment/refund acceptance all pass.
+
+- On 2026-08-21 public DNS was switched from Squarespace to Hostinger with
+  `cywater.org A 45.130.228.213` and `www CNAME cywater.org`; Google Workspace
+  and Postmark DNS records were preserved. Authority and public resolvers return
+  the new target, direct HTTPS is valid, `www` redirects to the apex, and the
+  user confirmed the WordPress site over a mobile network. The former four-hour
+  Squarespace answer may remain in individual VPN/router caches until its TTL
+  expires. Hostinger directory password protection now guards only
+  `public_html/staging` and returns HTTP 401 without credentials; production is
+  not password-protected. The predeploy backup remains at
+  `/home/u111638297/cywater-release-backups/production-predeploy-20260820T155410Z`;
+  a fresh post-DNS database/runtime/code backup is at
+  `/home/u111638297/cywater-release-backups/post-dns-pre-live-20260821T005914Z`.
+- Production now runs theme `0.6.34`, Core `0.6.6`, Membership `0.9.3`,
+  Partnerships `0.1.3`, Logo Call `0.3.1`, Forum `0.4.1`, Operations
+  `0.2.0`, Environment `0.5.5`, PMPro `3.8.2`, and Postmark `1.19.1`.
+  Production rewrite rules were refreshed so Events, Awards and Forum archives
+  return 200. Theme `0.6.33` removed the hard-coded review `noindex`; WordPress
+  now owns robots output, so production is indexable while staging remains
+  noindex. Runtime config explicitly sets production, disables the file editor
+  and debug display, and keeps mail/payment disabled and the Live-payment gate
+  closed. Theme `0.6.34` and Membership `0.9.3` fail closed while payments are
+  disabled: the three public cards show `Payments opening shortly`, and direct
+  checkout redirects to Membership. On 2026-08-21 the three role-routing
+  candidates were backed up and atomically deployed to staging and production.
+  Membership, account-security, Logo Call and Forum staging suites passed 36,
+  69, 28 and 141 checks respectively, intercepted all test mail and removed all
+  fixtures. The staging and production rollback backups are
+  `/home/u111638297/cywater-release-backups/email-routing-staging-predeploy-20260820T180258Z`
+  and
+  `/home/u111638297/cywater-release-backups/email-routing-production-predeploy-20260820T181044Z`.
+  The regenerated clean handoff bundle is
+  `dist/cywater-wordpress-production-clean-0.5.5.zip` (16,390,844 bytes),
+  SHA-256
+  `7a718c62d0de6369959165a45ad9bf4b43d4e60149e9c07363a24154c47fc26e`;
+  it contains Membership `0.9.3`, Logo Call `0.3.1`, Forum `0.4.1`, and the
+  new role-based mail router.
+  PMPro paid/order/renewal/refund templates now use `billing@cywater.org`; free
+  checkout and membership lifecycle templates use `membership@cywater.org`;
+  native account security uses `accounts@cywater.org` with replies to
+  `membership@cywater.org`. Logo Call and the paused Forum endorsement flow use
+  `membership@cywater.org`. The PMPro fallback is
+  `CYWater Membership <membership@cywater.org>`, and
+  `pmpro_only_filter_pmpro_emails=1` prevents it from replacing unrelated
+  WordPress/plugin identities; the WordPress administrator and platform owner
+  remain `web@cywater.org`. A corrected post-deploy check against Postmark's
+  JSON settings confirms that production has a saved Server API Token, Message
+  Stream `outbound`, Sender Email `web@cywater.org`, logs enabled, and Force
+  Sender Email/HTML/open/link tracking off. The user then enabled production
+  Postmark and one controlled account-route message
+  (`CYW-MAIL-20260820183111`) was accepted with Postmark ErrorCode `0` / `OK`
+  and visibly received in Gmail from
+  `CYWater Accounts <accounts@cywater.org>` at `web@cywater.org`; the router
+  supplied `membership@cywater.org` as the reply destination. The message
+  explicitly changed no account, membership, order, or payment data, and no
+  second test was sent. The production readiness marker is now
+  `CYWATER_MAIL_TRANSPORT=smtp`; the pre-change configuration is retained at
+  `/home/u111638297/cywater-release-backups/postmark-production-enable-20260820T183420Z`.
+  Staging Postmark remains enabled with the same non-secret flags. Stripe
+  Live OAuth/webhook and the controlled real
+  `$0.50` payment/refund remain pending. The production purity gate passes 22
+  checks, with one Administrator, zero PMPro orders, zero Logo entries/votes and
+  zero failed Action Scheduler tasks.
+
 Membership dues use three individual cards adapted from the original prototype:
-Student `$20/year`, Professional `$70/year`, and Lifetime `$700`. Display them
+Student `$20/year`, Professional `$50/year`, and Lifetime `$700`. Display them
 in ascending-price order, with Professional marked as the Standard option in the
 second position. Each card has its own direct Join action; there is no separate
 selection-summary step. No card is selected on initial load. Professional uses
 the teal accent action; the other individual plans use restrained outline
 actions that turn teal on hover or activation.
+
+Only staging Sandbox acceptance may append the fourth `$0.50` `Payment test`
+card. It is not a public membership product and must disappear outside the
+staging/test-mode gate.
 
 Institutional Partner is not an individual membership and must not appear in
 the membership-card grid or public PMPro level list. Present the current
@@ -749,6 +1120,35 @@ On the public GitHub Pages preview, payments, membership accounts, sign-in,
 registrations, receipts, and dashboard data are mock-only. The WordPress track
 may process isolated test data in local/staging environments, but must never
 describe sandbox activity as a real transaction.
+
+### Production Release Snapshot (2026-08-21)
+
+- The reviewed WordPress production candidate is live at `https://cywater.org/`
+  with theme `0.6.35`, Membership `0.9.4`, Logo Call `0.3.2`, Forum `0.4.2`,
+  Partnerships `0.1.5`, and Operations `0.2.1`. The complete predeploy database
+  and code trees are retained at
+  `/home/u111638297/cywater-release-backups/production-release-predeploy-20260821T132711`.
+- The member-login page now stores only `[cywater_member_login]` and renders one
+  form. Mobile navigation exposes Sign in/Account and Join CYWater as distinct
+  visible buttons. The header displays `CYWater` beside the water-drop mark and
+  uses the same mark as the fallback browser icon. The Board page no longer
+  exposes its internal publication note.
+- The production security candidate closes all nine findings from scan
+  `9f14cbb6-41bb-4a9a-83f7-8ee8a6714ff1`. Staging acceptance passed Membership
+  43, Logo 34, Partner lifecycle, and Operations 435 assertions. Forum passed
+  132 application/storage assertions; its remaining 11 HTTP checks were
+  intercepted by the deliberate outer staging Basic Auth and are not evidence
+  of an application failure. The auditable fix record is under
+  `local/security/2026-08-20-codex-security-scan/artifacts/fix_report.md`.
+- Postmark remains enabled with its stored key, `web@cywater.org` fallback and
+  Force From disabled so scoped Accounts, Membership, Billing and Contact
+  identities remain authoritative. No secrets are stored in Git.
+- Real charging is still intentionally closed. Production reports payment mode
+  `disabled`, `CYWATER_ALLOW_LIVE_PAYMENTS=false`, PMPro `sandbox`, and no saved
+  Live Connect credentials. Do not describe the site as accepting real payment
+  until the association-owned production Stripe connection/webhook passes a
+  presence-only preflight and one real charge, receipt, balance/payout and full
+  refund are reconciled end to end.
 
 ## Editing Guidance
 

@@ -33,8 +33,9 @@ return array(
 	 * admin_override - whether an administrator may grant or revoke authorship
 	 *   directly, bypassing the endorsement chain.
 	 * membership_required - whether an active PMPro membership is a
-	 *   prerequisite for publishing.
+	 *   prerequisite for submitting an article for review.
 	 */
+	'endorsements_enabled'          => false,
 	'endorsement_articles_required' => 1,
 	'endorsements_required'         => 1,
 	'admin_override'                => true,
@@ -53,12 +54,12 @@ return array(
 	 * comments_enabled - global switch. Individual articles also carry the
 	 *   WordPress per-post discussion checkbox, and both must be open.
 	 * comments_require_membership - restrict replies to active members.
-	 * comments_hold_first - hold a member's first reply for moderation and
-	 *   auto-approve afterwards, rather than pre-moderating everything.
+	 * comments_moderation_mode - auto publishes eligible members' replies;
+	 *   first holds only their first Forum reply; all holds every reply.
 	 */
 	'comments_enabled'              => true,
 	'comments_require_membership'   => true,
-	'comments_hold_first'           => true,
+	'comments_moderation_mode'      => 'auto',
 
 	/*
 	 * AI. Not implemented. These keys exist so the seam has a configuration
