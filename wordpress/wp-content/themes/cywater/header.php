@@ -12,9 +12,7 @@ $account = function_exists( 'pmpro_url' ) ? pmpro_url( 'account' ) : wp_login_ur
 <head>
 	<meta charset="<?php bloginfo( 'charset' ); ?>">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<?php if ( ! has_site_icon() ) : ?>
-		<link rel="icon" type="image/png" href="<?php echo esc_url( cywater_asset_uri( 'img/logo.png' ) ); ?>">
-	<?php endif; ?>
+	<?php cywater_brand_head_assets(); ?>
 	<?php wp_head(); ?>
 </head>
 <body <?php body_class(); ?> data-page="<?php echo esc_attr( $section ); ?>">
@@ -22,7 +20,7 @@ $account = function_exists( 'pmpro_url' ) ? pmpro_url( 'account' ) : wp_login_ur
 <header class="site-header">
 	<div class="header-inner">
 		<a class="brand" href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="<?php esc_attr_e( 'CYWater home', 'cywater' ); ?>">
-			<img class="brand-logo" src="<?php echo esc_url( cywater_asset_uri( 'img/logo.png' ) ); ?>" alt="" width="41" height="50">
+			<?php echo cywater_brand_logo_markup( 'header' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<span class="brand-name" aria-hidden="true">CYWater</span>
 		</a>
 		<nav class="nav" aria-label="<?php esc_attr_e( 'Primary', 'cywater' ); ?>">

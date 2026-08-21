@@ -10,7 +10,7 @@
 		<div class="footer-grid">
 			<div class="footer-brand">
 				<a class="brand" href="<?php echo esc_url( home_url( '/' ) ); ?>">
-					<img class="brand-logo brand-logo--footer" src="<?php echo esc_url( cywater_asset_uri( 'img/logo.png' ) ); ?>" alt="CYWater" width="41" height="50">
+					<?php echo cywater_brand_logo_markup( 'footer' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				</a>
 				<p class="footer-tag">A non-profit international association advancing water sciences education, research, and professional development. Founded in 2011.</p>
 			</div>

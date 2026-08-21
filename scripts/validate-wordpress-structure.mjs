@@ -20,6 +20,7 @@ const required = [
   "wordpress/wp-content/themes/cywater/style.css",
   "wordpress/wp-content/themes/cywater/functions.php",
   "wordpress/wp-content/themes/cywater/header.php",
+  "wordpress/wp-content/themes/cywater/assets/img/favicon.svg",
   "wordpress/wp-content/themes/cywater/front-page.php",
   "wordpress/wp-content/themes/cywater/home.php",
   "wordpress/wp-content/themes/cywater/archive-cyw_event.php",
@@ -507,6 +508,10 @@ const parityFiles = {
     path.join(root, "wordpress", "wp-content", "themes", "cywater", "header.php"),
     "utf8"
   ),
+  wordpressFunctions: await readFile(
+    path.join(root, "wordpress", "wp-content", "themes", "cywater", "functions.php"),
+    "utf8"
+  ),
   wordpressComponentsCss: await readFile(
     path.join(root, "wordpress", "wp-content", "themes", "cywater", "assets", "css", "components.css"),
     "utf8"
@@ -534,13 +539,32 @@ assert(
 assertMarkers(
   parityFiles.wordpressHeader,
   [
-    "if ( ! has_site_icon() )",
-    "img/logo.png",
+    "cywater_brand_head_assets()",
+    "cywater_brand_logo_markup( 'header' )",
     '<span class="brand-name" aria-hidden="true">CYWater</span>',
     "nav-mobile-account",
     "esc_html__( 'Sign in', 'cywater' )",
   ],
   "WordPress header branding and mobile account entry"
+);
+assertMarkers(
+  parityFiles.wordpressFunctions,
+  [
+    "add_theme_support(\n\t\t'custom-logo'",
+    "cywater_brand_logo_url",
+    "cywater_brand_logo_markup",
+    "cywater_brand_icon_url",
+    "cywater_brand_icon_links",
+    "cywater-site-icon",
+    "remove_action( 'wp_head', 'wp_site_icon', 99 )",
+    "remove_action( 'login_head', 'wp_site_icon', 99 )",
+    "remove_action( 'admin_head', 'wp_site_icon', 10 )",
+    "add_action( 'login_head', 'cywater_brand_login_head', 0 )",
+    "add_action( 'admin_head', 'cywater_brand_admin_head', 0 )",
+    "remove_action( 'admin_head', 'wp_site_icon', 10 )",
+    "rel=\"shortcut icon\"",
+  ],
+  "WordPress single-source Logo and early browser icon"
 );
 assertMarkers(
   parityFiles.wordpressComponentsCss,

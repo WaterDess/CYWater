@@ -12,13 +12,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CYWATER_THEME_VERSION', '0.6.35' );
+define( 'CYWATER_THEME_VERSION', '0.6.39' );
 
 function cywater_theme_setup() {
 	add_theme_support( 'title-tag' );
 	add_theme_support( 'post-thumbnails' );
 	add_theme_support( 'responsive-embeds' );
 	add_theme_support( 'editor-styles' );
+	add_theme_support(
+		'custom-logo',
+		array(
+			'height'      => 600,
+			'width'       => 493,
+			'flex-height' => true,
+			'flex-width'  => true,
+		)
+	);
 	add_editor_style( 'assets/css/editor.css' );
 	add_theme_support(
 		'html5',
@@ -32,8 +41,22 @@ function cywater_theme_setup() {
 	);
 	add_image_size( 'cywater-card', 960, 640, true );
 	add_image_size( 'cywater-wide', 1600, 900, true );
+	add_image_size( 'cywater-site-icon', 128, 128, false );
 }
 add_action( 'after_setup_theme', 'cywater_theme_setup' );
+
+/**
+ * CYWater owns one brand source rather than an unrelated Logo and Site Icon.
+ * The theme emits its own icon links from the active custom Logo, so suppress
+ * WordPress' independent Site Icon output if one was configured previously.
+ */
+function cywater_remove_independent_site_icon() {
+	remove_action( 'wp_head', 'wp_site_icon', 99 );
+	remove_action( 'login_head', 'wp_site_icon', 99 );
+	remove_action( 'admin_head', 'wp_site_icon', 10 );
+	remove_action( 'admin_head', 'wp_site_icon', 99 );
+}
+add_action( 'init', 'cywater_remove_independent_site_icon' );
 
 /**
  * Preserve the verified static site's punctuation exactly.
@@ -72,6 +95,127 @@ add_action( 'wp_enqueue_scripts', 'cywater_enqueue_assets' );
 function cywater_asset_uri( $relative_path ) {
 	return get_theme_file_uri( 'assets/' . ltrim( $relative_path, '/' ) );
 }
+
+/**
+ * Return the one editable Logo attachment used by every CYWater surface.
+ */
+function cywater_brand_logo_id() {
+	$logo_id = absint( get_theme_mod( 'custom_logo', 0 ) );
+	return $logo_id && wp_attachment_is_image( $logo_id ) ? $logo_id : 0;
+}
+
+/**
+ * Return the active brand Logo URL, falling back to the bundled mark.
+ */
+function cywater_brand_logo_url() {
+	$logo_id = cywater_brand_logo_id();
+	if ( $logo_id ) {
+		$url = wp_get_attachment_image_url( $logo_id, 'full' );
+		if ( $url ) {
+			return $url;
+		}
+	}
+	return cywater_asset_uri( 'img/logo.png' );
+}
+
+/**
+ * Render the active brand Logo with consistent loading and intrinsic sizing.
+ *
+ * @param string $context Header or footer.
+ * @return string
+ */
+function cywater_brand_logo_markup( $context = 'header' ) {
+	$logo_id = cywater_brand_logo_id();
+	$class   = 'brand-logo' . ( 'footer' === $context ? ' brand-logo--footer' : '' );
+	$attrs   = array(
+		'class'    => $class,
+		'alt'      => 'footer' === $context ? get_bloginfo( 'name' ) : '',
+		'loading'  => 'eager',
+		'decoding' => 'async',
+	);
+	if ( 'header' === $context ) {
+		$attrs['fetchpriority'] = 'high';
+	}
+	if ( $logo_id ) {
+		$markup = wp_get_attachment_image( $logo_id, 'full', false, $attrs );
+		if ( $markup ) {
+			return $markup;
+		}
+	}
+
+	$attributes = '';
+	foreach ( $attrs as $name => $value ) {
+		$attributes .= sprintf( ' %s="%s"', esc_attr( $name ), esc_attr( $value ) );
+	}
+	return sprintf(
+		'<img%s src="%s" width="493" height="600">',
+		$attributes,
+		esc_url( cywater_brand_logo_url() )
+	);
+}
+
+/**
+ * Use a small derivative of the same custom Logo as the browser icon.
+ * Future Logo uploads receive the cywater-site-icon image size automatically.
+ */
+function cywater_brand_icon_url() {
+	$logo_id = cywater_brand_logo_id();
+	if ( $logo_id ) {
+		$metadata = wp_get_attachment_metadata( $logo_id );
+		$size     = isset( $metadata['sizes']['cywater-site-icon'] ) ? 'cywater-site-icon' : 'medium';
+		$url      = wp_get_attachment_image_url( $logo_id, $size );
+		if ( $url ) {
+			return $url;
+		}
+	}
+	return cywater_asset_uri( 'img/favicon.svg' );
+}
+
+/**
+ * Emit the single-source Logo as browser icon links.
+ */
+function cywater_brand_icon_links() {
+	$logo_id      = cywater_brand_logo_id();
+	$icon_url     = cywater_brand_icon_url();
+	$icon_version = $logo_id ? get_post_modified_time( 'U', true, $logo_id ) : cywater_asset_version( 'assets/img/favicon.svg' );
+	$icon_url     = add_query_arg( 'cyw-brand', $icon_version ?: CYWATER_THEME_VERSION, $icon_url );
+	$icon_type    = $logo_id ? get_post_mime_type( $logo_id ) : 'image/svg+xml';
+	?>
+	<link rel="icon" href="<?php echo esc_url( $icon_url ); ?>" type="<?php echo esc_attr( $icon_type ?: 'image/png' ); ?>" sizes="any">
+	<link rel="shortcut icon" href="<?php echo esc_url( $icon_url ); ?>" type="<?php echo esc_attr( $icon_type ?: 'image/png' ); ?>">
+	<?php
+}
+
+/**
+ * Emit icon discovery before wp_head and preload the visible header mark.
+ */
+function cywater_brand_head_assets() {
+	cywater_brand_icon_links();
+	?>
+	<link rel="preload" as="image" href="<?php echo esc_url( cywater_brand_logo_url() ); ?>" fetchpriority="high">
+	<?php
+}
+
+/**
+ * WordPress login does not render the theme header. Remove any Site Icon hook
+ * added after init immediately before it could render, then output the Logo.
+ */
+function cywater_brand_login_head() {
+	remove_action( 'login_head', 'wp_site_icon', 10 );
+	remove_action( 'login_head', 'wp_site_icon', 99 );
+	cywater_brand_icon_links();
+}
+add_action( 'login_head', 'cywater_brand_login_head', 0 );
+
+/**
+ * WordPress administration likewise needs the same replace-once browser icon.
+ */
+function cywater_brand_admin_head() {
+	remove_action( 'admin_head', 'wp_site_icon', 10 );
+	remove_action( 'admin_head', 'wp_site_icon', 99 );
+	cywater_brand_icon_links();
+}
+add_action( 'admin_head', 'cywater_brand_admin_head', 0 );
 
 function cywater_current_section() {
 	if ( is_front_page() ) {
