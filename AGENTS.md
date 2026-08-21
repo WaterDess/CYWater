@@ -1124,16 +1124,18 @@ describe sandbox activity as a real transaction.
 ### Production Release Snapshot (2026-08-21)
 
 - The reviewed WordPress production candidate is live at `https://cywater.org/`
-  with theme `0.6.39`, Membership `0.9.4`, Logo Call `0.3.2`, Forum `0.4.2`,
+  with theme `0.6.40`, Membership `0.9.4`, Logo Call `0.3.2`, Forum `0.4.2`,
   Partnerships `0.1.5`, and Operations `0.2.1`. The complete predeploy database
   and code trees are retained at
   `/home/u111638297/cywater-release-backups/production-release-predeploy-20260821T132711`.
 - The member-login page now stores only `[cywater_member_login]` and renders one
-  form. Mobile navigation exposes Sign in/Account and Join CYWater as distinct
-  visible buttons. The header displays `CYWater` beside the water-drop mark and
+  form. Mobile navigation exposes Sign in/Account and Join CYWater together at
+  the top of the drawer instead of below the full navigation list; signed-out
+  visitors go directly to `/member-login/`. The header displays `CYWater`
+  beside the water-drop mark and
   uses the same mark as the fallback browser icon. The Board page no longer
   exposes its internal publication note.
-- Theme `0.6.39` makes the WordPress custom Logo the one brand source for the
+- Theme `0.6.40` makes the WordPress custom Logo the one brand source for the
   header, footer and browser icon. With no custom Logo it uses the bundled mark
   and a 4 KB early-discovered favicon derivative; it preloads the header mark
   and suppresses WordPress' unrelated Site Icon output on public, login, and
@@ -1145,6 +1147,8 @@ describe sandbox activity as a real transaction.
   later core Site Icon hook removed. The complete predeploy `0.6.38` production
   theme is retained under
   `/home/u111638297/cywater-release-backups/brand-logo-production-predeploy-20260821T174923Z/cywater-live-before-switch`.
+  The immediately preceding complete `0.6.39` theme is retained under
+  `/home/u111638297/cywater-release-backups/mobile-nav-production-predeploy-20260821T180553Z/cywater-active-at-switch`.
 - The production security candidate closes all nine findings from scan
   `9f14cbb6-41bb-4a9a-83f7-8ee8a6714ff1`. Staging acceptance passed Membership
   43, Logo 34, Partner lifecycle, and Operations 435 assertions. Forum passed

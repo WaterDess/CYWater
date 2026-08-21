@@ -58,12 +58,12 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 
 Hostinger staging is available at `https://staging.cywater.org/`, and the public
 production site is live at `https://cywater.org/`. The 2026-08-22 accepted code
-baseline uses the CYWater `0.6.39` theme, CYWater Membership `0.9.4`, CYWater
+baseline uses the CYWater `0.6.40` theme, CYWater Membership `0.9.4`, CYWater
 Partnerships `0.1.5`, CYWater Logo Call `0.3.2`, CYWater Forum `0.4.2`, CYWater
 Environment `0.5.5`, CYWater Core `0.6.6`, CYWater Operations `0.2.1`, and Event
 Tickets `5.29.1`.
 
-Theme `0.6.39` treats the editable WordPress custom Logo as the single brand
+Theme `0.6.40` treats the editable WordPress custom Logo as the single brand
 source for the header, footer, and browser icon. The bundled fallback uses the
 same mark through a 4 KB favicon derivative declared before `wp_head`, while
 the full header mark is preloaded. WordPress' separate Site Icon output is
@@ -71,6 +71,12 @@ suppressed on public, login, and administration surfaces so the two identities
 cannot drift. Replace the Logo once under **Appearance > Customize > Site
 Identity**; future uploads receive a small uncropped icon derivative
 automatically.
+
+The mobile drawer keeps Sign in/Account and Join CYWater together at the top,
+before the full navigation list. Signed-out visitors go directly to the PMPro
+member-login page. The managed login page contains only
+`[cywater_member_login]`; the wrapper renders PMPro once, preventing the
+historical duplicate form caused by retaining `[pmpro_login]` alongside it.
 
 The public production cutover is complete, while paid membership remains
 **No-Go** until Stripe Live and the real charge/refund acceptance are complete.

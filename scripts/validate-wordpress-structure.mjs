@@ -542,6 +542,8 @@ assertMarkers(
     "cywater_brand_head_assets()",
     "cywater_brand_logo_markup( 'header' )",
     '<span class="brand-name" aria-hidden="true">CYWater</span>',
+    "pmpro_url( is_user_logged_in() ? 'account' : 'login' )",
+    'class="nav-mobile-actions"',
     "nav-mobile-account",
     "esc_html__( 'Sign in', 'cywater' )",
   ],
@@ -655,6 +657,8 @@ assertMarkers(
     ".event-carousel-track.is-moving-previous .upcoming-event-card.is-active,\n.event-carousel-track.is-moving-next .upcoming-event-card.is-active {\n  opacity: 1;\n  transform: scale(0.84);\n  filter: none;\n  box-shadow: none;",
     ".nav-mobile .btn-outline { border-color: var(--ink); color: var(--ink); }",
     ".nav-mobile .btn-primary { border-color: var(--ink); color: var(--white); }",
+    ".nav-mobile-actions {\n    display: grid;",
+    ".nav-mobile-actions .btn { min-width: 0; }",
   ],
   "WordPress-specific page stylesheet"
 );

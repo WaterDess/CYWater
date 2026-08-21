@@ -5,7 +5,9 @@
  * @package CYWater
  */
 $section = cywater_current_section();
-$account = function_exists( 'pmpro_url' ) ? pmpro_url( 'account' ) : wp_login_url();
+$account = function_exists( 'pmpro_url' )
+	? pmpro_url( is_user_logged_in() ? 'account' : 'login' )
+	: wp_login_url();
 ?>
 <!doctype html>
 <html <?php language_attributes(); ?>>
@@ -65,6 +67,10 @@ $account = function_exists( 'pmpro_url' ) ? pmpro_url( 'account' ) : wp_login_ur
 	</div>
 </header>
 <nav id="cywater-mobile-nav" class="nav-mobile" aria-label="<?php esc_attr_e( 'Mobile', 'cywater' ); ?>">
+	<div class="nav-mobile-actions" role="group" aria-label="<?php esc_attr_e( 'Account', 'cywater' ); ?>">
+		<a class="btn btn-outline btn-block nav-mobile-account" href="<?php echo esc_url( $account ); ?>"><?php echo is_user_logged_in() ? esc_html__( 'Account', 'cywater' ) : esc_html__( 'Sign in', 'cywater' ); ?></a>
+		<a class="btn btn-primary btn-block" href="<?php echo esc_url( home_url( '/membership/' ) ); ?>"><?php esc_html_e( 'Join CYWater', 'cywater' ); ?></a>
+	</div>
 	<a href="<?php echo esc_url( home_url( '/about/' ) ); ?>"><?php esc_html_e( 'About', 'cywater' ); ?></a>
 	<a href="<?php echo esc_url( home_url( '/board/' ) ); ?>" class="sub-link"><?php esc_html_e( 'Board', 'cywater' ); ?></a>
 	<a href="<?php echo esc_url( home_url( '/bylaws/' ) ); ?>" class="sub-link"><?php esc_html_e( 'Bylaws', 'cywater' ); ?></a>
@@ -76,6 +82,4 @@ $account = function_exists( 'pmpro_url' ) ? pmpro_url( 'account' ) : wp_login_ur
 	<a href="<?php echo esc_url( home_url( '/news/' ) ); ?>"><?php esc_html_e( 'News', 'cywater' ); ?></a>
 	<a href="<?php echo esc_url( home_url( '/awards/' ) ); ?>"><?php esc_html_e( 'Awards', 'cywater' ); ?></a>
 	<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>"><?php esc_html_e( 'Contact', 'cywater' ); ?></a>
-	<a class="btn btn-outline btn-block nav-mobile-account" href="<?php echo esc_url( $account ); ?>"><?php echo is_user_logged_in() ? esc_html__( 'Account', 'cywater' ) : esc_html__( 'Sign in', 'cywater' ); ?></a>
-	<a class="btn btn-primary btn-block" href="<?php echo esc_url( home_url( '/membership/' ) ); ?>"><?php esc_html_e( 'Join CYWater', 'cywater' ); ?></a>
 </nav>
