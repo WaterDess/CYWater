@@ -1124,7 +1124,7 @@ describe sandbox activity as a real transaction.
 ### Production Release Snapshot (2026-08-21)
 
 - The reviewed WordPress production candidate is live at `https://cywater.org/`
-  with theme `0.6.40`, Membership `0.9.4`, Logo Call `0.3.2`, Forum `0.4.2`,
+  with theme `0.6.41`, Membership `0.9.4`, Logo Call `0.3.2`, Forum `0.4.2`,
   Partnerships `0.1.5`, and Operations `0.2.1`. The complete predeploy database
   and code trees are retained at
   `/home/u111638297/cywater-release-backups/production-release-predeploy-20260821T132711`.
@@ -1132,10 +1132,10 @@ describe sandbox activity as a real transaction.
   form. Mobile navigation exposes Sign in/Account and Join CYWater together at
   the top of the drawer instead of below the full navigation list; signed-out
   visitors go directly to `/member-login/`. The header displays `CYWater`
-  beside the water-drop mark and
-  uses the same mark as the fallback browser icon. The Board page no longer
-  exposes its internal publication note.
-- Theme `0.6.40` makes the WordPress custom Logo the one brand source for the
+  beside the water-drop mark and uses the same mark as the fallback browser
+  icon. The Board page no longer exposes internal publication or future
+  committee-appointment notes.
+- Theme `0.6.41` makes the WordPress custom Logo the one brand source for the
   header, footer and browser icon. With no custom Logo it uses the bundled mark
   and a 4 KB early-discovered favicon derivative; it preloads the header mark
   and suppresses WordPress' unrelated Site Icon output on public, login, and

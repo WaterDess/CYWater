@@ -601,7 +601,9 @@ assertMarkers(parityFiles.staticBoard, [...boardMarkers, "Leadership update in p
 assertMarkers(parityFiles.wordpressBoard, boardMarkers, "WordPress Board template");
 assert(
   !parityFiles.wordpressBoard.includes("Current Board leadership.") &&
-    !parityFiles.wordpressBoard.includes("confirmed for public display"),
+    !parityFiles.wordpressBoard.includes("confirmed for public display") &&
+    !parityFiles.wordpressBoard.includes("Committee chairs and members will be published") &&
+    !parityFiles.staticBoard.includes("Committee chairs and members will be published"),
   "WordPress Board must not expose internal publication notes."
 );
 

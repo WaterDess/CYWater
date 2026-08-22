@@ -89,7 +89,6 @@ while ( have_posts() ) :
 			<div class="section-head" data-reveal><span class="eyebrow">Standing committees</span><h2>Committee framework</h2></div>
 			<div class="prose" data-reveal>
 				<ul><li>Awards Committee</li><li>Scientific and Technical Committee</li><li>Nomination Committee</li><li>Tellers Committee</li></ul>
-				<p>Committee chairs and members will be published after appointment and confirmation.</p>
 			</div>
 			<?php edit_post_link( 'Edit Board introduction', '<span class="admin-edit-link">', '</span>' ); ?>
 		</div>
