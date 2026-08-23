@@ -204,6 +204,17 @@ Remaining acceptance and handover checks:
       reachability, and the current-account webhook pass presence-only checks
 - [ ] One controlled real payment, receipt, Stripe balance/payout evidence,
       webhook delivery, and full refund reconcile end to end
+      - an isolated, non-benefit, non-recurring USD `$0.50` Live acceptance
+        level is open at `/membership-checkout/?level=5`; it is absent from the
+        public membership cards and currently has zero orders/entitlements
+      - the stale pre-Live Membership page cache was purged after discovery;
+        the uncached and canonical public page now expose the Student,
+        Professional, and Lifetime checkout actions while keeping the fixture
+        absent, and a logged-out fixture request correctly gates through sign-in
+      - the payer must personally submit the payment; after reconciliation,
+        obtain action-time refund confirmation, issue the full refund, verify
+        only this fixture entitlement is removed, and close new signup while
+        retaining the financial audit trail
 - [x] Protected PMPro Sandbox order/receipt surface passes invoice QA; production
       tax/invoice wording and any separate Stripe Billing workflow remain policy
       decisions rather than duplicated transaction code

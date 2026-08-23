@@ -1172,6 +1172,25 @@ describe sandbox activity as a real transaction.
   do not describe the end-to-end financial acceptance as complete until one
   controlled real payment, receipt, Stripe balance/payout evidence, webhook,
   and full refund are reconciled.
+- On 2026-08-23 an isolated production-only `Live Payment Acceptance Test`
+  level was opened at `/membership-checkout/?level=5` for the final financial
+  acceptance. It charges USD `$0.50` once, expires after one day, has no
+  recurring amount, lives in its own PMPro level group, is absent from the
+  public Membership cards, and is excluded from every configured CYWater
+  benefit level. Immediately before payment it had zero orders and zero active
+  entitlements. The tracked WP-CLI helper
+  `scripts/cywater-production-live-payment-fixture.php` is restricted to the
+  production domain/runtime and can close new signup without deleting the
+  order/refund audit trail. The payer must personally submit payment details;
+  after success, reconcile the PMPro order, receipt, Postmark delivery, Stripe
+  balance/payment and webhooks, obtain action-time confirmation for the full
+  refund, verify only the fixture entitlement is removed, and close the
+  fixture.
+- The first 2026-08-23 post-switch public check found a stale pre-Live
+  Membership page in LiteSpeed cache. WordPress and LiteSpeed caches were
+  purged. The canonical public page now shows Student, Professional, and
+  Lifetime checkout actions, keeps the Live acceptance fixture out of the card
+  grid, and routes logged-out fixture access through the normal sign-in gate.
 - On 2026-08-23 the production pre-financial audit upgraded CYWater Environment
   to `0.5.6`. It now rejects the entire unused XML-RPC endpoint with HTTP 403;
   the prior filters had removed application methods but still exposed the

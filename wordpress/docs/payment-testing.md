@@ -2,11 +2,11 @@
 
 ## Scope
 
-Run checkout acceptance only in the dedicated Stripe Sandbox. A production
-Stripe OAuth connection and production webhook may be prepared on staging, but
-they must not become the active checkout environment while the application
-safety gate is closed. The gate rejects `sk_live_` and `pk_live_` values unless
-the runtime is Production and explicitly sets both
+Use the dedicated Stripe Sandbox for ordinary development and regression
+testing. A production Live transaction is permitted only for an explicitly
+authorized, controlled financial-acceptance run after the application safety
+gate is open. The gate rejects `sk_live_` and `pk_live_` values unless the
+runtime is Production and explicitly sets both
 `CYWATER_PAYMENT_MODE=live` and `CYWATER_ALLOW_LIVE_PAYMENTS=true`. CYWater does
 not store card data.
 
@@ -53,6 +53,29 @@ performed. Final financial acceptance remains one controlled real payment,
 receipt, balance/payout and webhook reconciliation followed by a full refund.
 The free PMPro Stripe integration also adds a separate 2% PMPro fee unless a
 qualifying premium PMPro license is activated.
+
+On 2026-08-23 an isolated production-only `Live Payment Acceptance Test` level
+was opened at `https://cywater.org/membership-checkout/?level=5`. It charges
+USD `$0.50` once, expires after one day, has no recurring amount, is stored in
+its own PMPro level group, is absent from the public Membership cards, and is
+excluded from `cywater_membership_level_ids`; it therefore grants no Student,
+Professional, Lifetime, Forum, directory, or other CYWater member benefit. The
+tracked WP-CLI helper `scripts/cywater-production-live-payment-fixture.php`
+fails closed outside the production domain/runtime, reports non-secret
+aggregate acceptance state, and can close new signup without deleting the
+order/refund audit trail. Immediately before payment it reported zero orders
+and zero active entitlements. The participant must personally enter and submit
+payment details. After one successful charge, reconcile the PMPro order,
+receipt, Postmark delivery, Stripe balance/payment, and required webhooks; then
+obtain action-time confirmation, issue a full refund through the authoritative
+PMPro/Stripe order path, verify the fixture entitlement alone is removed, and
+close the fixture.
+
+The first post-switch public check found that LiteSpeed still served the
+pre-Live Membership page with disabled payment actions. WordPress and LiteSpeed
+caches were purged; both the canonical and cache-busted page now show the three
+standard checkout actions, keep the acceptance fixture private from the card
+grid, and route a logged-out fixture request through the normal sign-in gate.
 
 The manual acceptance fixture is the staging-only `Sandbox Payment Test` PMPro
 level. It charges `$0.50` once, expires after one day, lives in a separate level
