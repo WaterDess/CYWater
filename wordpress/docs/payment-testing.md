@@ -41,15 +41,18 @@ same read-only preflight confirmed that the Live account is reachable, charges
 and payouts are enabled, identity details are submitted, and there is no
 currently due account requirement.
 
-The saved PMPro gateway environment remains `sandbox`, the site remains a
-staging runtime, `CYWATER_PAYMENT_MODE` is temporarily `test` for the explicit
-small-value Sandbox acceptance, and `CYWATER_ALLOW_LIVE_PAYMENTS` remains
-false. No production charge or refund was
-performed. The final financial acceptance is a separately authorized real
-small-value payment followed by a full refund after the production cutover
-configuration has passed its preflight. The free PMPro Stripe integration also
-adds a separate 2% PMPro fee unless a qualifying premium PMPro license is
-activated.
+On 2026-08-23 production was changed to `CYWATER_PAYMENT_MODE=live` with
+`CYWATER_ALLOW_LIVE_PAYMENTS=true`; WordPress reports production, the Live gate
+open, PMPro gateway Stripe, and saved environment Live. The current Live account
+is reachable with charges and payouts enabled, details submitted, and no due
+requirement. Its PMPro webhook is present, enabled, API-current, and subscribed
+to all ten required events. Student `$20`, Professional `$50`, and Lifetime
+`$700` checkout routes return HTTPS 200 and allow signup, while the Sandbox
+fixture is absent from production. No production charge or refund has yet been
+performed. Final financial acceptance remains one controlled real payment,
+receipt, balance/payout and webhook reconciliation followed by a full refund.
+The free PMPro Stripe integration also adds a separate 2% PMPro fee unless a
+qualifying premium PMPro license is activated.
 
 The manual acceptance fixture is the staging-only `Sandbox Payment Test` PMPro
 level. It charges `$0.50` once, expires after one day, lives in a separate level

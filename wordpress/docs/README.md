@@ -78,8 +78,10 @@ member-login page. The managed login page contains only
 `[cywater_member_login]`; the wrapper renders PMPro once, preventing the
 historical duplicate form caused by retaining `[pmpro_login]` alongside it.
 
-The public production cutover is complete, while paid membership remains
-**No-Go** until Stripe Live and the real charge/refund acceptance are complete.
+The public production cutover is complete. On 2026-08-23 the association opened
+the production membership runtime to Stripe Live; end-to-end financial
+acceptance remains pending until a controlled real charge and refund are
+reconciled.
 The 2026-08-21 remediation candidate closes all nine validated authorization,
 payment-destination, identity-privacy, lifecycle and storage findings. The
 account, membership, Partner, Forum, Operations, editor, publishing, policy,
@@ -94,18 +96,21 @@ Membership, Partnerships, Logo Call, Forum, Operations, and Environment. It also
 read-only `cywater-production-purity-audit.php` gate that must pass on the
 production target before DNS cutover. See
 `production-checklist.md` for the exact release gates and cleanup order.
-PMPro and Stripe
-Sandbox are active for staging acceptance; the live-payment gate remains
-closed. On 2026-08-16 the association authorized PMPro's Stripe Live OAuth
+PMPro and Stripe Sandbox remain active for staging acceptance. On 2026-08-16
+the association authorized PMPro's Stripe Live OAuth
 connection. A presence-only check confirmed the production Connect
 configuration without reading credentials, and PMPro's production webhook was
 created and verified through Stripe Live as enabled, API-current, and subscribed
 to all ten event types required by the installed PMPro version. A read-only Live
 account preflight also confirmed that charges and payouts are enabled, identity
 details are submitted, and no current account requirement is due. The saved
-PMPro checkout environment remains Sandbox, the staging payment mode is
-temporarily `test` for explicit checkout/refund acceptance, and no real charge
-or refund has been performed. The free PMPro Stripe
+On 2026-08-23 production was independently read back as `production`, payment
+mode `live`, Live gate open, Stripe gateway with saved environment `live`, and
+Live Connect reachable with charges/payouts enabled and no due requirement.
+PMPro's webhook for the current `CY Water` account was created/repaired and
+verified as enabled, API-current, and subscribed to all ten required events.
+The three production checkout routes are reachable and the Sandbox fixture is
+absent. No real charge or refund has yet been performed. The free PMPro Stripe
 integration currently adds a separate 2% PMPro fee. Postmark is connected on
 staging, its domain authentication is verified, and the user confirmed a
 successful post-rotation test message on 2026-08-02. On 2026-08-03, PMPro's

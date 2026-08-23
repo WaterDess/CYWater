@@ -1159,12 +1159,19 @@ describe sandbox activity as a real transaction.
 - Postmark remains enabled with its stored key, `web@cywater.org` fallback and
   Force From disabled so scoped Accounts, Membership, Billing and Contact
   identities remain authoritative. No secrets are stored in Git.
-- Real charging is still intentionally closed. Production reports payment mode
-  `disabled`, `CYWATER_ALLOW_LIVE_PAYMENTS=false`, PMPro `sandbox`, and no saved
-  Live Connect credentials. Do not describe the site as accepting real payment
-  until the association-owned production Stripe connection/webhook passes a
-  presence-only preflight and one real charge, receipt, balance/payout and full
-  refund are reconciled end to end.
+- On 2026-08-23 the association opened real membership charging. Production
+  reports payment mode `live`, the authoritative Live-payment gate open, PMPro
+  gateway `stripe` with saved environment `live`, and the association-owned
+  Live Connect account reachable with charges and payouts enabled, identity
+  details submitted, and no currently due requirement. After the user selected
+  the current `CY Water` account, PMPro's Live webhook was created/repaired and
+  read back as present, enabled, API-current, and subscribed to all ten required
+  event types. Student `$20`, Professional `$50`, and Lifetime `$700` HTTPS
+  checkout routes return 200 and allow signup; the Sandbox-only fixture is
+  absent from production. No real charge or refund has yet been performed, so
+  do not describe the end-to-end financial acceptance as complete until one
+  controlled real payment, receipt, Stripe balance/payout evidence, webhook,
+  and full refund are reconciled.
 
 ## Editing Guidance
 

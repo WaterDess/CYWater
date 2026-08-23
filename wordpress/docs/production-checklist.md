@@ -1,14 +1,16 @@
 # Production Checklist
 
-## 2026-08-20 Release Audit Decision
+## 2026-08-23 Release Audit Decision
 
-**Current decision: public-site Go; paid membership remains closed.** Public DNS
+**Current decision: public-site Go; Stripe Live runtime open; final financial
+acceptance pending.** Public DNS
 now points to the clean Hostinger production target, HTTPS is valid, and the
 user confirmed the WordPress site on a mobile network. Production data purity,
 approved policy publication, archive rewrites, indexing, runtime hardening,
 staging password protection, and post-cutover backups pass. Membership cards
-and direct checkout fail closed until production Postmark delivery, Stripe Live
-OAuth/webhook, and the controlled real payment/refund acceptance pass. Paid
+and direct checkout now use the production Live gate and association-owned
+Stripe account. OAuth, account readiness, and the Live webhook pass presence-
+only acceptance; the controlled real payment/refund is still outstanding. Paid
 Events remain separately disabled pending their own review. A sealed standard security scan
 reported nine validated findings (seven medium, two low). All nine findings are
 fixed on staging and production: the Event Tickets global Live-payment gate,
@@ -25,10 +27,11 @@ The association subsequently directed that Logo Call be included at launch.
 The production-clean profile therefore contains the theme plus Core, Membership,
 Partnerships, Logo Call, Forum, Operations, and Environment. Only the reviewed
 Logo Event configuration moves to production; staging entries, votes, identities,
-and protected files do not. The public information site is live, but taking money
-remains No-Go until production email, Stripe Live, and final browser/payment gates pass.
+and protected files do not. The public information site and Live payment runtime
+are active; do not mark end-to-end financial acceptance complete until a real
+payment, receipt, balance/payout evidence, webhook, and full refund reconcile.
 
-Before changing this decision to Go:
+Remaining acceptance and handover checks:
 
 - [x] Recover and archive the exact active Logo Call `0.2.3` and Environment
       `0.5.5` trees without overwriting staging
@@ -189,6 +192,10 @@ Before changing this decision to Go:
         passed; this remains a reversible admin asset-resilience setting
 - [x] Stripe Sandbox connection and PMPro webhook are configured outside Git
 - [x] Successful, failed, cancelled, duplicate, refund, expiry, and renewal tests pass
+- [x] Production Stripe Live OAuth, gate, account readiness, checkout
+      reachability, and the current-account webhook pass presence-only checks
+- [ ] One controlled real payment, receipt, Stripe balance/payout evidence,
+      webhook delivery, and full refund reconcile end to end
 - [x] Protected PMPro Sandbox order/receipt surface passes invoice QA; production
       tax/invoice wording and any separate Stripe Billing workflow remain policy
       decisions rather than duplicated transaction code
