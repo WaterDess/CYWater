@@ -19,6 +19,14 @@ cleanup, exact Stripe Partner URL allowlisting and lifecycle-safe token rotation
 generic registration collision responses, and verified-email composition for
 the member directory.
 
+The 2026-08-23 pre-financial audit additionally closed the remaining XML-RPC
+`system.*` surface with CYWater Environment `0.5.6`; production now returns HTTP
+403 for an XML-RPC POST while the homepage remains healthy. All eight custom
+theme/plugin trees match the reviewed local candidate. Unused inactive
+Hostinger AI/onboarding/Reach plugins and three inactive themes were moved to a
+dated rollback archive outside the public tree; Twenty Twenty-Five remains as a
+fallback theme.
+
 Hostinger File Manager recovered the former Logo Call `0.2.3` and
 Environment `0.5.5` trees read-only. Normalized comparison matched all 5/5 and
 7/7 files before further work. At the association's direction, Logo Call was
@@ -204,7 +212,7 @@ Remaining acceptance and handover checks:
       - Transport and Postmark delivery passed on 2026-08-03; automatic
         recurring scheduling is healthy with zero failed actions. Final
         legal/footer copy and a non-Gmail delivery target remain open.
-- [ ] Editor, Administrator, and ordinary member permissions pass; any later
+- [x] Editor, Administrator, and ordinary member permissions pass; any later
       non-administrator membership delegation uses the official PMPro role
       - Administrator/editor/member boundaries pass. The official PMPro
         Membership Manager Add On is not installed and does not block payment
@@ -307,9 +315,10 @@ Remaining acceptance and handover checks:
 
 ## Must Pass Before Production
 
-- [ ] Legal entity and bank account pass Stripe live verification
+- [x] Legal entity and bank account pass Stripe live verification
 - [x] Production domain ownership and DNS change window are approved
-- [ ] Production secrets are installed through the host/GitHub environment
+- [x] Production secrets are installed through the host environment and remain
+      outside Git
 - [ ] Small live payment and refund are reconciled end to end
 - [ ] Monitoring, incident contacts, rollback artifact, and handover document are signed
 - [ ] GitHub Pages transition/redirect decision is approved

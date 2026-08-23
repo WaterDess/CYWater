@@ -60,7 +60,7 @@ Hostinger staging is available at `https://staging.cywater.org/`, and the public
 production site is live at `https://cywater.org/`. The 2026-08-22 accepted code
 baseline uses the CYWater `0.6.41` theme, CYWater Membership `0.9.4`, CYWater
 Partnerships `0.1.5`, CYWater Logo Call `0.3.2`, CYWater Forum `0.4.2`, CYWater
-Environment `0.5.5`, CYWater Core `0.6.6`, CYWater Operations `0.2.1`, and Event
+Environment `0.5.6`, CYWater Core `0.6.6`, CYWater Operations `0.2.1`, and Event
 Tickets `5.29.1`.
 
 Theme `0.6.41` treats the editable WordPress custom Logo as the single brand
@@ -103,8 +103,8 @@ configuration without reading credentials, and PMPro's production webhook was
 created and verified through Stripe Live as enabled, API-current, and subscribed
 to all ten event types required by the installed PMPro version. A read-only Live
 account preflight also confirmed that charges and payouts are enabled, identity
-details are submitted, and no current account requirement is due. The saved
-On 2026-08-23 production was independently read back as `production`, payment
+details are submitted, and no current account requirement is due. On 2026-08-23
+production was independently read back as `production`, payment
 mode `live`, Live gate open, Stripe gateway with saved environment `live`, and
 Live Connect reachable with charges/payouts enabled and no due requirement.
 PMPro's webhook for the current `CY Water` account was created/repaired and
@@ -119,6 +119,17 @@ the association-controlled `web@cywater.org` identity. Registration, password
 reset, and seven PMPro transaction/lifecycle templates were then Delivered.
 PMPro's recurring Action Scheduler jobs are pending normally with zero failed
 actions; final copy/legal review and a non-Gmail delivery target remain open.
+
+On 2026-08-23 the production pre-financial audit upgraded CYWater Environment
+to `0.5.6`. WordPress' XML-RPC filters had removed application methods but still
+left the `system.*` discovery and multicall surface reachable; the plugin now
+rejects the endpoint itself with HTTP 403. The change passed PHP syntax and
+application validation on staging before production deployment. All eight
+custom theme/plugin trees then matched the local candidate file-for-file.
+Three inactive Hostinger onboarding/AI/Reach plugins and three unused inactive
+themes were moved out of the public code tree into the recoverable archive
+`/home/u111638297/cywater-release-backups/production-inactive-code-cleanup-20260823T115154`.
+Twenty Twenty-Five remains installed as the fallback theme.
 
 On 2026-08-21 Membership `0.9.3`, Logo Call `0.3.1`, and Forum `0.4.1`
 were backed up and atomically deployed to both staging and production. Their

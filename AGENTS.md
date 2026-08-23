@@ -1172,6 +1172,16 @@ describe sandbox activity as a real transaction.
   do not describe the end-to-end financial acceptance as complete until one
   controlled real payment, receipt, Stripe balance/payout evidence, webhook,
   and full refund are reconciled.
+- On 2026-08-23 the production pre-financial audit upgraded CYWater Environment
+  to `0.5.6`. It now rejects the entire unused XML-RPC endpoint with HTTP 403;
+  the prior filters had removed application methods but still exposed the
+  `system.*` discovery and multicall surface. The fix passed staging PHP/runtime
+  checks before production deployment. All eight custom theme/plugin trees
+  match the local candidate file-for-file. Inactive Hostinger AI Assistant,
+  Easy Onboarding, Reach, Hostinger AI Theme, Twenty Twenty-Four, and Twenty
+  Twenty-Three were moved from the public code tree to the recoverable archive
+  `/home/u111638297/cywater-release-backups/production-inactive-code-cleanup-20260823T115154`.
+  Twenty Twenty-Five remains installed as the fallback theme.
 
 ## Editing Guidance
 

@@ -11,12 +11,32 @@ final class CYWater_Public_Surface {
 	public static function register() {
 		add_filter( 'rest_endpoints', array( __CLASS__, 'hide_user_endpoints' ) );
 		add_action( 'template_redirect', array( __CLASS__, 'disable_author_archives' ), 0 );
+		add_action( 'init', array( __CLASS__, 'deny_xmlrpc_requests' ), -9999 );
 		add_filter( 'xmlrpc_enabled', '__return_false' );
 		add_filter( 'xmlrpc_methods', '__return_empty_array', PHP_INT_MAX );
 		add_filter( 'wp_headers', array( __CLASS__, 'remove_pingback_header' ) );
 		add_filter( 'the_generator', '__return_empty_string' );
 		remove_action( 'wp_head', 'wp_generator' );
 		remove_action( 'wp_head', 'rsd_link' );
+	}
+
+	/**
+	 * Reject the legacy XML-RPC endpoint itself.
+	 *
+	 * The core xmlrpc_enabled filter disables authenticated XML-RPC methods but
+	 * still leaves the system.* discovery and multicall methods reachable. The
+	 * site has no XML-RPC client dependency, so fail closed before WordPress
+	 * creates the XML-RPC server.
+	 */
+	public static function deny_xmlrpc_requests() {
+		if ( ! defined( 'XMLRPC_REQUEST' ) || ! XMLRPC_REQUEST ) {
+			return;
+		}
+
+		status_header( 403 );
+		nocache_headers();
+		header( 'Content-Type: text/plain; charset=utf-8' );
+		exit( 'XML-RPC services are disabled on this site.' );
 	}
 
 	/**
