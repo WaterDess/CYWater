@@ -1,6 +1,6 @@
 <?php
 /**
- * Create, inspect, or close the isolated production Live-payment acceptance level.
+ * Create, inspect, close, or remove the isolated production Live-payment acceptance level.
  *
  * Run only through WP-CLI. Creating or reopening the level requires both:
  *
@@ -9,7 +9,8 @@
  *
  * The level is deliberately outside CYWater's configured benefit levels and in
  * its own PMPro group. Closing it disables new checkout while preserving the
- * PMPro/Stripe order and refund audit trail.
+ * PMPro/Stripe order and refund audit trail. Removal is allowed only when no
+ * order or entitlement has ever existed.
  */
 
 if ( ! defined( 'WP_CLI' ) || ! WP_CLI ) {
@@ -17,9 +18,9 @@ if ( ! defined( 'WP_CLI' ) || ! WP_CLI ) {
 }
 
 $action = sanitize_key( getenv( 'CYWATER_LIVE_ACCEPTANCE_ACTION' ) ?: 'status' );
-$valid  = array( 'create', 'status', 'disable' );
+$valid  = array( 'create', 'status', 'disable', 'remove' );
 if ( ! in_array( $action, $valid, true ) ) {
-	WP_CLI::error( 'Action must be create, status, or disable.' );
+	WP_CLI::error( 'Action must be create, status, disable, or remove.' );
 }
 
 if ( 'https://cywater.org' !== untrailingslashit( home_url() ) || 'production' !== wp_get_environment_type() ) {
@@ -33,6 +34,8 @@ if ( ! class_exists( 'PMPro_Membership_Level' ) || ! function_exists( 'pmpro_get
 global $wpdb;
 $level_name = 'Live Payment Acceptance Test';
 $group_name = 'Production financial acceptance';
+$orders_table = $wpdb->pmpro_membership_orders;
+$users_table  = $wpdb->pmpro_memberships_users;
 $level_id   = (int) $wpdb->get_var(
 	$wpdb->prepare(
 		"SELECT id FROM {$wpdb->pmpro_membership_levels} WHERE name = %s LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
@@ -117,9 +120,42 @@ if ( 'disable' === $action ) {
 	update_option( 'cywater_live_payment_acceptance_fixture', $fixture, false );
 }
 
+if ( 'remove' === $action ) {
+	if ( 'NO_ORDERS_AND_DEFERRED' !== getenv( 'CYWATER_LIVE_ACCEPTANCE_ACK' ) ) {
+		WP_CLI::error( 'Removal requires the explicit no-orders acknowledgement.' );
+	}
+	if ( ! $level_id ) {
+		WP_CLI::error( 'The Live acceptance level does not exist.' );
+	}
+	$core_ids = array_map( 'absint', (array) get_option( 'cywater_membership_level_ids', array() ) );
+	$orders   = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$orders_table} WHERE membership_id = %d", $level_id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	$users    = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$users_table} WHERE membership_id = %d", $level_id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	if ( in_array( $level_id, $core_ids, true ) || $orders || $users ) {
+		WP_CLI::error( 'The level is not an empty isolated fixture and will not be removed.' );
+	}
+
+	$fixture = (array) get_option( 'cywater_live_payment_acceptance_fixture', array() );
+	if ( $level_id !== absint( $fixture['level_id'] ?? 0 ) ) {
+		WP_CLI::error( 'The stored fixture identity does not match the level.' );
+	}
+	$group_id = absint( $fixture['group_id'] ?? 0 );
+	$level    = new PMPro_Membership_Level( $level_id );
+	if ( true !== $level->delete() ) {
+		WP_CLI::error( 'PMPro did not completely remove the empty fixture level.' );
+	}
+	if ( $group_id ) {
+		foreach ( pmpro_get_level_groups() as $group ) {
+			if ( $group_id === absint( $group->id ) && $group_name === $group->name ) {
+				pmpro_delete_level_group( $group_id );
+				break;
+			}
+		}
+	}
+	delete_option( 'cywater_live_payment_acceptance_fixture' );
+	$level_id = 0;
+}
+
 $level = $level_id ? new PMPro_Membership_Level( $level_id ) : null;
-$orders_table = $wpdb->pmpro_membership_orders;
-$users_table  = $wpdb->pmpro_memberships_users;
 $result = array(
 	'action'              => $action,
 	'level_present'       => (bool) $level_id,

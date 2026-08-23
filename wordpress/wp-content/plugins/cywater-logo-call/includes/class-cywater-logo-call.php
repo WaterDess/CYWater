@@ -204,8 +204,6 @@ final class CYWater_Logo_Call {
 		$phase   = self::phase( $event_id );
 		$user_id = get_current_user_id();
 		$close   = self::date_label( get_post_meta( $event_id, '_cywater_logo_call_close_at', true ) );
-		$vote_open  = self::date_label( get_post_meta( $event_id, '_cywater_logo_call_vote_open', true ) );
-		$vote_close = self::date_label( get_post_meta( $event_id, '_cywater_logo_call_vote_close', true ) );
 		$submitter   = CYWater_Logo_Call_Eligibility::public_label( $event_id, 'submit' );
 		$voter       = CYWater_Logo_Call_Eligibility::public_label( $event_id, 'vote' );
 		$reward      = (string) get_post_meta( $event_id, '_cywater_logo_call_reward', true );
@@ -225,7 +223,7 @@ final class CYWater_Logo_Call {
 				<li><?php echo esc_html( sprintf( __( 'During voting, each %s has one final vote.', 'cywater-logo-call' ), $voter ) ); ?></li>
 				<li><?php esc_html_e( 'After voting closes, the three highest-ranked eligible designs become finalists. If a tie affects third place, the Board resolves the finalist place under the published review criteria. The Board then selects the official logo from the three finalists.', 'cywater-logo-call' ); ?></li>
 			</ul></div>
-			<p class="cywater-logo-call__schedule"><?php echo esc_html( sprintf( __( 'A separate voting activity opens after submissions close, from %1$s to %2$s. Only eligible designs approved for voting appear there.', 'cywater-logo-call' ), $vote_open, $vote_close ) ); ?></p>
+			<p class="cywater-logo-call__schedule"><?php esc_html_e( 'After submissions close, a separate voting activity will be held. Voting details will be announced separately, and only eligible designs approved for voting will appear there.', 'cywater-logo-call' ); ?></p>
 			<?php self::render_feedback(); ?>
 			<?php if ( 'submission' === $phase ) : ?>
 				<?php self::render_submission_form( $event_id, $user_id ); ?>
@@ -702,6 +700,7 @@ final class CYWater_Logo_Call {
 		}
 		if ( $times['open_at'] && $now < $times['open_at'] ) { return 'before'; }
 		if ( $times['close_at'] && $now <= $times['close_at'] ) { return 'submission'; }
+		if ( $times['close_at'] && ! $times['vote_open'] ) { return 'review'; }
 		if ( $times['vote_open'] && $now < $times['vote_open'] ) { return 'review'; }
 		if ( $times['vote_open'] && $times['vote_close'] && $now >= $times['vote_open'] && $now <= $times['vote_close'] ) { return 'voting'; }
 		if ( $times['vote_close'] && $now > $times['vote_close'] ) { return 'results'; }
@@ -836,7 +835,7 @@ final class CYWater_Logo_Call {
 			$id = wp_insert_post( array( 'post_type' => 'cyw_event', 'post_status' => $status, 'post_name' => 'logo-design-call-2026', 'post_title' => 'CYWater Logo Design Call 2026', 'post_content' => '<p>CYWater invites registered users to propose one original association logo. After submissions close, eligible designs enter a separate public voting activity; three finalists advance to Board selection.</p>' ), true );
 			if ( is_wp_error( $id ) ) { WP_CLI::error( $id->get_error_message() ); }
 		}
-		$dates = array( 'open_at' => '2026-08-12 00:00', 'close_at' => '2026-09-12 23:59', 'vote_open' => '2026-09-14 00:00', 'vote_close' => '2026-09-21 23:59' );
+		$dates = array( 'open_at' => '2026-08-12 00:00', 'close_at' => '2026-09-30 23:59', 'vote_open' => '', 'vote_close' => '' );
 		update_post_meta( $id, '_cywater_logo_call_enabled', '1' );
 		if ( ! term_exists( 'member-program', 'cyw_event_type' ) ) { wp_insert_term( 'Member program', 'cyw_event_type', array( 'slug' => 'member-program' ) ); }
 		wp_set_object_terms( $id, 'member-program', 'cyw_event_type' );
@@ -846,7 +845,7 @@ final class CYWater_Logo_Call {
 			update_post_meta( $id, '_cywater_logo_call_' . $action . '_levels', array() );
 		}
 		update_post_meta( $id, '_cywater_logo_call_reward', self::default_reward() );
-		update_post_meta( $id, '_cyw_start_date', '2026-08-12' ); update_post_meta( $id, '_cyw_end_date', '2026-09-21' ); update_post_meta( $id, '_cyw_date_label', 'Aug 12–Sep 21, 2026' ); update_post_meta( $id, '_cyw_location', 'Online' ); update_post_meta( $id, '_cyw_format', 'Logo design call' ); update_post_meta( $id, '_cyw_status', 'upcoming' );
+		update_post_meta( $id, '_cyw_start_date', '2026-08-12' ); update_post_meta( $id, '_cyw_end_date', '2026-09-30' ); update_post_meta( $id, '_cyw_date_label', 'Aug 12–Sep 30, 2026' ); update_post_meta( $id, '_cyw_location', 'Online' ); update_post_meta( $id, '_cyw_format', 'Logo design call' ); update_post_meta( $id, '_cyw_status', 'upcoming' );
 		WP_CLI::success( 'Configured ' . $status . ' review event: ' . $id );
 	}
 
@@ -936,6 +935,9 @@ final class CYWater_Logo_Call {
 			self::qa_assert( ! self::public_asset_allowed( get_post( $entry_id ), 'source' ), 'Shortlisted asset is private during submission' ); ++$checks;
 
 			update_post_meta( $event_id, '_cywater_logo_call_close_at', wp_date( 'Y-m-d H:i', current_time( 'timestamp' ) - 2 * HOUR_IN_SECONDS ) );
+			delete_post_meta( $event_id, '_cywater_logo_call_vote_open' );
+			delete_post_meta( $event_id, '_cywater_logo_call_vote_close' );
+			self::qa_assert( 'review' === self::phase( $event_id ), 'Closed submissions wait safely for an unscheduled voting activity' ); ++$checks;
 			update_post_meta( $event_id, '_cywater_logo_call_vote_open', wp_date( 'Y-m-d H:i', current_time( 'timestamp' ) - HOUR_IN_SECONDS ) );
 			update_post_meta( $event_id, '_cywater_logo_call_vote_close', wp_date( 'Y-m-d H:i', current_time( 'timestamp' ) + HOUR_IN_SECONDS ) );
 			self::qa_assert( 'voting' === self::phase( $event_id ), 'Voting phase is open' ); ++$checks;

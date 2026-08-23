@@ -2,8 +2,8 @@
 
 ## 2026-08-23 Release Audit Decision
 
-**Current decision: public-site Go; Stripe Live runtime open; final financial
-acceptance pending.** Public DNS
+**Current decision: public-site build Go; Stripe Live runtime open; final
+financial acceptance deliberately deferred.** Public DNS
 now points to the clean Hostinger production target, HTTPS is valid, and the
 user confirmed the WordPress site on a mobile network. Production data purity,
 approved policy publication, archive rewrites, indexing, runtime hardening,
@@ -20,8 +20,10 @@ generic registration collision responses, and verified-email composition for
 the member directory.
 
 The 2026-08-23 pre-financial audit additionally closed the remaining XML-RPC
-`system.*` surface with CYWater Environment `0.5.6`; production now returns HTTP
-403 for an XML-RPC POST while the homepage remains healthy. All eight custom
+`system.*` surface with CYWater Environment `0.5.6`; Environment `0.5.7` also
+removes the core users sitemap so disabled author archives cannot advertise an
+Administrator account slug. Production returns HTTP 403 for an XML-RPC POST
+while the homepage remains healthy. All eight custom
 theme/plugin trees match the reviewed local candidate. Unused inactive
 Hostinger AI/onboarding/Reach plugins and three inactive themes were moved to a
 dated rollback archive outside the public tree; Twenty Twenty-Five remains as a
@@ -30,7 +32,9 @@ fallback theme.
 Hostinger File Manager recovered the former Logo Call `0.2.3` and
 Environment `0.5.5` trees read-only. Normalized comparison matched all 5/5 and
 7/7 files before further work. At the association's direction, Logo Call was
-subsequently replaced by independently accepted staging Logo Call `0.3.2`.
+subsequently replaced by independently accepted staging Logo Call `0.3.2`, then
+Logo Call `0.3.3` extended submissions through September 30 and left voting
+unscheduled and undated on the public page until a separate announcement.
 The association subsequently directed that Logo Call be included at launch.
 The production-clean profile therefore contains the theme plus Core, Membership,
 Partnerships, Logo Call, Forum, Operations, and Environment. Only the reviewed
@@ -38,8 +42,14 @@ Logo Event configuration moves to production; staging entries, votes, identities
 and protected files do not. The public information site and Live payment runtime
 are active; do not mark end-to-end financial acceptance complete until a real
 payment, receipt, balance/payout evidence, webhook, and full refund reconcile.
+The final production-clean `0.5.7` bundle is 16,399,216 bytes with SHA-256
+`5ee57d80cbbb19659cdbde8c2e590105e5efdb9919121e4cd7847a73e8ce30c7`.
 
 Remaining acceptance and handover checks:
+
+The unchecked items below are follow-up financial, governance, handover,
+restore-rehearsal, cross-browser, or future paid-Event operations. They are not
+staging/test residue and do not reopen the accepted public-site build baseline.
 
 - [x] Recover and archive the exact active Logo Call `0.2.3` and Environment
       `0.5.5` trees without overwriting staging
@@ -204,17 +214,19 @@ Remaining acceptance and handover checks:
       reachability, and the current-account webhook pass presence-only checks
 - [ ] One controlled real payment, receipt, Stripe balance/payout evidence,
       webhook delivery, and full refund reconcile end to end
-      - an isolated, non-benefit, non-recurring USD `$0.50` Live acceptance
-        level is open at `/membership-checkout/?level=5`; it is absent from the
-        public membership cards and currently has zero orders/entitlements
+      - this acceptance was deliberately deferred on 2026-08-23; the isolated
+        USD `$0.50` level had zero orders and zero entitlements, was first
+        closed, then completely removed together with its empty group
       - the stale pre-Live Membership page cache was purged after discovery;
         the uncached and canonical public page now expose the Student,
-        Professional, and Lifetime checkout actions while keeping the fixture
-        absent, and a logged-out fixture request correctly gates through sign-in
-      - the payer must personally submit the payment; after reconciliation,
-        obtain action-time refund confirmation, issue the full refund, verify
-        only this fixture entitlement is removed, and close new signup while
-        retaining the financial audit trail
+        Professional, and Lifetime checkout actions, while the former fixture
+        URL now returns to Membership and no test card or level remains
+      - when financial acceptance resumes, recreate an isolated fixture with
+        the tracked fail-closed helper; the payer must personally submit the
+        payment, and after reconciliation obtain action-time refund
+        confirmation,
+        issue the full refund, verify only the fixture entitlement is removed,
+        and remove the empty fixture after retaining any required audit trail
 - [x] Protected PMPro Sandbox order/receipt surface passes invoice QA; production
       tax/invoice wording and any separate Stripe Billing workflow remain policy
       decisions rather than duplicated transaction code

@@ -47,9 +47,9 @@ $logo_event_id = (int) $wpdb->get_var(
 ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- fixed table and fixed marker literals.
 $logo_expectations = array(
 	'_cywater_logo_call_open_at'         => '2026-08-12 00:00',
-	'_cywater_logo_call_close_at'        => '2026-09-12 23:59',
-	'_cywater_logo_call_vote_open'       => '2026-09-14 00:00',
-	'_cywater_logo_call_vote_close'      => '2026-09-21 23:59',
+	'_cywater_logo_call_close_at'        => '2026-09-30 23:59',
+	'_cywater_logo_call_vote_open'       => '',
+	'_cywater_logo_call_vote_close'      => '',
 	'_cywater_logo_call_submit_audience' => 'registered',
 	'_cywater_logo_call_vote_audience'   => 'registered',
 	'_cywater_logo_call_reward'          => 'Two years of CYWater Professional membership',

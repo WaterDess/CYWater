@@ -1,7 +1,20 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { PHP } from "@php-wasm/universal";
 import { loadNodeRuntime } from "@php-wasm/node";
+import { jspi } from "@php-wasm/node-8-3";
+
+const phpBuildRoot = dirname(
+  fileURLToPath(import.meta.resolve("@php-wasm/node-8-3/package.json"))
+);
+const phpWasmPath = join(
+  phpBuildRoot,
+  (await jspi()) ? "jspi" : "asyncify",
+  "8_3_32",
+  "php_8_3.wasm"
+);
 
 const configSource = readFileSync(
   new URL("../wordpress/wp-content/plugins/cywater-environment/includes/class-cywater-config.php", import.meta.url),
@@ -56,7 +69,14 @@ const scenarios = [
 async function exerciseScenario(scenario) {
   const php = new PHP(
     await loadNodeRuntime("8.3", {
-      emscriptenOptions: { processId: scenarios.indexOf(scenario) + 1 },
+      emscriptenOptions: {
+        processId: scenarios.indexOf(scenario) + 1,
+        // @php-wasm/universal supplies an identity locateFile callback. On
+        // Windows that can make a transitive runtime resolve the WASM binary
+        // from process.cwd() instead of the build package that owns it.
+        locateFile: (requestedPath) =>
+          requestedPath.endsWith("php_8_3.wasm") ? phpWasmPath : requestedPath,
+      },
     })
   );
   const configEval = scenario.omitConfig
@@ -192,13 +212,17 @@ echo json_encode(
     )
 );`;
 
-  const output = await php.runStream({ code });
-  const stdout = await output.stdoutText;
-  const stderr = await output.stderrText;
-  const exitCode = await output.exitCode;
-  assert.equal(exitCode, 0, `${scenario.name}: PHP harness failed: ${stderr}`);
-  assert.equal(stderr, "", `${scenario.name}: PHP harness emitted stderr`);
-  return JSON.parse(stdout);
+  try {
+    const output = await php.runStream({ code });
+    const stdout = await output.stdoutText;
+    const stderr = await output.stderrText;
+    const exitCode = await output.exitCode;
+    assert.equal(exitCode, 0, `${scenario.name}: PHP harness failed: ${stderr}`);
+    assert.equal(stderr, "", `${scenario.name}: PHP harness emitted stderr`);
+    return JSON.parse(stdout);
+  } finally {
+    php.exit();
+  }
 }
 
 for (const scenario of scenarios) {

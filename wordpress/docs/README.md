@@ -59,9 +59,21 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 Hostinger staging is available at `https://staging.cywater.org/`, and the public
 production site is live at `https://cywater.org/`. The 2026-08-22 accepted code
 baseline uses the CYWater `0.6.41` theme, CYWater Membership `0.9.4`, CYWater
-Partnerships `0.1.5`, CYWater Logo Call `0.3.2`, CYWater Forum `0.4.2`, CYWater
-Environment `0.5.6`, CYWater Core `0.6.6`, CYWater Operations `0.2.1`, and Event
+Partnerships `0.1.5`, CYWater Logo Call `0.3.3`, CYWater Forum `0.4.2`, CYWater
+Environment `0.5.7`, CYWater Core `0.6.6`, CYWater Operations `0.2.1`, and Event
 Tickets `5.29.1`.
+
+Logo Call `0.3.3` keeps submissions open through September 30, 2026. Its public
+copy states only that a separate voting activity follows; no voting dates are
+published or scheduled yet, and the post-submission phase safely waits for a
+later voting configuration. Environment `0.5.7` removes WordPress' users
+sitemap in addition to the existing REST-user and author-archive protections.
+The production purity gate passes 22 checks, and the repeatable public residue
+audit checks 81 sitemap/key URLs with zero staging, Sandbox, temporary-host,
+local-development, QA-identity, or private acceptance-fixture hits.
+The resulting production-clean `0.5.7` bundle is
+`dist/cywater-wordpress-production-clean-0.5.7.zip` (16,399,216 bytes), SHA-256
+`5ee57d80cbbb19659cdbde8c2e590105e5efdb9919121e4cd7847a73e8ce30c7`.
 
 Theme `0.6.41` treats the editable WordPress custom Logo as the single brand
 source for the header, footer, and browser icon. The bundled fallback uses the

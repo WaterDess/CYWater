@@ -10,6 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 final class CYWater_Public_Surface {
 	public static function register() {
 		add_filter( 'rest_endpoints', array( __CLASS__, 'hide_user_endpoints' ) );
+		add_filter( 'wp_sitemaps_add_provider', array( __CLASS__, 'hide_user_sitemap' ), 10, 2 );
 		add_action( 'template_redirect', array( __CLASS__, 'disable_author_archives' ), 0 );
 		add_action( 'init', array( __CLASS__, 'deny_xmlrpc_requests' ), -9999 );
 		add_filter( 'xmlrpc_enabled', '__return_false' );
@@ -18,6 +19,18 @@ final class CYWater_Public_Surface {
 		add_filter( 'the_generator', '__return_empty_string' );
 		remove_action( 'wp_head', 'wp_generator' );
 		remove_action( 'wp_head', 'rsd_link' );
+	}
+
+	/**
+	 * Do not advertise account slugs through the core users sitemap while
+	 * CYWater author archives are disabled by default.
+	 *
+	 * @param WP_Sitemaps_Provider|false $provider Sitemap provider instance.
+	 * @param string                     $name     Provider name.
+	 * @return WP_Sitemaps_Provider|false
+	 */
+	public static function hide_user_sitemap( $provider, $name ) {
+		return 'users' === $name ? false : $provider;
 	}
 
 	/**

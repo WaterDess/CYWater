@@ -141,8 +141,11 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   integration acceptance.
 - Normal setup runs preserve imported WordPress posts and metadata. Force import
   is destructive and requires a database backup plus explicit approval.
-- No live payment, personal bank account, hosting purchase, or production SMTP
-  is authorized at this stage. All credentials remain outside Git.
+- Production Postmark and Stripe Live are now authorized only through the
+  scoped runtime controls recorded in the current production snapshot below.
+  Real charges remain user-submitted actions, and refunds require action-time
+  confirmation. Bank details, credentials, and other secrets remain outside
+  Git.
 
 ### Temporary Integration Snapshot (2026-07-23)
 
@@ -1173,26 +1176,23 @@ describe sandbox activity as a real transaction.
   controlled real payment, receipt, Stripe balance/payout evidence, webhook,
   and full refund are reconciled.
 - On 2026-08-23 an isolated production-only `Live Payment Acceptance Test`
-  level was opened at `/membership-checkout/?level=5` for the final financial
-  acceptance. It charges USD `$0.50` once, expires after one day, has no
-  recurring amount, lives in its own PMPro level group, is absent from the
-  public Membership cards, and is excluded from every configured CYWater
-  benefit level. Immediately before payment it had zero orders and zero active
-  entitlements. The tracked WP-CLI helper
+  level was briefly opened for the final financial acceptance. The association
+  then deliberately deferred the real charge/refund. The fixture still had
+  zero orders and zero entitlements, so it was closed and completely removed
+  together with its empty PMPro group; its former direct URL now returns to the
+  normal Membership page. The tracked WP-CLI helper
   `scripts/cywater-production-live-payment-fixture.php` is restricted to the
-  production domain/runtime and can close new signup without deleting the
-  order/refund audit trail. The payer must personally submit payment details;
-  after success, reconcile the PMPro order, receipt, Postmark delivery, Stripe
-  balance/payment and webhooks, obtain action-time confirmation for the full
-  refund, verify only the fixture entitlement is removed, and close the
-  fixture.
+  production domain/runtime and can recreate the same non-benefit USD `$0.50`
+  fixture later. No production test payment level or checkout remains now.
 - The first 2026-08-23 post-switch public check found a stale pre-Live
   Membership page in LiteSpeed cache. WordPress and LiteSpeed caches were
   purged. The canonical public page now shows Student, Professional, and
   Lifetime checkout actions, keeps the Live acceptance fixture out of the card
   grid, and routes logged-out fixture access through the normal sign-in gate.
 - On 2026-08-23 the production pre-financial audit upgraded CYWater Environment
-  to `0.5.6`. It now rejects the entire unused XML-RPC endpoint with HTTP 403;
+  to `0.5.7`. It rejects the entire unused XML-RPC endpoint with HTTP 403 and
+  removes the core users sitemap so disabled author archives do not advertise
+  an Administrator account slug;
   the prior filters had removed application methods but still exposed the
   `system.*` discovery and multicall surface. The fix passed staging PHP/runtime
   checks before production deployment. All eight custom theme/plugin trees
@@ -1201,6 +1201,16 @@ describe sandbox activity as a real transaction.
   Twenty-Three were moved from the public code tree to the recoverable archive
   `/home/u111638297/cywater-release-backups/production-inactive-code-cleanup-20260823T115154`.
   Twenty Twenty-Five remains installed as the fallback theme.
+- Logo Call `0.3.3` keeps submissions open through September 30, 2026. Voting
+  dates are neither scheduled in Event metadata nor shown publicly; the page
+  states only that a separate voting activity follows, and the workflow waits
+  safely in review after submissions close until voting is configured. Staging
+  QA passed 35 self-cleaning checks before production deployment. Production
+  purity passes 22 read-only checks, and a repeatable HTTP audit checked 81
+  sitemap and key routes with zero staging, Sandbox, temporary-host,
+  local-development, QA-identity, or private payment-fixture residue hits.
+  The final production-clean `0.5.7` bundle is 16,399,216 bytes with SHA-256
+  `5ee57d80cbbb19659cdbde8c2e590105e5efdb9919121e4cd7847a73e8ce30c7`.
 
 ## Editing Guidance
 

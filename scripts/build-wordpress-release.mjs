@@ -78,7 +78,7 @@ async function readPackageVersion(item) {
 
 const stagingSourceMinimums = new Map([
   ["cywater-logo-call", "0.2.3"],
-  ["cywater-environment", "0.5.6"],
+  ["cywater-environment", "0.5.7"],
 ]);
 
 function compareVersions(left, right) {

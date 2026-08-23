@@ -55,7 +55,7 @@ The free PMPro Stripe integration also adds a separate 2% PMPro fee unless a
 qualifying premium PMPro license is activated.
 
 On 2026-08-23 an isolated production-only `Live Payment Acceptance Test` level
-was opened at `https://cywater.org/membership-checkout/?level=5`. It charges
+was briefly opened at `https://cywater.org/membership-checkout/?level=5`. It charges
 USD `$0.50` once, expires after one day, has no recurring amount, is stored in
 its own PMPro level group, is absent from the public Membership cards, and is
 excluded from `cywater_membership_level_ids`; it therefore grants no Student,
@@ -69,7 +69,12 @@ payment details. After one successful charge, reconcile the PMPro order,
 receipt, Postmark delivery, Stripe balance/payment, and required webhooks; then
 obtain action-time confirmation, issue a full refund through the authoritative
 PMPro/Stripe order path, verify the fixture entitlement alone is removed, and
-close the fixture.
+close the fixture. The association then deliberately deferred the real-payment
+acceptance. The fixture still had zero orders and zero entitlements, so it was
+closed and completely removed together with its empty PMPro group. The former
+URL now returns to the normal Membership page. No production test payment level
+is currently installed; recreate it with the same fail-closed helper only when
+the controlled charge/refund acceptance resumes.
 
 The first post-switch public check found that LiteSpeed still served the
 pre-Live Membership page with disabled payment actions. WordPress and LiteSpeed
