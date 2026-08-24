@@ -27,6 +27,7 @@ const required = [
   "wordpress/wp-content/themes/cywater/archive-cyw_award.php",
   "wordpress/wp-content/themes/cywater/archive-cyw_forum_post.php",
   "wordpress/wp-content/themes/cywater/forum-member.php",
+  "wordpress/wp-content/themes/cywater/forum-activity.php",
   "wordpress/wp-content/themes/cywater/comments.php",
   "wordpress/wp-content/themes/cywater/single-cyw_forum_post.php",
   "wordpress/wp-content/themes/cywater/taxonomy-cyw_forum_category.php",

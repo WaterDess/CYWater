@@ -54,7 +54,7 @@ if ( class_exists( 'CYWater_Membership_Account_Routing' ) ) {
 				);
 				// Sits next to Membership: the forum is a member activity
 				// rather than another editorial section.
-				if ( cywater_forum_enabled() ) {
+				if ( cywater_forum_enabled() && is_user_logged_in() ) {
 					$links = array_slice( $links, 0, 1, true )
 						+ array( 'forum' => array( 'Forum', '/forum/' ) )
 						+ array_slice( $links, 1, null, true );
@@ -81,7 +81,7 @@ if ( class_exists( 'CYWater_Membership_Account_Routing' ) ) {
 	<a href="<?php echo esc_url( home_url( '/board/' ) ); ?>" class="sub-link"><?php esc_html_e( 'Board', 'cywater' ); ?></a>
 	<a href="<?php echo esc_url( home_url( '/bylaws/' ) ); ?>" class="sub-link"><?php esc_html_e( 'Bylaws', 'cywater' ); ?></a>
 	<a href="<?php echo esc_url( home_url( '/membership/' ) ); ?>"><?php esc_html_e( 'Membership', 'cywater' ); ?></a>
-	<?php if ( cywater_forum_enabled() ) : ?>
+	<?php if ( cywater_forum_enabled() && is_user_logged_in() ) : ?>
 		<a href="<?php echo esc_url( home_url( '/forum/' ) ); ?>"><?php esc_html_e( 'Forum', 'cywater' ); ?></a>
 	<?php endif; ?>
 	<a href="<?php echo esc_url( home_url( '/events/' ) ); ?>"><?php esc_html_e( 'Events', 'cywater' ); ?></a>

@@ -23,6 +23,8 @@ final class CYWater_Forum_Comments {
 	public static function register() {
 		add_filter( 'comments_open', array( __CLASS__, 'comments_open' ), 10, 2 );
 		add_filter( 'pings_open', '__return_false' );
+		add_action( 'pre_get_comments', array( __CLASS__, 'separate_signed_out_comment_cache' ) );
+		add_filter( 'comments_clauses', array( __CLASS__, 'hide_forum_comments_from_signed_out' ), 10, 2 );
 		add_filter( 'pre_comment_approved', array( __CLASS__, 'moderation_decision' ), 10, 2 );
 		add_filter( 'map_meta_cap', array( __CLASS__, 'gate_comment_moderation' ), 10, 4 );
 		add_filter( 'rest_pre_dispatch', array( __CLASS__, 'gate_rest_comment_moderation' ), 10, 3 );
@@ -55,6 +57,27 @@ final class CYWater_Forum_Comments {
 
 	public static function may_comment( $user_id ) {
 		return array() === self::participation_blockers( $user_id );
+	}
+
+	/** Keep anonymous and authenticated comment-query cache entries independent. */
+	public static function separate_signed_out_comment_cache( $query ) {
+		if ( ! is_user_logged_in() && $query instanceof WP_Comment_Query ) {
+			$query->query_vars['cache_domain'] = 'cywater-forum-signed-out';
+		}
+	}
+
+	/** Forum discussion is readable by registered accounts, while posting keeps its membership gate. */
+	public static function hide_forum_comments_from_signed_out( $clauses, $query ) {
+		unset( $query );
+		if ( is_user_logged_in() ) {
+			return $clauses;
+		}
+		global $wpdb;
+		$clauses['where'] .= $wpdb->prepare(
+			" AND {$wpdb->comments}.comment_post_ID NOT IN (SELECT ID FROM {$wpdb->posts} WHERE post_type = %s)",
+			CYWater_Forum_Content::POST_TYPE
+		);
+		return $clauses;
 	}
 
 	/**
@@ -211,6 +234,17 @@ final class CYWater_Forum_Comments {
 		$method   = strtoupper( $request->get_method() );
 		$user_id  = get_current_user_id();
 		$is_staff = CYWater_Forum_Roles::is_staff( $user_id );
+
+		if ( ! $user_id && 'GET' === $method && preg_match( '#^/wp/v2/comments/(\d+)$#', $route, $public_matches ) ) {
+			$public_comment = get_comment( absint( $public_matches[1] ) );
+			if ( $public_comment instanceof WP_Comment && self::is_forum_comment( $public_comment ) ) {
+				return new WP_Error(
+					'cywater_forum_comment_login_required',
+					__( 'Sign in with a registered CYWater account to view Forum replies.', 'cywater-forum' ),
+					array( 'status' => 401 )
+				);
+			}
+		}
 
 		if ( '/wp/v2/comments' === $route && 'POST' === $method ) {
 			$post_id = absint( $request->get_param( 'post' ) );

@@ -36,16 +36,18 @@ $moderation_note = $moderation_notes[ $moderation_mode ] ?? $moderation_notes['a
 			<?php
 			$count = (int) get_comments_number();
 			echo esc_html(
-				$count
+				! is_user_logged_in()
+					? __( 'Member discussion.', 'cywater' )
+					: ( $count
 					/* translators: %d: reply count. */
 					? sprintf( _n( '%d reply.', '%d replies.', $count, 'cywater' ), $count )
-					: __( 'Questions and replies.', 'cywater' )
+					: __( 'Questions and replies.', 'cywater' ) )
 			);
 			?>
 		</h2>
 	</div>
 
-	<?php if ( have_comments() ) : ?>
+	<?php if ( is_user_logged_in() && have_comments() ) : ?>
 		<ol class="comment-list">
 			<?php
 			wp_list_comments(
@@ -68,15 +70,15 @@ $moderation_note = $moderation_notes[ $moderation_mode ] ?? $moderation_notes['a
 		?>
 	<?php endif; ?>
 
-	<?php if ( ! comments_open() ) : ?>
+	<?php if ( ! is_user_logged_in() ) : ?>
+		<div class="forum-comments-gate">
+			<p><?php esc_html_e( 'Sign in with a registered CYWater account to view the discussion. An active membership is required only when you post a reply.', 'cywater' ); ?></p>
+			<a class="btn btn-primary" href="<?php echo esc_url( cywater_login_url( get_permalink() ) ); ?>"><?php esc_html_e( 'Sign in', 'cywater' ); ?></a>
+		</div>
+	<?php elseif ( ! comments_open() ) : ?>
 		<?php if ( get_comments_number() ) : ?>
 			<p class="forum-comments-note"><?php esc_html_e( 'This discussion is closed.', 'cywater' ); ?></p>
 		<?php endif; ?>
-	<?php elseif ( ! is_user_logged_in() ) : ?>
-		<div class="forum-comments-gate">
-			<p><?php esc_html_e( 'Sign in to ask a question or reply.', 'cywater' ); ?></p>
-			<a class="btn btn-primary" href="<?php echo esc_url( cywater_login_url( get_permalink() ) ); ?>"><?php esc_html_e( 'Sign in', 'cywater' ); ?></a>
-		</div>
 	<?php elseif ( ! $may_reply ) : ?>
 		<div class="forum-comments-gate">
 			<?php if ( in_array( 'email_unverified', $reply_blockers, true ) ) : ?>

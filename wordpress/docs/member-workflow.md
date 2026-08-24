@@ -144,6 +144,23 @@ Add On and is not installed on staging. Until the association provides a valid
 license and installs that Add On, only administrators may operate membership
 records; editors and ordinary members remain denied.
 
+## Forum Access
+
+- A signed-out visitor does not see Forum in desktop or mobile navigation and
+  cannot read Forum archives, articles, author profiles, replies, search or
+  REST records. A direct Forum URL returns to the managed member login.
+- Any signed-in WordPress account may browse published Forum articles, view
+  their replies, and like or unlike an article. Likes do not require a paid
+  membership.
+- Publishing or editing one's own Forum article and posting a reply require an
+  email-verified active Student, Professional, or Lifetime membership.
+- Account contains one **View Forum activity** link. The separate private view
+  lists My posts and Liked posts and links to the author's front-end workspace;
+  those lists are not embedded in the main PMPro profile.
+- Membership never grants moderation or `/wp-admin/`. Community Moderator is a
+  separately assigned staff bundle for cross-author editing, take-down,
+  restoration, permanent deletion, reply moderation, and engagement cleanup.
+
 ## Account Lifecycle
 
 - Public members use `/member-register/`, `/member-login/`, and `/account/` as

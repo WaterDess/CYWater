@@ -39,7 +39,7 @@ Event Tickets                 CYWater Membership
 | `plugins/cywater-membership` | PMPro levels, professional profile fields, privacy opt-in, directory, read-only admin projection | Stripe SDK, webhook endpoint, theme layout, duplicate member/order storage |
 | `plugins/cywater-partnerships` | Institutional expressions of interest, private applicant status, Board/MOU workflow, approved external payment-link handoff | Individual membership, PMPro orders, Stripe credentials, automatic Board approval |
 | `plugins/cywater-logo-call` | Event-scoped submissions and votes, protected design files, immutable work numbers, entrant acceptance and finalist/selection/handoff state | Theme/navigation, account or membership state, payment state, automatic rights transfer or reward grant |
-| `plugins/cywater-forum` | Forum articles and taxonomies, verified active-member direct publication and own-content lifecycle, likes, opaque privacy-scoped author pages, Account activity projection, Forum-specific comments and moderator boundaries | Membership state, PMPro orders, unrelated WordPress comments, broad site administration |
+| `plugins/cywater-forum` | Account-only Forum reading, Forum articles and taxonomies, verified active-member direct publication and own-content lifecycle, registered-account likes, opaque privacy-scoped author pages, private Forum activity projection, Forum-specific comments and moderator boundaries | Membership state, PMPro orders, unrelated WordPress comments, broad site administration |
 | `plugins/cywater-operations` | Composable operational roles, minimal role/workflow audit, paid-Event terms approval and registration-readiness gate, sole Logo review UI and audited ZIP/CSV export | Logo submission/vote ownership, protected-file storage, PMPro membership/order administration, Stripe/Event Tickets transactions, event refunds, policy approval outside WordPress |
 | `plugins/cywater-environment` | Environment reads, Mailpit routing, test/live safety gates, readiness report, conservative response headers | Membership rules, content rendering, full CSP policy |
 | Paid Memberships Pro | Registration, orders, membership activation, renewal/expiry mechanics, Stripe gateway/webhook | CYWater content and visual design |
@@ -168,6 +168,14 @@ Event Tickets                 CYWater Membership
     action, prior/new state, timestamp, and a short machine reason. It must not
     duplicate names, email addresses, application notes, content, payment data,
     or credentials.
+18. Forum audience and participation are separate gates. Anonymous visitors do
+    not receive Forum navigation, content, comments, discovery surfaces, or
+    REST reads. Any registered account may read Forum articles/replies and
+    create or remove its own likes. Publishing an article or reply still
+    requires a currently email-verified active Student, Professional, or
+    Lifetime membership. Account links to one private Forum activity view; it
+    does not duplicate Forum lists inside the PMPro account record. These
+    audience rules never grant Forum moderation or WordPress administration.
 
 ## Verified Staging Boundary
 

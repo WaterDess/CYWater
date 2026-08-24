@@ -2,7 +2,7 @@
 /**
  * Plugin Name: CYWater Forum
  * Description: Member-published forum articles, staff moderation, scoped discussion, and the dormant per-viewer AI reaction seam.
- * Version: 0.6.0
+ * Version: 0.6.1
  * Requires at least: 7.0
  * Requires PHP: 8.1
  * Text Domain: cywater-forum
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CYWATER_FORUM_VERSION', '0.6.0' );
+define( 'CYWATER_FORUM_VERSION', '0.6.1' );
 define( 'CYWATER_FORUM_DIR', plugin_dir_path( __FILE__ ) );
 
 require_once CYWATER_FORUM_DIR . 'includes/class-cywater-forum-settings.php';
@@ -63,6 +63,7 @@ function cywater_forum_activate() {
 	CYWater_Forum_Comments::apply_discussion_defaults();
 	CYWater_Forum_Covers::ensure_storage();
 	CYWater_Forum_Workspace::setup_page();
+	CYWater_Forum_Community::register_routes();
 	CYWater_Forum_Community::install_schema();
 	flush_rewrite_rules();
 }

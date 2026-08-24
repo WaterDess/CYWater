@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CYWATER_THEME_VERSION', '0.6.44' );
+define( 'CYWATER_THEME_VERSION', '0.6.45' );
 
 function cywater_theme_setup() {
 	add_theme_support( 'title-tag' );
@@ -227,7 +227,7 @@ function cywater_current_section() {
 	if ( is_post_type_archive( 'cyw_award' ) || is_singular( 'cyw_award' ) ) {
 		return 'awards';
 	}
-	if ( is_post_type_archive( 'cyw_forum_post' ) || is_singular( 'cyw_forum_post' ) || is_tax( array( 'cyw_forum_category', 'cyw_forum_topic' ) ) || get_query_var( 'cywater_forum_member' ) || is_page( array( 'forum-endorsement', 'forum-workspace' ) ) ) {
+	if ( is_post_type_archive( 'cyw_forum_post' ) || is_singular( 'cyw_forum_post' ) || is_tax( array( 'cyw_forum_category', 'cyw_forum_topic' ) ) || get_query_var( 'cywater_forum_member' ) || get_query_var( 'cywater_forum_activity' ) || is_page( array( 'forum-endorsement', 'forum-workspace' ) ) ) {
 		return 'forum';
 	}
 	if ( is_home() || is_singular( 'post' ) || is_category() ) {

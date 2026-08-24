@@ -16,6 +16,7 @@ final class CYWater_Forum_Community {
 	private const SCHEMA_OPTION     = 'cywater_forum_community_schema_version';
 	private const AUTHOR_TOKEN_META = 'cywater_forum_public_token';
 	private const AUTHOR_QUERY_VAR  = 'cywater_forum_member';
+	private const ACTIVITY_QUERY_VAR = 'cywater_forum_activity';
 	private const AUTHOR_TOKEN_RX   = '/^[a-f0-9]{32}$/';
 
 	private static $current_author = null;
@@ -27,6 +28,12 @@ final class CYWater_Forum_Community {
 		add_filter( 'query_vars', array( __CLASS__, 'query_vars' ) );
 		add_filter( 'template_include', array( __CLASS__, 'author_template' ), 20 );
 		add_filter( 'document_title_parts', array( __CLASS__, 'author_document_title' ) );
+		add_action( 'template_redirect', array( __CLASS__, 'protect_forum_routes' ), 1 );
+		add_filter( 'wp_robots', array( __CLASS__, 'activity_robots' ) );
+		add_filter( 'rest_pre_dispatch', array( __CLASS__, 'protect_forum_rest_reads' ), 5, 3 );
+		add_filter( 'wp_sitemaps_post_types', array( __CLASS__, 'exclude_forum_post_sitemap' ) );
+		add_filter( 'wp_sitemaps_taxonomies', array( __CLASS__, 'exclude_forum_taxonomy_sitemaps' ) );
+		add_action( 'pre_get_posts', array( __CLASS__, 'exclude_forum_from_signed_out_search' ), 30 );
 		add_action( 'transition_post_status', array( __CLASS__, 'ensure_author_token_on_publish' ), 10, 3 );
 		add_action( 'cywater_forum_after_article', array( __CLASS__, 'render_article_engagement' ), 20 );
 		add_action( 'admin_post_cywater_forum_toggle_like', array( __CLASS__, 'handle_toggle_like' ) );
@@ -69,6 +76,7 @@ final class CYWater_Forum_Community {
 	public static function maybe_install_schema() {
 		if ( CYWATER_FORUM_VERSION !== get_option( self::SCHEMA_OPTION ) ) {
 			self::install_schema();
+			flush_rewrite_rules( false );
 		}
 	}
 
@@ -78,10 +86,16 @@ final class CYWater_Forum_Community {
 			'index.php?' . self::AUTHOR_QUERY_VAR . '=$matches[1]',
 			'top'
 		);
+		add_rewrite_rule(
+			'^forum/activity/?$',
+			'index.php?' . self::ACTIVITY_QUERY_VAR . '=1',
+			'top'
+		);
 	}
 
 	public static function query_vars( $vars ) {
 		$vars[] = self::AUTHOR_QUERY_VAR;
+		$vars[] = self::ACTIVITY_QUERY_VAR;
 		return $vars;
 	}
 
@@ -89,7 +103,94 @@ final class CYWater_Forum_Community {
 		return (bool) get_query_var( self::AUTHOR_QUERY_VAR );
 	}
 
+	public static function is_activity_request() {
+		return '1' === (string) get_query_var( self::ACTIVITY_QUERY_VAR );
+	}
+
+	public static function activity_url() {
+		return home_url( '/forum/activity/' );
+	}
+
+	public static function is_forum_frontend_request() {
+		return self::is_activity_request()
+			|| self::is_author_request()
+			|| is_post_type_archive( CYWater_Forum_Content::POST_TYPE )
+			|| is_singular( CYWater_Forum_Content::POST_TYPE )
+			|| is_tax( array( CYWater_Forum_Content::CATEGORY, CYWater_Forum_Content::TOPIC ) )
+			|| CYWater_Forum_Workspace::is_workspace_request();
+	}
+
+	public static function protect_forum_routes() {
+		if ( ! self::is_forum_frontend_request() ) {
+			return;
+		}
+		if ( ! is_user_logged_in() ) {
+			$return = self::current_public_url( get_post_type_archive_link( CYWater_Forum_Content::POST_TYPE ) );
+			$login = class_exists( 'CYWater_Membership_Account_Routing' )
+				? CYWater_Membership_Account_Routing::login_url( $return )
+				: wp_login_url( $return );
+			wp_safe_redirect( $login );
+			exit;
+		}
+		if ( ! defined( 'DONOTCACHEPAGE' ) ) {
+			define( 'DONOTCACHEPAGE', true );
+		}
+		nocache_headers();
+	}
+
+	public static function protect_forum_rest_reads( $result, $server, $request ) {
+		unset( $server );
+		if ( null !== $result || is_user_logged_in() || 'GET' !== strtoupper( $request->get_method() ) ) {
+			return $result;
+		}
+		$route = rtrim( $request->get_route(), '/' );
+		if ( preg_match( '#^/wp/v2/(cyw_forum_post|cyw_forum_category|cyw_forum_topic)(?:/|$)#', $route ) ) {
+			return new WP_Error(
+				'cywater_forum_login_required',
+				__( 'Sign in with a registered CYWater account to view the Forum.', 'cywater-forum' ),
+				array( 'status' => 401 )
+			);
+		}
+		return $result;
+	}
+
+	public static function exclude_forum_post_sitemap( $post_types ) {
+		unset( $post_types[ CYWater_Forum_Content::POST_TYPE ] );
+		return $post_types;
+	}
+
+	public static function exclude_forum_taxonomy_sitemaps( $taxonomies ) {
+		unset( $taxonomies[ CYWater_Forum_Content::CATEGORY ], $taxonomies[ CYWater_Forum_Content::TOPIC ] );
+		return $taxonomies;
+	}
+
+	public static function exclude_forum_from_signed_out_search( $query ) {
+		if ( is_admin() || is_user_logged_in() || ! $query instanceof WP_Query || ! $query->is_search() ) {
+			return;
+		}
+		$post_types = get_post_types( array( 'exclude_from_search' => false ), 'names' );
+		$query->set( 'post_type', array_values( array_diff( $post_types, array( CYWater_Forum_Content::POST_TYPE ) ) ) );
+	}
+
+	public static function activity_robots( $robots ) {
+		if ( self::is_activity_request() ) {
+			$robots['noindex']   = true;
+			$robots['nofollow']  = true;
+			$robots['noarchive'] = true;
+		}
+		return $robots;
+	}
+
 	public static function author_template( $template ) {
+		if ( self::is_activity_request() ) {
+			$activity_template = locate_template( 'forum-activity.php', false, false );
+			if ( $activity_template ) {
+				status_header( 200 );
+				return $activity_template;
+			}
+			return $template;
+		}
+
 		if ( ! self::is_author_request() ) {
 			return $template;
 		}
@@ -113,6 +214,11 @@ final class CYWater_Forum_Community {
 	}
 
 	public static function author_document_title( $parts ) {
+		if ( self::is_activity_request() ) {
+			$parts['title'] = __( 'My Forum activity', 'cywater-forum' );
+			return $parts;
+		}
+
 		if ( ! self::is_author_request() ) {
 			return $parts;
 		}
@@ -229,7 +335,8 @@ final class CYWater_Forum_Community {
 	}
 
 	public static function can_like( $user_id ) {
-		return CYWater_Forum_Comments::may_comment( absint( $user_id ) );
+		$user_id = absint( $user_id );
+		return $user_id > 0 && get_userdata( $user_id ) instanceof WP_User;
 	}
 
 	public static function has_liked( $post_id, $user_id ) {
@@ -260,7 +367,7 @@ final class CYWater_Forum_Community {
 			return new WP_Error( 'article_unavailable', __( 'That Forum article is unavailable.', 'cywater-forum' ) );
 		}
 		if ( ! self::can_like( $user_id ) ) {
-			return new WP_Error( 'like_forbidden', __( 'An active, email-verified CYWater membership is required to like Forum articles.', 'cywater-forum' ) );
+			return new WP_Error( 'like_forbidden', __( 'Sign in with a registered CYWater account to like Forum articles.', 'cywater-forum' ) );
 		}
 
 		if ( self::has_liked( $post_id, $user_id ) ) {
@@ -286,23 +393,27 @@ final class CYWater_Forum_Community {
 	public static function handle_toggle_like() {
 		$post_id = absint( $_POST['forum_post_id'] ?? 0 );
 		if ( ! is_user_logged_in() ) {
-			self::redirect_to_login( $post_id );
+			self::redirect_to_login( $post_id, wp_unslash( $_POST['forum_return_url'] ?? '' ) );
 		}
 		check_admin_referer( 'cywater_forum_like_' . $post_id, 'cywater_forum_like_nonce' );
 		$result = self::toggle_like( $post_id, get_current_user_id() );
-		$args   = is_wp_error( $result ) ? array( 'forum_like' => $result->get_error_code() ) : array( 'forum_like' => $result ? 'liked' : 'unliked' );
-		$url    = get_permalink( $post_id );
-		wp_safe_redirect( add_query_arg( $args, $url ?: get_post_type_archive_link( CYWater_Forum_Content::POST_TYPE ) ) . '#forum-engagement' );
+		$args     = is_wp_error( $result ) ? array( 'forum_like' => $result->get_error_code() ) : array( 'forum_like' => $result ? 'liked' : 'unliked' );
+		$fallback = get_permalink( $post_id ) ?: get_post_type_archive_link( CYWater_Forum_Content::POST_TYPE );
+		$posted   = esc_url_raw( wp_unslash( $_POST['forum_return_url'] ?? '' ) );
+		$url      = wp_validate_redirect( $posted, $fallback );
+		$anchor   = sanitize_html_class( wp_unslash( $_POST['forum_return_anchor'] ?? 'forum-engagement' ) );
+		wp_safe_redirect( add_query_arg( $args, $url ) . '#' . $anchor );
 		exit;
 	}
 
 	public static function handle_signed_out_like() {
-		self::redirect_to_login( absint( $_POST['forum_post_id'] ?? 0 ) );
+		self::redirect_to_login( absint( $_POST['forum_post_id'] ?? 0 ), wp_unslash( $_POST['forum_return_url'] ?? '' ) );
 	}
 
-	private static function redirect_to_login( $post_id ) {
-		$return = get_permalink( absint( $post_id ) );
-		$return = $return ?: get_post_type_archive_link( CYWater_Forum_Content::POST_TYPE );
+	private static function redirect_to_login( $post_id, $requested_return = '' ) {
+		$fallback = get_permalink( absint( $post_id ) );
+		$fallback = $fallback ?: get_post_type_archive_link( CYWater_Forum_Content::POST_TYPE );
+		$return   = wp_validate_redirect( esc_url_raw( $requested_return ), $fallback );
 		$login  = class_exists( 'CYWater_Membership_Account_Routing' )
 			? CYWater_Membership_Account_Routing::login_url( $return )
 			: wp_login_url( $return );
@@ -315,25 +426,39 @@ final class CYWater_Forum_Community {
 			return;
 		}
 		$post_id = $post->ID;
+		?>
+		<section id="forum-engagement" class="forum-engagement" aria-label="<?php esc_attr_e( 'Forum article appreciation', 'cywater-forum' ); ?>">
+			<?php self::render_like_control( $post_id, 'article' ); ?>
+		</section>
+		<?php
+	}
+
+	public static function render_like_control( $post_id, $context = 'article' ) {
+		$post_id = absint( $post_id );
 		$user_id = get_current_user_id();
 		$count   = self::like_count( $post_id );
 		$liked   = $user_id ? self::has_liked( $post_id, $user_id ) : false;
+		$return   = self::current_public_url( get_permalink( $post_id ) );
+		$anchor   = 'card' === $context ? 'forum-card-' . $post_id : 'forum-engagement';
 		?>
-		<section id="forum-engagement" class="forum-engagement" aria-label="<?php esc_attr_e( 'Forum article appreciation', 'cywater-forum' ); ?>">
-			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-				<input type="hidden" name="action" value="cywater_forum_toggle_like">
-				<input type="hidden" name="forum_post_id" value="<?php echo esc_attr( (string) $post_id ); ?>">
-				<?php wp_nonce_field( 'cywater_forum_like_' . $post_id, 'cywater_forum_like_nonce' ); ?>
-				<button class="btn <?php echo $liked ? 'btn-accent' : 'btn-outline'; ?> forum-like-button" type="submit" <?php disabled( $user_id && ! self::can_like( $user_id ) ); ?> aria-pressed="<?php echo $liked ? 'true' : 'false'; ?>">
-					<?php echo esc_html( $liked ? __( 'Liked', 'cywater-forum' ) : __( 'Like', 'cywater-forum' ) ); ?>
-				</button>
-			</form>
-			<span class="forum-like-count"><?php echo esc_html( sprintf( _n( '%d like', '%d likes', $count, 'cywater-forum' ), $count ) ); ?></span>
-			<?php if ( $user_id && ! self::can_like( $user_id ) ) : ?>
-				<span class="forum-engagement-note"><?php esc_html_e( 'An active, email-verified membership is required.', 'cywater-forum' ); ?></span>
-			<?php endif; ?>
-		</section>
+		<form class="forum-like-form forum-like-form--<?php echo esc_attr( sanitize_html_class( $context ) ); ?>" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+			<input type="hidden" name="action" value="cywater_forum_toggle_like">
+			<input type="hidden" name="forum_post_id" value="<?php echo esc_attr( (string) $post_id ); ?>">
+			<input type="hidden" name="forum_return_url" value="<?php echo esc_url( $return ); ?>">
+			<input type="hidden" name="forum_return_anchor" value="<?php echo esc_attr( $anchor ); ?>">
+			<?php wp_nonce_field( 'cywater_forum_like_' . $post_id, 'cywater_forum_like_nonce' ); ?>
+			<button class="forum-like-control<?php echo $liked ? ' is-liked' : ''; ?>" type="submit" aria-pressed="<?php echo $liked ? 'true' : 'false'; ?>" aria-label="<?php echo esc_attr( $liked ? __( 'Unlike this Forum post', 'cywater-forum' ) : __( 'Like this Forum post', 'cywater-forum' ) ); ?>">
+				<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"/></svg>
+				<span><?php echo esc_html( (string) $count ); ?></span>
+			</button>
+		</form>
 		<?php
+	}
+
+	private static function current_public_url( $fallback ) {
+		$request = wp_unslash( $_SERVER['REQUEST_URI'] ?? '' );
+		$url     = $request ? home_url( $request ) : $fallback;
+		return remove_query_arg( 'forum_like', wp_validate_redirect( $url, $fallback ) );
 	}
 
 	public static function append_account_panel( $content ) {
@@ -350,7 +475,22 @@ final class CYWater_Forum_Community {
 			return $content;
 		}
 		self::$account_rendered = true;
-		return $content . self::account_panel( get_current_user_id() );
+		return $content . self::account_entry();
+	}
+
+	public static function account_entry() {
+		ob_start();
+		?>
+		<section class="forum-account-entry" aria-labelledby="forum-account-entry-heading">
+			<div>
+				<span class="eyebrow"><?php esc_html_e( 'Community', 'cywater-forum' ); ?></span>
+				<h2 id="forum-account-entry-heading"><?php esc_html_e( 'Forum activity', 'cywater-forum' ); ?></h2>
+				<p><?php esc_html_e( 'Open a private view of your Forum posts and the posts you have liked.', 'cywater-forum' ); ?></p>
+			</div>
+			<a class="btn btn-outline" href="<?php echo esc_url( self::activity_url() ); ?>"><?php esc_html_e( 'View Forum activity', 'cywater-forum' ); ?></a>
+		</section>
+		<?php
+		return ob_get_clean();
 	}
 
 	public static function liked_posts( $user_id, $limit = 20, $offset = 0 ) {
@@ -374,7 +514,7 @@ final class CYWater_Forum_Community {
 		return (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM ' . self::table_name() . ' WHERE user_id = %d', absint( $user_id ) ) );
 	}
 
-	public static function account_panel( $user_id ) {
+	public static function activity_panel( $user_id ) {
 		$articles = CYWater_Forum_Workspace::articles_for_user( $user_id );
 		$liked    = self::liked_posts( $user_id, 12 );
 		ob_start();
@@ -382,7 +522,7 @@ final class CYWater_Forum_Community {
 		<section class="forum-account-panel" aria-labelledby="forum-account-heading">
 			<div class="forum-account-heading">
 				<div><span class="eyebrow"><?php esc_html_e( 'Community', 'cywater-forum' ); ?></span><h2 id="forum-account-heading"><?php esc_html_e( 'Forum activity', 'cywater-forum' ); ?></h2></div>
-				<a class="btn btn-accent" href="<?php echo esc_url( CYWater_Forum_Workspace::url() ); ?>"><?php esc_html_e( 'Write or manage posts', 'cywater-forum' ); ?></a>
+				<a class="btn btn-primary" href="<?php echo esc_url( CYWater_Forum_Workspace::url() ); ?>"><?php esc_html_e( 'Write or manage posts', 'cywater-forum' ); ?></a>
 			</div>
 			<div class="forum-account-grid">
 				<div class="forum-account-list">
@@ -391,7 +531,7 @@ final class CYWater_Forum_Community {
 					<?php foreach ( array_slice( $articles, 0, 12 ) as $article ) : ?>
 						<p><a href="<?php echo esc_url( 'publish' === $article->post_status ? get_permalink( $article ) : add_query_arg( 'edit', $article->ID, CYWater_Forum_Workspace::url() ) ); ?>"><?php echo esc_html( get_the_title( $article ) ); ?></a><span><?php echo esc_html( CYWater_Forum_Workspace::status_label( $article->post_status ) ); ?></span></p>
 					<?php endforeach; ?>
-					<?php if ( CYWater_Forum_Content::published_count( $user_id ) > 0 ) : ?><a class="link" href="<?php echo esc_url( self::author_url( $user_id ) ); ?>"><?php esc_html_e( 'View my public author page', 'cywater-forum' ); ?></a><?php endif; ?>
+					<?php if ( CYWater_Forum_Content::published_count( $user_id ) > 0 ) : ?><a class="link" href="<?php echo esc_url( self::author_url( $user_id ) ); ?>"><?php esc_html_e( 'View my Forum profile', 'cywater-forum' ); ?></a><?php endif; ?>
 				</div>
 				<div class="forum-account-list">
 					<h3><?php esc_html_e( 'Liked posts', 'cywater-forum' ); ?></h3>

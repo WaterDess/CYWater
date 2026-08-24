@@ -1127,7 +1127,7 @@ describe sandbox activity as a real transaction.
 ### Production Release Snapshot (2026-08-21)
 
 - The reviewed WordPress production candidate is live at `https://cywater.org/`
-  with theme `0.6.44`, Membership `0.9.6`, Logo Call `0.4.1`, Forum `0.6.0`,
+  with theme `0.6.45`, Membership `0.9.6`, Logo Call `0.4.1`, Forum `0.6.1`,
   Partnerships `0.1.5`, and Operations `0.3.1`. The complete initial-release database
   and code trees are retained at
   `/home/u111638297/cywater-release-backups/production-release-predeploy-20260821T132711`.
@@ -1275,6 +1275,29 @@ describe sandbox activity as a real transaction.
   Stripe remains `live`; its configuration snapshot SHA-256 stayed exactly
   `664630dbc4a4e67a9bf9c14da2a89e43b3a4b430dbe80828e18c7efb4742971e`
   across this release, and no payment or refund was initiated.
+- On 2026-08-24 Forum `0.6.1` and theme `0.6.45` made Forum reading an
+  account-only community surface. Signed-out visitors no longer see Forum in
+  desktop or mobile navigation; archive, article, taxonomy, opaque author and
+  private activity routes return to the managed front-end login, while Forum
+  REST reads, search discovery, sitemaps and replies remain unavailable to
+  anonymous clients. Any registered account may read published Forum articles
+  and replies and like or unlike directly from an archive card; publishing and
+  replying still require an email-verified active Student, Professional or
+  Lifetime membership. Account now contains one compact link to the private
+  `/forum/activity/` view instead of embedding post lists. Anonymous and
+  authenticated comment queries use distinct cache domains so a private
+  visibility result cannot poison another audience's cache. Staging passed 149
+  self-cleaning assertions and removed every fixture. Production preserves one
+  legitimate published article, passed anonymous route/navigation/REST checks,
+  and all 13 Forum plus 95 theme files match the reviewed local candidate with
+  manifest SHA-256 values
+  `bd0e0ddfc697b85be2791c492ece560a3b8fce7bb1672fd686c23dcd974ff5ef`
+  and
+  `0f39fad3d6c1173a1ea9857ff2018747bce7ff5ca52b1a28f8d0f8802a043bdd`.
+  The production database and prior code trees are retained at
+  `/home/u111638297/cywater-release-backups/forum-community-visibility-production-predeploy-20260824T130000Z`.
+  Stripe remains `live` with the Live gate open; no payment configuration,
+  charge or refund was changed by this release.
 
 ## Editing Guidance
 
