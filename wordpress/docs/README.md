@@ -58,7 +58,7 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 
 Hostinger staging is available at `https://staging.cywater.org/`, and the public
 production site is live at `https://cywater.org/`. The 2026-08-24 accepted code
-baseline uses the CYWater `0.6.45` theme, CYWater Membership `0.9.6`, CYWater
+baseline uses the CYWater `0.6.46` theme, CYWater Membership `0.9.6`, CYWater
 Partnerships `0.1.5`, CYWater Logo Call `0.4.1`, CYWater Forum `0.6.1`, CYWater
 Environment `0.5.7`, CYWater Core `0.6.6`, CYWater Operations `0.3.1`, and Event
 Tickets `5.29.1`.
@@ -94,6 +94,22 @@ Forum plus 95 theme files match local. The predeploy rollback is
 `/home/u111638297/cywater-release-backups/forum-community-visibility-production-predeploy-20260824T130000Z`.
 This release did not change Stripe: the saved environment remains Live and no
 payment or refund was initiated.
+
+Theme `0.6.46` gives Account one shared module rail: PMPro identity and
+membership sections, Account security, and the compact Forum activity entry now
+use the same width. Account-security actions have explicit vertical spacing,
+while registration and email-verification forms keep their narrower reading
+measure. The same release replaces the unbalanced Forum-author sidebar with a
+centered community profile/feed shell reused by the private activity view. The
+author identity lives in the standard page hero, an optional public profile is
+a quiet inline facts strip, and a single published card centers within the feed
+instead of leaving an empty second column. Forum card title and excerpt leading
+were increased on desktop and mobile. Staging passed 149 Forum and 77
+account-security self-cleaning checks; production visual checks passed at the
+default desktop viewport and 390 x 844 mobile viewport. The reviewed theme zip
+SHA-256 is `f917a0507ded4815451cb931e44c0b41ebb25ce7ece1e637a32130627499a7da`,
+and the production rollback is
+`/home/u111638297/cywater-release-backups/account-community-layout-theme-0.6.46-production-predeploy-20260824T140500Z`.
 
 Theme `0.6.43` retains the editable WordPress custom Logo as the single brand
 source for the header, footer, and browser icon. The bundled fallback uses the

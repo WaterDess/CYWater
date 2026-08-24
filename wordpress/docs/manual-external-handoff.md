@@ -11,7 +11,7 @@ Hostinger File Manager recovered and archived the former Logo Call `0.2.3` and
 Environment `0.5.5` trees before the accepted releases. The current production
 baseline is Membership `0.9.6`, Partnerships `0.1.5`, Logo Call `0.4.1`, Forum
 `0.6.1`, Operations `0.3.1`, Environment `0.5.7`, Core `0.6.6`, and theme
-`0.6.45`. Forum staging QA passed 149 self-cleaning assertions; production
+`0.6.46`. Forum staging QA passed 149 self-cleaning assertions; production
 anonymous-route, REST, navigation, file-integrity, and cache checks passed.
 See `production-checklist.md` for the
 authoritative order.

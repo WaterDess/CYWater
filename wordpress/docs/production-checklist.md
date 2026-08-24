@@ -161,12 +161,17 @@ staging/test residue and do not reopen the accepted public-site build baseline.
       describes the verified-member Forum submission and moderation path in
       the benefits grid, and starts every Membership FAQ collapsed; public-page
       assertions pass and the 93-file theme tree matches local
-- [x] Forum `0.6.1` and theme `0.6.45` keep Forum invisible to signed-out
+- [x] Forum `0.6.1` and theme `0.6.46` keep Forum invisible to signed-out
       visitors across navigation, front-end routes, search, sitemaps, replies,
       and REST; registered accounts may read and like, while publishing and
       replying retain the verified active-membership gate. Staging passes 149
       self-cleaning assertions, production anonymous and registered-account
       route checks pass, and the 13 Forum plus 95 theme files match local
+- [x] Theme `0.6.46` aligns every Account module to one content rail, spaces
+      Account-security actions, and replaces the unbalanced Forum-author
+      sidebar with the centered community profile/feed shell reused by private
+      Forum activity. A lone post card centers; multiple posts retain the
+      two-column feed. Desktop and 390 x 844 mobile production views pass
 - [x] Event Tickets is isolated to the existing Events model; free RSVP,
       capacity, attendee reporting, public form output, Editor content boundary,
       confirmation-mail handoff, and automatic QA cleanup pass

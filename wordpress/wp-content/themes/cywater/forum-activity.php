@@ -25,7 +25,7 @@ get_template_part(
 );
 ?>
 <section class="section forum-activity-section">
-	<div class="container">
+	<div class="container container-narrow forum-community-shell">
 		<?php
 		if ( class_exists( 'CYWater_Forum_Community' ) ) {
 			echo CYWater_Forum_Community::activity_panel( get_current_user_id() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped

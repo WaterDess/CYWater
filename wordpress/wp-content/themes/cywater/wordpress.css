@@ -214,6 +214,30 @@
   margin-top: var(--sp-2);
 }
 
+/* Account page modules share one content rail and one action rhythm.
+   Registration and verification cards keep their compact 38rem measure on
+   their own pages; only the member account projection expands to the PMPro
+   rail. */
+body.pmpro-account .pmpro,
+body.pmpro-account .pmpro_section,
+body.pmpro-account .cywater-register,
+body.pmpro-account .forum-account-entry {
+  width: 100%;
+  max-width: none;
+}
+
+body.pmpro-account .cywater-register form {
+  margin: var(--sp-4) 0 0;
+}
+
+body.pmpro-account .cywater-register form + p {
+  margin: var(--sp-3) 0 0;
+}
+
+body.pmpro-account .cywater-register .btn {
+  margin-top: 0;
+}
+
 .faq-item { border-bottom: 1px solid var(--line); }
 .faq-item:first-child { border-top: 1px solid var(--line); }
 .faq-item > h3 { margin: 0; font: inherit; }
@@ -253,7 +277,11 @@
 
 .forum-card .card-body {
   min-height: 100%;
+  gap: var(--sp-3);
 }
+
+.forum-card .card-title { line-height: 1.42; }
+.forum-card .card-excerpt { line-height: 1.68; }
 
 .forum-card .card-media {
   aspect-ratio: 16 / 9;
@@ -402,26 +430,42 @@
 .forum-engagement .forum-like-form { margin: 0; }
 .forum-engagement .forum-like-control { min-width: 5rem; min-height: 2.85rem; padding-inline: 1rem; }
 
-/* Privacy-scoped, account-only author page */
+/* Shared community profile/feed shell. Public author pages and the private
+   account activity view use the same centered content rail. */
 
-.forum-member-layout {
-  display: grid;
-  grid-template-columns: minmax(15rem, .7fr) minmax(0, 1.7fr);
-  gap: var(--sp-7);
-  align-items: start;
-}
+.forum-community-shell { max-width: var(--container-narrow); }
 
 .forum-member-profile {
-  padding: var(--sp-6);
-  transform: none;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-5);
+  margin-bottom: var(--sp-7);
+  padding: var(--sp-5) 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
 }
 
-.forum-member-profile:hover { transform: none; border-color: var(--line); box-shadow: none; }
-.forum-member-profile h2 { margin-top: var(--sp-4); font-size: var(--fs-xl); }
-.forum-member-profile dl { margin-top: var(--sp-4); }
+.forum-member-facts {
+  display: grid;
+  flex: 1;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-4) var(--sp-6);
+}
+
+.forum-member-profile dl { margin: 0; }
 .forum-member-profile dt { color: var(--ink-mute); font-size: var(--fs-xs); font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
 .forum-member-profile dd { margin: var(--sp-1) 0 0; }
-.forum-member-photo { display: block; width: 8rem; height: 8rem; border-radius: 50%; object-fit: cover; }
+.forum-member-photo { display: block; flex: 0 0 6rem; width: 6rem; height: 6rem; border-radius: 50%; object-fit: cover; }
+
+.forum-community-feed .section-head {
+  margin-bottom: var(--sp-6);
+}
+
+.forum-community-grid > .forum-card:only-child {
+  grid-column: 1 / -1;
+  justify-self: center;
+  width: min(100%, 34rem);
+}
 
 /* Account projection */
 
@@ -845,8 +889,9 @@
     grid-template-columns: 1fr;
   }
 
-  .forum-member-layout,
-  .forum-account-grid { grid-template-columns: 1fr; }
+  .forum-account-grid,
+  .forum-member-facts { grid-template-columns: 1fr; }
+  .forum-member-profile { align-items: flex-start; flex-direction: column; }
   .forum-account-entry { align-items: stretch; flex-direction: column; }
   .forum-account-entry .btn { align-self: flex-start; }
 

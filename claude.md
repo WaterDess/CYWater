@@ -1127,7 +1127,7 @@ describe sandbox activity as a real transaction.
 ### Production Release Snapshot (2026-08-21)
 
 - The reviewed WordPress production candidate is live at `https://cywater.org/`
-  with theme `0.6.45`, Membership `0.9.6`, Logo Call `0.4.1`, Forum `0.6.1`,
+  with theme `0.6.46`, Membership `0.9.6`, Logo Call `0.4.1`, Forum `0.6.1`,
   Partnerships `0.1.5`, and Operations `0.3.1`. The complete initial-release database
   and code trees are retained at
   `/home/u111638297/cywater-release-backups/production-release-predeploy-20260821T132711`.
@@ -1298,6 +1298,22 @@ describe sandbox activity as a real transaction.
   `/home/u111638297/cywater-release-backups/forum-community-visibility-production-predeploy-20260824T130000Z`.
   Stripe remains `live` with the Live gate open; no payment configuration,
   charge or refund was changed by this release.
+- On 2026-08-24 theme `0.6.46` established one reusable Account/community
+  layout system. PMPro identity and membership sections, Account security, and
+  the compact Forum activity entry now share the same content rail; the
+  registration and verification cards remain intentionally narrower outside
+  Account. Security actions have explicit vertical spacing. The Forum-author
+  page no longer uses an asymmetric sidebar: the author identity is carried by
+  the standard page hero, optional public details use a quiet inline facts
+  strip, and published posts use the same centered community feed shell as the
+  private activity view. A single card centers while multiple cards retain the
+  two-column grid, and Forum title/excerpt leading is relaxed. Staging passed
+  149 Forum and 77 account-security self-cleaning checks. Production passed
+  desktop and 390 x 844 mobile visual review, all 32 theme PHP files linted,
+  and Stripe stayed `production/live/live/open`. The reviewed release zip
+  SHA-256 is `f917a0507ded4815451cb931e44c0b41ebb25ce7ece1e637a32130627499a7da`;
+  the production rollback is retained at
+  `/home/u111638297/cywater-release-backups/account-community-layout-theme-0.6.46-production-predeploy-20260824T140500Z`.
 
 ## Editing Guidance
 

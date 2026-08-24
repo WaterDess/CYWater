@@ -14,6 +14,7 @@ get_header();
 $author  = class_exists( 'CYWater_Forum_Community' ) ? CYWater_Forum_Community::current_author() : null;
 $profile = $author instanceof WP_User ? CYWater_Forum_Community::public_profile( $author->ID ) : array();
 $count   = $author instanceof WP_User ? CYWater_Forum_Content::published_count( $author->ID ) : 0;
+$count_label = sprintf( _n( '%d published contribution to the CYWater community.', '%d published contributions to the CYWater community.', $count, 'cywater' ), $count );
 $paged   = max( 1, absint( get_query_var( 'paged' ) ) );
 $posts   = $author instanceof WP_User
 	? new WP_Query(
@@ -33,33 +34,34 @@ $posts   = $author instanceof WP_User
 		'template-parts/page-hero',
 		null,
 		array(
-			'eyebrow'     => __( 'Forum author', 'cywater' ),
+			'eyebrow'     => __( 'Forum community', 'cywater' ),
 			'title'       => $author instanceof WP_User ? $author->display_name : __( 'Author unavailable', 'cywater' ),
-			'lead'        => __( 'Published contributions to the CYWater community.', 'cywater' ),
+			'lead'        => $count_label,
 			'breadcrumbs' => '<a href="' . esc_url( get_post_type_archive_link( 'cyw_forum_post' ) ) . '">' . esc_html__( 'Forum', 'cywater' ) . '</a>',
 		)
 	);
 	?>
 	<section class="section forum-member-page">
-		<div class="container">
-			<div class="forum-member-layout">
-				<aside class="forum-member-profile card" aria-labelledby="forum-member-profile-heading">
+		<div class="container container-narrow forum-community-shell">
+			<?php if ( $profile ) : ?>
+				<aside class="forum-member-profile" aria-label="<?php esc_attr_e( 'Public member profile', 'cywater' ); ?>">
 					<?php if ( isset( $profile['cyw_profile_photo'] ) ) : ?><?php echo wp_kses_post( $profile['cyw_profile_photo']['value'] ); ?><?php endif; ?>
-					<h2 id="forum-member-profile-heading"><?php echo esc_html( $author->display_name ); ?></h2>
-					<p><?php echo esc_html( sprintf( _n( '%d published Forum post', '%d published Forum posts', $count, 'cywater' ), $count ) ); ?></p>
-					<?php foreach ( $profile as $key => $item ) : ?>
-						<?php if ( 'cyw_profile_photo' === $key ) { continue; } ?>
-						<dl><dt><?php echo esc_html( $item['label'] ); ?></dt><dd>
-						<?php if ( 'cyw_orcid' === $key && preg_match( '/^\d{4}-\d{4}-\d{4}-[\dX]{4}$/', (string) $item['value'] ) ) : ?>
-							<a href="<?php echo esc_url( 'https://orcid.org/' . $item['value'] ); ?>" rel="noopener noreferrer"><?php echo esc_html( $item['value'] ); ?></a>
-						<?php else : ?><?php echo esc_html( (string) $item['value'] ); ?><?php endif; ?>
-						</dd></dl>
-					<?php endforeach; ?>
+					<div class="forum-member-facts">
+						<?php foreach ( $profile as $key => $item ) : ?>
+							<?php if ( 'cyw_profile_photo' === $key ) { continue; } ?>
+							<dl><dt><?php echo esc_html( $item['label'] ); ?></dt><dd>
+							<?php if ( 'cyw_orcid' === $key && preg_match( '/^\d{4}-\d{4}-\d{4}-[\dX]{4}$/', (string) $item['value'] ) ) : ?>
+								<a href="<?php echo esc_url( 'https://orcid.org/' . $item['value'] ); ?>" rel="noopener noreferrer"><?php echo esc_html( $item['value'] ); ?></a>
+							<?php else : ?><?php echo esc_html( (string) $item['value'] ); ?><?php endif; ?>
+							</dd></dl>
+						<?php endforeach; ?>
+					</div>
 				</aside>
-				<div class="forum-member-posts">
-					<div class="section-head"><span class="eyebrow"><?php esc_html_e( 'Writing', 'cywater' ); ?></span><h2><?php esc_html_e( 'Published Forum posts.', 'cywater' ); ?></h2></div>
+			<?php endif; ?>
+			<section class="forum-community-feed" aria-labelledby="forum-member-posts-heading">
+				<div class="section-head center"><span class="eyebrow"><?php esc_html_e( 'Writing', 'cywater' ); ?></span><h2 id="forum-member-posts-heading"><?php esc_html_e( 'Published Forum posts.', 'cywater' ); ?></h2></div>
 					<?php if ( $posts instanceof WP_Query && $posts->have_posts() ) : ?>
-						<div class="grid grid-2">
+						<div class="grid grid-2 forum-community-grid">
 							<?php while ( $posts->have_posts() ) : $posts->the_post(); get_template_part( 'template-parts/forum-card' ); endwhile; ?>
 						</div>
 						<?php
@@ -74,8 +76,7 @@ $posts   = $author instanceof WP_User
 						);
 						?>
 					<?php else : ?><p><?php esc_html_e( 'No public Forum posts are available.', 'cywater' ); ?></p><?php endif; ?>
-				</div>
-			</div>
+			</section>
 		</div>
 	</section>
 </main>
