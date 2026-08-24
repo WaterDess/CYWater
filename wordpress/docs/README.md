@@ -59,15 +59,16 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 Hostinger staging is available at `https://staging.cywater.org/`, and the public
 production site is live at `https://cywater.org/`. The 2026-08-24 accepted code
 baseline uses the CYWater `0.6.43` theme, CYWater Membership `0.9.6`, CYWater
-Partnerships `0.1.5`, CYWater Logo Call `0.4.0`, CYWater Forum `0.5.0`, CYWater
-Environment `0.5.7`, CYWater Core `0.6.6`, CYWater Operations `0.3.0`, and Event
+Partnerships `0.1.5`, CYWater Logo Call `0.4.1`, CYWater Forum `0.5.0`, CYWater
+Environment `0.5.7`, CYWater Core `0.6.6`, CYWater Operations `0.3.1`, and Event
 Tickets `5.29.1`.
 
-Logo Call `0.4.0` keeps submissions open through September 30, 2026. Its public
+Logo Call `0.4.1` keeps submissions open through September 30, 2026. Its public
 copy states only that a separate voting activity follows; no voting dates are
 published or scheduled yet. Valid entrants earn Student membership through the
-end of 2026, the five voting finalists earn two years of Professional
-membership, and final winner fulfillment remains Board-controlled. The
+end of 2026, the five voting finalists earn one year of Professional
+membership, and the accepted Board-selected design earns a total two years of
+Professional membership. Final winner fulfillment remains Board-controlled. The
 post-submission phase safely waits for a later voting configuration. Environment `0.5.7` removes WordPress' users
 sitemap in addition to the existing REST-user and author-archive protections.
 The production purity gate passes 22 checks, and the repeatable public residue
@@ -604,7 +605,7 @@ and does not block launch; it is needed only if this work is later delegated to
 a non-Administrator. CYWater must not create a local imitation of that licensed
 role.
 
-CYWater Logo Call `0.4.0` is attached only to the enabled
+CYWater Logo Call `0.4.1` is attached only to the enabled
 `CYWater Logo Design Call 2026` Event. It accepts one PNG, JPEG
 or WebP logo file of at most 5 MB per eligible account; no separate lockup is
 requested during the open call. Submission grants only a limited review,
@@ -615,8 +616,9 @@ place boundary, and the Board selects the official logo from those finalists.
 The selected entrant must complete a documented winning-design assignment and
 deliver accepted scalable or high-resolution production files before an
 Administrator may record the selected-design reward as fulfilled. Every valid
-entrant earns Student membership through December 31, 2026, and the five
-finalists earn two years of Professional membership. Protected files stay
+entrant earns Student membership through December 31, 2026, the five
+finalists earn one year of Professional membership, and the accepted
+Board-selected design earns a total two years of Professional membership. Protected files stay
 outside public uploads. The sole operational
 entry is **Logo reviews**, which shows protected thumbnails, stable work
 numbers, account/verified-email/profile context, vote counts and handoff state;

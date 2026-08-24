@@ -218,7 +218,7 @@ final class CYWater_Logo_Call {
 				<li><?php echo esc_html( sprintf( __( 'One design file per %s.', 'cywater-logo-call' ), $submitter ) ); ?></li>
 				<li><?php esc_html_e( 'PNG, JPEG or WebP, maximum 5 MB. Only the logo design itself is required at this stage.', 'cywater-logo-call' ); ?></li>
 				<li><?php esc_html_e( 'Participation reward: Student membership through December 31, 2026, applied automatically without shortening or replacing a higher existing benefit.', 'cywater-logo-call' ); ?></li>
-				<li><?php esc_html_e( 'Finalist reward: the five highest-ranked eligible designs receive two years of Professional membership.', 'cywater-logo-call' ); ?></li>
+				<li><?php esc_html_e( 'Finalist reward: the five highest-ranked eligible designs receive one year of Professional membership.', 'cywater-logo-call' ); ?></li>
 				<li><?php echo esc_html( sprintf( __( 'Board-selected design reward: %s.', 'cywater-logo-call' ), $reward ) ); ?></li>
 				<li><?php esc_html_e( 'Entrants retain non-winning work. Submission grants CYWater a limited license to review and display the entry for this call and voting.', 'cywater-logo-call' ); ?></li>
 				<li><?php esc_html_e( 'The Board-selected entrant must complete CYWater’s winning-design rights assignment and provide production-ready scalable or high-resolution files before official use and reward fulfillment.', 'cywater-logo-call' ); ?></li>
@@ -793,7 +793,7 @@ final class CYWater_Logo_Call {
 	}
 
 	private static function default_reward() {
-		return __( 'CYWater Lifetime membership (final term subject to Board confirmation)', 'cywater-logo-call' );
+		return __( 'Two years of CYWater Professional membership', 'cywater-logo-call' );
 	}
 
 	/**
@@ -841,7 +841,7 @@ final class CYWater_Logo_Call {
 		return true;
 	}
 
-	/** Apply the two-year Professional finalist award when it is safe to do so. */
+	/** Apply the one-year Professional finalist award when it is safe to do so. */
 	public static function grant_finalist_reward( $entry_id ) {
 		$entry = get_post( absint( $entry_id ) );
 		if ( ! $entry instanceof WP_Post || self::ENTRY_TYPE !== $entry->post_type || ! function_exists( 'pmpro_changeMembershipLevel' ) || ! function_exists( 'pmpro_getMembershipLevelsForUser' ) ) {
@@ -850,7 +850,7 @@ final class CYWater_Logo_Call {
 		$level_ids       = (array) get_option( 'cywater_membership_level_ids', array() );
 		$professional_id = absint( $level_ids['professional'] ?? 0 );
 		$lifetime_id     = absint( $level_ids['lifetime'] ?? 0 );
-		$end             = ( new DateTimeImmutable( 'now', wp_timezone() ) )->modify( '+2 years' )->setTime( 23, 59, 59 );
+		$end             = ( new DateTimeImmutable( 'now', wp_timezone() ) )->modify( '+1 year' )->setTime( 23, 59, 59 );
 		if ( ! $professional_id ) {
 			return new WP_Error( 'reward_level_missing' );
 		}
@@ -877,6 +877,54 @@ final class CYWater_Logo_Call {
 		update_post_meta( $entry->ID, '_cywater_logo_finalist_reward_status', 'granted' );
 		update_post_meta( $entry->ID, '_cywater_logo_finalist_reward_level', $professional_id );
 		update_post_meta( $entry->ID, '_cywater_logo_finalist_reward_end', $end->format( 'Y-m-d H:i:s' ) );
+		return true;
+	}
+
+	/**
+	 * Upgrade the Board-selected entrant to a total two-year Professional award.
+	 * The normal path replaces this plugin's one-year finalist grant. Existing
+	 * paid terms are never cancelled or shortened; they must first be extended
+	 * manually if they do not already cover the full award period.
+	 *
+	 * @return true|WP_Error
+	 */
+	public static function grant_selected_reward( $entry_id ) {
+		$entry = get_post( absint( $entry_id ) );
+		if ( ! $entry instanceof WP_Post || self::ENTRY_TYPE !== $entry->post_type || 'selected' !== get_post_meta( $entry->ID, '_cywater_logo_status', true ) || ! function_exists( 'pmpro_changeMembershipLevel' ) || ! function_exists( 'pmpro_getMembershipLevelsForUser' ) ) {
+			return new WP_Error( 'reward_unavailable' );
+		}
+		$level_ids       = (array) get_option( 'cywater_membership_level_ids', array() );
+		$professional_id = absint( $level_ids['professional'] ?? 0 );
+		$lifetime_id     = absint( $level_ids['lifetime'] ?? 0 );
+		$end             = ( new DateTimeImmutable( 'now', wp_timezone() ) )->modify( '+2 years' )->setTime( 23, 59, 59 );
+		if ( ! $professional_id ) {
+			return new WP_Error( 'reward_level_missing' );
+		}
+
+		$active = (array) pmpro_getMembershipLevelsForUser( (int) $entry->post_author );
+		foreach ( $active as $level ) {
+			if ( $lifetime_id && (int) $level->id === $lifetime_id ) {
+				update_post_meta( $entry->ID, '_cywater_logo_selected_reward_status', 'covered_by_existing_membership' );
+				update_post_meta( $entry->ID, '_cywater_logo_selected_reward_end', 'non_expiring' );
+				return true;
+			}
+			if ( (int) $level->id === $professional_id && ( 0 === (int) $level->enddate || (int) $level->enddate >= $end->getTimestamp() ) ) {
+				update_post_meta( $entry->ID, '_cywater_logo_selected_reward_status', 'covered_by_existing_membership' );
+				update_post_meta( $entry->ID, '_cywater_logo_selected_reward_end', $end->format( 'Y-m-d H:i:s' ) );
+				return true;
+			}
+		}
+		if ( $active && 'granted' !== (string) get_post_meta( $entry->ID, '_cywater_logo_finalist_reward_status', true ) ) {
+			return new WP_Error( 'existing_membership_requires_review' );
+		}
+
+		$grant = self::complimentary_level( $professional_id, (int) $entry->post_author, $end->format( 'Y-m-d H:i:s' ) );
+		if ( ! $grant || ! pmpro_changeMembershipLevel( $grant, (int) $entry->post_author, 'admin_changed' ) ) {
+			return new WP_Error( 'reward_grant_failed' );
+		}
+		update_post_meta( $entry->ID, '_cywater_logo_selected_reward_status', 'granted' );
+		update_post_meta( $entry->ID, '_cywater_logo_selected_reward_level', $professional_id );
+		update_post_meta( $entry->ID, '_cywater_logo_selected_reward_end', $end->format( 'Y-m-d H:i:s' ) );
 		return true;
 	}
 

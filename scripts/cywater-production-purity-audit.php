@@ -52,7 +52,7 @@ $logo_expectations = array(
 	'_cywater_logo_call_vote_close'      => '',
 	'_cywater_logo_call_submit_audience' => 'registered',
 	'_cywater_logo_call_vote_audience'   => 'registered',
-	'_cywater_logo_call_reward'          => 'CYWater Lifetime membership (final term subject to Board confirmation)',
+	'_cywater_logo_call_reward'          => 'Two years of CYWater Professional membership',
 );
 foreach ( $logo_expectations as $meta_key => $expected_value ) {
 	$actual_value = $logo_event_id ? (string) get_post_meta( $logo_event_id, $meta_key, true ) : '';

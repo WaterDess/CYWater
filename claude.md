@@ -1127,8 +1127,8 @@ describe sandbox activity as a real transaction.
 ### Production Release Snapshot (2026-08-21)
 
 - The reviewed WordPress production candidate is live at `https://cywater.org/`
-  with theme `0.6.43`, Membership `0.9.6`, Logo Call `0.4.0`, Forum `0.5.0`,
-  Partnerships `0.1.5`, and Operations `0.3.0`. The complete initial-release database
+  with theme `0.6.43`, Membership `0.9.6`, Logo Call `0.4.1`, Forum `0.5.0`,
+  Partnerships `0.1.5`, and Operations `0.3.1`. The complete initial-release database
   and code trees are retained at
   `/home/u111638297/cywater-release-backups/production-release-predeploy-20260821T132711`.
 - The member-login page now stores only `[cywater_member_login]` and renders one
@@ -1228,17 +1228,17 @@ describe sandbox activity as a real transaction.
   deletion. Legacy `pending` Forum data is normalized to draft, and the exact
   empty production fixture `Test post - please ignore` was permanently removed
   only after the production backup. No real Forum article existed at cutover.
-- Logo Call `0.4.0` and Operations `0.3.0` keep submissions open through
+- Logo Call `0.4.1` and Operations `0.3.1` keep submissions open through
   September 30, 2026. Voting dates and detailed ballot/tie rules are not yet
   scheduled or published. A valid entrant receives Student membership through
   December 31, 2026 without shortening or replacing a higher existing benefit;
-  the five voting finalists receive two years of Professional membership. Safe
-  complimentary grants are automatic, while a conflicting paid Stripe term is
+  the five voting finalists receive one year of Professional membership. The
+  accepted Board-selected design receives a total two years of Professional
+  membership after its rights and final files are accepted. Safe complimentary
+  grants are automatic, while a conflicting paid Stripe term is
   flagged for manual fulfillment instead of being cancelled or replaced. The
-  selected-design reward remains a separate controlled fulfillment item because
-  the requested phrase “Lifetime membership for two years” requires Board
-  clarification before an entitlement can be issued accurately.
-- Staging Logo Call QA passed 36 self-cleaning checks and Operations passed 435;
+  selected-design reward remains gated by accepted rights and final files.
+- Staging Logo Call QA passed 36 self-cleaning checks and Operations passed 437;
   Forum passed 130 application/storage assertions, while only its outer HTTP
   probes were intercepted by deliberate staging Basic Auth. Production remains
   Stripe `live`, has zero Forum and Logo Call fixtures, passed 22 read-only
@@ -1249,6 +1249,10 @@ describe sandbox activity as a real transaction.
   `/home/u111638297/cywater-release-backups/forum-logo-direct-publish-production-20260824T004908Z`.
   The deployed candidate bundle is 16,280,910 bytes with SHA-256
   `6f375e84b66cbb26480f1cd8b6d23305e6d58c68700c36a767e1e51ab357afbd`.
+  The reward-term follow-up database and prior Logo/Operations trees are at
+  `/home/u111638297/cywater-release-backups/logo-reward-terms-production-20260824T012851Z`;
+  its 105,584-byte deployment bundle has SHA-256
+  `d6e846c99216da06f93296b7ec579e4beb16100fdd1f35948edf8bf8bcabf1dd`.
 
 ## Editing Guidance
 
