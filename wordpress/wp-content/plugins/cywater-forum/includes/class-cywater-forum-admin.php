@@ -38,23 +38,17 @@ final class CYWater_Forum_Admin {
 		<h2 id="cywater-forum-authorship"><?php esc_html_e( 'CYWater Forum participation', 'cywater-forum' ); ?></h2>
 		<table class="form-table" role="presentation">
 			<tr>
-				<th scope="row"><?php esc_html_e( 'Can submit for review', 'cywater-forum' ); ?></th>
+				<th scope="row"><?php esc_html_e( 'Can publish Forum articles', 'cywater-forum' ); ?></th>
 				<td>
 					<?php if ( array() === $submission_blockers ) : ?>
 						<strong><?php esc_html_e( 'Yes', 'cywater-forum' ); ?></strong>
 						<?php if ( ! CYWater_Forum_Roles::is_staff( $user->ID ) ) : ?>
-							<p class="description"><?php esc_html_e( 'The account may save a draft or submit it for Community Moderator review; it cannot publish directly.', 'cywater-forum' ); ?></p>
+							<p class="description"><?php esc_html_e( 'The account may save drafts and publish or update its own Forum articles directly.', 'cywater-forum' ); ?></p>
 						<?php endif; ?>
 					<?php else : ?>
 						<strong><?php esc_html_e( 'No', 'cywater-forum' ); ?></strong>
 						<p class="description"><?php echo esc_html( implode( ', ', array_map( array( __CLASS__, 'blocker_label' ), $submission_blockers ) ) ); ?></p>
 					<?php endif; ?>
-				</td>
-			</tr>
-			<tr>
-				<th scope="row"><?php esc_html_e( 'Can publish', 'cywater-forum' ); ?></th>
-				<td>
-					<strong><?php echo CYWater_Forum_Roles::can_publish( $user->ID ) ? esc_html__( 'Yes — Forum staff', 'cywater-forum' ) : esc_html__( 'No — moderator review required', 'cywater-forum' ); ?></strong>
 				</td>
 			</tr>
 			<tr>
@@ -104,7 +98,7 @@ final class CYWater_Forum_Admin {
 							<input type="checkbox" name="cywater_forum_admin_grant" value="1" <?php checked( $granted ); ?> />
 							<?php esc_html_e( 'Authorise this account to satisfy the legacy endorsement prerequisite.', 'cywater-forum' ); ?>
 						</label>
-						<p class="description"><?php esc_html_e( 'This does not grant direct publication; Community Moderator review remains required.', 'cywater-forum' ); ?></p>
+						<p class="description"><?php esc_html_e( 'This satisfies only the legacy endorsement prerequisite; membership and email-verification requirements still apply.', 'cywater-forum' ); ?></p>
 					<?php else : ?>
 						<p class="description"><?php esc_html_e( 'Legacy override is disabled in the Forum settings.', 'cywater-forum' ); ?></p>
 					<?php endif; ?>
@@ -161,7 +155,7 @@ final class CYWater_Forum_Admin {
 		}
 		if ( CYWater_Forum_Roles::can_submit( $user_id ) ) {
 			/* translators: %d: published article count. */
-			return esc_html( sprintf( _n( 'Eligible to submit, %d article', 'Eligible to submit, %d articles', $count, 'cywater-forum' ), $count ) );
+			return esc_html( sprintf( _n( 'Eligible to publish, %d article', 'Eligible to publish, %d articles', $count, 'cywater-forum' ), $count ) );
 		}
 		$account = get_userdata( $user_id );
 		if ( ( $account instanceof WP_User && in_array( CYWater_Forum_Roles::AUTHOR_ROLE, (array) $account->roles, true ) ) || $count > 0 ) {
@@ -176,7 +170,6 @@ final class CYWater_Forum_Admin {
 			'not_endorsed'        => __( 'no endorsement', 'cywater-forum' ),
 			'membership_inactive' => __( 'membership inactive', 'cywater-forum' ),
 			'email_unverified'    => __( 'email unverified', 'cywater-forum' ),
-			'moderator_review_required' => __( 'Community Moderator review required', 'cywater-forum' ),
 		);
 		return $labels[ $blocker ] ?? $blocker;
 	}

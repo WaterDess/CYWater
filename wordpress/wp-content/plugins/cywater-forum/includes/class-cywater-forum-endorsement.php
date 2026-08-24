@@ -47,7 +47,7 @@ final class CYWater_Forum_Endorsement {
 		return '<div class="cywater-register forum-endorsement"><h2>'
 			. esc_html__( 'Forum participation', 'cywater-forum' )
 			. '</h2><p>'
-			. esc_html__( 'Invitations and endorsements are currently paused. Verified CYWater members with an active individual membership may submit articles directly for moderator review.', 'cywater-forum' )
+			. esc_html__( 'Invitations and endorsements are currently paused. Verified CYWater members with an active individual membership may publish Forum articles directly.', 'cywater-forum' )
 			. '</p><a class="btn btn-primary" href="'
 			. esc_url( get_post_type_archive_link( CYWater_Forum_Content::POST_TYPE ) )
 			. '">'

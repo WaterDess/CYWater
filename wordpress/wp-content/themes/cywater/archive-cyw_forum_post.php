@@ -31,7 +31,7 @@ get_template_part(
 	array(
 		'eyebrow' => 'Community writing',
 		'title'   => 'CYWater Forum.',
-		'lead'    => 'Verified CYWater members with an active individual membership may submit articles on research, practice, and early-career life for Community Moderator review.',
+		'lead'    => 'Verified CYWater members with an active individual membership may publish articles on research, practice, and early-career life and join the discussion.',
 		'actions' => cywater_forum_hero_actions(),
 	)
 );

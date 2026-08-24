@@ -100,7 +100,7 @@ final class CYWater_Operations_Logo_Review {
 		}
 		$messages = array(
 			'updated'   => __( 'The review was saved and audited.', 'cywater-operations' ),
-			'finalists' => __( 'The three finalists were confirmed and audited.', 'cywater-operations' ),
+			'finalists' => __( 'The five finalists and their Professional membership rewards were recorded and audited.', 'cywater-operations' ),
 			'selected'  => __( 'The Board selection was recorded and audited.', 'cywater-operations' ),
 			'fulfilled' => __( 'The rights, final-file and reward handoff was updated and audited.', 'cywater-operations' ),
 			'error'     => __( 'The requested change was not saved.', 'cywater-operations' ),
@@ -170,15 +170,15 @@ final class CYWater_Operations_Logo_Review {
 		if ( current_user_can( 'cywater_select_logo_finalists' ) && empty( $finalists ) ) {
 			$ranked = array_values( array_filter( $entries, static function ( $entry ) { return 'shortlisted' === get_post_meta( $entry->ID, '_cywater_logo_status', true ); } ) );
 			usort( $ranked, static function ( $a, $b ) { return CYWater_Logo_Call::vote_count( $b->ID ) <=> CYWater_Logo_Call::vote_count( $a->ID ) ?: $a->ID <=> $b->ID; } );
-			echo '<section class="cywater-logo-review__panel"><h2>' . esc_html__( 'Confirm three voting finalists', 'cywater-operations' ) . '</h2><p>' . esc_html__( 'Select exactly three entries from the highest-ranked pool. When third place is tied, this records the Board’s tie resolution.', 'cywater-operations' ) . '</p><form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="' . esc_attr( self::FINALISTS_ACTION ) . '"><input type="hidden" name="event_id" value="' . esc_attr( $event_id ) . '">';
+			echo '<section class="cywater-logo-review__panel"><h2>' . esc_html__( 'Confirm five voting finalists', 'cywater-operations' ) . '</h2><p>' . esc_html__( 'Select exactly five entries from the highest-ranked pool. When fifth place is tied, this records the Board’s tie resolution. Each finalist earns two years of Professional membership; any existing paid-membership conflict is flagged for manual fulfillment.', 'cywater-operations' ) . '</p><form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="' . esc_attr( self::FINALISTS_ACTION ) . '"><input type="hidden" name="event_id" value="' . esc_attr( $event_id ) . '">';
 			wp_nonce_field( self::FINALISTS_ACTION . '_' . $event_id );
 			foreach ( $ranked as $index => $entry ) {
 				echo '<label class="cywater-logo-review__choice"><input type="checkbox" name="finalist_ids[]" value="' . esc_attr( $entry->ID ) . '"> <strong>' . esc_html( CYWater_Logo_Call::work_number( $entry->ID ) ) . '</strong> — ' . esc_html( sprintf( __( 'rank %1$d, %2$d votes', 'cywater-operations' ), $index + 1, CYWater_Logo_Call::vote_count( $entry->ID ) ) ) . '</label>';
 			}
-			submit_button( __( 'Confirm three finalists', 'cywater-operations' ) ); echo '</form></section>';
+			submit_button( __( 'Confirm five finalists', 'cywater-operations' ) ); echo '</form></section>';
 		}
-		if ( current_user_can( 'cywater_select_official_logo' ) && 3 === count( $finalists ) && ! self::selected_for_event( $event_id ) ) {
-			echo '<section class="cywater-logo-review__panel"><h2>' . esc_html__( 'Record Board selection', 'cywater-operations' ) . '</h2><p>' . esc_html__( 'This action selects the official design from the three confirmed finalists. It does not itself mark the rights assignment, final files or reward complete.', 'cywater-operations' ) . '</p><form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="' . esc_attr( self::SELECT_ACTION ) . '"><input type="hidden" name="event_id" value="' . esc_attr( $event_id ) . '">';
+		if ( current_user_can( 'cywater_select_official_logo' ) && 5 === count( $finalists ) && ! self::selected_for_event( $event_id ) ) {
+			echo '<section class="cywater-logo-review__panel"><h2>' . esc_html__( 'Record Board selection', 'cywater-operations' ) . '</h2><p>' . esc_html__( 'This action selects the official design from the five confirmed finalists. It does not itself mark the rights assignment, final files or selected-design reward complete.', 'cywater-operations' ) . '</p><form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="' . esc_attr( self::SELECT_ACTION ) . '"><input type="hidden" name="event_id" value="' . esc_attr( $event_id ) . '">';
 			wp_nonce_field( self::SELECT_ACTION . '_' . $event_id );
 			foreach ( $finalists as $entry ) {
 				echo '<label class="cywater-logo-review__choice"><input required type="radio" name="entry_id" value="' . esc_attr( $entry->ID ) . '"> ' . esc_html( CYWater_Logo_Call::work_number( $entry->ID ) ) . '</label>';
@@ -270,28 +270,36 @@ final class CYWater_Operations_Logo_Review {
 		}
 		$event_id = absint( $event_id );
 		$ids      = array_values( array_unique( array_filter( array_map( 'absint', (array) $ids ) ) ) );
-		if ( 3 !== count( $ids ) || 'results' !== CYWater_Logo_Call::current_phase( $event_id ) || self::selected_for_event( $event_id ) ) {
+		if ( 5 !== count( $ids ) || 'results' !== CYWater_Logo_Call::current_phase( $event_id ) || self::selected_for_event( $event_id ) ) {
 			return new WP_Error( 'cywater_logo_finalists_invalid' );
 		}
 		$ranked = array_values( array_filter( CYWater_Logo_Call::entries( $event_id ), static function ( $entry ) { return 'shortlisted' === get_post_meta( $entry->ID, '_cywater_logo_status', true ); } ) );
 		usort( $ranked, static function ( $a, $b ) { return CYWater_Logo_Call::vote_count( $b->ID ) <=> CYWater_Logo_Call::vote_count( $a->ID ) ?: $a->ID <=> $b->ID; } );
-		if ( count( $ranked ) < 3 ) {
+		if ( count( $ranked ) < 5 ) {
 			return new WP_Error( 'cywater_logo_finalists_insufficient' );
 		}
-		$cutoff = CYWater_Logo_Call::vote_count( $ranked[2]->ID );
+		$cutoff = CYWater_Logo_Call::vote_count( $ranked[4]->ID );
 		$pool   = array_map( static function ( $entry ) { return (int) $entry->ID; }, array_filter( $ranked, static function ( $entry ) use ( $cutoff ) { return CYWater_Logo_Call::vote_count( $entry->ID ) >= $cutoff; } ) );
 		if ( array_diff( $ids, $pool ) ) {
 			return new WP_Error( 'cywater_logo_finalists_rank' );
 		}
-		if ( ! CYWater_Operations_Audit::record( 'logo_event', $event_id, 'finalists_authorized', 'voting_closed', 'three_finalists', 0, 'logo_governance' ) ) {
+		if ( ! CYWater_Operations_Audit::record( 'logo_event', $event_id, 'finalists_authorized', 'voting_closed', 'five_finalists', 0, 'logo_governance' ) ) {
 			return new WP_Error( 'cywater_logo_finalists_audit' );
 		}
 		$old = array();
 		foreach ( $ranked as $entry ) {
 			$old[ $entry->ID ] = (string) get_post_meta( $entry->ID, '_cywater_logo_status', true );
-			update_post_meta( $entry->ID, '_cywater_logo_status', in_array( (int) $entry->ID, $ids, true ) ? 'finalist' : 'not_selected' );
+			$is_finalist = in_array( (int) $entry->ID, $ids, true );
+			update_post_meta( $entry->ID, '_cywater_logo_status', $is_finalist ? 'finalist' : 'not_selected' );
+			if ( $is_finalist ) {
+				$reward = CYWater_Logo_Call::grant_finalist_reward( $entry->ID );
+				if ( is_wp_error( $reward ) ) {
+					update_post_meta( $entry->ID, '_cywater_logo_finalist_reward_status', 'manual_required' );
+					update_post_meta( $entry->ID, '_cywater_logo_finalist_reward_note', sanitize_key( $reward->get_error_code() ) );
+				}
+			}
 		}
-		if ( 3 !== count( CYWater_Logo_Call::finalists( $event_id ) ) ) {
+		if ( 5 !== count( CYWater_Logo_Call::finalists( $event_id ) ) ) {
 			foreach ( $old as $id => $status ) { update_post_meta( $id, '_cywater_logo_status', $status ); }
 			return new WP_Error( 'cywater_logo_finalists_write' );
 		}
@@ -313,11 +321,11 @@ final class CYWater_Operations_Logo_Review {
 		}
 		$finalists = CYWater_Logo_Call::finalists( $event_id );
 		$ids       = wp_list_pluck( $finalists, 'ID' );
-		if ( 'results' !== CYWater_Logo_Call::current_phase( $event_id ) || 3 !== count( $ids ) || ! in_array( absint( $entry_id ), array_map( 'absint', $ids ), true ) || self::selected_for_event( $event_id ) ) {
+		if ( 'results' !== CYWater_Logo_Call::current_phase( $event_id ) || 5 !== count( $ids ) || ! in_array( absint( $entry_id ), array_map( 'absint', $ids ), true ) || self::selected_for_event( $event_id ) ) {
 			return new WP_Error( 'cywater_logo_select_invalid' );
 		}
 		$entry = self::entry( $entry_id );
-		if ( ! $entry || ! CYWater_Operations_Audit::record( 'logo_event', $event_id, 'board_selection_authorized', 'three_finalists', 'official_selected', (int) $entry->post_author, 'logo_governance' ) ) {
+		if ( ! $entry || ! CYWater_Operations_Audit::record( 'logo_event', $event_id, 'board_selection_authorized', 'five_finalists', 'official_selected', (int) $entry->post_author, 'logo_governance' ) ) {
 			return new WP_Error( 'cywater_logo_select_audit' );
 		}
 		update_post_meta( $entry_id, '_cywater_logo_status', 'selected' );
@@ -398,12 +406,12 @@ final class CYWater_Operations_Logo_Review {
 
 	private static function csv_manifest( $entries ) {
 		$stream = fopen( 'php://temp', 'w+' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
-		fputcsv( $stream, array( 'work_number', 'event', 'entrant_legal_name', 'account_name', 'verified_email', 'institution', 'country_or_region', 'title_or_role', 'career_stage', 'submitted_utc', 'statement', 'status', 'votes', 'original_file', 'mime_type', 'terms_version', 'terms_accepted_utc', 'rights_status', 'final_files_status', 'reward_status' ) );
+		fputcsv( $stream, array( 'work_number', 'event', 'entrant_legal_name', 'account_name', 'verified_email', 'institution', 'country_or_region', 'title_or_role', 'career_stage', 'submitted_utc', 'statement', 'status', 'votes', 'original_file', 'mime_type', 'terms_version', 'terms_accepted_utc', 'participation_reward_status', 'participation_reward_end', 'finalist_reward_status', 'finalist_reward_end', 'rights_status', 'final_files_status', 'selected_design_reward_status' ) );
 		foreach ( $entries as $entry ) {
 			$user = get_userdata( (int) $entry->post_author );
 			$file = CYWater_Logo_Call::source_file( $entry->ID );
 			fputcsv( $stream, array(
-				CYWater_Logo_Call::work_number( $entry->ID ), get_the_title( absint( get_post_meta( $entry->ID, '_cywater_logo_event_id', true ) ) ), get_post_meta( $entry->ID, '_cywater_logo_submitter_name', true ), $user ? $user->display_name : '', $user ? $user->user_email : '', get_user_meta( $entry->post_author, 'cyw_institution_name', true ), self::country_label( (string) get_user_meta( $entry->post_author, 'cyw_country', true ) ), get_user_meta( $entry->post_author, 'cyw_professional_title', true ), get_user_meta( $entry->post_author, 'cyw_career_stage', true ), $entry->post_date_gmt, get_post_meta( $entry->ID, '_cywater_logo_statement', true ), get_post_meta( $entry->ID, '_cywater_logo_status', true ), CYWater_Logo_Call::vote_count( $entry->ID ), $file['original'] ?? '', $file['type'] ?? '', get_post_meta( $entry->ID, '_cywater_logo_terms_version', true ), get_post_meta( $entry->ID, '_cywater_logo_terms_accepted_at', true ), get_post_meta( $entry->ID, '_cywater_logo_rights_status', true ), get_post_meta( $entry->ID, '_cywater_logo_final_files_status', true ), get_post_meta( $entry->ID, '_cywater_logo_reward_status', true ),
+				CYWater_Logo_Call::work_number( $entry->ID ), get_the_title( absint( get_post_meta( $entry->ID, '_cywater_logo_event_id', true ) ) ), get_post_meta( $entry->ID, '_cywater_logo_submitter_name', true ), $user ? $user->display_name : '', $user ? $user->user_email : '', get_user_meta( $entry->post_author, 'cyw_institution_name', true ), self::country_label( (string) get_user_meta( $entry->post_author, 'cyw_country', true ) ), get_user_meta( $entry->post_author, 'cyw_professional_title', true ), get_user_meta( $entry->post_author, 'cyw_career_stage', true ), $entry->post_date_gmt, get_post_meta( $entry->ID, '_cywater_logo_statement', true ), get_post_meta( $entry->ID, '_cywater_logo_status', true ), CYWater_Logo_Call::vote_count( $entry->ID ), $file['original'] ?? '', $file['type'] ?? '', get_post_meta( $entry->ID, '_cywater_logo_terms_version', true ), get_post_meta( $entry->ID, '_cywater_logo_terms_accepted_at', true ), get_post_meta( $entry->ID, '_cywater_logo_participation_reward_status', true ), get_post_meta( $entry->ID, '_cywater_logo_participation_reward_end', true ), get_post_meta( $entry->ID, '_cywater_logo_finalist_reward_status', true ), get_post_meta( $entry->ID, '_cywater_logo_finalist_reward_end', true ), get_post_meta( $entry->ID, '_cywater_logo_rights_status', true ), get_post_meta( $entry->ID, '_cywater_logo_final_files_status', true ), get_post_meta( $entry->ID, '_cywater_logo_reward_status', true ),
 			) );
 		}
 		rewind( $stream );

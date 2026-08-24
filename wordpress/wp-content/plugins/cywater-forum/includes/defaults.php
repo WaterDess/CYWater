@@ -29,11 +29,11 @@ return array(
 	 * endorsement_articles_required - published forum articles an existing
 	 *   author needs before they may endorse somebody else.
 	 * endorsements_required - endorsements a new author must collect before
-	 *   they may publish.
+	 *   they may participate.
 	 * admin_override - whether an administrator may grant or revoke authorship
 	 *   directly, bypassing the endorsement chain.
 	 * membership_required - whether an active PMPro membership is a
-	 *   prerequisite for submitting an article for review.
+	 *   prerequisite for publishing an article.
 	 */
 	'endorsements_enabled'          => false,
 	'endorsement_articles_required' => 1,

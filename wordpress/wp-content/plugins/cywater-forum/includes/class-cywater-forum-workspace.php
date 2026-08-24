@@ -3,8 +3,8 @@
  * Front-end Forum workspace for ordinary members.
  *
  * The workspace is intentionally separate from WordPress administration.
- * Members create and update their own draft or pending Forum articles here;
- * publication, take-down, restoration, and cross-author work remain in the
+ * Members create, publish, and update their own Forum articles here. Take-down,
+ * restoration, deletion of published work, and cross-author work remain in the
  * Community Moderator administration surface.
  */
 
@@ -16,7 +16,7 @@ final class CYWater_Forum_Workspace {
 	private const PAGE_OPTION        = 'cywater_forum_workspace_page_id';
 	private const SETUP_OPTION       = 'cywater_forum_workspace_setup_version';
 	private const PAGE_SLUG          = 'forum-workspace';
-	private const EDITABLE_STATUSES  = array( 'draft', 'pending' );
+	private const EDITABLE_STATUSES  = array( 'draft', 'publish' );
 	private const OPERATIONS_ROLES   = array(
 		'cywater_content_event_editor',
 		'cywater_community_moderator',
@@ -34,8 +34,21 @@ final class CYWater_Forum_Workspace {
 		add_action( 'init', array( __CLASS__, 'maybe_setup_page' ), 30 );
 		add_action( 'cywater_after_core_setup', array( __CLASS__, 'setup_page' ), 40 );
 		add_action( 'admin_post_cywater_forum_workspace_save', array( __CLASS__, 'handle_save' ) );
+		add_filter( 'wp_insert_post_data', array( __CLASS__, 'retire_pending_status' ), 20, 2 );
 		add_filter( 'show_admin_bar', array( __CLASS__, 'filter_admin_bar' ) );
 		add_filter( 'wp_robots', array( __CLASS__, 'filter_robots' ) );
+	}
+
+	/**
+	 * Pending review is not part of the Forum lifecycle. Normalize any legacy,
+	 * REST, or third-party attempt back to a private draft.
+	 */
+	public static function retire_pending_status( $data, $postarr ) {
+		$post_type = (string) ( $data['post_type'] ?? $postarr['post_type'] ?? '' );
+		if ( CYWater_Forum_Content::POST_TYPE === $post_type && 'pending' === ( $data['post_status'] ?? '' ) ) {
+			$data['post_status'] = 'draft';
+		}
+		return $data;
 	}
 
 	/** Create the one presentation-only Page used by the active theme. */
@@ -166,7 +179,7 @@ final class CYWater_Forum_Workspace {
 		return get_posts(
 			array(
 				'post_type'      => CYWater_Forum_Content::POST_TYPE,
-				'post_status'    => array( 'draft', 'pending', 'publish' ),
+				'post_status'    => array( 'draft', 'publish' ),
 				'author'         => $user_id,
 				'posts_per_page' => 100,
 				'orderby'        => 'modified',
@@ -185,7 +198,7 @@ final class CYWater_Forum_Workspace {
 			return new WP_Error( 'article_not_owned', __( 'You can edit only your own Forum articles.', 'cywater-forum' ) );
 		}
 		if ( ! in_array( $post->post_status, self::EDITABLE_STATUSES, true ) ) {
-			return new WP_Error( 'article_read_only', __( 'Published and taken-down Forum articles are read-only for members.', 'cywater-forum' ) );
+			return new WP_Error( 'article_read_only', __( 'Taken-down Forum articles are read-only for members.', 'cywater-forum' ) );
 		}
 		return $post;
 	}
@@ -214,7 +227,10 @@ final class CYWater_Forum_Workspace {
 
 		$requested_status = sanitize_key( (string) ( $input['status'] ?? 'draft' ) );
 		if ( ! in_array( $requested_status, self::EDITABLE_STATUSES, true ) ) {
-			return new WP_Error( 'status_forbidden', __( 'Members may save a draft or submit it for review; they cannot publish directly.', 'cywater-forum' ) );
+			return new WP_Error( 'status_forbidden', __( 'Members may save a draft or publish their own article.', 'cywater-forum' ) );
+		}
+		if ( $post_id && 'publish' === $existing->post_status && 'draft' === $requested_status ) {
+			return new WP_Error( 'status_forbidden', __( 'Published articles cannot be returned to draft from the member workspace. Contact a Community Moderator to take an article down.', 'cywater-forum' ) );
 		}
 
 		$title   = sanitize_text_field( (string) ( $input['title'] ?? '' ) );
@@ -278,7 +294,7 @@ final class CYWater_Forum_Workspace {
 		check_admin_referer( 'cywater_forum_workspace_save_' . $post_id, 'cywater_forum_workspace_nonce' );
 
 		$intent = sanitize_key( (string) ( $_POST['forum_intent'] ?? 'draft' ) );
-		$status = 'pending' === $intent ? 'pending' : 'draft';
+		$status = 'publish' === $intent ? 'publish' : 'draft';
 		$cover = self::upload_cover( $user_id, $post_id );
 		if ( is_wp_error( $cover ) ) {
 			self::redirect_with_result( 'error', $cover->get_error_code(), $post_id );
@@ -302,7 +318,7 @@ final class CYWater_Forum_Workspace {
 			self::redirect_with_result( 'error', $result->get_error_code(), $post_id );
 		}
 
-		self::redirect_with_result( 'notice', 'pending' === $status ? 'submitted' : 'saved', absint( $result ) );
+		self::redirect_with_result( 'notice', 'publish' === $status ? 'published' : 'saved', absint( $result ) );
 	}
 
 	private static function redirect_with_result( $type, $code, $post_id = 0 ) {
@@ -317,7 +333,6 @@ final class CYWater_Forum_Workspace {
 	public static function status_label( $status ) {
 		$labels = array(
 			'draft'   => __( 'Draft', 'cywater-forum' ),
-			'pending' => __( 'Pending review', 'cywater-forum' ),
 			'publish' => __( 'Published', 'cywater-forum' ),
 		);
 		return $labels[ (string) $status ] ?? __( 'Unavailable', 'cywater-forum' );
@@ -327,14 +342,14 @@ final class CYWater_Forum_Workspace {
 		$messages = array(
 			'notice' => array(
 				'saved'     => __( 'Draft saved.', 'cywater-forum' ),
-				'submitted' => __( 'Article submitted for Community Moderator review.', 'cywater-forum' ),
+				'published' => __( 'Article published.', 'cywater-forum' ),
 			),
 			'error'  => array(
 				'submission_blocked' => __( 'Your account is not currently eligible to submit Forum articles.', 'cywater-forum' ),
 				'article_not_found'   => __( 'That Forum article is unavailable.', 'cywater-forum' ),
 				'article_not_owned'   => __( 'You can edit only your own Forum articles.', 'cywater-forum' ),
-				'article_read_only'   => __( 'Published and taken-down articles are read-only for members.', 'cywater-forum' ),
-				'status_forbidden'    => __( 'Members cannot publish Forum articles directly.', 'cywater-forum' ),
+				'article_read_only'   => __( 'Taken-down articles are read-only for members.', 'cywater-forum' ),
+				'status_forbidden'    => __( 'That article status cannot be changed from the member workspace.', 'cywater-forum' ),
 				'title_required'      => __( 'Add an article title.', 'cywater-forum' ),
 				'content_required'    => __( 'Add the article text.', 'cywater-forum' ),
 				'category_invalid'    => __( 'Choose an existing Forum category.', 'cywater-forum' ),

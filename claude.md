@@ -1127,8 +1127,8 @@ describe sandbox activity as a real transaction.
 ### Production Release Snapshot (2026-08-21)
 
 - The reviewed WordPress production candidate is live at `https://cywater.org/`
-  with theme `0.6.42`, Membership `0.9.6`, Logo Call `0.3.2`, Forum `0.4.2`,
-  Partnerships `0.1.5`, and Operations `0.2.1`. The complete predeploy database
+  with theme `0.6.43`, Membership `0.9.6`, Logo Call `0.4.0`, Forum `0.5.0`,
+  Partnerships `0.1.5`, and Operations `0.3.0`. The complete initial-release database
   and code trees are retained at
   `/home/u111638297/cywater-release-backups/production-release-predeploy-20260821T132711`.
 - The member-login page now stores only `[cywater_member_login]` and renders one
@@ -1218,16 +1218,37 @@ describe sandbox activity as a real transaction.
   Twenty-Three were moved from the public code tree to the recoverable archive
   `/home/u111638297/cywater-release-backups/production-inactive-code-cleanup-20260823T115154`.
   Twenty Twenty-Five remains installed as the fallback theme.
-- Logo Call `0.3.3` keeps submissions open through September 30, 2026. Voting
-  dates are neither scheduled in Event metadata nor shown publicly; the page
-  states only that a separate voting activity follows, and the workflow waits
-  safely in review after submissions close until voting is configured. Staging
-  QA passed 35 self-cleaning checks before production deployment. Production
-  purity passes 22 read-only checks, and a repeatable HTTP audit checked 81
-  sitemap and key routes with zero staging, Sandbox, temporary-host,
-  local-development, QA-identity, or private payment-fixture residue hits.
-  The final production-clean `0.5.7` bundle is 16,399,216 bytes with SHA-256
-  `5ee57d80cbbb19659cdbde8c2e590105e5efdb9919121e4cd7847a73e8ce30c7`.
+- On 2026-08-24 Forum `0.5.0` and theme `0.6.43` replaced the former
+  pre-publication review queue with direct publication by an email-verified
+  active Student, Professional or Lifetime member. Eligible authors may create
+  and revise their own published Forum articles from the front-end workspace;
+  they cannot delete published articles, edit other authors, moderate replies,
+  or gain WordPress administration access. Community Moderators retain
+  cross-author editing, take-down, restoration, reply moderation and permanent
+  deletion. Legacy `pending` Forum data is normalized to draft, and the exact
+  empty production fixture `Test post - please ignore` was permanently removed
+  only after the production backup. No real Forum article existed at cutover.
+- Logo Call `0.4.0` and Operations `0.3.0` keep submissions open through
+  September 30, 2026. Voting dates and detailed ballot/tie rules are not yet
+  scheduled or published. A valid entrant receives Student membership through
+  December 31, 2026 without shortening or replacing a higher existing benefit;
+  the five voting finalists receive two years of Professional membership. Safe
+  complimentary grants are automatic, while a conflicting paid Stripe term is
+  flagged for manual fulfillment instead of being cancelled or replaced. The
+  selected-design reward remains a separate controlled fulfillment item because
+  the requested phrase “Lifetime membership for two years” requires Board
+  clarification before an entitlement can be issued accurately.
+- Staging Logo Call QA passed 36 self-cleaning checks and Operations passed 435;
+  Forum passed 130 application/storage assertions, while only its outer HTTP
+  probes were intercepted by deliberate staging Basic Auth. Production remains
+  Stripe `live`, has zero Forum and Logo Call fixtures, passed 22 read-only
+  purity checks, returned HTTP 200 for the Forum, Membership and Logo Event,
+  and all 124 deployed Forum/Logo/Operations/theme files match the local
+  candidate by SHA-256. The production database and four pre-release code trees
+  are retained at
+  `/home/u111638297/cywater-release-backups/forum-logo-direct-publish-production-20260824T004908Z`.
+  The deployed candidate bundle is 16,280,910 bytes with SHA-256
+  `6f375e84b66cbb26480f1cd8b6d23305e6d58c68700c36a767e1e51ab357afbd`.
 
 ## Editing Guidance
 

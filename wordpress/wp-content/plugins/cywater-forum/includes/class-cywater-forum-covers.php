@@ -2,7 +2,7 @@
 /**
  * Protected cover-image storage for member-authored Forum articles.
  *
- * Draft and pending covers must never enter WordPress' public uploads tree.
+ * Draft covers must never enter WordPress' public uploads tree.
  * One private file is retained per article and is streamed only through this
  * lifecycle-aware controller. Publication makes the stream public; taking the
  * article down closes the same URL immediately.
@@ -254,7 +254,7 @@ final class CYWater_Forum_Covers {
 		$posts = get_posts(
 			array(
 				'post_type'      => CYWater_Forum_Content::POST_TYPE,
-				'post_status'    => array( 'draft', 'pending', 'publish', 'trash' ),
+				'post_status'    => array( 'draft', 'publish', 'trash' ),
 				'posts_per_page' => -1,
 				'fields'         => 'ids',
 				'meta_key'       => '_thumbnail_id', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
@@ -363,7 +363,7 @@ final class CYWater_Forum_Covers {
 		if ( ! $user_id ) {
 			return false;
 		}
-		if ( in_array( $post->post_status, array( 'draft', 'pending' ), true ) && absint( $post->post_author ) === $user_id ) {
+		if ( 'draft' === $post->post_status && absint( $post->post_author ) === $user_id ) {
 			return true;
 		}
 		return user_can( $user_id, 'manage_options' ) || ( class_exists( 'CYWater_Forum_Roles' ) && CYWater_Forum_Roles::is_staff( $user_id ) );
@@ -378,7 +378,7 @@ final class CYWater_Forum_Covers {
 		$posts = get_posts(
 			array(
 				'post_type'      => CYWater_Forum_Content::POST_TYPE,
-				'post_status'    => array( 'draft', 'pending', 'publish', 'trash' ),
+				'post_status'    => array( 'draft', 'publish', 'trash' ),
 				'author'         => absint( $user_id ),
 				'posts_per_page' => -1,
 				'fields'         => 'ids',

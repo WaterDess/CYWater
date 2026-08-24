@@ -58,15 +58,17 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 
 Hostinger staging is available at `https://staging.cywater.org/`, and the public
 production site is live at `https://cywater.org/`. The 2026-08-24 accepted code
-baseline uses the CYWater `0.6.42` theme, CYWater Membership `0.9.6`, CYWater
-Partnerships `0.1.5`, CYWater Logo Call `0.3.3`, CYWater Forum `0.4.2`, CYWater
-Environment `0.5.7`, CYWater Core `0.6.6`, CYWater Operations `0.2.1`, and Event
+baseline uses the CYWater `0.6.43` theme, CYWater Membership `0.9.6`, CYWater
+Partnerships `0.1.5`, CYWater Logo Call `0.4.0`, CYWater Forum `0.5.0`, CYWater
+Environment `0.5.7`, CYWater Core `0.6.6`, CYWater Operations `0.3.0`, and Event
 Tickets `5.29.1`.
 
-Logo Call `0.3.3` keeps submissions open through September 30, 2026. Its public
+Logo Call `0.4.0` keeps submissions open through September 30, 2026. Its public
 copy states only that a separate voting activity follows; no voting dates are
-published or scheduled yet, and the post-submission phase safely waits for a
-later voting configuration. Environment `0.5.7` removes WordPress' users
+published or scheduled yet. Valid entrants earn Student membership through the
+end of 2026, the five voting finalists earn two years of Professional
+membership, and final winner fulfillment remains Board-controlled. The
+post-submission phase safely waits for a later voting configuration. Environment `0.5.7` removes WordPress' users
 sitemap in addition to the existing REST-user and author-archive protections.
 The production purity gate passes 22 checks, and the repeatable public residue
 audit checks 81 sitemap/key URLs with zero staging, Sandbox, temporary-host,
@@ -75,7 +77,7 @@ The resulting production-clean `0.5.7` bundle is
 `dist/cywater-wordpress-production-clean-0.5.7.zip` (16,399,216 bytes), SHA-256
 `5ee57d80cbbb19659cdbde8c2e590105e5efdb9919121e4cd7847a73e8ce30c7`.
 
-Theme `0.6.42` retains the editable WordPress custom Logo as the single brand
+Theme `0.6.43` retains the editable WordPress custom Logo as the single brand
 source for the header, footer, and browser icon. The bundled fallback uses the
 same mark through a 4 KB favicon derivative declared before `wp_head`, while
 the full header mark is preloaded. WordPress' separate Site Icon output is
@@ -95,7 +97,7 @@ managed public pages; a direct `/wp-admin/` request keeps WordPress' native
 staff login; and an authenticated non-staff member receives HTTP 403. Front-end
 sign-out returns to `/member-login/?loggedout=true`, and identity pages are
 explicitly excluded from full-page caching so login state cannot be masked by a
-stale public form. Theme `0.6.42` consumes the same routing source for its
+stale public form. Theme `0.6.43` consumes the same routing source for its
 desktop and mobile account actions.
 
 The public production cutover is complete. On 2026-08-23 the association opened
@@ -602,18 +604,20 @@ and does not block launch; it is needed only if this work is later delegated to
 a non-Administrator. CYWater must not create a local imitation of that licensed
 role.
 
-CYWater Logo Call `0.3.0` is the deployed staging plugin attached only to the
-enabled `CYWater Logo Design Call 2026` staging Event. It accepts one PNG, JPEG
+CYWater Logo Call `0.4.0` is attached only to the enabled
+`CYWater Logo Design Call 2026` Event. It accepts one PNG, JPEG
 or WebP logo file of at most 5 MB per eligible account; no separate lockup is
 requested during the open call. Submission grants only a limited review,
 display and voting license, so non-winning rights remain with the entrant. A
-separate vote opens after submissions close. Governance confirms exactly three
-highest-ranked eligible finalists, resolving only a tie that crosses the third-
+separate vote opens after submissions close. Governance confirms exactly five
+highest-ranked eligible finalists, resolving only a tie that crosses the fifth-
 place boundary, and the Board selects the official logo from those finalists.
 The selected entrant must complete a documented winning-design assignment and
 deliver accepted scalable or high-resolution production files before an
-Administrator may record the two-year Professional-membership reward as
-fulfilled. Protected files stay outside public uploads. The sole operational
+Administrator may record the selected-design reward as fulfilled. Every valid
+entrant earns Student membership through December 31, 2026, and the five
+finalists earn two years of Professional membership. Protected files stay
+outside public uploads. The sole operational
 entry is **Logo reviews**, which shows protected thumbnails, stable work
 numbers, account/verified-email/profile context, vote counts and handoff state;
 it provides a permission-gated ZIP plus CSV export. The self-cleaning staging

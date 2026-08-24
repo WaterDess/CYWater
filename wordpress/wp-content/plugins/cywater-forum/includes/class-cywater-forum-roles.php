@@ -10,8 +10,9 @@
  * - Permission to submit is evaluated per request, because membership can
  *   lapse and an email address can become unverified. A lapsed member keeps
  *   their role and records but cannot create or edit a submission.
- * - Publication is always staff-only. A member may save a draft or submit it
- *   for review; a Community Moderator decides whether it becomes public.
+ * - An eligible member may publish and edit their own article immediately.
+ *   Community Moderators retain cross-author editing, take-down, restoration,
+ *   deletion, term-management, and discussion-moderation powers.
  *
  * That split is why the gate lives in map_meta_cap rather than in the role.
  */
@@ -39,6 +40,8 @@ final class CYWater_Forum_Roles {
 		return array(
 			'read',
 			'edit_cyw_forum_posts',
+			'edit_published_cyw_forum_posts',
+			'publish_cyw_forum_posts',
 			'delete_cyw_forum_posts',
 		);
 	}
@@ -83,7 +86,7 @@ final class CYWater_Forum_Roles {
 
 		$role = get_role( self::AUTHOR_ROLE );
 		if ( $role ) {
-			foreach ( array( 'upload_files', 'edit_published_cyw_forum_posts', 'publish_cyw_forum_posts', 'delete_published_cyw_forum_posts' ) as $retired_cap ) {
+			foreach ( array( 'upload_files', 'delete_published_cyw_forum_posts' ) as $retired_cap ) {
 				$role->remove_cap( $retired_cap );
 			}
 			foreach ( self::author_capabilities() as $cap ) {
@@ -133,7 +136,7 @@ final class CYWater_Forum_Roles {
 	}
 
 	/**
-	 * Staff publish on the association's behalf and are never subject to the
+	 * Staff moderate on the association's behalf and are never subject to the
 	 * endorsement or membership gate.
 	 */
 	public static function is_staff( $user_id ) {
@@ -141,7 +144,8 @@ final class CYWater_Forum_Roles {
 	}
 
 	/**
-	 * Reasons this user may not publish right now.
+	 * Reasons this user may not publish right now. Publication and submission
+	 * share one eligibility policy; there is no per-article approval gate.
 	 *
 	 * @return array<int, string>
 	 */
@@ -149,16 +153,11 @@ final class CYWater_Forum_Roles {
 		if ( self::is_staff( $user_id ) ) {
 			return array();
 		}
-		$blockers = self::submission_blockers( $user_id );
-		if ( ! $blockers ) {
-			$blockers[] = 'moderator_review_required';
-		}
-		return $blockers;
+		return self::submission_blockers( $user_id );
 	}
 
 	/**
-	 * Reasons a member may not submit a new Forum article for moderation.
-	 * Publishing itself is always staff-only.
+	 * Reasons a member may not create, publish, or update a Forum article.
 	 *
 	 * @return array<int, string>
 	 */
@@ -191,7 +190,7 @@ final class CYWater_Forum_Roles {
 	}
 
 	public static function can_publish( $user_id ) {
-		return self::is_staff( $user_id );
+		return array() === self::publish_blockers( $user_id );
 	}
 
 	public static function can_submit( $user_id ) {
@@ -199,7 +198,7 @@ final class CYWater_Forum_Roles {
 	}
 
 	/**
-	 * Lazily grant the durable draft-author role to the signed-in member once
+	 * Lazily grant the durable Forum-author role to the signed-in member once
 	 * the authoritative membership and email gates are satisfied. The gates
 	 * remain request-time checks, so retaining the role never preserves access
 	 * after membership expires.
@@ -247,8 +246,9 @@ final class CYWater_Forum_Roles {
 	}
 
 	/**
-	 * The author role is retained for record ownership, so remove its create/edit
-	 * primitive at request time whenever the member no longer qualifies.
+	 * The author role is retained for record ownership, so remove its create,
+	 * publish, and edit-published primitives at request time whenever the member
+	 * no longer qualifies.
 	 *
 	 * @param array<string, bool> $allcaps
 	 * @param array<int, string>  $caps
@@ -258,20 +258,23 @@ final class CYWater_Forum_Roles {
 	 */
 	public static function gate_member_submission_primitives( $allcaps, $caps, $args, $user ) {
 		$requested = (string) ( $args[0] ?? '' );
-		if ( 'edit_cyw_forum_posts' !== $requested && ! in_array( 'edit_cyw_forum_posts', (array) $caps, true ) ) {
+		$participation_caps = array( 'edit_cyw_forum_posts', 'edit_published_cyw_forum_posts', 'publish_cyw_forum_posts' );
+		if ( ! in_array( $requested, $participation_caps, true ) && ! array_intersect( $participation_caps, (array) $caps ) ) {
 			return $allcaps;
 		}
 		if ( ! $user instanceof WP_User || ! empty( $allcaps['edit_others_cyw_forum_posts'] ) ) {
 			return $allcaps;
 		}
 		if ( ! self::can_submit( $user->ID ) ) {
-			$allcaps['edit_cyw_forum_posts'] = false;
+			foreach ( $participation_caps as $participation_cap ) {
+				$allcaps[ $participation_cap ] = false;
+			}
 		}
 		return $allcaps;
 	}
 
 	/**
-	 * Deny publication for every non-staff account.
+	 * Keep staff-only lifecycle controls separate from member publication.
 	 *
 	 * @param array<int, string> $caps    Primitive capabilities required.
 	 * @param string             $cap     Capability being checked.
@@ -301,7 +304,7 @@ final class CYWater_Forum_Roles {
 		if ( 'publish_cyw_forum_posts' !== $cap ) {
 			return $caps;
 		}
-		if ( self::is_staff( $user_id ) ) {
+		if ( self::can_publish( $user_id ) ) {
 			return $caps;
 		}
 		// do_not_allow is the documented way to deny a mapped capability

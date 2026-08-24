@@ -171,11 +171,11 @@ final class CYWater_Forum_Settings {
 				<h2><?php esc_html_e( 'Article participation', 'cywater-forum' ); ?></h2>
 				<table class="form-table" role="presentation">
 					<?php
-					self::checkbox_row( 'membership_required', __( 'Require active individual membership', 'cywater-forum' ), __( 'Only a verified account with an active Student, Professional or Lifetime membership may submit an article for moderator review.', 'cywater-forum' ), $values, $disabled );
+					self::checkbox_row( 'membership_required', __( 'Require active individual membership', 'cywater-forum' ), __( 'Only a verified account with an active Student, Professional or Lifetime membership may publish a Forum article.', 'cywater-forum' ), $values, $disabled );
 					self::checkbox_row( 'endorsements_enabled', __( 'Enable legacy endorsement workflow', 'cywater-forum' ), __( 'Currently paused. When disabled, no invitation request or link is processed; historical records and implementation are retained.', 'cywater-forum' ), $values, $disabled );
 					if ( ! empty( $values['endorsements_enabled'] ) ) {
 						self::number_row( 'endorsement_articles_required', __( 'Articles required to endorse', 'cywater-forum' ), __( 'Published forum articles an author needs before they may endorse someone else.', 'cywater-forum' ), $values, $disabled );
-						self::number_row( 'endorsements_required', __( 'Endorsements required to submit', 'cywater-forum' ), __( 'Endorsements a member must collect before submitting an article for moderator review.', 'cywater-forum' ), $values, $disabled );
+						self::number_row( 'endorsements_required', __( 'Endorsements required to participate', 'cywater-forum' ), __( 'Endorsements a member must collect before publishing an article when the legacy endorsement workflow is enabled.', 'cywater-forum' ), $values, $disabled );
 						self::checkbox_row( 'admin_override', __( 'Administrator override', 'cywater-forum' ), __( 'Allow an administrator to grant or revoke legacy endorsement status from the user editor.', 'cywater-forum' ), $values, $disabled );
 						self::number_row( 'endorsement_requests_per_day', __( 'Endorsement requests per day', 'cywater-forum' ), __( 'Requests one candidate may send in 24 hours.', 'cywater-forum' ), $values, $disabled );
 						self::number_row( 'endorsement_token_ttl_hours', __( 'Endorsement link lifetime (hours)', 'cywater-forum' ), __( 'How long an endorsement link stays valid. It is single-use regardless.', 'cywater-forum' ), $values, $disabled );

@@ -57,7 +57,7 @@ $blocker_copy = array(
 		array(
 			'eyebrow' => __( 'Member workspace', 'cywater' ),
 			'title'   => __( 'Write for the CYWater Forum.', 'cywater' ),
-			'lead'    => __( 'Save a draft, submit it for Community Moderator review, and follow the status of your own articles without entering WordPress administration.', 'cywater' ),
+			'lead'    => __( 'Save a draft or publish your own article directly, then update it from this workspace without entering WordPress administration.', 'cywater' ),
 			'actions' => '<a class="btn btn-outline" href="' . esc_url( get_post_type_archive_link( 'cyw_forum_post' ) ) . '">' . esc_html__( 'Browse Forum', 'cywater' ) . '</a>',
 		)
 	);
@@ -74,8 +74,8 @@ $blocker_copy = array(
 				<?php if ( CYWater_Forum_Roles::is_staff( $user_id ) ) : ?>
 					<div class="forum-workspace-gate card">
 						<span class="badge badge-teal"><?php esc_html_e( 'Staff workspace', 'cywater' ); ?></span>
-						<h2><?php esc_html_e( 'Review and publication stay in WordPress administration.', 'cywater' ); ?></h2>
-						<p><?php esc_html_e( 'Community Moderators use the protected Forum administration area to review, publish, take down, restore, and moderate discussion.', 'cywater' ); ?></p>
+						<h2><?php esc_html_e( 'Forum moderation stays in WordPress administration.', 'cywater' ); ?></h2>
+						<p><?php esc_html_e( 'Community Moderators use the protected Forum administration area to edit across authors, take down, restore or delete articles, and moderate discussion.', 'cywater' ); ?></p>
 						<a class="btn btn-accent" href="<?php echo esc_url( admin_url( 'edit.php?post_type=cyw_forum_post' ) ); ?>"><?php esc_html_e( 'Manage Forum', 'cywater' ); ?></a>
 					</div>
 				<?php elseif ( ! $can_submit ) : ?>
@@ -113,7 +113,7 @@ $blocker_copy = array(
 								<div class="field">
 									<label class="field-label" for="forum-content"><?php esc_html_e( 'Article text', 'cywater' ); ?> <span class="req" aria-hidden="true">*</span></label>
 									<textarea class="textarea forum-workspace-textarea" id="forum-content" name="forum_content" required <?php echo 'content_required' === $error_code ? 'aria-invalid="true"' : ''; ?>><?php echo esc_textarea( $editing instanceof WP_Post ? $editing->post_content : '' ); ?></textarea>
-									<p class="field-hint"><?php esc_html_e( 'Use clear paragraphs. A Community Moderator reviews every submission before publication.', 'cywater' ); ?></p>
+									<p class="field-hint"><?php esc_html_e( 'Use clear paragraphs. Publishing makes the article visible immediately; Community Moderators may remove content that violates Forum policy.', 'cywater' ); ?></p>
 								</div>
 
 								<div class="field-row">
@@ -136,8 +136,10 @@ $blocker_copy = array(
 								</div>
 
 								<div class="forum-workspace-actions">
-									<button class="btn btn-outline" type="submit" name="forum_intent" value="draft"><?php esc_html_e( 'Save draft', 'cywater' ); ?></button>
-									<button class="btn btn-accent" type="submit" name="forum_intent" value="pending"><?php esc_html_e( 'Submit for review', 'cywater' ); ?></button>
+									<?php if ( ! $editing instanceof WP_Post || 'draft' === $editing->post_status ) : ?>
+										<button class="btn btn-outline" type="submit" name="forum_intent" value="draft"><?php esc_html_e( 'Save draft', 'cywater' ); ?></button>
+									<?php endif; ?>
+									<button class="btn btn-accent" type="submit" name="forum_intent" value="publish"><?php echo $editing instanceof WP_Post && 'publish' === $editing->post_status ? esc_html__( 'Update article', 'cywater' ) : esc_html__( 'Publish article', 'cywater' ); ?></button>
 								</div>
 							</form>
 						</section>
@@ -146,21 +148,22 @@ $blocker_copy = array(
 
 				<?php if ( $is_logged_in && ! CYWater_Forum_Roles::is_staff( $user_id ) ) : ?>
 					<section class="forum-workspace-articles" aria-labelledby="forum-workspace-articles-title">
-						<div class="section-head"><span class="eyebrow"><?php esc_html_e( 'My articles', 'cywater' ); ?></span><h2 id="forum-workspace-articles-title"><?php esc_html_e( 'Drafts, reviews, and published work.', 'cywater' ); ?></h2></div>
+						<div class="section-head"><span class="eyebrow"><?php esc_html_e( 'My articles', 'cywater' ); ?></span><h2 id="forum-workspace-articles-title"><?php esc_html_e( 'Drafts and published work.', 'cywater' ); ?></h2></div>
 						<?php if ( ! $articles ) : ?>
 							<p class="lead"><?php esc_html_e( 'You have not started a Forum article yet.', 'cywater' ); ?></p>
 						<?php else : ?>
 							<div class="forum-workspace-status-grid">
-								<?php foreach ( array( 'draft', 'pending', 'publish' ) as $status ) : ?>
+								<?php foreach ( array( 'draft', 'publish' ) as $status ) : ?>
 									<?php $status_articles = array_values( array_filter( $articles, static fn( $article ) => $status === $article->post_status ) ); ?>
 									<section class="forum-workspace-status card" aria-labelledby="forum-workspace-status-<?php echo esc_attr( $status ); ?>">
-										<div class="forum-workspace-status-head"><span class="badge <?php echo 'publish' === $status ? 'badge-live' : ( 'pending' === $status ? 'badge-gold' : 'badge-mute' ); ?>" id="forum-workspace-status-<?php echo esc_attr( $status ); ?>"><?php echo esc_html( CYWater_Forum_Workspace::status_label( $status ) ); ?></span><span><?php echo esc_html( (string) count( $status_articles ) ); ?></span></div>
+										<div class="forum-workspace-status-head"><span class="badge <?php echo 'publish' === $status ? 'badge-live' : 'badge-mute'; ?>" id="forum-workspace-status-<?php echo esc_attr( $status ); ?>"><?php echo esc_html( CYWater_Forum_Workspace::status_label( $status ) ); ?></span><span><?php echo esc_html( (string) count( $status_articles ) ); ?></span></div>
 										<?php if ( ! $status_articles ) : ?><p class="field-hint"><?php esc_html_e( 'No articles in this state.', 'cywater' ); ?></p><?php endif; ?>
 										<?php foreach ( $status_articles as $article ) : ?>
 											<article class="forum-workspace-article-row">
 												<h3><?php echo esc_html( $article->post_title ?: __( 'Untitled article', 'cywater' ) ); ?></h3>
 												<p><?php echo esc_html( sprintf( __( 'Updated %s', 'cywater' ), get_the_modified_date( get_option( 'date_format' ), $article ) ) ); ?></p>
-												<?php if ( 'publish' === $status ) : ?><a class="link" href="<?php echo esc_url( get_permalink( $article ) ); ?>"><?php esc_html_e( 'Read article', 'cywater' ); ?></a><?php elseif ( $can_submit ) : ?><a class="link" href="<?php echo esc_url( add_query_arg( 'edit', $article->ID, $workspace_url ) ); ?>"><?php esc_html_e( 'Edit article', 'cywater' ); ?></a><?php else : ?><span class="field-hint"><?php esc_html_e( 'Read-only until eligibility is restored.', 'cywater' ); ?></span><?php endif; ?>
+											<?php if ( $can_submit ) : ?><a class="link" href="<?php echo esc_url( add_query_arg( 'edit', $article->ID, $workspace_url ) ); ?>"><?php esc_html_e( 'Edit article', 'cywater' ); ?></a><?php else : ?><span class="field-hint"><?php esc_html_e( 'Read-only until eligibility is restored.', 'cywater' ); ?></span><?php endif; ?>
+											<?php if ( 'publish' === $status ) : ?><a class="link" href="<?php echo esc_url( get_permalink( $article ) ); ?>"><?php esc_html_e( 'Read article', 'cywater' ); ?></a><?php endif; ?>
 											</article>
 										<?php endforeach; ?>
 									</section>

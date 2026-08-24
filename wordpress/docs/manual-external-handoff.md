@@ -12,7 +12,7 @@ recovered and archived the former Logo Call `0.2.3` and Environment `0.5.5`
 trees before the current staging work. Logo Call `0.3.2` is independently
 accepted and deployed on staging and production with the reviewed Event
 configuration and no staging entries, votes, identities, or protected files.
-Membership `0.9.6`, Partnerships `0.1.5`, Forum `0.4.2`, Operations `0.2.1`,
+Membership `0.9.6`, Partnerships `0.1.5`, Forum `0.5.0`, Operations `0.3.0`,
 and Environment `0.5.5` are the verified staging candidate versions. See
 `production-checklist.md` for the authoritative order.
 

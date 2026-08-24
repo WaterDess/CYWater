@@ -33,8 +33,10 @@ Hostinger File Manager recovered the former Logo Call `0.2.3` and
 Environment `0.5.5` trees read-only. Normalized comparison matched all 5/5 and
 7/7 files before further work. At the association's direction, Logo Call was
 subsequently replaced by independently accepted staging Logo Call `0.3.2`, then
-Logo Call `0.3.3` extended submissions through September 30 and left voting
-unscheduled and undated on the public page until a separate announcement.
+Logo Call `0.4.0` extends submissions through September 30, records the
+Student-through-2026 participation reward and two-year Professional reward for
+five finalists, and leaves voting unscheduled and undated on the public page
+until a separate announcement.
 The association subsequently directed that Logo Call be included at launch.
 The production-clean profile therefore contains the theme plus Core, Membership,
 Partnerships, Logo Call, Forum, Operations, and Environment. Only the reviewed

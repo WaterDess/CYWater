@@ -1,6 +1,6 @@
 <?php
 /**
- * Staging-only, self-cleaning runtime QA for CYWater Forum 0.4.2.
+ * Staging-only, self-cleaning runtime QA for CYWater Forum 0.5.0.
  *
  * Run with:
  *   wp eval-file /absolute/path/to/cywater-staging-forum-qa.php
@@ -36,8 +36,8 @@ if ( ! is_plugin_active( 'cywater-forum/cywater-forum.php' ) ) {
 }
 
 $forum_plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/cywater-forum/cywater-forum.php', false, false );
-if ( '0.4.2' !== (string) ( $forum_plugin_data['Version'] ?? '' ) || ! defined( 'CYWATER_FORUM_VERSION' ) || '0.4.2' !== CYWATER_FORUM_VERSION ) {
-	WP_CLI::error( 'Refusing to run: this QA is pinned to CYWater Forum 0.4.2.' );
+if ( '0.5.0' !== (string) ( $forum_plugin_data['Version'] ?? '' ) || ! defined( 'CYWATER_FORUM_VERSION' ) || '0.5.0' !== CYWATER_FORUM_VERSION ) {
+	WP_CLI::error( 'Refusing to run: this QA is pinned to CYWater Forum 0.5.0.' );
 }
 
 $forum_qa_required_classes = array(
@@ -369,8 +369,8 @@ try {
 	$forum_qa_assert( 'forum-workspace' === get_post_field( 'post_name', $forum_qa_workspace_page_id ), 'The Forum workspace page does not use the stable /forum-workspace/ route.' );
 	$forum_qa_author_role = get_role( CYWater_Forum_Roles::AUTHOR_ROLE );
 	$forum_qa_assert( $forum_qa_author_role instanceof WP_Role, 'The durable Forum Author role is unavailable.' );
-	$forum_qa_assert( empty( $forum_qa_author_role->capabilities['publish_cyw_forum_posts'] ), 'Forum Author still has a direct publication primitive.' );
-	$forum_qa_assert( empty( $forum_qa_author_role->capabilities['edit_published_cyw_forum_posts'] ), 'Forum Author can edit a published article.' );
+	$forum_qa_assert( ! empty( $forum_qa_author_role->capabilities['publish_cyw_forum_posts'] ), 'Forum Author lacks the direct publication primitive.' );
+	$forum_qa_assert( ! empty( $forum_qa_author_role->capabilities['edit_published_cyw_forum_posts'] ), 'Forum Author cannot update their own published article.' );
 	$forum_qa_assert( empty( $forum_qa_author_role->capabilities['delete_published_cyw_forum_posts'] ), 'Forum Author can delete a published article.' );
 	$forum_qa_assert( empty( $forum_qa_author_role->capabilities['upload_files'] ), 'Forum Author can bypass the front-end cover handler through the Media library.' );
 
@@ -458,7 +458,8 @@ try {
 	$forum_qa_assert( $forum_qa_author instanceof WP_User && in_array( CYWater_Forum_Roles::AUTHOR_ROLE, (array) $forum_qa_author->roles, true ), 'An eligible member did not receive the durable Forum Author role.' );
 	$forum_qa_assert( CYWater_Forum_Roles::can_submit( $forum_qa_author_id ), 'Verified active member remains blocked from article submission.' );
 	$forum_qa_assert( user_can( $forum_qa_author_id, 'edit_cyw_forum_posts' ), 'Eligible member cannot create a Forum draft.' );
-	$forum_qa_assert( ! user_can( $forum_qa_author_id, 'publish_cyw_forum_posts' ), 'Eligible member has a direct publication capability.' );
+	$forum_qa_assert( user_can( $forum_qa_author_id, 'publish_cyw_forum_posts' ), 'Eligible member cannot publish a Forum article directly.' );
+	$forum_qa_assert( user_can( $forum_qa_author_id, 'edit_published_cyw_forum_posts' ), 'Eligible member cannot update their own published Forum article.' );
 	$forum_qa_assert( ! user_can( $forum_qa_author_id, 'edit_others_cyw_forum_posts' ), 'Forum Author can edit another author\'s article.' );
 
 	$forum_qa_category_ids = get_terms(
@@ -577,42 +578,42 @@ try {
 	remove_filter( 'update_post_metadata', $forum_qa_meta_failure, 10 );
 	$forum_qa_assert( is_wp_error( $forum_qa_rollback_result ) && CYWater_Forum_Covers::get( $forum_qa_workspace_post_id ) === $forum_qa_replaced_cover && file_exists( $forum_qa_replaced_path ) && ( ! $forum_qa_rollback_path || ! file_exists( $forum_qa_rollback_path ) ), 'A failed cover metadata write did not preserve the prior cover and discard only the uncommitted replacement.' );
 
-	$forum_qa_workspace_pending = CYWater_Forum_Workspace::save_article(
-		$forum_qa_author_id,
-		array(
-			'post_id'     => $forum_qa_workspace_post_id,
-			'title'       => $forum_qa_marker . ' workspace pending',
-			'content'     => $forum_qa_marker . ' workspace pending body',
-			'category_id' => $forum_qa_category_id,
-			'topic_id'    => $forum_qa_topic_id,
-			'status'      => 'pending',
-		)
-	);
-	$forum_qa_assert( $forum_qa_workspace_post_id === $forum_qa_workspace_pending && 'pending' === get_post_status( $forum_qa_workspace_post_id ), 'Eligible member could not submit a front-end draft for review.' );
-
-	$forum_qa_workspace_pending_update = CYWater_Forum_Workspace::save_article(
-		$forum_qa_author_id,
-		array(
-			'post_id'     => $forum_qa_workspace_post_id,
-			'title'       => $forum_qa_marker . ' workspace pending updated',
-			'content'     => $forum_qa_marker . ' workspace updated pending body',
-			'category_id' => $forum_qa_category_id,
-			'topic_id'    => $forum_qa_topic_id,
-			'status'      => 'pending',
-		)
-	);
-	$forum_qa_assert( $forum_qa_workspace_post_id === $forum_qa_workspace_pending_update && false !== strpos( (string) get_post_field( 'post_content', $forum_qa_workspace_post_id ), 'updated pending body' ), 'Eligible member could not update their own pending-review article.' );
-
 	$forum_qa_workspace_publish = CYWater_Forum_Workspace::save_article(
 		$forum_qa_author_id,
 		array(
-			'post_id' => $forum_qa_workspace_post_id,
-			'title'   => $forum_qa_marker . ' forbidden workspace publication',
-			'content' => $forum_qa_marker . ' forbidden workspace publication body',
-			'status'  => 'publish',
+			'post_id'     => $forum_qa_workspace_post_id,
+			'title'       => $forum_qa_marker . ' workspace published',
+			'content'     => $forum_qa_marker . ' workspace published body',
+			'category_id' => $forum_qa_category_id,
+			'topic_id'    => $forum_qa_topic_id,
+			'status'      => 'publish',
 		)
 	);
-	$forum_qa_assert( is_wp_error( $forum_qa_workspace_publish ) && 'status_forbidden' === $forum_qa_workspace_publish->get_error_code() && 'pending' === get_post_status( $forum_qa_workspace_post_id ), 'Member published or changed state through the front-end service.' );
+	$forum_qa_assert( $forum_qa_workspace_post_id === $forum_qa_workspace_publish && 'publish' === get_post_status( $forum_qa_workspace_post_id ), 'Eligible member could not publish a front-end draft directly.' );
+
+	$forum_qa_workspace_published_update = CYWater_Forum_Workspace::save_article(
+		$forum_qa_author_id,
+		array(
+			'post_id'     => $forum_qa_workspace_post_id,
+			'title'       => $forum_qa_marker . ' workspace published updated',
+			'content'     => $forum_qa_marker . ' workspace updated published body',
+			'category_id' => $forum_qa_category_id,
+			'topic_id'    => $forum_qa_topic_id,
+			'status'      => 'publish',
+		)
+	);
+	$forum_qa_assert( $forum_qa_workspace_post_id === $forum_qa_workspace_published_update && false !== strpos( (string) get_post_field( 'post_content', $forum_qa_workspace_post_id ), 'updated published body' ), 'Eligible member could not update their own published article.' );
+
+	$forum_qa_workspace_unpublish = CYWater_Forum_Workspace::save_article(
+		$forum_qa_author_id,
+		array(
+			'post_id' => $forum_qa_workspace_post_id,
+			'title'   => $forum_qa_marker . ' forbidden workspace unpublish',
+			'content' => $forum_qa_marker . ' forbidden workspace unpublish body',
+			'status'  => 'draft',
+		)
+	);
+	$forum_qa_assert( is_wp_error( $forum_qa_workspace_unpublish ) && 'status_forbidden' === $forum_qa_workspace_unpublish->get_error_code() && 'publish' === get_post_status( $forum_qa_workspace_post_id ), 'Member bypassed staff take-down control by reverting a published article to draft.' );
 
 	wp_set_current_user( $forum_qa_moderator_id );
 	$forum_qa_foreign_post_id = wp_insert_post(
@@ -642,7 +643,6 @@ try {
 	$forum_qa_assert( is_wp_error( $forum_qa_foreign_update ) && 'article_not_owned' === $forum_qa_foreign_update->get_error_code(), 'Member updated another author\'s article through the front-end service.' );
 
 	wp_set_current_user( $forum_qa_moderator_id );
-	wp_update_post( array( 'ID' => $forum_qa_workspace_post_id, 'post_status' => 'publish' ) );
 	$forum_qa_assert( CYWater_Forum_Covers::can_stream( $forum_qa_workspace_post_id, 0, '' ), 'A published Forum cover is not publicly streamable.' );
 	$forum_qa_workspace_trashed = wp_trash_post( $forum_qa_workspace_post_id );
 	$forum_qa_assert( $forum_qa_workspace_trashed instanceof WP_Post && ! CYWater_Forum_Covers::can_stream( $forum_qa_workspace_post_id, 0, '' ), 'Taking down a Forum article did not revoke anonymous cover access.' );
@@ -653,12 +653,12 @@ try {
 		$forum_qa_author_id,
 		array(
 			'post_id' => $forum_qa_workspace_post_id,
-			'title'   => $forum_qa_marker . ' forbidden published update',
-			'content' => $forum_qa_marker . ' forbidden published update body',
-			'status'  => 'draft',
+			'title'   => $forum_qa_marker . ' allowed published update',
+			'content' => $forum_qa_marker . ' allowed published update body',
+			'status'  => 'publish',
 		)
 	);
-	$forum_qa_assert( is_wp_error( $forum_qa_published_workspace_update ) && 'article_read_only' === $forum_qa_published_workspace_update->get_error_code() && 'publish' === get_post_status( $forum_qa_workspace_post_id ), 'Member edited or reverted a published article through the front-end service.' );
+	$forum_qa_assert( $forum_qa_workspace_post_id === $forum_qa_published_workspace_update && false !== strpos( (string) get_post_field( 'post_content', $forum_qa_workspace_post_id ), 'allowed published update body' ), 'Member could not update their own published article through the front-end service.' );
 	$forum_qa_author_articles = wp_list_pluck( CYWater_Forum_Workspace::articles_for_user( $forum_qa_author_id ), 'ID' );
 	$forum_qa_assert( in_array( $forum_qa_workspace_post_id, array_map( 'absint', $forum_qa_author_articles ), true ), 'The front-end My articles query omitted the member\'s published article.' );
 	wp_set_current_user( $forum_qa_admin_id );
@@ -688,7 +688,7 @@ try {
 		'/wp/v2/cyw_forum_post/' . $forum_qa_post_id,
 		array( 'status' => 'pending' )
 	);
-	$forum_qa_assert( 200 === $forum_qa_rest_status( $forum_qa_pending_response ) && 'pending' === get_post_status( $forum_qa_post_id ), 'Eligible member could not submit a Forum article for review.' );
+	$forum_qa_assert( 'draft' === get_post_status( $forum_qa_post_id ), 'Retired pending-review state remains writable through REST.' );
 
 	$forum_qa_publish_response = $forum_qa_rest(
 		$forum_qa_author_id,
@@ -696,25 +696,15 @@ try {
 		'/wp/v2/cyw_forum_post/' . $forum_qa_post_id,
 		array( 'status' => 'publish', 'comment_status' => 'open' )
 	);
-	$forum_qa_assert( $forum_qa_rest_status( $forum_qa_publish_response ) >= 400, 'Eligible member bypassed moderator review and published through REST.' );
-	$forum_qa_assert( 'pending' === get_post_status( $forum_qa_post_id ), 'Rejected member publication changed the pending review status.' );
-
-	$forum_qa_moderator_publish = $forum_qa_rest(
-		$forum_qa_moderator_id,
-		'POST',
-		'/wp/v2/cyw_forum_post/' . $forum_qa_post_id,
-		array( 'status' => 'publish', 'comment_status' => 'open' )
-	);
-	$forum_qa_assert( 200 === $forum_qa_rest_status( $forum_qa_moderator_publish ), 'Community Moderator could not publish the reviewed member article.' );
-	$forum_qa_assert( 'publish' === get_post_status( $forum_qa_post_id ), 'Moderator publication did not persist.' );
+	$forum_qa_assert( 200 === $forum_qa_rest_status( $forum_qa_publish_response ) && 'publish' === get_post_status( $forum_qa_post_id ), 'Eligible member could not publish their Forum article directly through REST.' );
 
 	$forum_qa_author_published_update = $forum_qa_rest(
 		$forum_qa_author_id,
 		'POST',
 		'/wp/v2/cyw_forum_post/' . $forum_qa_post_id,
-		array( 'content' => $forum_qa_marker . ' forbidden post-publication author update' )
+		array( 'content' => $forum_qa_marker . ' allowed post-publication author update' )
 	);
-	$forum_qa_assert( $forum_qa_rest_status( $forum_qa_author_published_update ) >= 400, 'Member edited a published Forum article without moderator review.' );
+	$forum_qa_assert( 200 === $forum_qa_rest_status( $forum_qa_author_published_update ), 'Member could not edit their own published Forum article.' );
 
 	$forum_qa_editor_update = $forum_qa_rest(
 		$forum_qa_editor_id,
@@ -1038,7 +1028,7 @@ try {
 	$forum_qa_lapsed_author = get_userdata( $forum_qa_author_id );
 	$forum_qa_assert( $forum_qa_lapsed_author instanceof WP_User && in_array( CYWater_Forum_Roles::AUTHOR_ROLE, (array) $forum_qa_lapsed_author->roles, true ), 'Membership lapse destructively removed the historical Forum Author role.' );
 	$forum_qa_assert( ! CYWater_Forum_Roles::can_submit( $forum_qa_author_id ), 'Lapsed member remains eligible to submit a Forum article.' );
-	$forum_qa_assert( ! user_can( $forum_qa_author_id, 'edit_cyw_forum_posts' ), 'Lapsed member retained the request-time Forum submission primitive.' );
+	$forum_qa_assert( ! user_can( $forum_qa_author_id, 'edit_cyw_forum_posts' ) && ! user_can( $forum_qa_author_id, 'publish_cyw_forum_posts' ) && ! user_can( $forum_qa_author_id, 'edit_published_cyw_forum_posts' ), 'Lapsed member retained a request-time Forum participation primitive.' );
 	$forum_qa_lapsed_create = $forum_qa_rest(
 		$forum_qa_author_id,
 		'POST',
@@ -1061,7 +1051,7 @@ try {
 	// must not regain the capability WordPress uses to untrash it or recover it
 	// through REST. Community Moderators are staff and retain the explicit
 	// recovery path, which restores the prior publication state.
-	$forum_qa_assert( ! user_can( $forum_qa_author_id, 'delete_post', $forum_qa_post_id ), 'Forum Author can take down a published article without moderator review.' );
+	$forum_qa_assert( ! user_can( $forum_qa_author_id, 'delete_post', $forum_qa_post_id ), 'Forum Author can take down a published article without staff moderation.' );
 	wp_set_current_user( $forum_qa_admin_id );
 	$forum_qa_trashed = wp_trash_post( $forum_qa_post_id );
 	$forum_qa_assert( $forum_qa_trashed instanceof WP_Post && 'trash' === get_post_status( $forum_qa_post_id ), 'Administrator could not take down the QA forum article.' );
