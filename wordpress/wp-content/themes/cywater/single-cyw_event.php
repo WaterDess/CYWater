@@ -41,7 +41,6 @@ while ( have_posts() ) :
 				<?php if ( ! $is_logo_call && $event_summary ) : ?><p class="lead" style="margin:var(--sp-4) 0 var(--sp-5)"<?php echo $reveal_attr; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>><?php echo esc_html( $event_summary ); ?></p><?php endif; ?>
 				<div class="prose entry-content"<?php echo $reveal_attr; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>><?php echo cywater_article_content(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
 				<div style="text-align:center; margin-top:var(--sp-6)"><a class="link" href="<?php echo esc_url( get_post_type_archive_link( 'cyw_event' ) ); ?>">Back to Events</a></div>
-				<?php edit_post_link( 'Edit this event', '<span class="admin-edit-link">', '</span>' ); ?>
 			</div></div>
 		</div>
 	</section>

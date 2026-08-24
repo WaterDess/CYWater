@@ -48,12 +48,6 @@
   border-bottom-color: var(--teal);
 }
 
-.admin-edit-link {
-  display: inline-block;
-  margin-top: var(--sp-5);
-  font-size: var(--fs-sm);
-}
-
 /* Event Tickets is an operational form, not long-form article content. */
 .single-cyw_event .entry-content .tribe-common,
 .single-cyw_event .entry-content .tribe-tickets {
@@ -884,7 +878,6 @@ body.pmpro-account .cywater-register .btn {
   .forum-workspace-actions .btn {
     width: 100%;
   }
-
   .forum-workspace-status-grid {
     grid-template-columns: 1fr;
   }

@@ -90,7 +90,6 @@ while ( have_posts() ) :
 			<div class="prose" data-reveal>
 				<ul><li>Awards Committee</li><li>Scientific and Technical Committee</li><li>Nomination Committee</li><li>Tellers Committee</li></ul>
 			</div>
-			<?php edit_post_link( 'Edit Board introduction', '<span class="admin-edit-link">', '</span>' ); ?>
 		</div>
 	</section>
 	<?php

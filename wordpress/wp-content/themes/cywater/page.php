@@ -15,7 +15,6 @@ while ( have_posts() ) :
 	<section class="section">
 		<div class="container container-narrow">
 			<div class="prose entry-content" data-reveal><?php the_content(); ?></div>
-			<?php edit_post_link( __( 'Edit this page', 'cywater' ), '<span class="admin-edit-link">', '</span>' ); ?>
 		</div>
 	</section>
 	<?php

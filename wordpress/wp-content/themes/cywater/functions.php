@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CYWATER_THEME_VERSION', '0.6.47' );
+define( 'CYWATER_THEME_VERSION', '0.6.48' );
 
 function cywater_theme_setup() {
 	add_theme_support( 'title-tag' );
@@ -408,12 +408,9 @@ function cywater_forum_hero_actions() {
 	}
 	$user_id  = get_current_user_id();
 	$blockers = CYWater_Forum_Roles::submission_blockers( $user_id );
-	if ( CYWater_Forum_Roles::is_staff( $user_id ) ) {
-		return '<a class="btn btn-accent" href="' . esc_url( admin_url( 'edit.php?post_type=cyw_forum_post' ) ) . '">' . esc_html__( 'Manage Forum', 'cywater' ) . '</a>';
-	}
 	if ( ! $blockers ) {
 		$url = class_exists( 'CYWater_Forum_Workspace' ) ? CYWater_Forum_Workspace::url() : home_url( '/forum-workspace/' );
-		return '<a class="btn btn-accent" href="' . esc_url( $url ) . '">' . esc_html__( 'Submit an article', 'cywater' ) . '</a>';
+		return '<a class="btn btn-accent" href="' . esc_url( $url ) . '">' . esc_html__( 'Write a Forum post', 'cywater' ) . '</a>';
 	}
 	if ( in_array( 'email_unverified', $blockers, true ) ) {
 		return '<a class="btn btn-accent" href="' . esc_url( home_url( '/verify-email/' ) ) . '">' . esc_html__( 'Verify email', 'cywater' ) . '</a>';

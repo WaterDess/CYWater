@@ -135,17 +135,14 @@ final class CYWater_Forum_Roles {
 		return true;
 	}
 
-	/**
-	 * Staff moderate on the association's behalf and are never subject to the
-	 * endorsement or membership gate.
-	 */
+	/** Staff moderate on the association's behalf. */
 	public static function is_staff( $user_id ) {
 		return user_can( absint( $user_id ), 'edit_others_cyw_forum_posts' );
 	}
 
 	/**
-	 * Reasons this user may not publish right now. Publication and submission
-	 * share one eligibility policy; there is no per-article approval gate.
+	 * Backend publication gate. Staff capabilities act only in the protected
+	 * administration plane; everyone else uses the member participation gate.
 	 *
 	 * @return array<int, string>
 	 */
@@ -157,7 +154,9 @@ final class CYWater_Forum_Roles {
 	}
 
 	/**
-	 * Reasons a member may not create, publish, or update a Forum article.
+	 * Front-end participation gate. This intentionally ignores staff roles: an
+	 * Administrator or Moderator has exactly the same personal member
+	 * prerequisites as any other account when acting on the public site.
 	 *
 	 * @return array<int, string>
 	 */
@@ -165,9 +164,6 @@ final class CYWater_Forum_Roles {
 		$user_id = absint( $user_id );
 		if ( ! $user_id ) {
 			return array( 'signed_out' );
-		}
-		if ( self::is_staff( $user_id ) ) {
-			return array();
 		}
 
 		$blockers = array();
@@ -205,7 +201,7 @@ final class CYWater_Forum_Roles {
 	 */
 	public static function sync_current_member_role() {
 		$user_id = get_current_user_id();
-		if ( $user_id && ! self::is_staff( $user_id ) && self::can_submit( $user_id ) ) {
+		if ( $user_id && self::can_submit( $user_id ) ) {
 			self::grant_author_role( $user_id );
 		}
 	}

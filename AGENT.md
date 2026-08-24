@@ -1127,7 +1127,7 @@ describe sandbox activity as a real transaction.
 ### Production Release Snapshot (2026-08-21)
 
 - The reviewed WordPress production candidate is live at `https://cywater.org/`
-  with theme `0.6.47`, Membership `0.9.6`, Logo Call `0.4.2`, Forum `0.6.1`,
+  with theme `0.6.48`, Membership `0.9.6`, Logo Call `0.4.2`, Forum `0.6.2`,
   Partnerships `0.1.5`, and Operations `0.3.2`. The complete initial-release database
   and code trees are retained at
   `/home/u111638297/cywater-release-backups/production-release-predeploy-20260821T132711`.
@@ -1320,6 +1320,29 @@ describe sandbox activity as a real transaction.
   SHA-256 is `f917a0507ded4815451cb931e44c0b41ebb25ce7ece1e637a32130627499a7da`;
   the production rollback is retained at
   `/home/u111638297/cywater-release-backups/account-community-layout-theme-0.6.46-production-predeploy-20260824T140500Z`.
+- On 2026-08-25 Forum `0.6.2` and theme `0.6.48` separated personal Forum
+  participation from protected administration at the policy boundary instead
+  of hiding controls conditionally. On the public site every account,
+  including an Administrator or Community Moderator, must have verified email
+  and an active Student, Professional or Lifetime membership to publish as
+  themselves. An eligible dual-role account receives the same **Write a Forum
+  post** action and personal workspace as an ordinary member; an ineligible
+  staff account receives no personal publishing privilege. Backend
+  cross-author editing, take-down, restoration, permanent deletion and reply
+  moderation remain capability-based and available only inside WordPress
+  administration. Public templates no longer render `Manage Forum`, WordPress
+  edit links or the public admin toolbar. Staging passed 154 self-cleaning
+  assertions. Production passed 86 read-only assertions across three staff
+  accounts; its two Community Moderators comprise one personally eligible
+  member and one account with no active membership or historical successful
+  production membership order. No account or membership data was changed.
+  All 13 Forum and 95 theme files on staging and production match the local
+  candidate file-for-file. Rollbacks are retained at
+  `/home/u111638297/cywater-release-backups/forum-role-separation-staging-predeploy-20260824T172842Z`
+  and
+  `/home/u111638297/cywater-release-backups/forum-role-separation-production-predeploy-20260824T172842Z`.
+  Production Stripe remained `live`; no payment setting, order, charge or
+  refund was changed.
 
 ## Editing Guidance
 

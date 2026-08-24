@@ -135,6 +135,21 @@ assert(
   "The native login-derived author archive template must stay removed; Forum authors use forum-member.php."
 );
 
+const themeFrontendFiles = (await findTextFiles(path.join(root, "wordpress/wp-content/themes/cywater"))).filter(
+  (file) => path.extname(file) === ".php"
+);
+for (const file of themeFrontendFiles) {
+  const contents = await readFile(file, "utf8");
+  assert(
+    !contents.includes("edit_post_link("),
+    `Public theme template exposes a WordPress edit shortcut: ${path.relative(root, file)}.`
+  );
+  assert(
+    !contents.includes("Manage Forum"),
+    `Public theme template exposes a Forum administration shortcut: ${path.relative(root, file)}.`
+  );
+}
+
 function normalizeNewlines(contents) {
   return contents.replace(/\r\n?/g, "\n");
 }

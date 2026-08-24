@@ -14,7 +14,7 @@ $workspace_ready = class_exists( 'CYWater_Forum_Workspace' ) && class_exists( 'C
 $user_id         = get_current_user_id();
 $is_logged_in    = is_user_logged_in();
 $blockers        = $workspace_ready && $is_logged_in ? CYWater_Forum_Roles::submission_blockers( $user_id ) : array( 'signed_out' );
-$can_submit      = $workspace_ready && $is_logged_in && ! $blockers && ! CYWater_Forum_Roles::is_staff( $user_id );
+$can_submit      = $workspace_ready && $is_logged_in && ! $blockers;
 $articles        = $workspace_ready && $is_logged_in ? CYWater_Forum_Workspace::articles_for_user( $user_id ) : array();
 $edit_id         = isset( $_GET['edit'] ) ? absint( $_GET['edit'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 $editing         = null;
@@ -71,14 +71,7 @@ $blocker_copy = array(
 				<?php if ( $notice ) : ?><div class="forum-workspace-notice is-success" role="status"><?php echo esc_html( $notice ); ?></div><?php endif; ?>
 				<?php if ( $error ) : ?><div class="forum-workspace-notice is-error" role="alert"><?php echo esc_html( $error ); ?></div><?php endif; ?>
 
-				<?php if ( CYWater_Forum_Roles::is_staff( $user_id ) ) : ?>
-					<div class="forum-workspace-gate card">
-						<span class="badge badge-teal"><?php esc_html_e( 'Staff workspace', 'cywater' ); ?></span>
-						<h2><?php esc_html_e( 'Forum moderation stays in WordPress administration.', 'cywater' ); ?></h2>
-						<p><?php esc_html_e( 'Community Moderators use the protected Forum administration area to edit across authors, take down, restore or permanently delete articles, moderate discussion, and review engagement counts.', 'cywater' ); ?></p>
-						<a class="btn btn-accent" href="<?php echo esc_url( admin_url( 'edit.php?post_type=cyw_forum_post' ) ); ?>"><?php esc_html_e( 'Manage Forum', 'cywater' ); ?></a>
-					</div>
-				<?php elseif ( ! $can_submit ) : ?>
+				<?php if ( ! $can_submit ) : ?>
 					<div class="forum-workspace-gate card">
 						<span class="badge badge-mute"><?php esc_html_e( 'Submission unavailable', 'cywater' ); ?></span>
 						<h2><?php esc_html_e( 'Your articles remain visible to you.', 'cywater' ); ?></h2>
@@ -156,7 +149,7 @@ $blocker_copy = array(
 					</div>
 				<?php endif; ?>
 
-				<?php if ( $is_logged_in && ! CYWater_Forum_Roles::is_staff( $user_id ) ) : ?>
+				<?php if ( $is_logged_in ) : ?>
 					<section class="forum-workspace-articles" aria-labelledby="forum-workspace-articles-title">
 						<div class="section-head"><span class="eyebrow"><?php esc_html_e( 'My articles', 'cywater' ); ?></span><h2 id="forum-workspace-articles-title"><?php esc_html_e( 'Drafts and published work.', 'cywater' ); ?></h2></div>
 						<?php if ( ! $articles ) : ?>

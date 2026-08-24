@@ -33,7 +33,6 @@ while ( have_posts() ) :
 				</aside>
 				<div class="prose entry-content"><?php the_content(); ?></div>
 			</div>
-			<?php edit_post_link( __( 'Edit this page', 'cywater' ), '<span class="admin-edit-link">', '</span>' ); ?>
 		</div>
 	</section>
 	<?php

@@ -39,13 +39,11 @@ final class CYWater_Forum_Admin {
 		<h2 id="cywater-forum-authorship"><?php esc_html_e( 'CYWater Forum participation', 'cywater-forum' ); ?></h2>
 		<table class="form-table" role="presentation">
 			<tr>
-				<th scope="row"><?php esc_html_e( 'Can publish Forum articles', 'cywater-forum' ); ?></th>
+				<th scope="row"><?php esc_html_e( 'Personal front-end publishing', 'cywater-forum' ); ?></th>
 				<td>
 					<?php if ( array() === $submission_blockers ) : ?>
 						<strong><?php esc_html_e( 'Yes', 'cywater-forum' ); ?></strong>
-						<?php if ( ! CYWater_Forum_Roles::is_staff( $user->ID ) ) : ?>
-							<p class="description"><?php esc_html_e( 'The account may save drafts and publish or update its own Forum articles directly.', 'cywater-forum' ); ?></p>
-						<?php endif; ?>
+						<p class="description"><?php esc_html_e( 'The account meets the ordinary member requirements and may create, publish, or update its own Forum posts on the public site. Staff management access, if assigned, is separate.', 'cywater-forum' ); ?></p>
 					<?php else : ?>
 						<strong><?php esc_html_e( 'No', 'cywater-forum' ); ?></strong>
 						<p class="description"><?php echo esc_html( implode( ', ', array_map( array( __CLASS__, 'blocker_label' ), $submission_blockers ) ) ); ?></p>
@@ -152,7 +150,9 @@ final class CYWater_Forum_Admin {
 		}
 		$count = CYWater_Forum_Content::published_count( $user_id );
 		if ( CYWater_Forum_Roles::is_staff( $user_id ) ) {
-			return esc_html__( 'Forum staff', 'cywater-forum' );
+			return CYWater_Forum_Roles::can_submit( $user_id )
+				? esc_html__( 'Forum staff · eligible member', 'cywater-forum' )
+				: esc_html__( 'Forum staff · personal posting unavailable', 'cywater-forum' );
 		}
 		if ( CYWater_Forum_Roles::can_submit( $user_id ) ) {
 			/* translators: %d: published article count. */

@@ -1,6 +1,7 @@
 <?php
 /**
- * Front-end Forum workspace for ordinary members.
+ * Front-end Forum workspace for members, including members who also have a
+ * staff role.
  *
  * The workspace is intentionally separate from WordPress administration.
  * Members create, publish, update, and withdraw their own Forum articles here.
@@ -210,7 +211,9 @@ final class CYWater_Forum_Workspace {
 	/**
 	 * Save through the front-end service boundary.
 	 *
-	 * @param int                 $user_id             Acting member.
+	 * @param int                 $user_id             Acting member. A staff
+	 *                                                capability never replaces
+	 *                                                this personal eligibility.
 	 * @param array<string,mixed> $input               Allowlisted article fields.
 	 * @param array<string,mixed>|int $cover           Optional staged protected cover record.
 	 * @return int|WP_Error

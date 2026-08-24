@@ -1,6 +1,6 @@
 <?php
 /**
- * Staging-only, self-cleaning runtime QA for CYWater Forum 0.6.1.
+ * Staging-only, self-cleaning runtime QA for CYWater Forum 0.6.2.
  *
  * Run with:
  *   wp eval-file /absolute/path/to/cywater-staging-forum-qa.php
@@ -36,8 +36,8 @@ if ( ! is_plugin_active( 'cywater-forum/cywater-forum.php' ) ) {
 }
 
 $forum_plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/cywater-forum/cywater-forum.php', false, false );
-if ( '0.6.1' !== (string) ( $forum_plugin_data['Version'] ?? '' ) || ! defined( 'CYWATER_FORUM_VERSION' ) || '0.6.1' !== CYWATER_FORUM_VERSION ) {
-	WP_CLI::error( 'Refusing to run: this QA is pinned to CYWater Forum 0.6.1.' );
+if ( '0.6.2' !== (string) ( $forum_plugin_data['Version'] ?? '' ) || ! defined( 'CYWATER_FORUM_VERSION' ) || '0.6.2' !== CYWATER_FORUM_VERSION ) {
+	WP_CLI::error( 'Refusing to run: this QA is pinned to CYWater Forum 0.6.2.' );
 }
 
 $forum_qa_required_classes = array(
@@ -954,6 +954,22 @@ try {
 	);
 
 	$forum_qa_assert( $forum_qa_verify_email( $forum_qa_moderator_id ), 'Community Moderator email verification fixture could not be created.' );
+	$forum_qa_moderator_article_blockers = CYWater_Forum_Roles::submission_blockers( $forum_qa_moderator_id );
+	$forum_qa_assert( in_array( 'membership_inactive', $forum_qa_moderator_article_blockers, true ) && ! CYWater_Forum_Roles::can_submit( $forum_qa_moderator_id ), 'Community Moderator role replaced the personal membership requirement for Forum publishing.' );
+	$forum_qa_moderator_nonmember_article = CYWater_Forum_Workspace::save_article(
+		$forum_qa_moderator_id,
+		array(
+			'title'   => $forum_qa_marker . ' forbidden non-member moderator article',
+			'content' => $forum_qa_marker . ' forbidden non-member moderator article body',
+			'status'  => 'draft',
+		)
+	);
+	$forum_qa_assert( is_wp_error( $forum_qa_moderator_nonmember_article ) && 'submission_blocked' === $forum_qa_moderator_nonmember_article->get_error_code(), 'Community Moderator used the personal workspace without active membership.' );
+	if ( $forum_qa_can_reach_application_http ) {
+		$forum_qa_moderator_nonmember_archive_response = $forum_qa_user_http_get( $forum_qa_moderator_id, (string) get_post_type_archive_link( CYWater_Forum_Content::POST_TYPE ) );
+		$forum_qa_moderator_nonmember_archive_body     = is_wp_error( $forum_qa_moderator_nonmember_archive_response ) ? '' : (string) wp_remote_retrieve_body( $forum_qa_moderator_nonmember_archive_response );
+		$forum_qa_assert( ! is_wp_error( $forum_qa_moderator_nonmember_archive_response ) && 200 === (int) wp_remote_retrieve_response_code( $forum_qa_moderator_nonmember_archive_response ) && false !== strpos( $forum_qa_moderator_nonmember_archive_body, 'View membership' ) && false === strpos( $forum_qa_moderator_nonmember_archive_body, 'Manage Forum' ), 'Community Moderator without membership did not receive the ordinary non-member Forum experience.' );
+	}
 	$forum_qa_moderator_nonmember_response = $forum_qa_rest(
 		$forum_qa_moderator_id,
 		'POST',
@@ -967,6 +983,38 @@ try {
 		'Community Moderator role bypassed the active-member participation requirement.'
 	);
 	$forum_qa_assert( $forum_qa_activate_member( $forum_qa_moderator_id ), 'Community Moderator membership fixture could not be activated.' );
+	wp_set_current_user( $forum_qa_moderator_id );
+	CYWater_Forum_Roles::sync_current_member_role();
+	wp_set_current_user( $forum_qa_admin_id );
+	$forum_qa_moderator_user = get_userdata( $forum_qa_moderator_id );
+	$forum_qa_assert( CYWater_Forum_Roles::can_submit( $forum_qa_moderator_id ) && $forum_qa_moderator_user instanceof WP_User && in_array( CYWater_Forum_Roles::AUTHOR_ROLE, (array) $forum_qa_moderator_user->roles, true ), 'Eligible Community Moderator did not retain the ordinary member authorship path.' );
+	$forum_qa_moderator_workspace_article = CYWater_Forum_Workspace::save_article(
+		$forum_qa_moderator_id,
+		array(
+			'title'   => $forum_qa_marker . ' eligible moderator personal article',
+			'content' => $forum_qa_marker . ' eligible moderator personal article body',
+			'status'  => 'draft',
+		)
+	);
+	$forum_qa_moderator_workspace_post_id = is_wp_error( $forum_qa_moderator_workspace_article ) ? 0 : absint( $forum_qa_moderator_workspace_article );
+	if ( $forum_qa_moderator_workspace_post_id ) {
+		$forum_qa_posts[] = $forum_qa_moderator_workspace_post_id;
+	}
+	$forum_qa_assert( $forum_qa_moderator_workspace_post_id > 0 && $forum_qa_moderator_id === absint( get_post_field( 'post_author', $forum_qa_moderator_workspace_post_id ) ), 'Eligible Community Moderator could not use the ordinary personal Forum workspace.' );
+	$forum_qa_assert( user_can( $forum_qa_moderator_id, 'edit_others_cyw_forum_posts' ) && user_can( $forum_qa_moderator_id, 'moderate_comments' ), 'Using the personal member path removed the Community Moderator management capabilities.' );
+	if ( $forum_qa_can_reach_application_http ) {
+		$forum_qa_moderator_archive_response = $forum_qa_user_http_get( $forum_qa_moderator_id, (string) get_post_type_archive_link( CYWater_Forum_Content::POST_TYPE ) );
+		$forum_qa_moderator_archive_body     = is_wp_error( $forum_qa_moderator_archive_response ) ? '' : (string) wp_remote_retrieve_body( $forum_qa_moderator_archive_response );
+		$forum_qa_assert( ! is_wp_error( $forum_qa_moderator_archive_response ) && 200 === (int) wp_remote_retrieve_response_code( $forum_qa_moderator_archive_response ) && false !== strpos( $forum_qa_moderator_archive_body, 'Write a Forum post' ) && false === strpos( $forum_qa_moderator_archive_body, 'Manage Forum' ), 'Eligible Community Moderator did not receive the ordinary member Forum archive experience.' );
+
+		$forum_qa_moderator_workspace_response = $forum_qa_user_http_get( $forum_qa_moderator_id, CYWater_Forum_Workspace::url() );
+		$forum_qa_moderator_workspace_body     = is_wp_error( $forum_qa_moderator_workspace_response ) ? '' : (string) wp_remote_retrieve_body( $forum_qa_moderator_workspace_response );
+		$forum_qa_assert( ! is_wp_error( $forum_qa_moderator_workspace_response ) && 200 === (int) wp_remote_retrieve_response_code( $forum_qa_moderator_workspace_response ) && false !== strpos( $forum_qa_moderator_workspace_body, 'Publish article' ) && false !== strpos( $forum_qa_moderator_workspace_body, 'My articles' ) && false === strpos( $forum_qa_moderator_workspace_body, 'Manage Forum' ), 'Eligible Community Moderator did not receive the ordinary personal publishing workspace.' );
+
+		$forum_qa_admin_account_response = $forum_qa_user_http_get( $forum_qa_admin_id, home_url( '/account/' ) );
+		$forum_qa_admin_account_body     = is_wp_error( $forum_qa_admin_account_response ) ? '' : (string) wp_remote_retrieve_body( $forum_qa_admin_account_response );
+		$forum_qa_assert( ! is_wp_error( $forum_qa_admin_account_response ) && 200 === (int) wp_remote_retrieve_response_code( $forum_qa_admin_account_response ) && false === strpos( $forum_qa_admin_account_body, 'Edit this page' ) && false === strpos( $forum_qa_admin_account_body, 'Manage Forum' ), 'Administrator-only shortcuts leaked into the public Account experience.' );
+	}
 	$forum_qa_moderator_comment_response = $forum_qa_rest(
 		$forum_qa_moderator_id,
 		'POST',

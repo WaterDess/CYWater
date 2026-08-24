@@ -57,9 +57,9 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 ## Current State
 
 Hostinger staging is available at `https://staging.cywater.org/`, and the public
-production site is live at `https://cywater.org/`. The 2026-08-24 accepted code
-baseline uses the CYWater `0.6.47` theme, CYWater Membership `0.9.6`, CYWater
-Partnerships `0.1.5`, CYWater Logo Call `0.4.2`, CYWater Forum `0.6.1`, CYWater
+production site is live at `https://cywater.org/`. The 2026-08-25 accepted code
+baseline uses the CYWater `0.6.48` theme, CYWater Membership `0.9.6`, CYWater
+Partnerships `0.1.5`, CYWater Logo Call `0.4.2`, CYWater Forum `0.6.2`, CYWater
 Environment `0.5.7`, CYWater Core `0.6.6`, CYWater Operations `0.3.2`, and Event
 Tickets `5.29.1`.
 
@@ -82,7 +82,7 @@ The resulting production-clean `0.5.7` bundle is
 `dist/cywater-wordpress-production-clean-0.5.7.zip` (16,415,745 bytes), SHA-256
 `47edcc10ca5f9e8da8a97ab591025ddd46efe6adc1c869ffae5482401c486013`.
 
-Forum `0.6.1` is the production account-only lightweight-community baseline.
+Forum `0.6.2` is the production account-only lightweight-community baseline.
 Signed-out visitors do not see Forum navigation and cannot read Forum archives,
 articles, terms, author profiles, replies, search results, sitemaps, or REST
 records; direct front-end routes return to the managed CYWater login. Any
@@ -90,12 +90,18 @@ registered account may read published Forum articles and replies and like or
 unlike directly from a card. Publishing and replying remain restricted to an
 email-verified active Student, Professional, or Lifetime member. Authors manage
 their own writing in `/forum-workspace/`, while Account links once to the private
-`/forum/activity/` view for My posts and Liked posts. Moderators retain
+`/forum/activity/` view for My posts and Liked posts. Personal participation
+and administration are independent: an Administrator or Community Moderator
+must still satisfy the ordinary email-verification and active-membership rules
+to write as themselves on the public site, while their protected backend
 cross-author editing, restoration, permanent deletion, reply moderation, and
-engagement cleanup. Staging passed 149 self-cleaning Forum assertions;
-production contains one legitimate article and no Forum QA fixture, and all 13
-Forum plus 95 theme files match local. The predeploy rollback is
-`/home/u111638297/cywater-release-backups/forum-community-visibility-production-predeploy-20260824T130000Z`.
+engagement cleanup remain capability-based. Dual-role members see the same
+front-end writing controls as every other eligible member. Public templates no
+longer render `Manage Forum`, WordPress edit shortcuts, or the admin toolbar.
+Staging passed 154 self-cleaning Forum assertions; production passed 86
+read-only role-separation assertions without changing data, and all 13 Forum
+plus 95 theme files match local. The production predeploy rollback is
+`/home/u111638297/cywater-release-backups/forum-role-separation-production-predeploy-20260824T172842Z`.
 This release did not change Stripe: the saved environment remains Live and no
 payment or refund was initiated.
 

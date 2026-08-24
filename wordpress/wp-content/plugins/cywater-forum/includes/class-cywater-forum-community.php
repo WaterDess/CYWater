@@ -522,7 +522,7 @@ final class CYWater_Forum_Community {
 		<section class="forum-account-panel" aria-labelledby="forum-account-heading">
 			<div class="forum-account-heading">
 				<div><span class="eyebrow"><?php esc_html_e( 'Community', 'cywater-forum' ); ?></span><h2 id="forum-account-heading"><?php esc_html_e( 'Forum activity', 'cywater-forum' ); ?></h2></div>
-				<a class="btn btn-primary" href="<?php echo esc_url( CYWater_Forum_Workspace::url() ); ?>"><?php esc_html_e( 'Write or manage posts', 'cywater-forum' ); ?></a>
+				<a class="btn btn-primary" href="<?php echo esc_url( CYWater_Forum_Workspace::url() ); ?>"><?php esc_html_e( 'Open my Forum posts', 'cywater-forum' ); ?></a>
 			</div>
 			<div class="forum-account-grid">
 				<div class="forum-account-list">

@@ -29,7 +29,6 @@ while ( have_posts() ) :
 		<?php foreach ( array( '2011' => 'CYWater was founded as an international water-science community.', '2012' => 'The Young Scientist Best Paper Award was established.', '2013' => 'The first Annual Meeting was held in Beijing.', '2020' => 'The Annual Meeting moved online and reached participants across multiple continents.', '2026' => 'The next Annual Meeting will take place in Nanjing, China.' ) as $year => $copy ) : ?><div class="timeline-item"><div class="timeline-year"><?php echo esc_html( $year ); ?></div><p style="margin-top:.3rem"><?php echo esc_html( $copy ); ?></p></div><?php endforeach; ?>
 	</div></div></section>
 	<section class="section"><div class="container container-narrow"><div class="section-head center" data-reveal><span class="eyebrow center">Governance</span><h2>Governance</h2></div><p class="lead" style="text-align:center; margin-bottom:var(--sp-6)">The Board of Directors holds the Association's corporate powers, sets strategic direction, oversees finances, appoints committees, and ensures compliance with law and mission. Current appointments are being updated.</p><div class="hero-actions" style="justify-content:center"><a class="btn btn-outline" href="<?php echo esc_url( home_url( '/board/' ) ); ?>">Board</a><a class="btn btn-outline" href="<?php echo esc_url( home_url( '/bylaws/' ) ); ?>">Bylaws</a></div></div></section>
-	<?php edit_post_link( __( 'Edit this page', 'cywater' ), '<span class="admin-edit-link">', '</span>' ); ?>
 	<?php
 endwhile;
 ?>
