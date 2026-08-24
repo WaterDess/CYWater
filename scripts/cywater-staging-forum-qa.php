@@ -1,6 +1,6 @@
 <?php
 /**
- * Staging-only, self-cleaning runtime QA for CYWater Forum 0.5.0.
+ * Staging-only, self-cleaning runtime QA for CYWater Forum 0.6.0.
  *
  * Run with:
  *   wp eval-file /absolute/path/to/cywater-staging-forum-qa.php
@@ -36,8 +36,8 @@ if ( ! is_plugin_active( 'cywater-forum/cywater-forum.php' ) ) {
 }
 
 $forum_plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/cywater-forum/cywater-forum.php', false, false );
-if ( '0.5.0' !== (string) ( $forum_plugin_data['Version'] ?? '' ) || ! defined( 'CYWATER_FORUM_VERSION' ) || '0.5.0' !== CYWATER_FORUM_VERSION ) {
-	WP_CLI::error( 'Refusing to run: this QA is pinned to CYWater Forum 0.5.0.' );
+if ( '0.6.0' !== (string) ( $forum_plugin_data['Version'] ?? '' ) || ! defined( 'CYWATER_FORUM_VERSION' ) || '0.6.0' !== CYWATER_FORUM_VERSION ) {
+	WP_CLI::error( 'Refusing to run: this QA is pinned to CYWater Forum 0.6.0.' );
 }
 
 $forum_qa_required_classes = array(
@@ -48,6 +48,7 @@ $forum_qa_required_classes = array(
 	'CYWater_Forum_Settings',
 	'CYWater_Forum_Covers',
 	'CYWater_Forum_Workspace',
+	'CYWater_Forum_Community',
 	'CYWater_Membership_Account_Security',
 	'CYWater_Operations_Roles',
 	'CYWater_Operations_Audit',
@@ -90,6 +91,7 @@ $forum_qa_templates = array(
 	'archive-cyw_forum_post.php',
 	'single-cyw_forum_post.php',
 	'page-forum-workspace.php',
+	'forum-member.php',
 	'comments.php',
 );
 foreach ( $forum_qa_templates as $forum_qa_template ) {
@@ -264,6 +266,7 @@ $forum_qa_basic_auth = '';
 if ( '' !== $forum_qa_basic_user && '' !== $forum_qa_basic_pass ) {
 	$forum_qa_basic_auth = 'Basic ' . base64_encode( $forum_qa_basic_user . ':' . $forum_qa_basic_pass );
 }
+$forum_qa_can_reach_application_http = '' !== $forum_qa_basic_auth;
 
 $forum_qa_http_get = static function ( $url ) use ( $forum_qa_basic_auth ) {
 	$headers = array( 'Cache-Control' => 'no-cache' );
@@ -348,21 +351,25 @@ try {
 	$forum_qa_assert( CYWater_Forum_Workspace::can_access_admin( $forum_qa_governance_id ), 'Governance Approver is incorrectly denied WordPress administration.' );
 	$forum_qa_denial_hook = has_action( 'init', array( 'CYWater_Forum_Workspace', 'deny_nonstaff_admin' ) );
 	$forum_qa_assert( false !== $forum_qa_denial_hook && $forum_qa_denial_hook < 30, 'The member admin denial does not run before wp-admin menu construction.' );
-	foreach ( array( 'index.php', 'profile.php', 'upload.php', 'edit.php?post_type=cyw_forum_post' ) as $forum_qa_admin_path ) {
-		$forum_qa_admin_response = $forum_qa_admin_http_get( $forum_qa_author_id, $forum_qa_admin_path );
-		$forum_qa_admin_location = is_wp_error( $forum_qa_admin_response ) ? '' : wp_remote_retrieve_header( $forum_qa_admin_response, 'location' );
-		$forum_qa_assert(
-			! is_wp_error( $forum_qa_admin_response )
-				&& 403 === wp_remote_retrieve_response_code( $forum_qa_admin_response )
-				&& '' === (string) $forum_qa_admin_location,
-			'Ordinary member did not receive a direct 403 denial for wp-admin route: ' . $forum_qa_admin_path
-		);
+	if ( $forum_qa_can_reach_application_http ) {
+		foreach ( array( 'index.php', 'profile.php', 'upload.php', 'edit.php?post_type=cyw_forum_post' ) as $forum_qa_admin_path ) {
+			$forum_qa_admin_response = $forum_qa_admin_http_get( $forum_qa_author_id, $forum_qa_admin_path );
+			$forum_qa_admin_location = is_wp_error( $forum_qa_admin_response ) ? '' : wp_remote_retrieve_header( $forum_qa_admin_response, 'location' );
+			$forum_qa_assert(
+				! is_wp_error( $forum_qa_admin_response )
+					&& 403 === wp_remote_retrieve_response_code( $forum_qa_admin_response )
+					&& '' === (string) $forum_qa_admin_location,
+				'Ordinary member did not receive a direct 403 denial for wp-admin route: ' . $forum_qa_admin_path
+			);
+		}
+	} else {
+		WP_CLI::log( 'HTTP route assertions skipped because staging Basic Auth credentials were not supplied; application-layer permission assertions still run.' );
 	}
 	$forum_qa_assert( false === has_filter( 'login_redirect', array( 'CYWater_Forum_Workspace', 'filter_login_redirect' ) ), 'Forum workspace still specializes WordPress login redirects.' );
 	wp_set_current_user( $forum_qa_author_id );
 	$forum_qa_assert( false === CYWater_Forum_Workspace::filter_admin_bar( true ), 'Ordinary member still receives the WordPress administration toolbar.' );
 	wp_set_current_user( $forum_qa_moderator_id );
-	$forum_qa_assert( true === CYWater_Forum_Workspace::filter_admin_bar( true ), 'Community Moderator lost the WordPress administration toolbar.' );
+	$forum_qa_assert( false === CYWater_Forum_Workspace::filter_admin_bar( true ), 'Community Moderator sees a WordPress administration toolbar on the public site.' );
 	wp_set_current_user( $forum_qa_admin_id );
 	$forum_qa_workspace_page_id = CYWater_Forum_Workspace::page_id();
 	$forum_qa_assert( $forum_qa_workspace_page_id > 0 && 'publish' === get_post_status( $forum_qa_workspace_page_id ), 'The published front-end Forum workspace page is unavailable.' );
@@ -604,6 +611,33 @@ try {
 	);
 	$forum_qa_assert( $forum_qa_workspace_post_id === $forum_qa_workspace_published_update && false !== strpos( (string) get_post_field( 'post_content', $forum_qa_workspace_post_id ), 'updated published body' ), 'Eligible member could not update their own published article.' );
 
+	$forum_qa_author_token = CYWater_Forum_Community::author_token( $forum_qa_author_id, false );
+	$forum_qa_author_url   = CYWater_Forum_Community::author_url( $forum_qa_author_id );
+	$forum_qa_assert( 1 === preg_match( '/^[a-f0-9]{32}$/', $forum_qa_author_token ), 'Published Forum author did not receive an opaque public token.' );
+	$forum_qa_assert( false !== strpos( $forum_qa_author_url, '/forum/member/' . $forum_qa_author_token . '/' ), 'Forum byline does not use the controlled public-author route.' );
+	$forum_qa_assert( false === strpos( $forum_qa_author_url, get_userdata( $forum_qa_author_id )->user_nicename ), 'Forum author URL exposes the WordPress login-derived nicename.' );
+	update_user_meta( $forum_qa_author_id, 'cyw_profile_public', 1 );
+	update_user_meta( $forum_qa_author_id, 'cyw_public_fields', array( 'cyw_institution_name' ) );
+	update_user_meta( $forum_qa_author_id, 'cyw_institution_name', $forum_qa_marker . ' public institution' );
+	$forum_qa_public_profile = CYWater_Forum_Community::public_profile( $forum_qa_author_id );
+	$forum_qa_assert( isset( $forum_qa_public_profile['cyw_institution_name'] ) && ! isset( $forum_qa_public_profile['cyw_country'] ), 'Forum author page does not honor the member\'s selected public-profile fields.' );
+
+	$forum_qa_assert( 0 === CYWater_Forum_Community::like_count( $forum_qa_workspace_post_id ), 'Temporary Forum article started with unrelated likes.' );
+	$forum_qa_like_result = CYWater_Forum_Community::toggle_like( $forum_qa_workspace_post_id, $forum_qa_author_id );
+	$forum_qa_assert( true === $forum_qa_like_result && 1 === CYWater_Forum_Community::like_count( $forum_qa_workspace_post_id ) && CYWater_Forum_Community::has_liked( $forum_qa_workspace_post_id, $forum_qa_author_id ), 'Eligible member could not like a published Forum article.' );
+	$forum_qa_assert( is_wp_error( CYWater_Forum_Community::toggle_like( $forum_qa_workspace_post_id, $forum_qa_subscriber_id ) ), 'Registered non-member could like a Forum article.' );
+	$forum_qa_account_panel = CYWater_Forum_Community::account_panel( $forum_qa_author_id );
+	$forum_qa_assert( false !== strpos( $forum_qa_account_panel, esc_html( get_the_title( $forum_qa_workspace_post_id ) ) ) && false !== strpos( $forum_qa_account_panel, 'Liked posts' ), 'Member Account Forum projection omitted owned or liked posts.' );
+	$forum_qa_assert( false === CYWater_Forum_Community::toggle_like( $forum_qa_workspace_post_id, $forum_qa_author_id ) && 0 === CYWater_Forum_Community::like_count( $forum_qa_workspace_post_id ), 'Eligible member could not remove their own like.' );
+	$forum_qa_assert( true === CYWater_Forum_Community::toggle_like( $forum_qa_workspace_post_id, $forum_qa_author_id ), 'Eligible member could not restore a like for lifecycle checks.' );
+
+	if ( $forum_qa_can_reach_application_http ) {
+		$forum_qa_author_response = $forum_qa_http_get( $forum_qa_author_url );
+		$forum_qa_author_body     = is_wp_error( $forum_qa_author_response ) ? '' : (string) wp_remote_retrieve_body( $forum_qa_author_response );
+		$forum_qa_assert( ! is_wp_error( $forum_qa_author_response ) && 200 === (int) wp_remote_retrieve_response_code( $forum_qa_author_response ), 'Controlled Forum author route did not return HTTP 200.' );
+		$forum_qa_assert( false !== strpos( $forum_qa_author_body, esc_html( $forum_qa_marker . ' public institution' ) ) && false === strpos( $forum_qa_author_body, esc_html( get_userdata( $forum_qa_author_id )->user_email ) ), 'Controlled author page omitted opted-in data or exposed the account email.' );
+	}
+
 	$forum_qa_workspace_unpublish = CYWater_Forum_Workspace::save_article(
 		$forum_qa_author_id,
 		array(
@@ -644,8 +678,12 @@ try {
 
 	wp_set_current_user( $forum_qa_moderator_id );
 	$forum_qa_assert( CYWater_Forum_Covers::can_stream( $forum_qa_workspace_post_id, 0, '' ), 'A published Forum cover is not publicly streamable.' );
-	$forum_qa_workspace_trashed = wp_trash_post( $forum_qa_workspace_post_id );
-	$forum_qa_assert( $forum_qa_workspace_trashed instanceof WP_Post && ! CYWater_Forum_Covers::can_stream( $forum_qa_workspace_post_id, 0, '' ), 'Taking down a Forum article did not revoke anonymous cover access.' );
+	wp_set_current_user( $forum_qa_author_id );
+	$forum_qa_workspace_trashed = CYWater_Forum_Workspace::trash_article( $forum_qa_author_id, $forum_qa_workspace_post_id );
+	$forum_qa_assert( $forum_qa_workspace_trashed instanceof WP_Post && ! CYWater_Forum_Covers::can_stream( $forum_qa_workspace_post_id, 0, '' ), 'An author could not remove their own published article or its anonymous cover access remained open.' );
+	$forum_qa_foreign_trash = CYWater_Forum_Workspace::trash_article( $forum_qa_author_id, $forum_qa_foreign_post_id );
+	$forum_qa_assert( is_wp_error( $forum_qa_foreign_trash ) && 'article_not_owned' === $forum_qa_foreign_trash->get_error_code(), 'Member removed another author\'s Forum article through the front-end service.' );
+	wp_set_current_user( $forum_qa_moderator_id );
 	$forum_qa_workspace_restored = wp_untrash_post( $forum_qa_workspace_post_id );
 	$forum_qa_assert( $forum_qa_workspace_restored instanceof WP_Post && 'publish' === get_post_status( $forum_qa_workspace_post_id ) && CYWater_Forum_Covers::can_stream( $forum_qa_workspace_post_id, 0, '' ), 'Moderator restoration did not restore the published cover lifecycle.' );
 	wp_set_current_user( $forum_qa_author_id );
@@ -1001,19 +1039,21 @@ try {
 	);
 	$forum_qa_assert( 'cywater_forum_membership_required' === (string) ( $forum_qa_subscriber_comment_data['code'] ?? '' ), 'Subscriber rejection did not use the forum membership boundary.' );
 
-	$forum_qa_archive_response = $forum_qa_http_get( (string) get_post_type_archive_link( CYWater_Forum_Content::POST_TYPE ) );
-	$forum_qa_archive_body     = is_wp_error( $forum_qa_archive_response ) ? '' : (string) wp_remote_retrieve_body( $forum_qa_archive_response );
-	$forum_qa_assert( ! is_wp_error( $forum_qa_archive_response ) && 200 === (int) wp_remote_retrieve_response_code( $forum_qa_archive_response ), 'Public forum archive did not return HTTP 200.' );
-	$forum_qa_assert( false !== strpos( $forum_qa_archive_body, esc_html( $forum_qa_marker ) ), 'Published QA forum article is absent from the public archive.' );
+	if ( $forum_qa_can_reach_application_http ) {
+		$forum_qa_archive_response = $forum_qa_http_get( (string) get_post_type_archive_link( CYWater_Forum_Content::POST_TYPE ) );
+		$forum_qa_archive_body     = is_wp_error( $forum_qa_archive_response ) ? '' : (string) wp_remote_retrieve_body( $forum_qa_archive_response );
+		$forum_qa_assert( ! is_wp_error( $forum_qa_archive_response ) && 200 === (int) wp_remote_retrieve_response_code( $forum_qa_archive_response ), 'Public forum archive did not return HTTP 200.' );
+		$forum_qa_assert( false !== strpos( $forum_qa_archive_body, esc_html( $forum_qa_marker ) ), 'Published QA forum article is absent from the public archive.' );
 
-	$forum_qa_single_response = $forum_qa_http_get( get_permalink( $forum_qa_post_id ) );
-	$forum_qa_single_body     = is_wp_error( $forum_qa_single_response ) ? '' : (string) wp_remote_retrieve_body( $forum_qa_single_response );
-	$forum_qa_assert( ! is_wp_error( $forum_qa_single_response ) && 200 === (int) wp_remote_retrieve_response_code( $forum_qa_single_response ), 'Public forum article did not return HTTP 200.' );
-	$forum_qa_assert( false !== strpos( $forum_qa_single_body, esc_html( $forum_qa_marker ) ), 'Published article title/body is absent from its public route.' );
-	$forum_qa_assert( false !== strpos( $forum_qa_single_body, esc_html( $forum_qa_first_reply ) ), 'Approved first reply is absent from the public article.' );
-	$forum_qa_assert( false !== strpos( $forum_qa_single_body, esc_html( $forum_qa_second_reply ) ), 'Approved later reply is absent from the public article.' );
-	$forum_qa_assert( false !== strpos( $forum_qa_single_body, esc_html( $forum_qa_staff_reply ) ), 'Approved Community Moderator reply is absent from the public article.' );
-	$forum_qa_assert( false === strpos( $forum_qa_single_body, esc_html( $forum_qa_pending_reply ) ), 'Held reply leaked into the anonymous public article.' );
+		$forum_qa_single_response = $forum_qa_http_get( get_permalink( $forum_qa_post_id ) );
+		$forum_qa_single_body     = is_wp_error( $forum_qa_single_response ) ? '' : (string) wp_remote_retrieve_body( $forum_qa_single_response );
+		$forum_qa_assert( ! is_wp_error( $forum_qa_single_response ) && 200 === (int) wp_remote_retrieve_response_code( $forum_qa_single_response ), 'Public forum article did not return HTTP 200.' );
+		$forum_qa_assert( false !== strpos( $forum_qa_single_body, esc_html( $forum_qa_marker ) ), 'Published article title/body is absent from its public route.' );
+		$forum_qa_assert( false !== strpos( $forum_qa_single_body, esc_html( $forum_qa_first_reply ) ), 'Approved first reply is absent from the public article.' );
+		$forum_qa_assert( false !== strpos( $forum_qa_single_body, esc_html( $forum_qa_second_reply ) ), 'Approved later reply is absent from the public article.' );
+		$forum_qa_assert( false !== strpos( $forum_qa_single_body, esc_html( $forum_qa_staff_reply ) ), 'Approved Community Moderator reply is absent from the public article.' );
+		$forum_qa_assert( false === strpos( $forum_qa_single_body, esc_html( $forum_qa_pending_reply ) ), 'Held reply leaked into the anonymous public article.' );
+	}
 
 	$forum_qa_moderator_approve = $forum_qa_rest(
 		$forum_qa_moderator_id,
@@ -1046,12 +1086,10 @@ try {
 	);
 	$forum_qa_assert( is_wp_error( $forum_qa_lapsed_workspace_create ) && 'submission_blocked' === $forum_qa_lapsed_workspace_create->get_error_code(), 'A lapsed member bypassed eligibility through the front-end service.' );
 
-	// Published Forum records remain staff-controlled. Once the record is in
-	// trash, a Forum Author
-	// must not regain the capability WordPress uses to untrash it or recover it
-	// through REST. Community Moderators are staff and retain the explicit
-	// recovery path, which restores the prior publication state.
-	$forum_qa_assert( ! user_can( $forum_qa_author_id, 'delete_post', $forum_qa_post_id ), 'Forum Author can take down a published article without staff moderation.' );
+	// The front-end service lets an author withdraw their own work, but does not
+	// grant the backend lifecycle capability. Once in Trash, only staff may
+	// restore the record or permanently delete it.
+	$forum_qa_assert( ! user_can( $forum_qa_author_id, 'delete_post', $forum_qa_post_id ), 'Forum Author gained the backend published-post deletion capability.' );
 	wp_set_current_user( $forum_qa_admin_id );
 	$forum_qa_trashed = wp_trash_post( $forum_qa_post_id );
 	$forum_qa_assert( $forum_qa_trashed instanceof WP_Post && 'trash' === get_post_status( $forum_qa_post_id ), 'Administrator could not take down the QA forum article.' );
@@ -1121,6 +1159,10 @@ try {
 		if ( get_user_by( 'id', $forum_qa_cleanup_user_id ) && ! wp_delete_user( $forum_qa_cleanup_user_id ) ) {
 			$forum_qa_cleanup_failures[] = 'A temporary user could not be deleted.';
 		}
+	}
+	$forum_qa_remaining_likes = (int) $wpdb->get_var( 'SELECT COUNT(*) FROM ' . CYWater_Forum_Community::table_name() . ' WHERE post_id IN (' . implode( ',', array_map( 'absint', array_unique( $forum_qa_posts ) ) ) . ') OR user_id IN (' . implode( ',', array_map( 'absint', array_unique( $forum_qa_users ) ) ) . ')' );
+	if ( $forum_qa_remaining_likes > 0 ) {
+		$forum_qa_cleanup_failures[] = 'Temporary Forum likes remain after post and user cleanup.';
 	}
 
 	foreach ( array_unique( array_map( 'absint', $forum_qa_comments ) ) as $forum_qa_comment_id ) {

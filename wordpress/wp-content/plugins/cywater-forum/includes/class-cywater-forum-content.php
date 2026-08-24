@@ -21,7 +21,6 @@ final class CYWater_Forum_Content {
 		add_action( 'init', array( __CLASS__, 'register_content_types' ) );
 		add_action( 'pre_get_posts', array( __CLASS__, 'order_archives' ) );
 		add_action( 'cywater_after_core_setup', array( __CLASS__, 'seed_categories' ), 30 );
-		add_filter( 'cywater_public_author_archive_allowed', array( __CLASS__, 'allow_author_archive' ), 10, 2 );
 		add_filter( 'pre_untrash_post', array( __CLASS__, 'prevent_nonstaff_untrash' ), 10, 3 );
 		add_filter( 'wp_untrash_post_status', array( __CLASS__, 'restore_previous_status' ), 10, 3 );
 		add_filter( 'post_row_actions', array( __CLASS__, 'remove_nonstaff_untrash_action' ), 10, 2 );
@@ -103,55 +102,6 @@ final class CYWater_Forum_Content {
 			unset( $actions['untrash'] );
 		}
 		return $actions;
-	}
-
-	/**
-	 * Open an author archive only for someone who has actually published here.
-	 *
-	 * cywater-environment 404s author archives so that numeric account
-	 * discovery cannot enumerate members. Reading by author is a stated forum
-	 * requirement, so the forum opts one account in at a time rather than
-	 * turning the protection off. A member who has published nothing still
-	 * 404s, which is what keeps enumeration closed.
-	 *
-	 * Only the byline is exposed. Affiliation, ORCID, and the rest of the
-	 * professional profile stay behind the member directory's opt-in, because
-	 * publishing an article is consent to a byline, not to a public profile.
-	 *
-	 * @param bool $allowed
-	 * @param int  $author_id
-	 * @return bool
-	 */
-	public static function allow_author_archive( $allowed, $author_id ) {
-		if ( $allowed ) {
-			return true;
-		}
-
-		/*
-		 * Refuse the numeric `?author=N` form outright.
-		 *
-		 * WordPress's redirect_canonical turns `?author=1` into
-		 * `/author/<user_nicename>/`, and the nicename is derived from the
-		 * login. Allowing the numeric form back would hand out the
-		 * administrator's login slug to anyone who guesses an id — the exact
-		 * enumeration that cywater-environment closes, against the one account
-		 * that currently has no MFA. Only the pretty permalink is served, and
-		 * only for an account that has actually published.
-		 */
-		if ( isset( $_GET['author'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			return false;
-		}
-
-		/*
-		 * Staff never get a public archive. They own the imported News posts, so
-		 * opening one would both expose an operations account and fill the page
-		 * with content that is not forum writing.
-		 */
-		if ( CYWater_Forum_Roles::is_staff( $author_id ) ) {
-			return false;
-		}
-
-		return self::published_count( $author_id ) > 0;
 	}
 
 	public static function register_content_types() {
@@ -253,13 +203,6 @@ final class CYWater_Forum_Content {
 		if ( $is_forum_archive ) {
 			$query->set( 'posts_per_page', 12 );
 			return;
-		}
-		// An author archive is a forum byline page and shows forum writing only.
-		// Including core posts would list imported News under a Forum
-		// breadcrumb and contradict the article count in the header.
-		if ( $query->is_author() ) {
-			$query->set( 'post_type', self::POST_TYPE );
-			$query->set( 'posts_per_page', 12 );
 		}
 	}
 

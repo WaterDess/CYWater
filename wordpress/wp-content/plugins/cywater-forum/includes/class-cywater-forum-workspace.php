@@ -3,9 +3,9 @@
  * Front-end Forum workspace for ordinary members.
  *
  * The workspace is intentionally separate from WordPress administration.
- * Members create, publish, and update their own Forum articles here. Take-down,
- * restoration, deletion of published work, and cross-author work remain in the
- * Community Moderator administration surface.
+ * Members create, publish, update, and withdraw their own Forum articles here.
+ * Cross-author work, restoration, permanent deletion, comment moderation, and
+ * engagement governance remain in the Community Moderator administration area.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -34,6 +34,7 @@ final class CYWater_Forum_Workspace {
 		add_action( 'init', array( __CLASS__, 'maybe_setup_page' ), 30 );
 		add_action( 'cywater_after_core_setup', array( __CLASS__, 'setup_page' ), 40 );
 		add_action( 'admin_post_cywater_forum_workspace_save', array( __CLASS__, 'handle_save' ) );
+		add_action( 'admin_post_cywater_forum_workspace_trash', array( __CLASS__, 'handle_trash' ) );
 		add_filter( 'wp_insert_post_data', array( __CLASS__, 'retire_pending_status' ), 20, 2 );
 		add_filter( 'show_admin_bar', array( __CLASS__, 'filter_admin_bar' ) );
 		add_filter( 'wp_robots', array( __CLASS__, 'filter_robots' ) );
@@ -154,7 +155,10 @@ final class CYWater_Forum_Workspace {
 	}
 
 	public static function filter_admin_bar( $show ) {
-		if ( is_user_logged_in() && ! self::can_access_admin( get_current_user_id() ) ) {
+		// The public site stays a public-site experience for every role. wp-admin
+		// retains its own toolbar and navigation after an authorized user enters
+		// the administration area directly.
+		if ( ! is_admin() ) {
 			return false;
 		}
 		return $show;
@@ -289,7 +293,7 @@ final class CYWater_Forum_Workspace {
 		$user_id = get_current_user_id();
 		$post_id = absint( $_POST['forum_post_id'] ?? 0 );
 		if ( ! $user_id ) {
-			auth_redirect();
+			self::redirect_to_member_login();
 		}
 		check_admin_referer( 'cywater_forum_workspace_save_' . $post_id, 'cywater_forum_workspace_nonce' );
 
@@ -321,6 +325,52 @@ final class CYWater_Forum_Workspace {
 		self::redirect_with_result( 'notice', 'publish' === $status ? 'published' : 'saved', absint( $result ) );
 	}
 
+	/**
+	 * Let an author withdraw their own work without granting wp-admin access.
+	 * Trash is recoverable by a Community Moderator and immediately removes a
+	 * published article from the public Forum.
+	 */
+	public static function handle_trash() {
+		$user_id = get_current_user_id();
+		$post_id = absint( $_POST['forum_post_id'] ?? 0 );
+		if ( ! $user_id ) {
+			self::redirect_to_member_login();
+		}
+		check_admin_referer( 'cywater_forum_workspace_trash_' . $post_id, 'cywater_forum_workspace_trash_nonce' );
+		$result = self::trash_article( $user_id, $post_id );
+		if ( is_wp_error( $result ) ) {
+			self::redirect_with_result( 'error', $result->get_error_code() );
+		}
+		self::redirect_with_result( 'notice', 'removed' );
+	}
+
+	private static function redirect_to_member_login() {
+		$login = class_exists( 'CYWater_Membership_Account_Routing' )
+			? CYWater_Membership_Account_Routing::login_url( self::url() )
+			: wp_login_url( self::url() );
+		wp_safe_redirect( $login );
+		exit;
+	}
+
+	/** @return WP_Post|WP_Error */
+	public static function trash_article( $user_id, $post_id ) {
+		$user_id = absint( $user_id );
+		$post_id = absint( $post_id );
+		$post = get_post( $post_id );
+		if ( ! $post instanceof WP_Post || CYWater_Forum_Content::POST_TYPE !== $post->post_type ) {
+			return new WP_Error( 'article_not_found', __( 'That Forum article is unavailable.', 'cywater-forum' ) );
+		}
+		if ( absint( $post->post_author ) !== absint( $user_id ) ) {
+			return new WP_Error( 'article_not_owned', __( 'You can remove only your own Forum articles.', 'cywater-forum' ) );
+		}
+		if ( ! in_array( $post->post_status, self::EDITABLE_STATUSES, true ) ) {
+			return new WP_Error( 'article_read_only', __( 'That Forum article has already been taken down.', 'cywater-forum' ) );
+		}
+
+		$result = wp_trash_post( $post_id );
+		return $result instanceof WP_Post ? $result : new WP_Error( 'article_not_removed', __( 'The article could not be removed. Please contact CYWater.', 'cywater-forum' ) );
+	}
+
 	private static function redirect_with_result( $type, $code, $post_id = 0 ) {
 		$args = array( 'forum_' . sanitize_key( $type ) => sanitize_key( $code ) );
 		if ( $post_id ) {
@@ -343,12 +393,14 @@ final class CYWater_Forum_Workspace {
 			'notice' => array(
 				'saved'     => __( 'Draft saved.', 'cywater-forum' ),
 				'published' => __( 'Article published.', 'cywater-forum' ),
+				'removed'   => __( 'Article removed from the Forum. A Community Moderator can restore it if needed.', 'cywater-forum' ),
 			),
 			'error'  => array(
 				'submission_blocked' => __( 'Your account is not currently eligible to submit Forum articles.', 'cywater-forum' ),
 				'article_not_found'   => __( 'That Forum article is unavailable.', 'cywater-forum' ),
 				'article_not_owned'   => __( 'You can edit only your own Forum articles.', 'cywater-forum' ),
 				'article_read_only'   => __( 'Taken-down articles are read-only for members.', 'cywater-forum' ),
+				'article_not_removed' => __( 'The article could not be removed. Please contact CYWater.', 'cywater-forum' ),
 				'status_forbidden'    => __( 'That article status cannot be changed from the member workspace.', 'cywater-forum' ),
 				'title_required'      => __( 'Add an article title.', 'cywater-forum' ),
 				'content_required'    => __( 'Add the article text.', 'cywater-forum' ),

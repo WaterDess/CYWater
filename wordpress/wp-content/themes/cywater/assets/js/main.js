@@ -339,4 +339,14 @@
     headings.forEach((h) => spy.observe(h));
   }
 
+  /* ---------- Explicit confirmation for recoverable member removals ---------- */
+  document.querySelectorAll("[data-confirm]").forEach((control) => {
+    control.addEventListener("click", (event) => {
+      const message = control.getAttribute("data-confirm");
+      if (message && !window.confirm(message)) {
+        event.preventDefault();
+      }
+    });
+  });
+
 })();

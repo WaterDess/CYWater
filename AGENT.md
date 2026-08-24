@@ -1127,7 +1127,7 @@ describe sandbox activity as a real transaction.
 ### Production Release Snapshot (2026-08-21)
 
 - The reviewed WordPress production candidate is live at `https://cywater.org/`
-  with theme `0.6.43`, Membership `0.9.6`, Logo Call `0.4.1`, Forum `0.5.0`,
+  with theme `0.6.44`, Membership `0.9.6`, Logo Call `0.4.1`, Forum `0.6.0`,
   Partnerships `0.1.5`, and Operations `0.3.1`. The complete initial-release database
   and code trees are retained at
   `/home/u111638297/cywater-release-backups/production-release-predeploy-20260821T132711`.
@@ -1253,6 +1253,28 @@ describe sandbox activity as a real transaction.
   `/home/u111638297/cywater-release-backups/logo-reward-terms-production-20260824T012851Z`;
   its 105,584-byte deployment bundle has SHA-256
   `d6e846c99216da06f93296b7ec579e4beb16100fdd1f35948edf8bf8bcabf1dd`.
+- On 2026-08-24 Forum `0.6.0` and theme `0.6.44` completed the lightweight
+  community layer on production. An email-verified active Student,
+  Professional or Lifetime member can publish and edit their own Forum
+  articles directly, then withdraw an article from the front-end workspace to
+  the recoverable WordPress trash. Community Moderators retain cross-author
+  editing, take-down, restoration, permanent deletion, reply moderation and
+  the ability to clear an article's likes. Eligible members may like published
+  articles; Account now provides My posts and Liked posts. Public author links
+  use opaque `/forum/member/<token>/` routes and expose only profile fields the
+  active verified member opted into, while native login-derived WordPress
+  author archives remain closed. The public WordPress admin toolbar is hidden
+  for every signed-in role without changing staff access inside `/wp-admin/`.
+  Missing public routes use the CYWater 404 surface with Home and Contact
+  actions. Staging Forum QA passed 140 self-cleaning assertions, and the user
+  completed the production web check. Production preserves one legitimate
+  published Forum article and no Forum test fixture; all 13 Forum and 94 theme
+  files match the reviewed local candidate. The predeploy database and prior
+  code trees are retained at
+  `/home/u111638297/cywater-release-backups/forum-community-production-predeploy-20260824T045700Z`.
+  Stripe remains `live`; its configuration snapshot SHA-256 stayed exactly
+  `664630dbc4a4e67a9bf9c14da2a89e43b3a4b430dbe80828e18c7efb4742971e`
+  across this release, and no payment or refund was initiated.
 
 ## Editing Guidance
 

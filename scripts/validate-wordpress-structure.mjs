@@ -26,7 +26,7 @@ const required = [
   "wordpress/wp-content/themes/cywater/archive-cyw_event.php",
   "wordpress/wp-content/themes/cywater/archive-cyw_award.php",
   "wordpress/wp-content/themes/cywater/archive-cyw_forum_post.php",
-  "wordpress/wp-content/themes/cywater/author.php",
+  "wordpress/wp-content/themes/cywater/forum-member.php",
   "wordpress/wp-content/themes/cywater/comments.php",
   "wordpress/wp-content/themes/cywater/single-cyw_forum_post.php",
   "wordpress/wp-content/themes/cywater/taxonomy-cyw_forum_category.php",
@@ -59,6 +59,7 @@ const required = [
   "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-endorsement.php",
   "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-roles.php",
   "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-settings.php",
+  "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-community.php",
   "wordpress/wp-content/plugins/cywater-forum/includes/class-cywater-forum-workspace.php",
   "wordpress/wp-content/plugins/cywater-forum/includes/defaults.php",
   "wordpress/wp-content/plugins/cywater-forum/uninstall.php",
@@ -121,6 +122,17 @@ for (const file of filesToScan) {
 function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
+
+let nativeAuthorTemplatePresent = true;
+try {
+  await access(path.join(root, "wordpress/wp-content/themes/cywater/author.php"));
+} catch {
+  nativeAuthorTemplatePresent = false;
+}
+assert(
+  !nativeAuthorTemplatePresent,
+  "The native login-derived author archive template must stay removed; Forum authors use forum-member.php."
+);
 
 function normalizeNewlines(contents) {
   return contents.replace(/\r\n?/g, "\n");

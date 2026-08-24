@@ -13,6 +13,7 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 
 delete_option( 'cywater_forum_settings' );
 delete_option( 'cywater_forum_category_seed_version' );
+delete_option( 'cywater_forum_community_schema_version' );
 
 if ( function_exists( 'remove_role' ) ) {
 	remove_role( 'cyw_forum_author' );

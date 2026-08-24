@@ -58,8 +58,8 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 
 Hostinger staging is available at `https://staging.cywater.org/`, and the public
 production site is live at `https://cywater.org/`. The 2026-08-24 accepted code
-baseline uses the CYWater `0.6.43` theme, CYWater Membership `0.9.6`, CYWater
-Partnerships `0.1.5`, CYWater Logo Call `0.4.1`, CYWater Forum `0.5.0`, CYWater
+baseline uses the CYWater `0.6.44` theme, CYWater Membership `0.9.6`, CYWater
+Partnerships `0.1.5`, CYWater Logo Call `0.4.1`, CYWater Forum `0.6.0`, CYWater
 Environment `0.5.7`, CYWater Core `0.6.6`, CYWater Operations `0.3.1`, and Event
 Tickets `5.29.1`.
 
@@ -77,6 +77,23 @@ local-development, QA-identity, or private acceptance-fixture hits.
 The resulting production-clean `0.5.7` bundle is
 `dist/cywater-wordpress-production-clean-0.5.7.zip` (16,399,216 bytes), SHA-256
 `5ee57d80cbbb19659cdbde8c2e590105e5efdb9919121e4cd7847a73e8ce30c7`.
+
+Forum `0.6.0` is the production lightweight-community baseline. Verified
+active individual members publish and edit their own articles directly and can
+withdraw them to recoverable trash from `/forum-workspace/`; moderators own
+cross-author editing, restoration, permanent deletion, reply moderation and
+engagement cleanup. Eligible-member likes, opaque privacy-scoped Forum author
+pages, and Account views for owned and liked posts are active. Native
+login-derived author archives remain closed, and the public admin toolbar is
+hidden for every role without changing protected `/wp-admin/` access. The
+friendly public 404 links to Home and Contact. Staging passed 140 self-cleaning
+Forum assertions, production contains one legitimate article and no Forum QA
+fixture, all deployed 13 Forum and 94 theme files match local, and the user
+completed the production web check. The predeploy rollback is
+`/home/u111638297/cywater-release-backups/forum-community-production-predeploy-20260824T045700Z`.
+This release did not change Stripe: Live configuration retained SHA-256
+`664630dbc4a4e67a9bf9c14da2a89e43b3a4b430dbe80828e18c7efb4742971e`,
+and no payment or refund was initiated.
 
 Theme `0.6.43` retains the editable WordPress custom Logo as the single brand
 source for the header, footer, and browser icon. The bundled fallback uses the

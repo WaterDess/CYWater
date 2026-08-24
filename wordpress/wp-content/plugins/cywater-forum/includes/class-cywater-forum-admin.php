@@ -22,6 +22,7 @@ final class CYWater_Forum_Admin {
 		add_action( 'personal_options_update', array( __CLASS__, 'save_user_section' ) );
 		add_filter( 'manage_users_columns', array( __CLASS__, 'add_users_column' ) );
 		add_filter( 'manage_users_custom_column', array( __CLASS__, 'render_users_column' ), 10, 3 );
+		add_filter( 'user_row_actions', array( __CLASS__, 'author_row_action' ), 20, 2 );
 	}
 
 	public static function render_user_section( $user ) {
@@ -162,6 +163,18 @@ final class CYWater_Forum_Admin {
 			return esc_html__( 'Not currently eligible', 'cywater-forum' );
 		}
 		return esc_html__( '—', 'cywater-forum' );
+	}
+
+	/** Replace WordPress' login-derived author archive action with the Forum page. */
+	public static function author_row_action( $actions, $user ) {
+		if ( ! $user instanceof WP_User ) {
+			return $actions;
+		}
+		unset( $actions['view'] );
+		if ( class_exists( 'CYWater_Forum_Community' ) && CYWater_Forum_Content::published_count( $user->ID ) > 0 ) {
+			$actions['cywater_forum_author'] = '<a href="' . esc_url( CYWater_Forum_Community::author_url( $user->ID ) ) . '">' . esc_html__( 'View Forum author page', 'cywater-forum' ) . '</a>';
+		}
+		return $actions;
 	}
 
 	public static function blocker_label( $blocker ) {

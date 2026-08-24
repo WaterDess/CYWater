@@ -75,7 +75,7 @@ $blocker_copy = array(
 					<div class="forum-workspace-gate card">
 						<span class="badge badge-teal"><?php esc_html_e( 'Staff workspace', 'cywater' ); ?></span>
 						<h2><?php esc_html_e( 'Forum moderation stays in WordPress administration.', 'cywater' ); ?></h2>
-						<p><?php esc_html_e( 'Community Moderators use the protected Forum administration area to edit across authors, take down, restore or delete articles, and moderate discussion.', 'cywater' ); ?></p>
+						<p><?php esc_html_e( 'Community Moderators use the protected Forum administration area to edit across authors, take down, restore or permanently delete articles, moderate discussion, and review engagement counts.', 'cywater' ); ?></p>
 						<a class="btn btn-accent" href="<?php echo esc_url( admin_url( 'edit.php?post_type=cyw_forum_post' ) ); ?>"><?php esc_html_e( 'Manage Forum', 'cywater' ); ?></a>
 					</div>
 				<?php elseif ( ! $can_submit ) : ?>
@@ -136,12 +136,22 @@ $blocker_copy = array(
 								</div>
 
 								<div class="forum-workspace-actions">
+									<?php if ( $editing instanceof WP_Post ) : ?>
+										<button class="btn btn-ghost forum-remove-trigger" type="submit" form="forum-remove-article" data-confirm="<?php echo esc_attr( 'publish' === $editing->post_status ? __( 'Remove this published article from the Forum?', 'cywater' ) : __( 'Delete this draft?', 'cywater' ) ); ?>"><?php echo 'publish' === $editing->post_status ? esc_html__( 'Remove article', 'cywater' ) : esc_html__( 'Delete draft', 'cywater' ); ?></button>
+									<?php endif; ?>
 									<?php if ( ! $editing instanceof WP_Post || 'draft' === $editing->post_status ) : ?>
 										<button class="btn btn-outline" type="submit" name="forum_intent" value="draft"><?php esc_html_e( 'Save draft', 'cywater' ); ?></button>
 									<?php endif; ?>
 									<button class="btn btn-accent" type="submit" name="forum_intent" value="publish"><?php echo $editing instanceof WP_Post && 'publish' === $editing->post_status ? esc_html__( 'Update article', 'cywater' ) : esc_html__( 'Publish article', 'cywater' ); ?></button>
 								</div>
 							</form>
+							<?php if ( $editing instanceof WP_Post ) : ?>
+								<form id="forum-remove-article" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+									<input type="hidden" name="action" value="cywater_forum_workspace_trash">
+									<input type="hidden" name="forum_post_id" value="<?php echo esc_attr( (string) $editing->ID ); ?>">
+									<?php wp_nonce_field( 'cywater_forum_workspace_trash_' . $editing->ID, 'cywater_forum_workspace_trash_nonce' ); ?>
+								</form>
+							<?php endif; ?>
 						</section>
 					</div>
 				<?php endif; ?>
@@ -162,7 +172,15 @@ $blocker_copy = array(
 											<article class="forum-workspace-article-row">
 												<h3><?php echo esc_html( $article->post_title ?: __( 'Untitled article', 'cywater' ) ); ?></h3>
 												<p><?php echo esc_html( sprintf( __( 'Updated %s', 'cywater' ), get_the_modified_date( get_option( 'date_format' ), $article ) ) ); ?></p>
-											<?php if ( $can_submit ) : ?><a class="link" href="<?php echo esc_url( add_query_arg( 'edit', $article->ID, $workspace_url ) ); ?>"><?php esc_html_e( 'Edit article', 'cywater' ); ?></a><?php else : ?><span class="field-hint"><?php esc_html_e( 'Read-only until eligibility is restored.', 'cywater' ); ?></span><?php endif; ?>
+											<div class="forum-workspace-row-actions">
+												<?php if ( $can_submit ) : ?><a class="link" href="<?php echo esc_url( add_query_arg( 'edit', $article->ID, $workspace_url ) ); ?>"><?php esc_html_e( 'Edit article', 'cywater' ); ?></a><?php else : ?><span class="field-hint"><?php esc_html_e( 'Editing is paused.', 'cywater' ); ?></span><?php endif; ?>
+												<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+													<input type="hidden" name="action" value="cywater_forum_workspace_trash">
+													<input type="hidden" name="forum_post_id" value="<?php echo esc_attr( (string) $article->ID ); ?>">
+													<?php wp_nonce_field( 'cywater_forum_workspace_trash_' . $article->ID, 'cywater_forum_workspace_trash_nonce' ); ?>
+													<button class="link forum-remove-trigger" type="submit" data-confirm="<?php echo esc_attr( 'publish' === $article->post_status ? __( 'Remove this published article from the Forum?', 'cywater' ) : __( 'Delete this draft?', 'cywater' ) ); ?>"><?php echo 'publish' === $article->post_status ? esc_html__( 'Remove article', 'cywater' ) : esc_html__( 'Delete draft', 'cywater' ); ?></button>
+												</form>
+											</div>
 											<?php if ( 'publish' === $status ) : ?><a class="link" href="<?php echo esc_url( get_permalink( $article ) ); ?>"><?php esc_html_e( 'Read article', 'cywater' ); ?></a><?php endif; ?>
 											</article>
 										<?php endforeach; ?>
