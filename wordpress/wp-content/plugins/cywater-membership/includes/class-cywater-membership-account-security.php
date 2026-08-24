@@ -461,7 +461,6 @@ final class CYWater_Membership_Account_Security {
 	}
 
 	private static function login_url( $redirect ) {
-		$url = function_exists( 'pmpro_url' ) ? pmpro_url( 'login' ) : wp_login_url();
-		return add_query_arg( 'redirect_to', wp_validate_redirect( $redirect, home_url( '/account/' ) ), $url );
+		return CYWater_Membership_Account_Routing::login_url( wp_validate_redirect( $redirect, home_url( '/account/' ) ) );
 	}
 }

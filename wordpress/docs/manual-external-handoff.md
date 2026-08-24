@@ -1,16 +1,18 @@
 # Manual And External Handoff
 
-The public production site is live; only payment activation remains **No-Go**.
+The public production site is live; only end-to-end financial acceptance remains
+open. Stripe Live is connected and enabled, but it is not yet financially
+accepted.
 Repository remediation is implemented on staging and production and passes the
-real WordPress/MySQL automation suites. The final open production gate is the
-association-owned Stripe Live connection followed by one real charge, receipt,
-balance/payout observation and full-refund reconciliation.
+real WordPress/MySQL automation suites. The final open production gate is one
+controlled real charge, receipt, balance/payout observation and full-refund
+reconciliation through the association-owned Stripe Live account.
 Hostinger File Manager
 recovered and archived the former Logo Call `0.2.3` and Environment `0.5.5`
 trees before the current staging work. Logo Call `0.3.2` is independently
 accepted and deployed on staging and production with the reviewed Event
 configuration and no staging entries, votes, identities, or protected files.
-Membership `0.9.4`, Partnerships `0.1.5`, Forum `0.4.2`, Operations `0.2.1`,
+Membership `0.9.6`, Partnerships `0.1.5`, Forum `0.4.2`, Operations `0.2.1`,
 and Environment `0.5.5` are the verified staging candidate versions. See
 `production-checklist.md` for the authoritative order.
 

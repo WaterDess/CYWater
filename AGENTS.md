@@ -1127,7 +1127,7 @@ describe sandbox activity as a real transaction.
 ### Production Release Snapshot (2026-08-21)
 
 - The reviewed WordPress production candidate is live at `https://cywater.org/`
-  with theme `0.6.41`, Membership `0.9.4`, Logo Call `0.3.2`, Forum `0.4.2`,
+  with theme `0.6.42`, Membership `0.9.6`, Logo Call `0.3.2`, Forum `0.4.2`,
   Partnerships `0.1.5`, and Operations `0.2.1`. The complete predeploy database
   and code trees are retained at
   `/home/u111638297/cywater-release-backups/production-release-predeploy-20260821T132711`.
@@ -1138,6 +1138,23 @@ describe sandbox activity as a real transaction.
   beside the water-drop mark and uses the same mark as the fallback browser
   icon. The Board page no longer exposes internal publication or future
   committee-appointment notes.
+- On 2026-08-24 Membership `0.9.6` and theme `0.6.42` centralized account
+  routing without replacing WordPress authentication or PMPro account
+  ownership. Public registration, sign-in, password recovery, Account,
+  checkout returns, and front-end sign-out stay on the managed member pages;
+  sign-out returns to `/member-login/?loggedout=true`. A direct `/wp-admin/`
+  request retains WordPress' native staff login, while an authenticated
+  ordinary member still receives a direct HTTP 403 and gains no Forum or
+  Operations role. Login, registration, account and billing pages now opt out
+  of full-page caching. Staging account-security QA passed 77 checks; Forum
+  retained 132 passing application/storage assertions, with its 11 anonymous
+  HTTP probes intercepted only by staging Basic Auth. Production passed the
+  public route/form/notice checks and authenticated read-only checks for the
+  member 403 and login-to-Account redirect. Stripe remained `live` throughout.
+  Complete pre-release rollback trees are retained under
+  `/home/u111638297/cywater-release-backups/account-routing-0.9.5-production-pre-20260824T084500Z`
+  and
+  `/home/u111638297/cywater-release-backups/account-routing-membership-0.9.6-production-pre-20260824T091500Z`.
 - Theme `0.6.41` makes the WordPress custom Logo the one brand source for the
   header, footer and browser icon. With no custom Logo it uses the bundled mark
   and a 4 KB early-discovered favicon derivative; it preloads the header mark

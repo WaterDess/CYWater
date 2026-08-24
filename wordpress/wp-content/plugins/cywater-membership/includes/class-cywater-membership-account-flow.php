@@ -48,7 +48,7 @@ final class CYWater_Membership_Account_Flow {
 			exit;
 		}
 
-		$login_url = function_exists( 'pmpro_url' ) ? pmpro_url( 'login' ) : wp_login_url();
+		$login_url = CYWater_Membership_Account_Routing::login_url();
 		$login_url = add_query_arg(
 			array(
 				'cywater_checkout' => 'login_required',
@@ -302,7 +302,7 @@ final class CYWater_Membership_Account_Flow {
 			return $links;
 		}
 		$redirect = isset( $_REQUEST['redirect_to'] ) ? esc_url_raw( wp_unslash( $_REQUEST['redirect_to'] ) ) : home_url( '/membership/' );
-		$url      = add_query_arg( 'redirect_to', $redirect, home_url( '/member-register/' ) );
+		$url      = CYWater_Membership_Account_Routing::registration_url( $redirect );
 		$links    = array( 'register' => sprintf( '<a href="%s">%s</a>', esc_url( $url ), esc_html__( 'Create account', 'cywater-membership' ) ) ) + $links;
 		return $links;
 	}

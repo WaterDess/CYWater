@@ -16,6 +16,9 @@ if ( 'staging.cywater.org' !== $site_host ) {
 if ( ! class_exists( 'CYWater_Membership_Account_Security' ) ) {
 	WP_CLI::error( 'CYWater Membership account security is unavailable.' );
 }
+if ( ! class_exists( 'CYWater_Membership_Account_Routing' ) ) {
+	WP_CLI::error( 'CYWater Membership account routing is unavailable.' );
+}
 
 if ( '1' === getenv( 'CYWATER_ACCOUNT_QA_REAL_DELIVERY' ) ) {
 	$delivery_username = 'cywater_delivery_qa_' . gmdate( 'YmdHis' );
@@ -100,6 +103,23 @@ try {
 		$assert( false !== strpos( $register_html, 'name="' . $required_name . '"' ), 'Registration renders required core field: ' . $required_name );
 	}
 	$assert( false !== strpos( $register_html, '<select class="select" id="cywater-register-country"' ), 'Registration country is a single-select control ready for searchable enhancement' );
+	$public_login = CYWater_Membership_Account_Routing::login_url( home_url( '/account/' ) );
+	$assert( false !== strpos( $public_login, '/member-login/' ) && false !== strpos( $public_login, 'redirect_to=' ), 'Public sign-in uses the managed member page and preserves a same-site return target' );
+	$external_login = CYWater_Membership_Account_Routing::login_url( 'https://example.org/not-cywater' );
+	$assert( false === strpos( $external_login, 'example.org' ), 'Public sign-in discards an off-site return target' );
+	$registration_url = CYWater_Membership_Account_Routing::registration_url( home_url( '/membership/' ) );
+	$assert( false !== strpos( $registration_url, '/member-register/' ) && false !== strpos( $registration_url, 'redirect_to=' ), 'Registration uses the managed member page and preserves the selected continuation' );
+	$raw_logout      = wp_nonce_url( site_url( 'wp-login.php?action=logout', 'login' ), 'log-out' );
+	$frontend_logout = CYWater_Membership_Account_Routing::filter_frontend_logout_url( $raw_logout, '' );
+	$assert( false !== strpos( $frontend_logout, '_wpnonce=' ) && false !== strpos( $frontend_logout, 'redirect_to=' ) && false !== strpos( urldecode( $frontend_logout ), '/member-login/?loggedout=true' ), 'Front-end sign-out preserves the WordPress nonce and returns to the managed member page with a success notice' );
+	$explicit_logout = CYWater_Membership_Account_Routing::filter_frontend_logout_url( $raw_logout, home_url( '/membership/' ) );
+	$assert( $raw_logout === $explicit_logout, 'An explicit caller-owned sign-out destination is preserved' );
+	$admin_login = CYWater_Membership_Account_Routing::filter_admin_login_url( $public_login, admin_url( '/' ) );
+	$assert( false !== strpos( $admin_login, '/wp-login.php' ) && false === strpos( $admin_login, '/member-login/' ), 'An explicit WordPress administration request keeps the native staff login surface' );
+	$frontend_login = CYWater_Membership_Account_Routing::filter_admin_login_url( $public_login, home_url( '/account/' ) );
+	$assert( $public_login === $frontend_login, 'An ordinary member destination remains on the managed public sign-in surface' );
+	$cache_hook = has_action( 'template_redirect', array( 'CYWater_Membership_Account_Routing', 'prevent_identity_page_cache' ) );
+	$assert( false !== $cache_hook && 0 === $cache_hook, 'Member identity pages are excluded from full-page caching before other account redirects run' );
 
 	$original_user_id = get_current_user_id();
 	$original_post    = $_POST;

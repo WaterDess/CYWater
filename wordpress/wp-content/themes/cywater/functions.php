@@ -388,6 +388,9 @@ function cywater_forum_enabled() {
  * @return string
  */
 function cywater_login_url( $redirect = '' ) {
+	if ( class_exists( 'CYWater_Membership_Account_Routing' ) ) {
+		return CYWater_Membership_Account_Routing::login_url( $redirect );
+	}
 	$url = function_exists( 'pmpro_url' ) ? pmpro_url( 'login' ) : wp_login_url();
 	return $redirect ? add_query_arg( 'redirect_to', $redirect, $url ) : $url;
 }

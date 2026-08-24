@@ -57,8 +57,8 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 ## Current State
 
 Hostinger staging is available at `https://staging.cywater.org/`, and the public
-production site is live at `https://cywater.org/`. The 2026-08-22 accepted code
-baseline uses the CYWater `0.6.41` theme, CYWater Membership `0.9.4`, CYWater
+production site is live at `https://cywater.org/`. The 2026-08-24 accepted code
+baseline uses the CYWater `0.6.42` theme, CYWater Membership `0.9.6`, CYWater
 Partnerships `0.1.5`, CYWater Logo Call `0.3.3`, CYWater Forum `0.4.2`, CYWater
 Environment `0.5.7`, CYWater Core `0.6.6`, CYWater Operations `0.2.1`, and Event
 Tickets `5.29.1`.
@@ -75,7 +75,7 @@ The resulting production-clean `0.5.7` bundle is
 `dist/cywater-wordpress-production-clean-0.5.7.zip` (16,399,216 bytes), SHA-256
 `5ee57d80cbbb19659cdbde8c2e590105e5efdb9919121e4cd7847a73e8ce30c7`.
 
-Theme `0.6.41` treats the editable WordPress custom Logo as the single brand
+Theme `0.6.42` retains the editable WordPress custom Logo as the single brand
 source for the header, footer, and browser icon. The bundled fallback uses the
 same mark through a 4 KB favicon derivative declared before `wp_head`, while
 the full header mark is preloaded. WordPress' separate Site Icon output is
@@ -89,6 +89,14 @@ before the full navigation list. Signed-out visitors go directly to the PMPro
 member-login page. The managed login page contains only
 `[cywater_member_login]`; the wrapper renders PMPro once, preventing the
 historical duplicate form caused by retaining `[pmpro_login]` alongside it.
+Membership `0.9.6` centralizes public-member versus staff routing: registration,
+sign-in, sign-out, password recovery, Account, and checkout returns stay on the
+managed public pages; a direct `/wp-admin/` request keeps WordPress' native
+staff login; and an authenticated non-staff member receives HTTP 403. Front-end
+sign-out returns to `/member-login/?loggedout=true`, and identity pages are
+explicitly excluded from full-page caching so login state cannot be masked by a
+stale public form. Theme `0.6.42` consumes the same routing source for its
+desktop and mobile account actions.
 
 The public production cutover is complete. On 2026-08-23 the association opened
 the production membership runtime to Stripe Live; end-to-end financial

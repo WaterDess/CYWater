@@ -5,9 +5,15 @@
  * @package CYWater
  */
 $section = cywater_current_section();
-$account = function_exists( 'pmpro_url' )
-	? pmpro_url( is_user_logged_in() ? 'account' : 'login' )
-	: wp_login_url();
+if ( class_exists( 'CYWater_Membership_Account_Routing' ) ) {
+	$account = is_user_logged_in()
+		? CYWater_Membership_Account_Routing::account_url()
+		: CYWater_Membership_Account_Routing::login_url();
+} else {
+	$account = function_exists( 'pmpro_url' )
+		? pmpro_url( is_user_logged_in() ? 'account' : 'login' )
+		: wp_login_url();
+}
 ?>
 <!doctype html>
 <html <?php language_attributes(); ?>>

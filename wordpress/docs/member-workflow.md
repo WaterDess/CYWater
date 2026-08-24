@@ -146,6 +146,23 @@ records; editors and ordinary members remain denied.
 
 ## Account Lifecycle
 
+- Public members use `/member-register/`, `/member-login/`, and `/account/` as
+  the canonical registration, sign-in, password-recovery, and account surfaces.
+  WordPress still authenticates the credentials and PMPro still owns the member
+  account; these routes select the public presentation rather than creating a
+  second identity system.
+- Front-end sign-out keeps WordPress' nonced logout action but always returns to
+  `/member-login/?loggedout=true`, where the public page confirms that the
+  session ended. An explicit caller-owned redirect and an administration
+  sign-out remain authoritative.
+- A direct signed-out `/wp-admin/` request keeps WordPress' native staff login.
+  A signed-in ordinary member receives HTTP 403, while Administrators and
+  explicitly assigned CYWater Operations staff retain their normal admin
+  access. Membership never grants Forum or WordPress administration.
+- Login, registration, account, billing, and password-reset views are excluded
+  from full-page caching because their content and redirects vary by login
+  state. An already signed-in member who opens `/member-login/` returns to the
+  public Account page.
 - Registration creates a Subscriber account that is private by default, signs
   it in, sends email verification, and returns to the selected checkout only
   after verification succeeds.
