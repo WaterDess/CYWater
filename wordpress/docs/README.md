@@ -58,25 +58,29 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 
 Hostinger staging is available at `https://staging.cywater.org/`, and the public
 production site is live at `https://cywater.org/`. The 2026-08-24 accepted code
-baseline uses the CYWater `0.6.46` theme, CYWater Membership `0.9.6`, CYWater
-Partnerships `0.1.5`, CYWater Logo Call `0.4.1`, CYWater Forum `0.6.1`, CYWater
-Environment `0.5.7`, CYWater Core `0.6.6`, CYWater Operations `0.3.1`, and Event
+baseline uses the CYWater `0.6.47` theme, CYWater Membership `0.9.6`, CYWater
+Partnerships `0.1.5`, CYWater Logo Call `0.4.2`, CYWater Forum `0.6.1`, CYWater
+Environment `0.5.7`, CYWater Core `0.6.6`, CYWater Operations `0.3.2`, and Event
 Tickets `5.29.1`.
 
-Logo Call `0.4.1` keeps submissions open through September 30, 2026. Its public
-copy states only that a separate voting activity follows; no voting dates are
-published or scheduled yet. Valid entrants earn Student membership through the
-end of 2026, the five voting finalists earn one year of Professional
-membership, and the accepted Board-selected design earns a total two years of
-Professional membership. Final winner fulfillment remains Board-controlled. The
-post-submission phase safely waits for a later voting configuration. Environment `0.5.7` removes WordPress' users
+Logo Call `0.4.2` keeps submissions open through September 30, 2026 and adds a
+server-backed, responsive deadline countdown at the start of the Event body.
+Its public copy states only that a separate voting activity and finalist group
+follow; it does not publish a fixed finalist count or voting dates. After the
+vote, Governance may confirm either three or five highest-ranked eligible
+finalists based on the field and records the chosen count on the Event. Valid
+entrants earn Student membership through the end of 2026, every confirmed
+finalist earns one year of Professional membership, and the accepted
+Board-selected design earns a total two years of Professional membership. Final
+winner fulfillment remains Board-controlled. The post-submission phase safely
+waits for a later voting configuration. Environment `0.5.7` removes WordPress' users
 sitemap in addition to the existing REST-user and author-archive protections.
 The production purity gate passes 22 checks, and the repeatable public residue
 audit checks 81 sitemap/key URLs with zero staging, Sandbox, temporary-host,
 local-development, QA-identity, or private acceptance-fixture hits.
 The resulting production-clean `0.5.7` bundle is
-`dist/cywater-wordpress-production-clean-0.5.7.zip` (16,399,216 bytes), SHA-256
-`5ee57d80cbbb19659cdbde8c2e590105e5efdb9919121e4cd7847a73e8ce30c7`.
+`dist/cywater-wordpress-production-clean-0.5.7.zip` (16,415,745 bytes), SHA-256
+`47edcc10ca5f9e8da8a97ab591025ddd46efe6adc1c869ffae5482401c486013`.
 
 Forum `0.6.1` is the production account-only lightweight-community baseline.
 Signed-out visitors do not see Forum navigation and cannot read Forum archives,
@@ -476,8 +480,8 @@ It keeps permissions separate from user identity through four composable roles:
 first role edits public content and prepares paid Events; the second moderates
 Forum articles and comments; the third inspects Logo Call entries and records
 voting eligibility only; and the fourth handles Board records, Partner workflow,
-paid-Event approval, confirmation of the three Logo finalists, and selection of
-the official design from those three. Only an Administrator records accepted
+paid-Event approval, confirmation of the Event's three- or five-entry Logo
+finalist group, and selection of the official design from that group. Only an Administrator records accepted
 rights, accepted final production files, and reward fulfillment. None manages
 PMPro members/orders, payment
 credentials, plugins, themes, or Administrators. Role changes and workflow
@@ -638,19 +642,19 @@ and does not block launch; it is needed only if this work is later delegated to
 a non-Administrator. CYWater must not create a local imitation of that licensed
 role.
 
-CYWater Logo Call `0.4.1` is attached only to the enabled
+CYWater Logo Call `0.4.2` is attached only to the enabled
 `CYWater Logo Design Call 2026` Event. It accepts one PNG, JPEG
 or WebP logo file of at most 5 MB per eligible account; no separate lockup is
 requested during the open call. Submission grants only a limited review,
 display and voting license, so non-winning rights remain with the entrant. A
-separate vote opens after submissions close. Governance confirms exactly five
-highest-ranked eligible finalists, resolving only a tie that crosses the fifth-
-place boundary, and the Board selects the official logo from those finalists.
+separate vote opens after submissions close. Governance confirms either three
+or five highest-ranked eligible finalists after reviewing the eligible field,
+and the chosen count is stored on the Event before Board selection.
 The selected entrant must complete a documented winning-design assignment and
 deliver accepted scalable or high-resolution production files before an
 Administrator may record the selected-design reward as fulfilled. Every valid
-entrant earns Student membership through December 31, 2026, the five
-finalists earn one year of Professional membership, and the accepted
+entrant earns Student membership through December 31, 2026, every confirmed
+finalist earns one year of Professional membership, and the accepted
 Board-selected design earns a total two years of Professional membership. Protected files stay
 outside public uploads. The sole operational
 entry is **Logo reviews**, which shows protected thumbnails, stable work

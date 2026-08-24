@@ -33,10 +33,11 @@ Hostinger File Manager recovered the former Logo Call `0.2.3` and
 Environment `0.5.5` trees read-only. Normalized comparison matched all 5/5 and
 7/7 files before further work. At the association's direction, Logo Call was
 subsequently replaced by independently accepted staging Logo Call `0.3.2`, then
-Logo Call `0.4.0` extends submissions through September 30, records the
-Student-through-2026 participation reward and two-year Professional reward for
-five finalists, and leaves voting unscheduled and undated on the public page
-until a separate announcement.
+Logo Call `0.4.2` extends submissions through September 30, records the
+Student-through-2026 participation reward and the Professional finalist and
+selected-design rewards, and leaves voting unscheduled and undated on the
+public page until a separate announcement. The public Call does not state a
+fixed finalist count; Governance may record either three or five after voting.
 The association subsequently directed that Logo Call be included at launch.
 The production-clean profile therefore contains the theme plus Core, Membership,
 Partnerships, Logo Call, Forum, Operations, and Environment. Only the reviewed
@@ -44,8 +45,8 @@ Logo Event configuration moves to production; staging entries, votes, identities
 and protected files do not. The public information site and Live payment runtime
 are active; do not mark end-to-end financial acceptance complete until a real
 payment, receipt, balance/payout evidence, webhook, and full refund reconcile.
-The final production-clean `0.5.7` bundle is 16,399,216 bytes with SHA-256
-`5ee57d80cbbb19659cdbde8c2e590105e5efdb9919121e4cd7847a73e8ce30c7`.
+The final production-clean `0.5.7` bundle is 16,415,745 bytes with SHA-256
+`47edcc10ca5f9e8da8a97ab591025ddd46efe6adc1c869ffae5482401c486013`.
 
 Remaining acceptance and handover checks:
 

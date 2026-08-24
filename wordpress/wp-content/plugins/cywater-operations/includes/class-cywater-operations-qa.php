@@ -944,18 +944,20 @@ final class CYWater_Operations_QA {
 		self::assert_true( array( 2, 1, 1, 0, 0, 0 ) === array_map( array( 'CYWater_Logo_Call', 'vote_count' ), $entries ), 'Vote ranking is derived from one-vote account records.' );
 
 		wp_set_current_user( $program->ID );
-		$result = CYWater_Operations_Logo_Review::finalize_finalists( $event_id, array_slice( $entries, 0, 5 ) );
+		$result = CYWater_Operations_Logo_Review::finalize_finalists( $event_id, array_slice( $entries, 0, 3 ) );
 		self::assert_true( is_wp_error( $result ) && 'cywater_logo_finalists_forbidden' === $result->get_error_code(), 'Program Reviewer cannot confirm voting finalists.' );
 		$result = CYWater_Operations_Logo_Review::transition( $entries[0], 'not_selected' );
 		self::assert_true( is_wp_error( $result ) && 'cywater_logo_review_locked' === $result->get_error_code(), 'Eligibility review locks once voting has opened.' );
 
 		wp_set_current_user( $governance->ID );
-		$result = CYWater_Operations_Logo_Review::finalize_finalists( $event_id, array_slice( $entries, 0, 5 ) );
-		self::assert_true( true === $result && 5 === count( CYWater_Logo_Call::finalists( $event_id ) ), 'Governance confirms exactly five highest-ranked finalists.' );
+		$result = CYWater_Operations_Logo_Review::finalize_finalists( $event_id, array_slice( $entries, 0, 4 ) );
+		self::assert_true( is_wp_error( $result ) && 'cywater_logo_finalists_invalid' === $result->get_error_code(), 'Governance cannot record a finalist count outside the approved three-or-five choice.' );
+		$result = CYWater_Operations_Logo_Review::finalize_finalists( $event_id, array_slice( $entries, 0, 3 ) );
+		self::assert_true( true === $result && 3 === count( CYWater_Logo_Call::finalists( $event_id ) ) && 3 === absint( get_post_meta( $event_id, '_cywater_logo_finalist_count', true ) ), 'Governance records a three-entry finalist group from the highest-ranked pool.' );
 		self::assert_true( in_array( get_post_meta( $entries[0], '_cywater_logo_finalist_reward_status', true ), array( 'granted', 'covered_by_existing_membership' ), true ) && strtotime( (string) get_post_meta( $entries[0], '_cywater_logo_finalist_reward_end', true ) ) > time(), 'A finalist receives a recorded one-year Professional reward.' );
 		self::assert_true( 'not_selected' === get_post_meta( $entries[5], '_cywater_logo_status', true ), 'Non-finalist voting entry closes as not selected.' );
 		$result = CYWater_Operations_Logo_Review::select_official( $event_id, $entries[0] );
-		self::assert_true( true === $result && 'selected' === get_post_meta( $entries[0], '_cywater_logo_status', true ), 'Governance records the Board-selected design from the five finalists.' );
+		self::assert_true( true === $result && 'selected' === get_post_meta( $entries[0], '_cywater_logo_status', true ), 'Governance records the Board-selected design from the configured finalist group.' );
 		self::assert_true( 'pending' === get_post_meta( $entries[0], '_cywater_logo_rights_status', true ) && 'requested' === get_post_meta( $entries[0], '_cywater_logo_final_files_status', true ) && 'pending' === get_post_meta( $entries[0], '_cywater_logo_reward_status', true ), 'Board selection opens independent rights, final-file and reward gates.' );
 		$result = CYWater_Operations_Logo_Review::fulfill( $entries[0], 'accepted', 'accepted', 'fulfilled' );
 		self::assert_true( is_wp_error( $result ) && 'cywater_logo_fulfillment_forbidden' === $result->get_error_code(), 'Governance cannot self-complete selected-design fulfillment.' );

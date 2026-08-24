@@ -36,7 +36,7 @@ if ( $retained_entries || $retained_votes ) {
 
 $slug    = 'logo-design-call-2026';
 $event   = get_page_by_path( $slug, OBJECT, 'cyw_event' );
-$content = '<p>CYWater invites registered users to submit one original association logo through September 30, 2026. A separate voting activity follows; the five highest-ranked eligible designs receive one year of Professional membership and advance to Board selection. Every valid entrant receives Student membership through December 31, 2026. The Board-selected design receives two years of Professional membership after the required rights and final-file handoff is accepted. This Event hosts the removable submission and voting module below.</p>';
+$content = '<p>CYWater invites registered users to submit one original association logo through September 30, 2026. A separate voting activity follows; eligible designs confirmed as finalists receive one year of Professional membership and advance to Board selection. Every valid entrant receives Student membership through December 31, 2026. The Board-selected design receives two years of Professional membership after the required rights and final-file handoff is accepted. This Event hosts the removable submission and voting module below.</p>';
 $data    = array(
 	'post_type'    => 'cyw_event',
 	'post_status'  => 'publish',

@@ -1,3 +1,56 @@
+.cywater-logo-call__countdown {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(22rem, .9fr);
+	gap: clamp(1.5rem, 4vw, 3rem);
+	align-items: center;
+	margin: 0 0 clamp(2rem, 5vw, 4rem);
+	padding: clamp(1.5rem, 4vw, 2.5rem);
+	border: 1px solid rgba(255,255,255,.12);
+	border-radius: 1rem;
+	background: linear-gradient(135deg, var(--ink, #0e1b2c), #103a43);
+	box-shadow: 0 1.25rem 3rem rgba(14,27,44,.12);
+	color: var(--white, #fff);
+}
+.cywater-logo-call__countdown-copy h2 { margin: .35rem 0 .55rem; color: inherit; }
+.cywater-logo-call__countdown-copy p { margin: 0; color: rgba(255,255,255,.72); }
+.cywater-logo-call__countdown-eyebrow {
+	color: #8bd8d0 !important;
+	font-size: var(--fs-xs, .75rem);
+	font-weight: 700;
+	letter-spacing: .14em;
+	text-transform: uppercase;
+}
+.cywater-logo-call__countdown-units {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: .6rem;
+}
+.cywater-logo-call__countdown-unit {
+	display: grid;
+	gap: .25rem;
+	justify-items: center;
+	padding: .85rem .4rem;
+	border: 1px solid rgba(255,255,255,.14);
+	border-radius: .75rem;
+	background: rgba(255,255,255,.07);
+}
+.cywater-logo-call__countdown-unit strong {
+	color: var(--white, #fff);
+	font-family: var(--font-display, serif);
+	font-size: clamp(1.55rem, 3vw, 2.2rem);
+	font-variant-numeric: tabular-nums;
+	font-weight: 600;
+	line-height: 1;
+}
+.cywater-logo-call__countdown-unit span {
+	color: rgba(255,255,255,.64);
+	font-size: .68rem;
+	font-weight: 700;
+	letter-spacing: .08em;
+	text-transform: uppercase;
+}
+.cywater-logo-call__countdown.is-complete .cywater-logo-call__countdown-units { opacity: .5; }
+
 .cywater-logo-call {
 	margin-block: clamp(3rem, 7vw, 6rem);
 	padding: clamp(1.5rem, 4vw, 3rem);
@@ -105,3 +158,8 @@
 .cywater-logo-call__grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(16rem,100%),1fr)); gap: 1rem; margin-block: 1.5rem; }
 .cywater-logo-call__candidate { display: grid; gap: .75rem; padding: 1rem; border: 1px solid var(--cyw-border, #d9d6ca); border-radius: .75rem; background: #fff; }
 .cywater-logo-call__candidate img, .cywater-logo-call__selected { display: block; width: 100%; height: auto; max-height: 28rem; object-fit: contain; }
+
+@media (max-width: 760px) {
+	.cywater-logo-call__countdown { grid-template-columns: 1fr; }
+	.cywater-logo-call__countdown-units { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

@@ -9,9 +9,9 @@ controlled real charge, receipt, balance/payout observation and full-refund
 reconciliation through the association-owned Stripe Live account.
 Hostinger File Manager recovered and archived the former Logo Call `0.2.3` and
 Environment `0.5.5` trees before the accepted releases. The current production
-baseline is Membership `0.9.6`, Partnerships `0.1.5`, Logo Call `0.4.1`, Forum
-`0.6.1`, Operations `0.3.1`, Environment `0.5.7`, Core `0.6.6`, and theme
-`0.6.46`. Forum staging QA passed 149 self-cleaning assertions; production
+baseline is Membership `0.9.6`, Partnerships `0.1.5`, Logo Call `0.4.2`, Forum
+`0.6.1`, Operations `0.3.2`, Environment `0.5.7`, Core `0.6.6`, and theme
+`0.6.47`. Forum staging QA passed 149 self-cleaning assertions; production
 anonymous-route, REST, navigation, file-integrity, and cache checks passed.
 See `production-checklist.md` for the
 authoritative order.
@@ -84,7 +84,7 @@ assign one or more roles under **Users -> CYWater staff access**:
 | CYWater Content & Event Editor | Posts/News, media, Events, Awards, Event terms, Logo Call configuration, submit paid Event for approval, open/close registration after approval | Governance approval, Forum moderation, PMPro members/orders, payment settings |
 | CYWater Community Moderator | Cross-author Forum editing, take-down/restoration/permanent deletion, taxonomy, replies, and engagement cleanup | Other public content models, Events, membership/payment administration |
 | CYWater Program Reviewer | Inspect Logo entries and record eligibility for voting | Confirm finalists, select the official logo, delete submissions or protected files, fulfill rewards, Event/Partner approval, PMPro orders |
-| CYWater Governance Approver | Board records, Partner review/approval/payment confirmation, paid-Event approval, confirm the five Logo finalists and select the official design from those five | Event editing, Logo reward/final-file fulfillment, PMPro membership/order operations, gateway credentials |
+| CYWater Governance Approver | Board records, Partner review/approval/payment confirmation, paid-Event approval, confirm a three- or five-entry Logo finalist group and select the official design from that group | Event editing, Logo reward/final-file fulfillment, PMPro membership/order operations, gateway credentials |
 
 Only a built-in Administrator may assign or remove these roles. The operational
 audit records identifiers, role/workflow states, time, action, and a short reason

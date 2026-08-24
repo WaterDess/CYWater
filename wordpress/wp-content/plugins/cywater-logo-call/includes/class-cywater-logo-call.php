@@ -27,6 +27,7 @@ final class CYWater_Logo_Call {
 		add_action( 'save_post_cyw_event', array( __CLASS__, 'save_event' ) );
 		add_action( 'save_post_' . self::ENTRY_TYPE, array( __CLASS__, 'save_entry_review' ) );
 		add_filter( 'the_content', array( __CLASS__, 'append_event_module' ), 35 );
+		add_action( 'cywater_event_before_content', array( __CLASS__, 'render_event_countdown' ) );
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_assets' ) );
 		add_action( 'admin_post_cywater_logo_submit', array( __CLASS__, 'handle_submit' ) );
 		add_action( 'admin_post_cywater_logo_vote', array( __CLASS__, 'handle_vote' ) );
@@ -162,7 +163,7 @@ final class CYWater_Logo_Call {
 		foreach ( self::reward_statuses() as $key => $label ) {
 			echo '<option value="' . esc_attr( $key ) . '" ' . selected( $reward_status, $key, false ) . '>' . esc_html( $label ) . '</option>';
 		}
-		echo '</select></p><p>' . esc_html__( 'Shortlisted entries appear in voting. After voting, the five highest-ranked eligible designs become finalists and earn the finalist reward. The Board-selected official design then enters separate rights, final-file and selected-design reward checks.', 'cywater-logo-call' ) . '</p>';
+		echo '</select></p><p>' . esc_html__( 'Shortlisted entries appear in voting. After voting, Governance confirms the finalist group from the highest-ranked eligible designs. Each confirmed finalist earns the finalist reward. The Board-selected official design then enters separate rights, final-file and selected-design reward checks.', 'cywater-logo-call' ) . '</p>';
 	}
 
 	public static function save_entry_review( $post_id ) {
@@ -200,6 +201,45 @@ final class CYWater_Logo_Call {
 		return $content . self::render_module( $event_id );
 	}
 
+	public static function render_event_countdown( $event_id ) {
+		$event_id = absint( $event_id );
+		if ( self::is_enabled( $event_id ) ) {
+			echo self::render_countdown( $event_id ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		}
+	}
+
+	private static function render_countdown( $event_id ) {
+		$value     = (string) get_post_meta( $event_id, '_cywater_logo_call_close_at', true );
+		$deadline  = self::local_timestamp( $value );
+		$remaining = $deadline ? max( 0, $deadline - time() ) : 0;
+		if ( ! $deadline ) {
+			return '';
+		}
+		$units = array(
+			'days'    => array( (int) floor( $remaining / DAY_IN_SECONDS ), __( 'Days', 'cywater-logo-call' ) ),
+			'hours'   => array( (int) floor( ( $remaining % DAY_IN_SECONDS ) / HOUR_IN_SECONDS ), __( 'Hours', 'cywater-logo-call' ) ),
+			'minutes' => array( (int) floor( ( $remaining % HOUR_IN_SECONDS ) / MINUTE_IN_SECONDS ), __( 'Minutes', 'cywater-logo-call' ) ),
+			'seconds' => array( (int) ( $remaining % MINUTE_IN_SECONDS ), __( 'Seconds', 'cywater-logo-call' ) ),
+		);
+		ob_start();
+		?>
+		<section class="cywater-logo-call__countdown<?php echo $remaining ? '' : ' is-complete'; ?>" data-cywater-logo-countdown data-deadline="<?php echo esc_attr( wp_date( DATE_ATOM, $deadline ) ); ?>" aria-labelledby="cywater-logo-countdown-title">
+			<div class="cywater-logo-call__countdown-copy">
+				<p class="cywater-logo-call__countdown-eyebrow"><?php esc_html_e( 'Submission deadline', 'cywater-logo-call' ); ?></p>
+				<h2 id="cywater-logo-countdown-title" data-cywater-logo-countdown-title><?php echo esc_html( $remaining ? __( 'Time remaining to submit', 'cywater-logo-call' ) : __( 'Submissions are closed', 'cywater-logo-call' ) ); ?></h2>
+				<p><?php echo esc_html( sprintf( __( 'Submit by %s.', 'cywater-logo-call' ), self::date_label( $value ) ) ); ?></p>
+			</div>
+			<div class="cywater-logo-call__countdown-units" aria-hidden="true">
+				<?php foreach ( $units as $key => $unit ) : ?>
+					<span class="cywater-logo-call__countdown-unit"><strong data-cywater-logo-countdown-unit="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( sprintf( '%02d', $unit[0] ) ); ?></strong><span><?php echo esc_html( $unit[1] ); ?></span></span>
+				<?php endforeach; ?>
+			</div>
+			<p class="screen-reader-text" data-cywater-logo-countdown-status aria-live="polite"><?php echo esc_html( $remaining ? sprintf( __( '%d days remain before submissions close.', 'cywater-logo-call' ), (int) ceil( $remaining / DAY_IN_SECONDS ) ) : __( 'Submissions are closed.', 'cywater-logo-call' ) ); ?></p>
+		</section>
+		<?php
+		return ob_get_clean();
+	}
+
 	private static function render_module( $event_id ) {
 		$phase   = self::phase( $event_id );
 		$user_id = get_current_user_id();
@@ -218,7 +258,7 @@ final class CYWater_Logo_Call {
 				<li><?php echo esc_html( sprintf( __( 'One design file per %s.', 'cywater-logo-call' ), $submitter ) ); ?></li>
 				<li><?php esc_html_e( 'PNG, JPEG or WebP, maximum 5 MB. Only the logo design itself is required at this stage.', 'cywater-logo-call' ); ?></li>
 				<li><?php esc_html_e( 'Participation reward: Student membership through December 31, 2026, applied automatically without shortening or replacing a higher existing benefit.', 'cywater-logo-call' ); ?></li>
-				<li><?php esc_html_e( 'Finalist reward: the five highest-ranked eligible designs receive one year of Professional membership.', 'cywater-logo-call' ); ?></li>
+				<li><?php esc_html_e( 'Finalist reward: eligible designs confirmed as finalists after voting receive one year of Professional membership.', 'cywater-logo-call' ); ?></li>
 				<li><?php echo esc_html( sprintf( __( 'Board-selected design reward: %s.', 'cywater-logo-call' ), $reward ) ); ?></li>
 				<li><?php esc_html_e( 'Entrants retain non-winning work. Submission grants CYWater a limited license to review and display the entry for this call and voting.', 'cywater-logo-call' ); ?></li>
 				<li><?php esc_html_e( 'The Board-selected entrant must complete CYWater’s winning-design rights assignment and provide production-ready scalable or high-resolution files before official use and reward fulfillment.', 'cywater-logo-call' ); ?></li>
@@ -958,7 +998,7 @@ final class CYWater_Logo_Call {
 	}
 
 	public static function statuses() {
-		return array( 'submitted' => __( 'Submitted', 'cywater-logo-call' ), 'shortlisted' => __( 'Approved for voting', 'cywater-logo-call' ), 'finalist' => __( 'Top-five finalist', 'cywater-logo-call' ), 'not_selected' => __( 'Not selected', 'cywater-logo-call' ), 'selected' => __( 'Board-selected official design', 'cywater-logo-call' ), 'withdrawn' => __( 'Withdrawn', 'cywater-logo-call' ) );
+		return array( 'submitted' => __( 'Submitted', 'cywater-logo-call' ), 'shortlisted' => __( 'Approved for voting', 'cywater-logo-call' ), 'finalist' => __( 'Voting finalist', 'cywater-logo-call' ), 'not_selected' => __( 'Not selected', 'cywater-logo-call' ), 'selected' => __( 'Board-selected official design', 'cywater-logo-call' ), 'withdrawn' => __( 'Withdrawn', 'cywater-logo-call' ) );
 	}
 
 	public static function reward_statuses() {
@@ -987,7 +1027,7 @@ final class CYWater_Logo_Call {
 			$id     = (int) $existing->ID;
 			$status = (string) $existing->post_status;
 		} else {
-			$id = wp_insert_post( array( 'post_type' => 'cyw_event', 'post_status' => $status, 'post_name' => 'logo-design-call-2026', 'post_title' => 'CYWater Logo Design Call 2026', 'post_content' => '<p>CYWater invites registered users to propose one original association logo. Submissions close September 30, 2026; a separate voting activity follows, and five finalists advance to Board selection.</p>' ), true );
+			$id = wp_insert_post( array( 'post_type' => 'cyw_event', 'post_status' => $status, 'post_name' => 'logo-design-call-2026', 'post_title' => 'CYWater Logo Design Call 2026', 'post_content' => '<p>CYWater invites registered users to propose one original association logo. Submissions close September 30, 2026; a separate voting activity follows, and the finalist group advances to Board selection.</p>' ), true );
 			if ( is_wp_error( $id ) ) { WP_CLI::error( $id->get_error_message() ); }
 		}
 		$dates = array( 'open_at' => '2026-08-12 00:00', 'close_at' => '2026-09-30 23:59', 'vote_open' => '', 'vote_close' => '' );
@@ -1060,6 +1100,10 @@ final class CYWater_Logo_Call {
 			self::qa_assert( 'closed' === self::phase( $event_id ), 'Unpublished Event cannot accept participation' ); ++$checks;
 			wp_update_post( array( 'ID' => $event_id, 'post_status' => 'publish' ) );
 			self::qa_assert( 'submission' === self::phase( $event_id ), 'Submission phase is open' ); ++$checks;
+			$countdown = self::render_countdown( $event_id );
+			$module    = self::render_module( $event_id );
+			self::qa_assert( false !== strpos( $countdown, 'data-cywater-logo-countdown' ) && false !== strpos( $countdown, 'data-deadline=' ), 'Submission deadline renders one server-backed countdown' ); ++$checks;
+			self::qa_assert( false === stripos( $module, 'five highest-ranked' ) && false === stripos( $module, 'top-five' ), 'Public submission copy does not announce a fixed finalist count' ); ++$checks;
 			self::qa_assert( true === self::storage_capacity( $users['registered'], $event_id, self::MAX_SUBMISSION_BYTES ), 'Empty account and Event accept one bounded submission' ); ++$checks;
 			self::qa_assert( is_wp_error( self::storage_capacity( $users['registered'], $event_id, self::MAX_SUBMISSION_BYTES + 1 ) ), 'Submission aggregate limit fails closed' ); ++$checks;
 			$lock_result = self::acquire_storage_lock();

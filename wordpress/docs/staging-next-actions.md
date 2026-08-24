@@ -17,7 +17,9 @@ registered users for both actions. Each finalist receives one year of
 Professional membership; after the rights and final files are accepted, the
 selected entrant receives a total two years of Professional membership.
 Existing paid terms are never cancelled or shortened, and no payment/order is
-created for a complimentary reward.
+created for a complimentary reward. The public submission phase does not state
+a finalist count; after voting, Governance may record either three or five
+highest-ranked eligible finalists based on the field.
 
 The visual and content baseline is accepted at `staging.cywater.org`, and
 production traffic is live at `cywater.org`. Keep live payment disabled while

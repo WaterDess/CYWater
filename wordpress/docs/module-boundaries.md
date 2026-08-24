@@ -115,8 +115,8 @@ Event Tickets                 CYWater Membership
       eligibility, without confirming finalists, selecting the official logo,
       fulfilling rewards, or creating/deleting submissions and protected files;
     - **Governance Approver** owns Board records, Partner review/approval/payment
-      confirmation, approval of submitted paid-Event terms, confirmation of the
-      three Logo finalists, and official selection from those three. Final-file,
+      confirmation, approval of submitted paid-Event terms, confirmation of a
+      three- or five-entry Logo finalist group, and official selection from that group. Final-file,
       rights-assignment and reward fulfillment remain Administrator-only.
 
     The bundles may be assigned together to a named organization account, but
@@ -189,8 +189,8 @@ profile store. Membership `0.9.1` also applies the registration minimum of 12
 characters to PMPro's authenticated Change Password form and WordPress' lost-
 password reset validation. Logo Call owns one protected initial design file, immutable work
 number and entrant acceptance record. Program Reviewer may decide voting
-eligibility only. Governance Approver confirms the three ranked finalists and
-selects the Board's official design from those three. Only an Administrator may
+eligibility only. Governance Approver confirms either three or five ranked
+finalists and selects the Board's official design from that recorded group. Only an Administrator may
 record the later rights assignment, production-file acceptance and reward
 fulfillment. Operations owns the sole Logo review UI and its audited ZIP/CSV
 export but does not own submissions, votes, membership state or protected-file
