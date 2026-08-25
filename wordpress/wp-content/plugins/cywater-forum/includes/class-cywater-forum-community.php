@@ -124,7 +124,8 @@ final class CYWater_Forum_Community {
 		if ( ! self::is_forum_frontend_request() ) {
 			return;
 		}
-		if ( ! is_user_logged_in() ) {
+		$public_entry = is_post_type_archive( CYWater_Forum_Content::POST_TYPE );
+		if ( ! is_user_logged_in() && ! $public_entry ) {
 			$return = self::current_public_url( get_post_type_archive_link( CYWater_Forum_Content::POST_TYPE ) );
 			$login = class_exists( 'CYWater_Membership_Account_Routing' )
 				? CYWater_Membership_Account_Routing::login_url( $return )
@@ -136,6 +137,7 @@ final class CYWater_Forum_Community {
 			define( 'DONOTCACHEPAGE', true );
 		}
 		nocache_headers();
+		do_action( 'litespeed_control_set_nocache', 'CYWater Forum account gate' );
 	}
 
 	public static function protect_forum_rest_reads( $result, $server, $request ) {

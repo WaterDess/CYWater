@@ -89,11 +89,30 @@ $extract_verification = static function ( $mail ) {
 };
 
 try {
+	wp_set_current_user( 0 );
+	$guest_membership_action = CYWater_Membership_Account_Routing::membership_action();
+	$assert( 'Join CYWater' === (string) ( $guest_membership_action['label'] ?? '' ) && false !== strpos( (string) ( $guest_membership_action['url'] ?? '' ), '/membership/' ), 'Signed-out header action invites the visitor to join CYWater' );
+
 	$user_id = wp_create_user( $username, $initial_password, $email );
 	$assert( ! is_wp_error( $user_id ), 'Disposable Subscriber created' );
 	wp_update_user( array( 'ID' => $user_id, 'role' => 'subscriber' ) );
 	$assert( ! is_wp_error( wp_authenticate( $username, $initial_password ) ), 'Disposable account can authenticate with its initial password' );
 	$assert( ! CYWater_Membership_Account_Security::is_verified( $user_id ), 'New account starts unverified' );
+	wp_set_current_user( $user_id );
+	$inactive_membership_action = CYWater_Membership_Account_Routing::membership_action();
+	$assert( 'Choose Membership' === (string) ( $inactive_membership_action['label'] ?? '' ) && false !== strpos( (string) ( $inactive_membership_action['url'] ?? '' ), '/membership/' ), 'Registered non-member header action offers membership without misidentifying the account' );
+	$filtered_membership_actions = CYWater_Membership_Account_Routing::defer_secondary_membership_actions(
+		array(
+			'change' => '<span><a href="/membership/">Change</a></span>',
+			'cancel' => '<span><a href="/membership-cancel/">Cancel</a></span>',
+		),
+		1
+	);
+	ob_start();
+	CYWater_Membership_Account_Routing::render_secondary_membership_actions();
+	$membership_management_html = (string) ob_get_clean();
+	$assert( empty( $filtered_membership_actions ) && false !== strpos( $membership_management_html, '<details' ) && false !== strpos( $membership_management_html, 'Manage membership' ) && false !== strpos( $membership_management_html, 'Cancel' ), 'Change and cancel actions are grouped inside the explicit membership-management disclosure' );
+	wp_set_current_user( 0 );
 
 	$country_options = CYWater_Membership_Countries::options();
 	$assert( count( $country_options ) >= 240 && 'United States' === ( $country_options['US'] ?? '' ), 'Country selector reuses PMPro complete canonical country and region data' );
@@ -173,6 +192,9 @@ try {
 	$level_ids      = (array) get_option( 'cywater_membership_level_ids', array() );
 	$professional_id = absint( $level_ids['professional'] ?? 0 );
 	$assert( $professional_id > 0 && pmpro_changeMembershipLevel( $professional_id, $user_id ), 'Disposable account received a temporary active individual membership' );
+	wp_set_current_user( $user_id );
+	$active_membership_action = CYWater_Membership_Account_Routing::membership_action();
+	$assert( 'My Membership' === (string) ( $active_membership_action['label'] ?? '' ) && false !== strpos( (string) ( $active_membership_action['url'] ?? '' ), '/account/#pmpro_account-membership' ), 'Active individual member header action links directly to My Membership' );
 	update_user_meta( $user_id, 'cyw_institution_name', 'CYWater directory verification QA' );
 	update_user_meta( $user_id, 'cyw_profile_public', 1 );
 	update_user_meta( $user_id, 'cyw_public_fields', array( 'cyw_institution_name' ) );

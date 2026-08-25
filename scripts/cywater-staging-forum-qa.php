@@ -1,6 +1,6 @@
 <?php
 /**
- * Staging-only, self-cleaning runtime QA for CYWater Forum 0.6.2.
+ * Staging-only, self-cleaning runtime QA for CYWater Forum 0.6.3.
  *
  * Run with:
  *   wp eval-file /absolute/path/to/cywater-staging-forum-qa.php
@@ -36,8 +36,8 @@ if ( ! is_plugin_active( 'cywater-forum/cywater-forum.php' ) ) {
 }
 
 $forum_plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/cywater-forum/cywater-forum.php', false, false );
-if ( '0.6.2' !== (string) ( $forum_plugin_data['Version'] ?? '' ) || ! defined( 'CYWATER_FORUM_VERSION' ) || '0.6.2' !== CYWATER_FORUM_VERSION ) {
-	WP_CLI::error( 'Refusing to run: this QA is pinned to CYWater Forum 0.6.2.' );
+if ( '0.6.3' !== (string) ( $forum_plugin_data['Version'] ?? '' ) || ! defined( 'CYWATER_FORUM_VERSION' ) || '0.6.3' !== CYWATER_FORUM_VERSION ) {
+	WP_CLI::error( 'Refusing to run: this QA is pinned to CYWater Forum 0.6.3.' );
 }
 
 $forum_qa_required_classes = array(
@@ -1127,7 +1127,11 @@ try {
 
 	if ( $forum_qa_can_reach_application_http ) {
 		$forum_qa_archive_response = $forum_qa_http_get( (string) get_post_type_archive_link( CYWater_Forum_Content::POST_TYPE ) );
-		$forum_qa_assert( ! is_wp_error( $forum_qa_archive_response ) && 302 === (int) wp_remote_retrieve_response_code( $forum_qa_archive_response ), 'Signed-out visitor was not redirected away from the Forum archive.' );
+		$forum_qa_anonymous_archive_body = is_wp_error( $forum_qa_archive_response ) ? '' : (string) wp_remote_retrieve_body( $forum_qa_archive_response );
+		$forum_qa_assert( ! is_wp_error( $forum_qa_archive_response ) && 200 === (int) wp_remote_retrieve_response_code( $forum_qa_archive_response ), 'Signed-out visitor could not open the public Forum registration gate.' );
+		$forum_qa_assert( false !== strpos( $forum_qa_anonymous_archive_body, 'Create an account' ) && false !== strpos( $forum_qa_anonymous_archive_body, 'Sign in' ), 'Signed-out Forum registration gate is missing its account actions.' );
+		$forum_qa_assert( false !== strpos( $forum_qa_anonymous_archive_body, '>Forum<' ), 'Signed-out primary navigation hides the Forum entry.' );
+		$forum_qa_assert( false === strpos( $forum_qa_anonymous_archive_body, esc_html( $forum_qa_marker ) ) && false === strpos( $forum_qa_anonymous_archive_body, 'forum-card' ), 'Signed-out Forum gate leaked member writing or its card projection.' );
 		$forum_qa_archive_response = $forum_qa_user_http_get( $forum_qa_subscriber_id, (string) get_post_type_archive_link( CYWater_Forum_Content::POST_TYPE ) );
 		$forum_qa_archive_body     = is_wp_error( $forum_qa_archive_response ) ? '' : (string) wp_remote_retrieve_body( $forum_qa_archive_response );
 		$forum_qa_assert( ! is_wp_error( $forum_qa_archive_response ) && 200 === (int) wp_remote_retrieve_response_code( $forum_qa_archive_response ), 'Registered account could not open the Forum archive.' );

@@ -232,6 +232,36 @@ body.pmpro-account .cywater-register .btn {
   margin-top: 0;
 }
 
+.cywater-membership-management {
+  margin-top: var(--sp-3);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--line);
+}
+
+.cywater-membership-management summary {
+  width: fit-content;
+  color: var(--teal-deep);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cywater-membership-management summary:hover,
+.cywater-membership-management summary:focus-visible {
+  color: var(--teal);
+}
+
+.cywater-membership-management-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+  font-size: var(--fs-sm);
+}
+
+.cywater-membership-management-actions a {
+  color: var(--ink-soft);
+}
+
 .faq-item { border-bottom: 1px solid var(--line); }
 .faq-item:first-child { border-top: 1px solid var(--line); }
 .faq-item > h3 { margin: 0; font: inherit; }
@@ -258,6 +288,23 @@ body.pmpro-account .cywater-register .btn {
 .forum-filters .tag-list a.badge:hover {
   background: var(--teal);
   color: var(--white);
+}
+
+.forum-access-card {
+  padding: clamp(var(--sp-5), 6vw, var(--sp-7));
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--white);
+  box-shadow: var(--shadow-sm);
+}
+
+.forum-access-card h2 {
+  margin-top: var(--sp-3);
+}
+
+.forum-access-card .lead {
+  max-width: 62ch;
+  margin: var(--sp-3) 0 var(--sp-5);
 }
 
 .forum-card {

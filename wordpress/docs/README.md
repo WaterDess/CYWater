@@ -57,9 +57,9 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 ## Current State
 
 Hostinger staging is available at `https://staging.cywater.org/`, and the public
-production site is live at `https://cywater.org/`. The 2026-08-25 accepted code
-baseline uses the CYWater `0.6.48` theme, CYWater Membership `0.9.6`, CYWater
-Partnerships `0.1.5`, CYWater Logo Call `0.4.2`, CYWater Forum `0.6.2`, CYWater
+production site is live at `https://cywater.org/`. The 2026-08-26 accepted code
+baseline uses the CYWater `0.6.49` theme, CYWater Membership `0.9.7`, CYWater
+Partnerships `0.1.5`, CYWater Logo Call `0.4.2`, CYWater Forum `0.6.3`, CYWater
 Environment `0.5.7`, CYWater Core `0.6.6`, CYWater Operations `0.3.2`, and Event
 Tickets `5.29.1`.
 
@@ -82,28 +82,27 @@ The resulting production-clean `0.5.7` bundle is
 `dist/cywater-wordpress-production-clean-0.5.7.zip` (16,415,745 bytes), SHA-256
 `47edcc10ca5f9e8da8a97ab591025ddd46efe6adc1c869ffae5482401c486013`.
 
-Forum `0.6.2` is the production account-only lightweight-community baseline.
-Signed-out visitors do not see Forum navigation and cannot read Forum archives,
-articles, terms, author profiles, replies, search results, sitemaps, or REST
-records; direct front-end routes return to the managed CYWater login. Any
-registered account may read published Forum articles and replies and like or
-unlike directly from a card. Publishing and replying remain restricted to an
-email-verified active Student, Professional, or Lifetime member. Authors manage
-their own writing in `/forum-workspace/`, while Account links once to the private
-`/forum/activity/` view for My posts and Liked posts. Personal participation
-and administration are independent: an Administrator or Community Moderator
-must still satisfy the ordinary email-verification and active-membership rules
-to write as themselves on the public site, while their protected backend
-cross-author editing, restoration, permanent deletion, reply moderation, and
-engagement cleanup remain capability-based. Dual-role members see the same
-front-end writing controls as every other eligible member. Public templates no
-longer render `Manage Forum`, WordPress edit shortcuts, or the admin toolbar.
-Staging passed 154 self-cleaning Forum assertions; production passed 86
-read-only role-separation assertions without changing data, and all 13 Forum
-plus 95 theme files match local. The production predeploy rollback is
-`/home/u111638297/cywater-release-backups/forum-role-separation-production-predeploy-20260824T172842Z`.
-This release did not change Stripe: the saved environment remains Live and no
-payment or refund was initiated.
+Forum `0.6.3` is the production registered-community baseline. Forum remains in
+desktop and mobile navigation for signed-out visitors, and `/forum/` presents a
+public registration/sign-in introduction rather than removing the section or
+exposing community content. The gate contains no article cards, titles, replies,
+authors, categories or topics. Articles, terms, author profiles, activity,
+search results, sitemaps and REST records remain account-protected; direct
+content routes return to the managed CYWater login. Any registered account may
+then read published Forum articles and replies and like or unlike directly from
+a card. Publishing and replying remain restricted to an email-verified active
+Student, Professional, or Lifetime member. Authors manage their own writing in
+`/forum-workspace/`, while Account links once to the private `/forum/activity/`
+view for My posts and Liked posts. Personal participation and administration
+remain independent: an Administrator or Community Moderator must still satisfy
+the ordinary member rules to write as themselves, while protected cross-author
+management remains backend capability-based. Staging passed 154 Forum and 81
+account-security self-cleaning assertions. Production passed the public HTTP
+gate/content-denial checks, 86 read-only role assertions, and 14 read-only
+membership-UI assertions; all 13 Forum, 16 Membership and 95 theme files match
+local. The production rollback is retained at
+`/home/u111638297/cywater-release-backups/membership-forum-entry-production-predeploy-20260825T170451Z`.
+Stripe remained Live and no payment setting, order, charge or refund changed.
 
 Theme `0.6.46` gives Account one shared module rail: PMPro identity and
 membership sections, Account security, and the compact Forum activity entry now
@@ -130,19 +129,24 @@ cannot drift. Replace the Logo once under **Appearance > Customize > Site
 Identity**; future uploads receive a small uncropped icon derivative
 automatically.
 
-The mobile drawer keeps Sign in/Account and Join CYWater together at the top,
+The mobile drawer keeps the account and membership actions together at the top,
 before the full navigation list. Signed-out visitors go directly to the PMPro
 member-login page. The managed login page contains only
 `[cywater_member_login]`; the wrapper renders PMPro once, preventing the
 historical duplicate form caused by retaining `[pmpro_login]` alongside it.
-Membership `0.9.6` centralizes public-member versus staff routing: registration,
+Membership `0.9.7` centralizes public-member versus staff routing: registration,
 sign-in, sign-out, password recovery, Account, and checkout returns stay on the
 managed public pages; a direct `/wp-admin/` request keeps WordPress' native
 staff login; and an authenticated non-staff member receives HTTP 403. Front-end
 sign-out returns to `/member-login/?loggedout=true`, and identity pages are
 explicitly excluded from full-page caching so login state cannot be masked by a
-stale public form. Theme `0.6.43` consumes the same routing source for its
-desktop and mobile account actions.
+stale public form. Theme `0.6.49` consumes the same routing source for desktop
+and mobile. The membership action now reflects entitlement independently from
+identity: signed-out visitors see **Join CYWater**, registered non-members see
+**Choose Membership**, and active individual members see **My Membership**
+linked to the Account membership section. PMPro's Change and Cancel controls
+remain available but are grouped under an explicit **Manage membership**
+disclosure through PMPro's supported action-link hooks rather than vendor edits.
 
 The public production cutover is complete. On 2026-08-23 the association opened
 the production membership runtime to Stripe Live; end-to-end financial

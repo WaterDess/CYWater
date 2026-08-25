@@ -12,12 +12,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 final class CYWater_Membership_Account_Routing {
+	private static $deferred_membership_actions = array();
+
 	public static function register() {
 		/* PMPro installs its public-login filter at priority 50 on wp_loaded. */
 		add_filter( 'login_url', array( __CLASS__, 'filter_admin_login_url' ), 100, 2 );
 		add_filter( 'logout_url', array( __CLASS__, 'filter_frontend_logout_url' ), 100, 2 );
 		add_action( 'template_redirect', array( __CLASS__, 'prevent_identity_page_cache' ), 0 );
 		add_action( 'template_redirect', array( __CLASS__, 'redirect_authenticated_login_page' ), 14 );
+		add_filter( 'pmpro_member_action_links', array( __CLASS__, 'defer_secondary_membership_actions' ), 20, 2 );
+		add_action( 'pmpro_member_action_links_after', array( __CLASS__, 'render_secondary_membership_actions' ) );
 	}
 
 	/**
@@ -80,6 +84,93 @@ final class CYWater_Membership_Account_Routing {
 	public static function account_url() {
 		$url = function_exists( 'pmpro_url' ) ? (string) pmpro_url( 'account' ) : '';
 		return '' !== $url ? $url : home_url( '/account/' );
+	}
+
+	/** Return whether an account owns a current individual CYWater membership. */
+	public static function has_active_individual_membership( $user_id = 0 ) {
+		$user_id = $user_id ? absint( $user_id ) : get_current_user_id();
+		if ( ! $user_id || ! function_exists( 'pmpro_hasMembershipLevel' ) ) {
+			return false;
+		}
+
+		$levels = (array) get_option( 'cywater_membership_level_ids', array() );
+		$ids    = array_values(
+			array_filter(
+				array_map(
+					'absint',
+					array(
+						$levels['student'] ?? 0,
+						$levels['professional'] ?? 0,
+						$levels['lifetime'] ?? 0,
+					)
+				)
+			)
+		);
+
+		return $ids && (bool) pmpro_hasMembershipLevel( $ids, $user_id );
+	}
+
+	/**
+	 * Return the single membership action used by both desktop and mobile headers.
+	 *
+	 * Account identity and membership entitlement are intentionally separate:
+	 * signing in changes the account control, while only an active individual
+	 * membership changes this action to "My Membership".
+	 */
+	public static function membership_action() {
+		if ( ! is_user_logged_in() ) {
+			return array(
+				'label' => __( 'Join CYWater', 'cywater-membership' ),
+				'url'   => home_url( '/membership/' ),
+			);
+		}
+
+		if ( self::has_active_individual_membership() ) {
+			return array(
+				'label' => __( 'My Membership', 'cywater-membership' ),
+				'url'   => self::account_url() . '#pmpro_account-membership',
+			);
+		}
+
+		return array(
+			'label' => __( 'Choose Membership', 'cywater-membership' ),
+			'url'   => home_url( '/membership/' ),
+		);
+	}
+
+	/**
+	 * Keep routine membership details readable while moving destructive and
+	 * plan-changing actions behind one explicit disclosure.
+	 */
+	public static function defer_secondary_membership_actions( $links, $level_id ) {
+		$deferred = array();
+		foreach ( array( 'change', 'cancel' ) as $key ) {
+			if ( isset( $links[ $key ] ) ) {
+				$deferred[ $key ] = $links[ $key ];
+				unset( $links[ $key ] );
+			}
+		}
+		self::$deferred_membership_actions[] = array(
+			'level_id' => absint( $level_id ),
+			'links'    => $deferred,
+		);
+		return $links;
+	}
+
+	/** Render the actions deferred by defer_secondary_membership_actions(). */
+	public static function render_secondary_membership_actions() {
+		$entry = array_shift( self::$deferred_membership_actions );
+		if ( empty( $entry['links'] ) ) {
+			return;
+		}
+		?>
+		<details class="cywater-membership-management">
+			<summary><?php esc_html_e( 'Manage membership', 'cywater-membership' ); ?></summary>
+			<div class="cywater-membership-management-actions">
+				<?php echo wp_kses_post( implode( '<span aria-hidden="true"> · </span>', $entry['links'] ) ); ?>
+			</div>
+		</details>
+		<?php
 	}
 
 	/** Return the public landing page after a successful member sign-out. */

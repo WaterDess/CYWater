@@ -14,6 +14,12 @@ if ( class_exists( 'CYWater_Membership_Account_Routing' ) ) {
 		? pmpro_url( is_user_logged_in() ? 'account' : 'login' )
 		: wp_login_url();
 }
+$membership_action = class_exists( 'CYWater_Membership_Account_Routing' )
+	? CYWater_Membership_Account_Routing::membership_action()
+	: array(
+		'label' => is_user_logged_in() ? __( 'Choose Membership', 'cywater' ) : __( 'Join CYWater', 'cywater' ),
+		'url'   => home_url( '/membership/' ),
+	);
 ?>
 <!doctype html>
 <html <?php language_attributes(); ?>>
@@ -54,7 +60,7 @@ if ( class_exists( 'CYWater_Membership_Account_Routing' ) ) {
 				);
 				// Sits next to Membership: the forum is a member activity
 				// rather than another editorial section.
-				if ( cywater_forum_enabled() && is_user_logged_in() ) {
+				if ( cywater_forum_enabled() ) {
 					$links = array_slice( $links, 0, 1, true )
 						+ array( 'forum' => array( 'Forum', '/forum/' ) )
 						+ array_slice( $links, 1, null, true );
@@ -67,7 +73,7 @@ if ( class_exists( 'CYWater_Membership_Account_Routing' ) ) {
 		</nav>
 		<div class="header-actions">
 			<a class="btn btn-ghost" href="<?php echo esc_url( $account ); ?>"><?php echo is_user_logged_in() ? esc_html__( 'Account', 'cywater' ) : esc_html__( 'Sign in', 'cywater' ); ?></a>
-			<a class="btn btn-primary" href="<?php echo esc_url( home_url( '/membership/' ) ); ?>"><?php esc_html_e( 'Join CYWater', 'cywater' ); ?></a>
+			<a class="btn btn-primary" href="<?php echo esc_url( $membership_action['url'] ); ?>"><?php echo esc_html( $membership_action['label'] ); ?></a>
 			<button class="nav-toggle" aria-label="<?php esc_attr_e( 'Menu', 'cywater' ); ?>" aria-controls="cywater-mobile-nav" aria-expanded="false"><span></span></button>
 		</div>
 	</div>
@@ -75,13 +81,13 @@ if ( class_exists( 'CYWater_Membership_Account_Routing' ) ) {
 <nav id="cywater-mobile-nav" class="nav-mobile" aria-label="<?php esc_attr_e( 'Mobile', 'cywater' ); ?>">
 	<div class="nav-mobile-actions" role="group" aria-label="<?php esc_attr_e( 'Account', 'cywater' ); ?>">
 		<a class="btn btn-outline btn-block nav-mobile-account" href="<?php echo esc_url( $account ); ?>"><?php echo is_user_logged_in() ? esc_html__( 'Account', 'cywater' ) : esc_html__( 'Sign in', 'cywater' ); ?></a>
-		<a class="btn btn-primary btn-block" href="<?php echo esc_url( home_url( '/membership/' ) ); ?>"><?php esc_html_e( 'Join CYWater', 'cywater' ); ?></a>
+		<a class="btn btn-primary btn-block" href="<?php echo esc_url( $membership_action['url'] ); ?>"><?php echo esc_html( $membership_action['label'] ); ?></a>
 	</div>
 	<a href="<?php echo esc_url( home_url( '/about/' ) ); ?>"><?php esc_html_e( 'About', 'cywater' ); ?></a>
 	<a href="<?php echo esc_url( home_url( '/board/' ) ); ?>" class="sub-link"><?php esc_html_e( 'Board', 'cywater' ); ?></a>
 	<a href="<?php echo esc_url( home_url( '/bylaws/' ) ); ?>" class="sub-link"><?php esc_html_e( 'Bylaws', 'cywater' ); ?></a>
 	<a href="<?php echo esc_url( home_url( '/membership/' ) ); ?>"><?php esc_html_e( 'Membership', 'cywater' ); ?></a>
-	<?php if ( cywater_forum_enabled() && is_user_logged_in() ) : ?>
+	<?php if ( cywater_forum_enabled() ) : ?>
 		<a href="<?php echo esc_url( home_url( '/forum/' ) ); ?>"><?php esc_html_e( 'Forum', 'cywater' ); ?></a>
 	<?php endif; ?>
 	<a href="<?php echo esc_url( home_url( '/events/' ) ); ?>"><?php esc_html_e( 'Events', 'cywater' ); ?></a>

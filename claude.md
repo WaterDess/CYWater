@@ -1343,6 +1343,30 @@ describe sandbox activity as a real transaction.
   `/home/u111638297/cywater-release-backups/forum-role-separation-production-predeploy-20260824T172842Z`.
   Production Stripe remained `live`; no payment setting, order, charge or
   refund was changed.
+- On 2026-08-26 theme `0.6.49`, Membership `0.9.7`, and Forum `0.6.3`
+  established a public Forum entry without exposing the registered community.
+  Forum now remains in desktop and mobile navigation for signed-out visitors;
+  `/forum/` returns a no-cache 200 introduction with Create account and Sign
+  in actions, while article cards, known titles, replies, authors, categories
+  and topics remain absent. Direct article, taxonomy, author, activity and
+  workspace routes still return to the managed CYWater login, and anonymous
+  REST/search/sitemap protections remain intact. The shared header membership
+  action is now entitlement-aware: signed-out visitors see **Join CYWater**,
+  registered non-members see **Choose Membership**, and active Student,
+  Professional or Lifetime members see **My Membership** linked directly to
+  the Account membership section. PMPro Change and Cancel links remain
+  available under a **Manage membership** disclosure implemented through
+  PMPro's supported action hooks; no vendor file was edited. Staging passed
+  154 Forum and 81 Account self-cleaning assertions. Production public HTTP
+  checks confirmed the gate and protected-content redirect, then 86 Forum-role
+  and 14 membership-UI read-only assertions passed. All 95 theme, 16
+  Membership and 13 Forum files match local on both staging and production.
+  Rollbacks are retained at
+  `/home/u111638297/cywater-release-backups/membership-forum-entry-staging-predeploy-20260825T170130Z`
+  and
+  `/home/u111638297/cywater-release-backups/membership-forum-entry-production-predeploy-20260825T170451Z`.
+  Production remained `Stripe/live`; no payment setting, OAuth connection,
+  webhook, order, charge, refund or account membership was changed.
 
 ## Editing Guidance
 

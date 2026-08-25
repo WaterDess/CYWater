@@ -9,10 +9,11 @@ controlled real charge, receipt, balance/payout observation and full-refund
 reconciliation through the association-owned Stripe Live account.
 Hostinger File Manager recovered and archived the former Logo Call `0.2.3` and
 Environment `0.5.5` trees before the accepted releases. The current production
-baseline is Membership `0.9.6`, Partnerships `0.1.5`, Logo Call `0.4.2`, Forum
-`0.6.1`, Operations `0.3.2`, Environment `0.5.7`, Core `0.6.6`, and theme
-`0.6.47`. Forum staging QA passed 149 self-cleaning assertions; production
-anonymous-route, REST, navigation, file-integrity, and cache checks passed.
+baseline is Membership `0.9.7`, Partnerships `0.1.5`, Logo Call `0.4.2`, Forum
+`0.6.3`, Operations `0.3.2`, Environment `0.5.7`, Core `0.6.6`, and theme
+`0.6.49`. Forum staging QA passed 154 self-cleaning assertions and Account QA
+passed 81. Production public-gate, protected-content, REST, navigation,
+membership-UI, role-separation, file-integrity, and cache checks passed.
 See `production-checklist.md` for the
 authoritative order.
 
