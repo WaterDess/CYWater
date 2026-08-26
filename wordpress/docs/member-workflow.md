@@ -57,7 +57,7 @@ Started checkout
 
 Active
   -> annual end date reached: Expired
-  -> member/admin cancellation: Cancelled
+  -> administrator cancellation after a member support request: Cancelled
   -> approved renewal payment: Active with new end date
   -> full refund of current/latest order: Refunded; matching level and renewal subscription cancelled
   -> refund of an older order with a later successful renewal: newer entitlement remains Active
@@ -146,9 +146,10 @@ records; editors and ordinary members remain denied.
 
 ## Forum Access
 
-- A signed-out visitor does not see Forum in desktop or mobile navigation and
-  cannot read Forum archives, articles, author profiles, replies, search or
-  REST records. A direct Forum URL returns to the managed member login.
+- A signed-out visitor sees Forum in desktop and mobile navigation, but the
+  Forum page contains only the registration/sign-in introduction. It exposes no
+  article cards, titles, authors, replies, terms, search results or REST records.
+  Direct protected Forum content returns to the managed member login.
 - Any signed-in WordPress account may browse published Forum articles, view
   their replies, and like or unlike an article. Likes do not require a paid
   membership.
@@ -185,8 +186,11 @@ records; editors and ordinary members remain denied.
   after verification succeeds.
 - Sign-out ends only the browser session. The Account page exposes the normal
   PMPro/WordPress sign-out action.
-- Membership cancellation removes membership access and future renewal without
-  deleting the WordPress identity or its accounting history.
+- Account exposes no public Change or Cancel control. Members request a level
+  change or cancellation through `membership@cywater.org`; an administrator
+  completes the PMPro operation after reviewing the request. Same-level renewal
+  remains available. Cancellation removes membership access and future renewal
+  without deleting the WordPress identity or its accounting history.
 - A full refund revokes only the entitlement funded by that order. A later
   successful order protects the newer entitlement.
 - WordPress administrators may delete disposable, spam, or unpaid accounts.

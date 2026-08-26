@@ -71,8 +71,8 @@ final class CYWater_Editor {
 					'awardPanel'      => __( 'Award details', 'cywater-core' ),
 					'publicHeading'   => __( 'Public page visibility', 'cywater-core' ),
 					'publicCopy'      => __( 'Everyone can view this public record. Registration, submissions, voting, and payment eligibility are controlled separately by their own Event modules.', 'cywater-core' ),
-					'newsHelp'        => __( 'The editor canvas mirrors the public article typography. Set News cover image in the standard Post sidebar to use it on the News page; without one, the existing text tile is used.', 'cywater-core' ),
-					'eventHelp'       => __( 'Use the canvas for the public Event story. The Start date controls Event-list order. Optional fields keep their stated fallback when blank; Event placement is maintained in the next panel.', 'cywater-core' ),
+					'newsHelp'        => __( 'The editor canvas is the News detail story. Add any detail photographs here as Image or Gallery blocks. News cover image is separate and appears only on News listings and cards, so it is never inserted into the article automatically.', 'cywater-core' ),
+					'eventHelp'       => __( 'The editor canvas is the Event detail story. Add any detail photographs here as Image or Gallery blocks. Event cover image is separate and appears only on Event listings, cards, and the carousel, so it is never inserted into the Event automatically. The Start date controls list order; Event placement is maintained in the next panel.', 'cywater-core' ),
 					'awardHelp'       => __( 'Use the canvas for the public citation or ceremony narrative. Structured Award facts are maintained here.', 'cywater-core' ),
 				),
 			)

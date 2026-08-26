@@ -101,17 +101,27 @@ try {
 	wp_set_current_user( $user_id );
 	$inactive_membership_action = CYWater_Membership_Account_Routing::membership_action();
 	$assert( 'Choose Membership' === (string) ( $inactive_membership_action['label'] ?? '' ) && false !== strpos( (string) ( $inactive_membership_action['url'] ?? '' ), '/membership/' ), 'Registered non-member header action offers membership without misidentifying the account' );
-	$filtered_membership_actions = CYWater_Membership_Account_Routing::defer_secondary_membership_actions(
+	$level_ids = (array) get_option( 'cywater_membership_level_ids', array() );
+	$student_level_id = absint( $level_ids['student'] ?? 0 );
+	$professional_level_id = absint( $level_ids['professional'] ?? 0 );
+	$assert( $student_level_id > 0 && $professional_level_id > 0, 'Student and Professional membership levels are configured for routing QA' );
+	$assert( function_exists( 'pmpro_changeMembershipLevel' ) && pmpro_changeMembershipLevel( $student_level_id, $user_id ), 'Disposable account receives a temporary Student membership for account-action QA' );
+	$filtered_membership_actions = CYWater_Membership_Account_Routing::remove_self_service_membership_actions(
 		array(
 			'change' => '<span><a href="/membership/">Change</a></span>',
 			'cancel' => '<span><a href="/membership-cancel/">Cancel</a></span>',
 		),
-		1
+		$student_level_id
 	);
 	ob_start();
-	CYWater_Membership_Account_Routing::render_secondary_membership_actions();
-	$membership_management_html = (string) ob_get_clean();
-	$assert( empty( $filtered_membership_actions ) && false !== strpos( $membership_management_html, '<details' ) && false !== strpos( $membership_management_html, 'Manage membership' ) && false !== strpos( $membership_management_html, 'Cancel' ), 'Change and cancel actions are grouped inside the explicit membership-management disclosure' );
+	CYWater_Membership_Account_Routing::render_membership_support();
+	$membership_support_html = (string) ob_get_clean();
+	$assert( empty( $filtered_membership_actions ), 'Front-end Change and Cancel membership actions are removed completely' );
+	$assert( false === strpos( $membership_support_html, '<details' ) && false === strpos( $membership_support_html, 'pmpro_actionlink-' ), 'Account membership support contains no hidden PMPro self-service actions' );
+	$assert( false !== strpos( $membership_support_html, 'membership@cywater.org' ) && false !== strpos( $membership_support_html, 'mailto:' ), 'Active members receive the canonical Membership support address' );
+	$assert( CYWater_Membership_Account_Routing::is_prohibited_level_change( $professional_level_id, $user_id ), 'An active member cannot switch to a different public membership level' );
+	$assert( ! CYWater_Membership_Account_Routing::is_prohibited_level_change( $student_level_id, $user_id ), 'A same-level renewal remains distinct from a prohibited plan change' );
+	$assert( pmpro_changeMembershipLevel( 0, $user_id ), 'Temporary membership is removed after account-action QA' );
 	wp_set_current_user( 0 );
 
 	$country_options = CYWater_Membership_Countries::options();

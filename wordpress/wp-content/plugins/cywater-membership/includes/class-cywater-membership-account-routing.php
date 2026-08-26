@@ -12,16 +12,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 final class CYWater_Membership_Account_Routing {
-	private static $deferred_membership_actions = array();
+	private static $membership_support_rendered = false;
 
 	public static function register() {
 		/* PMPro installs its public-login filter at priority 50 on wp_loaded. */
 		add_filter( 'login_url', array( __CLASS__, 'filter_admin_login_url' ), 100, 2 );
 		add_filter( 'logout_url', array( __CLASS__, 'filter_frontend_logout_url' ), 100, 2 );
 		add_action( 'template_redirect', array( __CLASS__, 'prevent_identity_page_cache' ), 0 );
+		add_action( 'template_redirect', array( __CLASS__, 'prevent_frontend_membership_self_service' ), 5 );
 		add_action( 'template_redirect', array( __CLASS__, 'redirect_authenticated_login_page' ), 14 );
-		add_filter( 'pmpro_member_action_links', array( __CLASS__, 'defer_secondary_membership_actions' ), 20, 2 );
-		add_action( 'pmpro_member_action_links_after', array( __CLASS__, 'render_secondary_membership_actions' ) );
+		add_filter( 'pmpro_member_action_links', array( __CLASS__, 'remove_self_service_membership_actions' ), 20, 2 );
+		add_action( 'pmpro_member_action_links_after', array( __CLASS__, 'render_membership_support' ) );
 	}
 
 	/**
@@ -93,8 +94,15 @@ final class CYWater_Membership_Account_Routing {
 			return false;
 		}
 
+		$ids = self::individual_level_ids();
+
+		return $ids && (bool) pmpro_hasMembershipLevel( $ids, $user_id );
+	}
+
+	/** Return the configured Student, Professional, and Lifetime level IDs. */
+	public static function individual_level_ids() {
 		$levels = (array) get_option( 'cywater_membership_level_ids', array() );
-		$ids    = array_values(
+		return array_values(
 			array_filter(
 				array_map(
 					'absint',
@@ -106,8 +114,23 @@ final class CYWater_Membership_Account_Routing {
 				)
 			)
 		);
+	}
 
-		return $ids && (bool) pmpro_hasMembershipLevel( $ids, $user_id );
+	/** Return the active individual level IDs owned by one account. */
+	public static function active_individual_level_ids( $user_id = 0 ) {
+		$user_id = $user_id ? absint( $user_id ) : get_current_user_id();
+		if ( ! $user_id || ! function_exists( 'pmpro_hasMembershipLevel' ) ) {
+			return array();
+		}
+
+		return array_values(
+			array_filter(
+				self::individual_level_ids(),
+				static function ( $level_id ) use ( $user_id ) {
+					return (bool) pmpro_hasMembershipLevel( absint( $level_id ), $user_id );
+				}
+			)
+		);
 	}
 
 	/**
@@ -138,39 +161,80 @@ final class CYWater_Membership_Account_Routing {
 		);
 	}
 
-	/**
-	 * Keep routine membership details readable while moving destructive and
-	 * plan-changing actions behind one explicit disclosure.
-	 */
-	public static function defer_secondary_membership_actions( $links, $level_id ) {
-		$deferred = array();
+	/** Remove member-facing plan-change and cancellation controls completely. */
+	public static function remove_self_service_membership_actions( $links, $level_id ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
 		foreach ( array( 'change', 'cancel' ) as $key ) {
 			if ( isset( $links[ $key ] ) ) {
-				$deferred[ $key ] = $links[ $key ];
 				unset( $links[ $key ] );
 			}
 		}
-		self::$deferred_membership_actions[] = array(
-			'level_id' => absint( $level_id ),
-			'links'    => $deferred,
-		);
 		return $links;
 	}
 
-	/** Render the actions deferred by defer_secondary_membership_actions(). */
-	public static function render_secondary_membership_actions() {
-		$entry = array_shift( self::$deferred_membership_actions );
-		if ( empty( $entry['links'] ) ) {
+	/** Render one support path in place of self-service change/cancel actions. */
+	public static function render_membership_support() {
+		if ( self::$membership_support_rendered || ! self::has_active_individual_membership() ) {
 			return;
 		}
+		self::$membership_support_rendered = true;
+		$email = class_exists( 'CYWater_Membership_Email_Routing' )
+			? CYWater_Membership_Email_Routing::membership_email()
+			: 'membership@cywater.org';
 		?>
-		<details class="cywater-membership-management">
-			<summary><?php esc_html_e( 'Manage membership', 'cywater-membership' ); ?></summary>
-			<div class="cywater-membership-management-actions">
-				<?php echo wp_kses_post( implode( '<span aria-hidden="true"> · </span>', $entry['links'] ) ); ?>
-			</div>
-		</details>
+		<p class="cywater-membership-support">
+			<?php esc_html_e( 'Membership changes and cancellations are handled by the CYWater Membership team.', 'cywater-membership' ); ?>
+			<?php esc_html_e( 'Contact', 'cywater-membership' ); ?>
+			<a href="<?php echo esc_url( 'mailto:' . $email . '?subject=CYWater%20membership%20request' ); ?>"><?php echo esc_html( $email ); ?></a>
+			<?php esc_html_e( 'from the email address used for your account.', 'cywater-membership' ); ?>
+		</p>
 		<?php
+	}
+
+	/** Whether an active member is attempting to switch to another level. */
+	public static function is_prohibited_level_change( $requested_level_id, $user_id = 0 ) {
+		$requested_level_id = absint( $requested_level_id );
+		if ( ! $requested_level_id || ! in_array( $requested_level_id, self::individual_level_ids(), true ) ) {
+			return false;
+		}
+		$active_ids = self::active_individual_level_ids( $user_id );
+		return ! empty( $active_ids ) && ! in_array( $requested_level_id, $active_ids, true );
+	}
+
+	/**
+	 * Keep change/cancellation requests on the Membership support path.
+	 * PMPro remains the data authority and administrators retain its backend
+	 * controls; this gate only removes public self-service mutations.
+	 */
+	public static function prevent_frontend_membership_self_service() {
+		$cancel_page_id = absint( get_option( 'pmpro_cancel_page_id' ) );
+		if ( $cancel_page_id && is_page( $cancel_page_id ) ) {
+			self::redirect_to_membership_support();
+		}
+
+		if ( ! is_user_logged_in() ) {
+			return;
+		}
+		$checkout_page_id = absint( get_option( 'pmpro_checkout_page_id' ) );
+		if ( ! $checkout_page_id || ! is_page( $checkout_page_id ) ) {
+			return;
+		}
+
+		$requested_level_id = 0;
+		if ( isset( $_GET['level'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$requested_level_id = absint( wp_unslash( $_GET['level'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		} elseif ( isset( $_POST['level'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$requested_level_id = absint( wp_unslash( $_POST['level'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		}
+		if ( self::is_prohibited_level_change( $requested_level_id ) ) {
+			self::redirect_to_membership_support();
+		}
+	}
+
+	/** Redirect to the authoritative account section without mutating state. */
+	private static function redirect_to_membership_support() {
+		$url = add_query_arg( 'membership_support', '1', self::account_url() ) . '#pmpro_account-membership';
+		wp_safe_redirect( $url );
+		exit;
 	}
 
 	/** Return the public landing page after a successful member sign-out. */

@@ -9,14 +9,18 @@ controlled real charge, receipt, balance/payout observation and full-refund
 reconciliation through the association-owned Stripe Live account.
 Hostinger File Manager recovered and archived the former Logo Call `0.2.3` and
 Environment `0.5.5` trees before the accepted releases. The current production
-baseline is Membership `0.9.7`, Partnerships `0.1.5`, Logo Call `0.4.2`, Forum
-`0.6.3`, Operations `0.3.2`, Environment `0.5.7`, Core `0.6.6`, and theme
-`0.6.50`. Forum staging QA passed 154 self-cleaning assertions and Account QA
-passed 85. Production Membership UI and Forum role audits passed 18 and 86
-read-only assertions. Production public-gate, protected-content, REST, navigation,
-membership-UI, role-separation, file-integrity, and cache checks passed.
-See `production-checklist.md` for the
-authoritative order.
+baseline is Membership `0.9.8`, Partnerships `0.1.5`, Logo Call `0.4.2`, Forum
+`0.6.3`, Operations `0.3.2`, Environment `0.5.7`, Core `0.6.7`, and theme
+`0.6.51`. Forum staging QA passed 154 self-cleaning assertions and Account QA
+passed 92. Production Membership UI and Forum role audits passed 23 and 86
+read-only assertions. Production public-gate, protected-content, REST,
+navigation, membership-UI, role-separation, file-integrity, and cache checks
+passed. See `production-checklist.md` for the authoritative order.
+
+The staging membership-term suite currently reports that Stripe Sandbox
+Connect is unavailable. Treat this as a staging payment-environment follow-up,
+not a production regression: production remains connected to Stripe Live and
+this release did not change either gateway environment or any payment record.
 
 The items below additionally require an association decision, a named human
 identity, a paid license, a second browser/account, or a destructive host
@@ -172,8 +176,11 @@ payment reversal, an Event refund, sign-out, and account erasure are
 intentionally different operations:
 
 - sign-out ends only the browser session;
-- cancellation stops a future renewal or ends access under the applicable
-  membership terms but preserves the account and financial record;
+- members request changes or cancellation through `membership@cywater.org`;
+  Account intentionally exposes no public Change or Cancel control;
+- an administrator-processed cancellation stops a future renewal or ends
+  access under the applicable membership terms but preserves the account and
+  financial record;
 - the proposed launch rule is:
   **All membership sales are final and non-refundable.** There is no proration,
   unused-time credit, ordinary refund, or discretionary exception;

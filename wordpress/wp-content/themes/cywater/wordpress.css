@@ -246,34 +246,23 @@ body.pmpro-account .cywater-register .btn {
   margin-top: 0;
 }
 
-.cywater-membership-management {
-  margin-top: var(--sp-3);
-  padding-top: var(--sp-3);
-  border-top: 1px solid var(--line);
+.cywater-membership-support {
+	margin-top: var(--sp-3);
+	padding-top: var(--sp-3);
+	border-top: 1px solid var(--line);
+	color: var(--ink-soft);
+	font-size: var(--fs-sm);
+	line-height: 1.65;
 }
 
-.cywater-membership-management summary {
-  width: fit-content;
-  color: var(--teal-deep);
-  font-weight: 600;
-  cursor: pointer;
+.cywater-membership-support a {
+	color: var(--teal-deep);
+	font-weight: 600;
 }
 
-.cywater-membership-management summary:hover,
-.cywater-membership-management summary:focus-visible {
-  color: var(--teal);
-}
-
-.cywater-membership-management-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-2);
-  margin-top: var(--sp-3);
-  font-size: var(--fs-sm);
-}
-
-.cywater-membership-management-actions a {
-  color: var(--ink-soft);
+.cywater-membership-support a:hover,
+.cywater-membership-support a:focus-visible {
+	color: var(--teal);
 }
 
 .faq-item { border-bottom: 1px solid var(--line); }

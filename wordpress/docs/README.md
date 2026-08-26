@@ -57,11 +57,36 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 ## Current State
 
 Hostinger staging is available at `https://staging.cywater.org/`, and the public
-production site is live at `https://cywater.org/`. The 2026-08-26 accepted code
-baseline uses the CYWater `0.6.50` theme, CYWater Membership `0.9.7`, CYWater
+production site is live at `https://cywater.org/`. The 2026-08-27 accepted code
+baseline uses the CYWater `0.6.51` theme, CYWater Membership `0.9.8`, CYWater
 Partnerships `0.1.5`, CYWater Logo Call `0.4.2`, CYWater Forum `0.6.3`, CYWater
-Environment `0.5.7`, CYWater Core `0.6.6`, CYWater Operations `0.3.2`, and Event
+Environment `0.5.7`, CYWater Core `0.6.7`, CYWater Operations `0.3.2`, and Event
 Tickets `5.29.1`.
+
+Membership `0.9.8` removes public Change and Cancel self-service completely.
+Account presents one support route through `membership@cywater.org`; direct
+cancellation pages and attempts to switch an active member to another level
+also return to that support path. A same-level renewal remains available, and
+PMPro remains authoritative for administrator-side membership, order,
+subscription, billing-correction and refund operations. Theme `0.6.51` uses the
+same support presentation without hiding active controls in CSS or editing
+PMPro vendor files. Staging Account QA passed 92 assertions, and the production
+membership UI audit passed 23 read-only assertions. Production remained Stripe
+Live; no order, charge, subscription, payment setting or refund was changed.
+
+Core `0.6.7` makes the media boundary explicit in the editor: Featured image is
+the independent cover for home, archive, card and carousel contexts, while a
+News or Event detail photo is deliberately inserted into the Gutenberg body as
+an Image or Gallery block. Detail templates never auto-render the Featured
+image. The release normalized five legacy body-image records to current HTTPS,
+removed the old `founding-story` body copy of its listing cover while retaining
+its two independent detail photographs, and added the verified Kevin Trenberth
+keynote image to the 2020 online Event detail. The production inventory now has
+6 News/Event records with both cover and independent body media, 19 cover-only
+records and 9 text-only records. The 19 cover-only records were not filled with
+their own covers: no distinct verified detail media exists in the current media
+library, so editors may add suitable body media later without creating visual
+duplication.
 
 Logo Call `0.4.2` keeps submissions open through September 30, 2026 and adds a
 server-backed, responsive deadline countdown at the start of the Event body.
@@ -134,19 +159,20 @@ before the full navigation list. Signed-out visitors go directly to the PMPro
 member-login page. The managed login page contains only
 `[cywater_member_login]`; the wrapper renders PMPro once, preventing the
 historical duplicate form caused by retaining `[pmpro_login]` alongside it.
-Membership `0.9.7` centralizes public-member versus staff routing: registration,
+Membership `0.9.8` centralizes public-member versus staff routing: registration,
 sign-in, sign-out, password recovery, Account, and checkout returns stay on the
 managed public pages; a direct `/wp-admin/` request keeps WordPress' native
 staff login; and an authenticated non-staff member receives HTTP 403. Front-end
 sign-out returns to `/member-login/?loggedout=true`, and identity pages are
 explicitly excluded from full-page caching so login state cannot be masked by a
-stale public form. Theme `0.6.50` consumes the same routing source for desktop
+stale public form. Theme `0.6.51` consumes the same routing source for desktop
 and mobile. The membership action now reflects entitlement independently from
 identity: signed-out visitors see **Join CYWater**, registered non-members see
 **Choose Membership**, and active individual members see **My Membership**
-linked to the Account membership section. PMPro's Change and Cancel controls
-remain available but are grouped under an explicit **Manage membership**
-disclosure through PMPro's supported action-link hooks rather than vendor edits.
+linked to the Account membership section. Public Change and Cancel controls are
+not offered. Membership-level changes and cancellations are handled through
+`membership@cywater.org`, while same-level renewal and administrator-side PMPro
+operations remain available.
 The same theme release centers the one managed registration, verification, and
 account-closure card through a shared account-page context instead of page-ID
 offsets. The canonical `/member-register/` page contains exactly one
@@ -154,8 +180,8 @@ offsets. The canonical `/member-register/` page contains exactly one
 the Membership routing service and WordPress core public registration remains
 disabled. The signed-out Forum introduction retains one registration/sign-in
 action group rather than repeating it in both the Hero and access card.
-Staging Account and Forum QA passed 85 and 154 assertions, while production
-Membership UI and Forum role audits passed 18 and 86 read-only assertions. All
+Staging Account and Forum QA passed 92 and 154 assertions, while production
+Membership UI and Forum role audits passed 23 and 86 read-only assertions. All
 95 theme files match the reviewed tree on both environments; the production
 payment runtime remained Stripe Live.
 

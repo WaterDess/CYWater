@@ -1388,6 +1388,34 @@ describe sandbox activity as a real transaction.
   `/home/u111638297/cywater-release-backups/account-registration-layout-production-20260826T214244`.
   Production remained `Stripe/live`; no account, membership, order, payment,
   refund, webhook, OAuth, or session data was changed.
+- On 2026-08-27 theme `0.6.51`, Membership `0.9.8`, and Core `0.6.7`
+  completed the member-support and News/Event media boundary release on staging
+  and production. Public PMPro Change and Cancel self-service is removed at the
+  supported action-link and route layer rather than hidden with CSS or patched
+  in vendor code. Account, direct cancellation routes, and active cross-level
+  checkout attempts point to `membership@cywater.org`; same-level renewal and
+  administrator-side PMPro membership, order, subscription, billing-correction
+  and refund authority remain intact. Production remained `Stripe/live`, and
+  no payment setting, order, charge, subscription or refund changed.
+  Featured image remains the single independent home/archive/card/carousel
+  cover, while detail media is editor-owned Gutenberg Image/Gallery content and
+  is never auto-rendered from the cover. Five legacy detail-image records were
+  normalized to current HTTPS, the `founding-story` body copy of its listing
+  cover was removed while its two independent photographs were retained, and a
+  verified Kevin Trenberth keynote image was added to the 2020 online Event
+  detail. The read-only production inventory reports 6 News/Event records with
+  both cover and independent body media, 19 cover-only and 9 text-only; the
+  cover-only set was deliberately not populated with duplicate covers because
+  no distinct verified detail media exists in the current library. Staging
+  Account, Editor and Forum QA passed 92, 39 and 154 assertions. Production
+  Membership UI and Forum role audits passed 23 and 86 read-only assertions.
+  The staging Sandbox Connect warning remains an environment-only follow-up and
+  did not alter the verified production Live gateway. Reversible backups are
+  retained at
+  `/home/u111638297/cywater-release-backups/membership-images-staging-20260826T160208Z`
+  and
+  `/home/u111638297/cywater-release-backups/membership-images-production-20260826T160920Z`.
+
 
 ## Editing Guidance
 

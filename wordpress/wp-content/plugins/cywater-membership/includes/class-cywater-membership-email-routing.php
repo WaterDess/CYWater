@@ -58,6 +58,11 @@ final class CYWater_Membership_Email_Routing {
 		add_filter( 'wp_password_change_notification_email', array( __CLASS__, 'account_notification' ), 20, 3 );
 	}
 
+	/** Return the canonical public address for membership-service requests. */
+	public static function membership_email() {
+		return self::MEMBERSHIP_EMAIL;
+	}
+
 	/**
 	 * Keep variables embedded in PMPro templates consistent with the visible
 	 * sender. Otherwise a Membership email can still print the global Billing
