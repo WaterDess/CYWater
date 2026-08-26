@@ -15,9 +15,6 @@ $login_url       = class_exists( 'CYWater_Membership_Account_Routing' )
 	? CYWater_Membership_Account_Routing::login_url( get_post_type_archive_link( 'cyw_forum_post' ) )
 	: wp_login_url( get_post_type_archive_link( 'cyw_forum_post' ) );
 
-$guest_actions = '<a class="btn btn-primary" href="' . esc_url( $register_url ) . '">' . esc_html__( 'Create an account', 'cywater' ) . '</a>'
-	. '<a class="btn btn-outline" href="' . esc_url( $login_url ) . '">' . esc_html__( 'Sign in', 'cywater' ) . '</a>';
-
 $categories = array();
 $topics     = array();
 if ( ! $is_forum_guest ) {
@@ -49,7 +46,8 @@ get_template_part(
 		'lead'    => $is_forum_guest
 			? 'The Forum is a registered-account community for water scholars and practitioners. Create an account or sign in to browse member writing.'
 			: 'Verified CYWater members with an active individual membership may publish articles on research, practice, and early-career life and join the discussion.',
-		'actions' => $is_forum_guest ? $guest_actions : cywater_forum_hero_actions(),
+		/* Guest actions live once in the registration gate below. */
+		'actions' => $is_forum_guest ? '' : cywater_forum_hero_actions(),
 	)
 );
 ?>

@@ -1367,6 +1367,27 @@ describe sandbox activity as a real transaction.
   `/home/u111638297/cywater-release-backups/membership-forum-entry-production-predeploy-20260825T170451Z`.
   Production remained `Stripe/live`; no payment setting, OAuth connection,
   webhook, order, charge, refund or account membership was changed.
+- On 2026-08-26 theme `0.6.50` confirmed one canonical public account-creation
+  surface and corrected its shared layout. `/member-register/` contains exactly
+  one `[cywater_member_register]` shortcode, all public Create account actions
+  continue through `CYWater_Membership_Account_Routing::registration_url()`,
+  and WordPress core public registration remains disabled. Registration,
+  verification, and account-closure cards now share one centered account-page
+  context instead of page-ID offsets. The signed-out Forum introduction keeps
+  its registration explanation but exposes one Create account / Sign in action
+  group rather than repeating the same links in both the Hero and access card.
+  Staging Account and Forum QA passed 85 and 154 assertions; production
+  Membership UI and Forum role audits passed 18 and 86 read-only assertions.
+  Desktop browser geometry placed the card on the content centerline, and a
+  390px responsive check found one form, zero horizontal overflow, and a 0.1px
+  center delta. All 95 active theme files match the reviewed local tree by
+  SHA-256 on both environments. The reversible predeploy database and theme
+  trees are retained under
+  `/home/u111638297/cywater-release-backups/account-registration-layout-staging-20260826T213339`
+  and
+  `/home/u111638297/cywater-release-backups/account-registration-layout-production-20260826T214244`.
+  Production remained `Stripe/live`; no account, membership, order, payment,
+  refund, webhook, OAuth, or session data was changed.
 
 ## Editing Guidance
 

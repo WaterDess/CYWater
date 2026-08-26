@@ -118,6 +118,12 @@ try {
 	$assert( count( $country_options ) >= 240 && 'United States' === ( $country_options['US'] ?? '' ), 'Country selector reuses PMPro complete canonical country and region data' );
 	$assert( 'US' === CYWater_Membership_Countries::canonical_code( 'United States' ) && '' === CYWater_Membership_Countries::canonical_code( 'Typo Country' ), 'Country validation accepts canonical choices and rejects free-text typos' );
 	$register_html = CYWater_Membership_Account_Flow::registration_form();
+	$registration_page = get_page_by_path( 'member-register' );
+	$assert( $registration_page instanceof WP_Post, 'Canonical member registration page exists' );
+	$registration_content = $registration_page instanceof WP_Post ? (string) $registration_page->post_content : '';
+	$assert( 1 === substr_count( $registration_content, '[cywater_member_register]' ), 'Canonical member registration page renders the shared form exactly once' );
+	$assert( false === has_shortcode( $registration_content, 'pmpro_login' ) && false === has_shortcode( $registration_content, 'pmpro_checkout' ), 'Canonical member registration page contains no legacy or parallel account form' );
+	$assert( ! (bool) get_option( 'users_can_register' ), 'WordPress core public registration remains disabled in favor of the managed CYWater form' );
 	foreach ( array( 'first_name', 'last_name', 'cyw_institution_name', 'cyw_country', 'cyw_institution_type', 'cyw_professional_title', 'cyw_career_stage' ) as $required_name ) {
 		$assert( false !== strpos( $register_html, 'name="' . $required_name . '"' ), 'Registration renders required core field: ' . $required_name );
 	}

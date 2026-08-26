@@ -208,6 +208,20 @@
   margin-top: var(--sp-2);
 }
 
+/*
+ * Standalone account-flow cards sit on the visual centerline of the page.
+ * The body context is shared by every plugin-managed compact account page, so
+ * future changes do not depend on a database page ID or a one-off offset.
+ */
+body.cywater-compact-account-page .entry-content {
+  max-width: none;
+}
+
+body.cywater-compact-account-page .cywater-register {
+  width: 100%;
+  margin-inline: auto;
+}
+
 /* Account page modules share one content rail and one action rhythm.
    Registration and verification cards keep their compact 38rem measure on
    their own pages; only the member account projection expands to the PMPro

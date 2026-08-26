@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CYWATER_THEME_VERSION', '0.6.49' );
+define( 'CYWATER_THEME_VERSION', '0.6.50' );
 
 function cywater_theme_setup() {
 	add_theme_support( 'title-tag' );
@@ -355,6 +355,14 @@ function cywater_body_classes( $classes ) {
 	$section   = cywater_current_section();
 	if ( $section ) {
 		$classes[] = 'section-' . sanitize_html_class( $section );
+	}
+	/*
+	 * The account plugin owns one reusable compact card for registration,
+	 * verification, and closure. Give those managed pages one presentation
+	 * context instead of adding page-ID or shortcode-specific offsets.
+	 */
+	if ( is_page( array( 'member-register', 'verify-email', 'close-account' ) ) ) {
+		$classes[] = 'cywater-compact-account-page';
 	}
 	return $classes;
 }

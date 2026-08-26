@@ -58,7 +58,7 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 
 Hostinger staging is available at `https://staging.cywater.org/`, and the public
 production site is live at `https://cywater.org/`. The 2026-08-26 accepted code
-baseline uses the CYWater `0.6.49` theme, CYWater Membership `0.9.7`, CYWater
+baseline uses the CYWater `0.6.50` theme, CYWater Membership `0.9.7`, CYWater
 Partnerships `0.1.5`, CYWater Logo Call `0.4.2`, CYWater Forum `0.6.3`, CYWater
 Environment `0.5.7`, CYWater Core `0.6.6`, CYWater Operations `0.3.2`, and Event
 Tickets `5.29.1`.
@@ -140,13 +140,24 @@ managed public pages; a direct `/wp-admin/` request keeps WordPress' native
 staff login; and an authenticated non-staff member receives HTTP 403. Front-end
 sign-out returns to `/member-login/?loggedout=true`, and identity pages are
 explicitly excluded from full-page caching so login state cannot be masked by a
-stale public form. Theme `0.6.49` consumes the same routing source for desktop
+stale public form. Theme `0.6.50` consumes the same routing source for desktop
 and mobile. The membership action now reflects entitlement independently from
 identity: signed-out visitors see **Join CYWater**, registered non-members see
 **Choose Membership**, and active individual members see **My Membership**
 linked to the Account membership section. PMPro's Change and Cancel controls
 remain available but are grouped under an explicit **Manage membership**
 disclosure through PMPro's supported action-link hooks rather than vendor edits.
+The same theme release centers the one managed registration, verification, and
+account-closure card through a shared account-page context instead of page-ID
+offsets. The canonical `/member-register/` page contains exactly one
+`[cywater_member_register]` shortcode; every public Create account link uses
+the Membership routing service and WordPress core public registration remains
+disabled. The signed-out Forum introduction retains one registration/sign-in
+action group rather than repeating it in both the Hero and access card.
+Staging Account and Forum QA passed 85 and 154 assertions, while production
+Membership UI and Forum role audits passed 18 and 86 read-only assertions. All
+95 theme files match the reviewed tree on both environments; the production
+payment runtime remained Stripe Live.
 
 The public production cutover is complete. On 2026-08-23 the association opened
 the production membership runtime to Stripe Live; end-to-end financial
