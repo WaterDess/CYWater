@@ -1416,6 +1416,34 @@ describe sandbox activity as a real transaction.
   and
   `/home/u111638297/cywater-release-backups/membership-images-production-20260826T160920Z`.
 
+- On 2026-08-27 theme `0.6.52` and Core `0.6.8` corrected the
+  News/Event cover interpretation on staging and production. A native Featured
+  image remains the single cover source for home, archives, cards and Event
+  carousels, and the shared detail template now renders that cover once as the
+  first large News/Event content image. If the editor has already inserted the
+  same attachment in the body, attachment-ID and legacy-filename detection
+  suppresses the automatic figure, so a detail never shows two copies of its
+  cover. Independent Gutenberg Image/Gallery content remains untouched. The
+  previously removed manual `founding-story` cover is therefore visible again
+  through the shared rule, followed by its two independent 2013 photographs.
+  The 2020 online Event displays its meeting cover first and the independently
+  verified keynote image later in the body. No post required a copied Featured
+  image in stored HTML, and no payment, membership, order or gateway state was
+  changed. The self-cleaning staging editor suite passed 44 checks; production
+  Membership and Forum role audits passed 23 and 86 read-only assertions. A
+  real desktop/mobile browser check confirmed one 2022 Event cover with no
+  overflow, while `founding-story` rendered one cover plus two independent body
+  images and the 2020 Event rendered one cover plus one independent keynote
+  image. Active staging and production trees are byte-identical to local: theme
+  95/95 files with manifest SHA-256
+  `996f10295f8b97f5f53ac88e1f7ff74d4acf8d189080afe38ea641f05ac51751`
+  and Core 11/11 with
+  `e6f084937987d12562a6a16a53d756a84ff5bd5f1821d2bce5dfb47d7d8ff82d`.
+  Reversible code/database backups are retained under
+  `/home/u111638297/cywater-release-backups/detail-cover-staging-20260826T200311Z`
+  and
+  `/home/u111638297/cywater-release-backups/detail-cover-production-20260826T200456Z`.
+
 
 ## Editing Guidance
 

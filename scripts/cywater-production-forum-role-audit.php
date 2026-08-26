@@ -25,7 +25,7 @@ $audit_assert     = static function ( $condition, $message ) use ( &$audit_asser
 $plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/cywater-forum/cywater-forum.php', false, false );
 $theme       = wp_get_theme( 'cywater' );
 $audit_assert( '0.6.3' === (string) ( $plugin_data['Version'] ?? '' ), 'Unexpected CYWater Forum production version.' );
-$audit_assert( '0.6.51' === (string) $theme->get( 'Version' ), 'Unexpected CYWater theme production version.' );
+$audit_assert( '0.6.52' === (string) $theme->get( 'Version' ), 'Unexpected CYWater theme production version.' );
 $audit_assert( 'live' === (string) get_option( 'pmpro_gateway_environment' ), 'Production payment gateway is not Live.' );
 $audit_assert( 'cywater.org' === strtolower( (string) wp_parse_url( home_url( '/' ), PHP_URL_HOST ) ), 'Refusing to audit a non-production host.' );
 $audit_assert( class_exists( 'CYWater_Forum_Roles' ) && class_exists( 'CYWater_Forum_Workspace' ), 'Forum role or workspace service is unavailable.' );

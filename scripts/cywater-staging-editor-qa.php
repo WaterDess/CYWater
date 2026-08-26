@@ -27,9 +27,9 @@ $assert = static function ( $condition, $message ) use ( &$checks ) {
 };
 
 try {
-	$assert( defined( 'CYWATER_CORE_VERSION' ) && '0.6.7' === CYWATER_CORE_VERSION, 'Unexpected Core version.' );
+	$assert( defined( 'CYWATER_CORE_VERSION' ) && '0.6.8' === CYWATER_CORE_VERSION, 'Unexpected Core version.' );
 	$assert( defined( 'CYWATER_OPERATIONS_VERSION' ) && '0.3.2' === CYWATER_OPERATIONS_VERSION, 'Unexpected Operations version.' );
-	$assert( defined( 'CYWATER_THEME_VERSION' ) && '0.6.51' === CYWATER_THEME_VERSION, 'Unexpected theme version.' );
+	$assert( defined( 'CYWATER_THEME_VERSION' ) && '0.6.52' === CYWATER_THEME_VERSION, 'Unexpected theme version.' );
 	$assert( current_theme_supports( 'editor-styles' ), 'Theme editor styles are not enabled.' );
 	$assert( file_exists( get_theme_file_path( 'assets/css/editor.css' ) ), 'Theme editor stylesheet is missing.' );
 	$assert( file_exists( CYWATER_CORE_DIR . 'assets/editor-workspace.js' ), 'Editor workspace script is missing.' );
@@ -45,7 +45,7 @@ try {
 	$editor_script = file_get_contents( CYWATER_CORE_DIR . 'assets/editor-workspace.js' );
 	$assert( false !== $editor_script && str_contains( $editor_script, 'help: field.help || undefined' ), 'Editor field guidance is not rendered.' );
 	$editor_service = file_get_contents( CYWATER_CORE_DIR . 'includes/class-cywater-editor.php' );
-	$assert( false !== $editor_service && str_contains( $editor_service, 'cover image is separate' ) && str_contains( $editor_service, 'never inserted' ), 'News/Event editor guidance does not separate listing covers from detail images.' );
+	$assert( false !== $editor_service && str_contains( $editor_service, 'once at the start of the detail page' ) && str_contains( $editor_service, 'will not repeat it' ), 'News/Event editor guidance does not explain the shared cover and duplicate guard.' );
 
 	$administrators = get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ids' ) );
 	$assert( ! empty( $administrators ), 'No Administrator is available for the internal REST probe.' );
@@ -62,6 +62,35 @@ try {
 	);
 	$assert( ! is_wp_error( $created ) && $created > 0, 'Temporary Event could not be created.' );
 	$created_ids[] = (int) $created;
+	$image_ids = get_posts(
+		array(
+			'post_type'      => 'attachment',
+			'post_mime_type' => 'image',
+			'post_status'    => 'inherit',
+			'posts_per_page' => 1,
+			'fields'         => 'ids',
+		)
+	);
+	$assert( ! empty( $image_ids ), 'No existing image attachment is available for detail-cover QA.' );
+	$cover_id = (int) $image_ids[0];
+	$assert( set_post_thumbnail( $created, $cover_id ), 'Temporary Event cover could not be assigned.' );
+	$cover_figure = cywater_detail_featured_figure( $created );
+	$assert( false !== strpos( $cover_figure, 'cywater-detail-cover' ) && false !== strpos( $cover_figure, '<img' ), 'A listing cover is not rendered once on an Event detail.' );
+	$cover_url = wp_get_attachment_url( $cover_id );
+	$assert( false !== $cover_url, 'Temporary Event cover URL could not be resolved.' );
+	wp_update_post(
+		array(
+			'ID'           => $created,
+			'post_content' => '<figure><img src="' . esc_url( $cover_url ) . '" alt=""></figure>',
+		)
+	);
+	$assert( '' === cywater_detail_featured_figure( $created ), 'The template repeats a cover already placed in the detail body.' );
+	wp_update_post(
+		array(
+			'ID'           => $created,
+			'post_content' => '<!-- wp:paragraph --><p>Temporary editor QA.</p><!-- /wp:paragraph -->',
+		)
+	);
 
 	$request = new WP_REST_Request( 'POST', '/wp/v2/cyw_event/' . $created );
 	$request->set_param( 'id', $created );

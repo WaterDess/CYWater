@@ -26,6 +26,7 @@ while ( have_posts() ) :
 	<section class="section">
 		<div class="container container-narrow">
 			<div class="article-body">
+				<?php echo cywater_detail_featured_figure( get_the_ID() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				<div class="prose entry-content" data-reveal><?php echo cywater_article_content(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
 				<?php if ( $source ) : ?><hr class="divider" style="margin:var(--sp-7) 0"><div style="text-align:center"><a class="btn btn-outline btn-lg" href="<?php echo esc_url( $source ); ?>" target="_blank" rel="noopener">View source announcement</a></div><?php endif; ?>
 				<div style="text-align:center; margin-top:var(--sp-6)"><a class="link" href="<?php echo esc_url( home_url( '/news/' ) ); ?>">Back to News</a></div>

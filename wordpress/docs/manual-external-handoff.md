@@ -10,9 +10,10 @@ reconciliation through the association-owned Stripe Live account.
 Hostinger File Manager recovered and archived the former Logo Call `0.2.3` and
 Environment `0.5.5` trees before the accepted releases. The current production
 baseline is Membership `0.9.8`, Partnerships `0.1.5`, Logo Call `0.4.2`, Forum
-`0.6.3`, Operations `0.3.2`, Environment `0.5.7`, Core `0.6.7`, and theme
-`0.6.51`. Forum staging QA passed 154 self-cleaning assertions and Account QA
-passed 92. Production Membership UI and Forum role audits passed 23 and 86
+`0.6.3`, Operations `0.3.2`, Environment `0.5.7`, Core `0.6.8`, and theme
+`0.6.52`. Forum staging QA passed 154 self-cleaning assertions and Account QA
+passed 92. The detail-cover editor QA passed 44 self-cleaning assertions.
+Production Membership UI and Forum role audits passed 23 and 86
 read-only assertions. Production public-gate, protected-content, REST,
 navigation, membership-UI, role-separation, file-integrity, and cache checks
 passed. See `production-checklist.md` for the authoritative order.

@@ -21,7 +21,7 @@ try {
 	$assert( 'production' === wp_get_environment_type(), 'WordPress environment is production' );
 	$assert( 'cywater.org' === strtolower( (string) wp_parse_url( home_url( '/' ), PHP_URL_HOST ) ), 'Home URL is the CYWater production host' );
 	$assert( defined( 'CYWATER_MEMBERSHIP_VERSION' ) && '0.9.8' === CYWATER_MEMBERSHIP_VERSION, 'CYWater Membership version is 0.9.8' );
-	$assert( '0.6.51' === wp_get_theme()->get( 'Version' ), 'CYWater theme version is 0.6.51' );
+	$assert( '0.6.52' === wp_get_theme()->get( 'Version' ), 'CYWater theme version is 0.6.52' );
 	$assert( class_exists( 'CYWater_Membership_Account_Routing' ), 'Membership account-routing authority is active' );
 	$registration_page = get_page_by_path( 'member-register' );
 	$assert( $registration_page instanceof WP_Post, 'Canonical member registration page exists' );
