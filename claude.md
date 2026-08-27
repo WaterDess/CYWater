@@ -1491,6 +1491,31 @@ describe sandbox activity as a real transaction.
   and
   `/home/u111638297/cywater-release-backups/content-boundary-production-20260827T020736Z`.
 
+- On 2026-08-27 CYWater Membership `0.9.10` corrected the receipt identity
+  boundary. PMPro returns an order's linked user as a raw database object, so
+  the prior `WP_User` type check discarded the member identity and could leave
+  **Bill to** empty. The canonical web/email receipt model now resolves the
+  order owner by user ID and stores one immutable, versioned order-time identity
+  snapshot with registered name, professional title, institution/employer,
+  country or region, account email, and available billing-address lines. New
+  checkout and renewal orders capture the snapshot, while existing successful
+  or refunded orders were backfilled only after a complete database and plugin
+  backup. Later profile edits do not rewrite historical receipts. Staging passed
+  the 10-check self-cleaning identity QA and existing 18-check invoice suite
+  without creating a charge, membership, subscription, email, or Stripe object.
+  Production backfilled three complete orders and passed 22 read-only receipt
+  checks. The reported production order `#7F266F56D4` now has a stored identity
+  snapshot and five populated Bill-to lines. Staging remains Stripe Sandbox and
+  production remains Stripe Live. The 17 deployed Membership files match the
+  reviewed local tree file-for-file. Reversible backups are retained at
+  `/home/u111638297/cywater-release-backups/receipt-identity-staging-20260827T112034Z`
+  and
+  `/home/u111638297/cywater-release-backups/receipt-identity-production-20260827T112157Z`.
+  The regenerated clean handoff bundle is
+  `dist/cywater-wordpress-production-clean-0.5.7.zip` (16,425,753 bytes),
+  SHA-256
+  `b010e13fa8100bf66dc8831f26bf1b4eddacb048199c4adc003ce2d668f1eb3f`.
+
 
 ## Editing Guidance
 

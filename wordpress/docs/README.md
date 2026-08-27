@@ -58,10 +58,30 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 
 Hostinger staging is available at `https://staging.cywater.org/`, and the public
 production site is live at `https://cywater.org/`. The 2026-08-27 accepted code
-baseline uses the CYWater `0.6.54` theme, CYWater Membership `0.9.9`, CYWater
+baseline uses the CYWater `0.6.54` theme, CYWater Membership `0.9.10`, CYWater
 Partnerships `0.1.5`, CYWater Logo Call `0.4.2`, CYWater Forum `0.6.3`, CYWater
 Environment `0.5.7`, CYWater Core `0.6.9`, CYWater Operations `0.3.2`, and Event
 Tickets `5.29.1`.
+
+Membership `0.9.10` fixes the receipt identity boundary rather than adding a
+template-only workaround. PMPro's order API returns its linked user as a raw
+database object, so the former `WP_User` type check discarded the member name,
+institution and email and could leave **Bill to** empty. The canonical receipt
+model now resolves the order owner by user ID and stores a versioned order-time
+identity snapshot containing the registered name, professional title,
+institution/employer, country or region and account email, plus any available
+billing-address lines. New checkout and renewal orders capture this snapshot;
+historical successful/refunded orders were backfilled after complete database
+and plugin backups. Later profile edits no longer rewrite a historical receipt.
+Staging passed the 10-check self-cleaning identity test and existing 18-check
+invoice suite without creating a charge, membership, subscription, email or
+Stripe object. Production backfilled three complete orders and passed 22
+read-only receipt checks; the reported order `#7F266F56D4` now has all five
+required Bill-to identity lines. Production remained Stripe Live and staging
+remained Sandbox. Reversible backups are retained at
+`/home/u111638297/cywater-release-backups/receipt-identity-staging-20260827T112034Z`
+and
+`/home/u111638297/cywater-release-backups/receipt-identity-production-20260827T112157Z`.
 
 Membership `0.9.9` removes public Change and Cancel self-service completely.
 Account presents one support route through `membership@cywater.org`; direct
@@ -109,8 +129,8 @@ The production purity gate passes 22 checks, and the repeatable public residue
 audit checks 81 sitemap/key URLs with zero staging, Sandbox, temporary-host,
 local-development, QA-identity, or private acceptance-fixture hits.
 The resulting production-clean `0.5.7` bundle is
-`dist/cywater-wordpress-production-clean-0.5.7.zip` (16,415,745 bytes), SHA-256
-`47edcc10ca5f9e8da8a97ab591025ddd46efe6adc1c869ffae5482401c486013`.
+`dist/cywater-wordpress-production-clean-0.5.7.zip` (16,425,753 bytes), SHA-256
+`b010e13fa8100bf66dc8831f26bf1b4eddacb048199c4adc003ce2d668f1eb3f`.
 
 Forum `0.6.3` is the production registered-community baseline. Forum remains in
 desktop and mobile navigation for signed-out visitors, and `/forum/` presents a

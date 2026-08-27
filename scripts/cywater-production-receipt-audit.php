@@ -41,6 +41,14 @@ try {
 	$order = new MemberOrder();
 	$order->getMemberOrderByID( $order_id );
 	$model = CYWater_Membership_Receipt::view_model( $order );
+	$user  = get_userdata( absint( $order->user_id ?? 0 ) );
+	$assert( $user instanceof WP_User, 'Completed order resolves its registered member' );
+	$identity = get_pmpro_membership_order_meta( $order_id, CYWater_Membership_Receipt::IDENTITY_META_KEY, true );
+	$assert( is_array( $identity ) && 1 === absint( $identity['version'] ?? 0 ), 'Completed order has an immutable receipt identity snapshot' );
+	$assert( ! empty( $identity['name'] ) && in_array( $identity['name'], $model['bill_to'], true ), 'Bill to contains the order-time member name' );
+	$assert( ! empty( $identity['institution'] ) && in_array( $identity['institution'], $model['bill_to'], true ), 'Bill to contains the order-time institution or employer' );
+	$assert( ! empty( $identity['email'] ) && in_array( $identity['email'], $model['bill_to'], true ), 'Bill to contains the order-time account email' );
+	$assert( count( $model['bill_to'] ) >= 4, 'Bill to contains a complete member identity block' );
 
 	$assert( 'International Association of Contemporary Young Scholars in Water Sciences' === $model['organization_name'], 'Receipt prints the association full name' );
 	$assert( 'USD' === $model['currency'], 'Receipt states the actual production transaction currency' );

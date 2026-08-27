@@ -12,11 +12,55 @@ final class CYWater_Membership_Receipt {
 	public const ORGANIZATION_SHORT_NAME = 'CYWater';
 	public const BILLING_EMAIL = 'billing@cywater.org';
 	public const MAILING_ADDRESS = '202 E. Green St, Suite 2, Champaign, IL 61820, USA';
+	public const IDENTITY_META_KEY = '_cywater_receipt_identity_v1';
 
 	public static function register() {
 		// Run before PMPro's required KSES pass at priority 11.
 		add_filter( 'pmpro_email_subject', array( __CLASS__, 'email_subject' ), 10, 2 );
 		add_filter( 'pmpro_email_body', array( __CLASS__, 'email_body' ), 10, 2 );
+		// Capture billing identity when any order is created, including renewals.
+		add_action( 'pmpro_added_order', array( __CLASS__, 'snapshot_added_order' ), 20 );
+		// Refresh the initial checkout snapshot after PMPro saves profile fields.
+		add_action( 'pmpro_after_checkout', array( __CLASS__, 'snapshot_after_checkout' ), 30, 2 );
+	}
+
+	public static function snapshot_added_order( $order ) {
+		self::snapshot_order_identity( $order, false );
+	}
+
+	public static function snapshot_after_checkout( $user_id, $order ) {
+		if ( is_object( $order ) && empty( $order->user_id ) ) {
+			$order->user_id = absint( $user_id );
+		}
+		self::snapshot_order_identity( $order, true );
+	}
+
+	/**
+	 * Store the member identity used by a receipt on the order itself.
+	 *
+	 * Receipts must not change when a member later edits their profile. The
+	 * snapshot deliberately contains billing-identification fields only; career
+	 * stage and institution type remain profile data rather than invoice data.
+	 */
+	public static function snapshot_order_identity( $order, $replace = false ) {
+		$order_id = is_object( $order ) ? absint( $order->id ?? 0 ) : 0;
+		if ( ! $order_id || ! function_exists( 'update_pmpro_membership_order_meta' ) ) {
+			return false;
+		}
+
+		$existing = self::identity_snapshot( $order_id );
+		if ( $existing && ! $replace ) {
+			return true;
+		}
+
+		$user     = self::resolve_user( $order );
+		$billing  = ! empty( $order->billing ) && is_object( $order->billing ) ? $order->billing : null;
+		$identity = self::current_identity( $user, $billing );
+		if ( empty( $identity['name'] ) || empty( $identity['institution'] ) || empty( $identity['email'] ) ) {
+			return false;
+		}
+
+		return false !== update_pmpro_membership_order_meta( $order_id, self::IDENTITY_META_KEY, $identity );
 	}
 
 	/**
@@ -30,14 +74,11 @@ final class CYWater_Membership_Receipt {
 			return array();
 		}
 
-		if ( method_exists( $order, 'getUser' ) ) {
-			$order->getUser();
-		}
 		if ( method_exists( $order, 'getMembershipLevel' ) ) {
 			$order->getMembershipLevel();
 		}
 
-		$user       = ! empty( $order->user ) && $order->user instanceof WP_User ? $order->user : null;
+		$user       = self::resolve_user( $order );
 		$level      = ! empty( $order->membership_level ) ? $order->membership_level : null;
 		$currency   = strtoupper( sanitize_key( (string) ( $order->currency ?? get_option( 'pmpro_currency', 'USD' ) ) ) );
 		$currency   = $currency ?: 'USD';
@@ -48,29 +89,13 @@ final class CYWater_Membership_Receipt {
 		$tax        = isset( $order->tax ) ? (float) $order->tax : max( 0, $total - $subtotal );
 		$status     = sanitize_key( (string) ( $order->status ?? '' ) );
 
-		$bill_to = array();
-		$billing = ! empty( $order->billing ) && is_object( $order->billing ) ? $order->billing : null;
-		$name    = $billing && ! empty( $billing->name ) ? (string) $billing->name : ( $user ? $user->display_name : '' );
-		if ( $name ) {
-			$bill_to[] = $name;
+		$billing  = ! empty( $order->billing ) && is_object( $order->billing ) ? $order->billing : null;
+		$identity = self::identity_snapshot( absint( $order->id ?? 0 ) );
+		if ( ! $identity ) {
+			// Compatibility for historical orders created before snapshots existed.
+			$identity = self::current_identity( $user, $billing );
 		}
-		if ( $user ) {
-			$institution = trim( (string) get_user_meta( $user->ID, 'cyw_institution_name', true ) );
-			if ( $institution && ! in_array( $institution, $bill_to, true ) ) {
-				$bill_to[] = $institution;
-			}
-			$bill_to[] = $user->user_email;
-		}
-		if ( $billing ) {
-			$street = trim( implode( ', ', array_filter( array( $billing->street ?? '', $billing->street2 ?? '' ) ) ) );
-			$city   = trim( implode( ', ', array_filter( array( $billing->city ?? '', $billing->state ?? '', $billing->zip ?? '' ) ) ) );
-			foreach ( array( $street, $city, $billing->country ?? '' ) as $line ) {
-				$line = trim( (string) $line );
-				if ( $line ) {
-					$bill_to[] = $line;
-				}
-			}
-		}
+		$bill_to = self::bill_to_lines( $identity );
 
 		$term_end = '';
 		if ( function_exists( 'pmpro_get_subscription_period_end_date_for_order' ) ) {
@@ -106,6 +131,120 @@ final class CYWater_Membership_Receipt {
 			'organization_address' => self::MAILING_ADDRESS,
 			'order_url'          => function_exists( 'pmpro_url' ) ? pmpro_url( 'invoice', '?invoice=' . rawurlencode( (string) ( $order->code ?? '' ) ) ) : '',
 		);
+	}
+
+	private static function resolve_user( $order ) {
+		if ( ! is_object( $order ) ) {
+			return null;
+		}
+
+		$user_id = absint( $order->user_id ?? 0 );
+		if ( ! $user_id && ! empty( $order->user ) && is_object( $order->user ) ) {
+			$user_id = absint( $order->user->ID ?? 0 );
+		}
+		$user = $user_id ? get_userdata( $user_id ) : false;
+		return $user instanceof WP_User ? $user : null;
+	}
+
+	/** @return array<string,mixed> */
+	private static function current_identity( $user, $billing ) {
+		$first_name  = $user ? trim( (string) get_user_meta( $user->ID, 'first_name', true ) ) : '';
+		$last_name   = $user ? trim( (string) get_user_meta( $user->ID, 'last_name', true ) ) : '';
+		$name        = trim( $first_name . ' ' . $last_name );
+		$billing_name = $billing && ! empty( $billing->name ) ? trim( (string) $billing->name ) : '';
+		if ( ! $name ) {
+			$name = $billing_name ?: ( $user ? trim( (string) $user->display_name ) : '' );
+		}
+
+		$country_code = $user ? (string) get_user_meta( $user->ID, 'cyw_country', true ) : '';
+		$country      = self::country_label( $country_code );
+		$address      = array();
+		if ( $billing ) {
+			$street = trim( implode( ', ', array_filter( array( $billing->street ?? '', $billing->street2 ?? '' ) ) ) );
+			$city   = trim( implode( ', ', array_filter( array( $billing->city ?? '', $billing->state ?? '', $billing->zip ?? '' ) ) ) );
+			foreach ( array( $street, $city ) as $line ) {
+				$line = sanitize_text_field( (string) $line );
+				if ( $line ) {
+					$address[] = $line;
+				}
+			}
+		}
+
+		return array(
+			'version'       => 1,
+			'name'          => sanitize_text_field( $name ),
+			'title'         => $user ? sanitize_text_field( (string) get_user_meta( $user->ID, 'cyw_professional_title', true ) ) : '',
+			'institution'   => $user ? sanitize_text_field( (string) get_user_meta( $user->ID, 'cyw_institution_name', true ) ) : '',
+			'country'       => sanitize_text_field( $country ),
+			'email'         => $user ? sanitize_email( (string) $user->user_email ) : '',
+			'address_lines' => array_values( array_unique( array_filter( $address ) ) ),
+			'captured_at'   => gmdate( 'c' ),
+		);
+	}
+
+	/** @return array<string,mixed> */
+	private static function identity_snapshot( $order_id ) {
+		if ( ! $order_id || ! function_exists( 'get_pmpro_membership_order_meta' ) ) {
+			return array();
+		}
+		$identity = get_pmpro_membership_order_meta( $order_id, self::IDENTITY_META_KEY, true );
+		if ( ! is_array( $identity ) || 1 !== absint( $identity['version'] ?? 0 ) ) {
+			return array();
+		}
+		$address = isset( $identity['address_lines'] ) && is_array( $identity['address_lines'] )
+			? array_map( 'sanitize_text_field', $identity['address_lines'] )
+			: array();
+		return array(
+			'version'       => 1,
+			'name'          => sanitize_text_field( (string) ( $identity['name'] ?? '' ) ),
+			'title'         => sanitize_text_field( (string) ( $identity['title'] ?? '' ) ),
+			'institution'   => sanitize_text_field( (string) ( $identity['institution'] ?? '' ) ),
+			'country'       => sanitize_text_field( (string) ( $identity['country'] ?? '' ) ),
+			'email'         => sanitize_email( (string) ( $identity['email'] ?? '' ) ),
+			'address_lines' => array_values( array_unique( array_filter( $address ) ) ),
+			'captured_at'   => sanitize_text_field( (string) ( $identity['captured_at'] ?? '' ) ),
+		);
+	}
+
+	/** @return string[] */
+	private static function bill_to_lines( $identity ) {
+		$lines = array();
+		foreach ( array( 'name', 'title', 'institution' ) as $key ) {
+			$value = trim( (string) ( $identity[ $key ] ?? '' ) );
+			if ( $value ) {
+				$lines[] = $value;
+			}
+		}
+		foreach ( (array) ( $identity['address_lines'] ?? array() ) as $line ) {
+			$line = trim( (string) $line );
+			if ( $line ) {
+				$lines[] = $line;
+			}
+		}
+		$country = trim( (string) ( $identity['country'] ?? '' ) );
+		if ( $country ) {
+			$lines[] = $country;
+		}
+		$email = sanitize_email( (string) ( $identity['email'] ?? '' ) );
+		if ( $email ) {
+			$lines[] = $email;
+		}
+		return array_values( array_unique( array_filter( $lines ) ) );
+	}
+
+	private static function country_label( $value ) {
+		$value = trim( (string) $value );
+		if ( ! $value ) {
+			return '';
+		}
+		if ( class_exists( 'CYWater_Membership_Countries' ) ) {
+			$options = CYWater_Membership_Countries::options();
+			$code    = CYWater_Membership_Countries::canonical_code( $value );
+			if ( $code && isset( $options[ $code ] ) ) {
+				return (string) $options[ $code ];
+			}
+		}
+		return sanitize_text_field( $value );
 	}
 
 	public static function email_subject( $subject, $email ) {
