@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CYWATER_THEME_VERSION', '0.6.52' );
+define( 'CYWATER_THEME_VERSION', '0.6.53' );
 
 function cywater_theme_setup() {
 	add_theme_support( 'title-tag' );
@@ -88,6 +88,9 @@ function cywater_enqueue_assets() {
 	wp_enqueue_style( 'cywater-components', get_theme_file_uri( 'assets/css/components.css' ), array( 'cywater-base' ), cywater_asset_version( 'assets/css/components.css' ) );
 	wp_enqueue_style( 'cywater-pages', get_theme_file_uri( 'assets/css/pages.css' ), array( 'cywater-components' ), cywater_asset_version( 'assets/css/pages.css' ) );
 	wp_enqueue_style( 'cywater-wordpress', get_theme_file_uri( 'wordpress.css' ), array( 'cywater-pages' ), cywater_asset_version( 'wordpress.css' ) );
+	if ( is_page( array( 'membership-order', 'membership-confirmation' ) ) ) {
+		wp_enqueue_style( 'cywater-receipt', get_theme_file_uri( 'assets/css/receipt.css' ), array( 'cywater-wordpress' ), cywater_asset_version( 'assets/css/receipt.css' ) );
+	}
 	wp_enqueue_script( 'cywater-main', get_theme_file_uri( 'assets/js/main.js' ), array(), cywater_asset_version( 'assets/js/main.js' ), true );
 }
 add_action( 'wp_enqueue_scripts', 'cywater_enqueue_assets' );

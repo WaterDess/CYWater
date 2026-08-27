@@ -33,6 +33,7 @@ final class CYWater_Membership_Setup {
 		update_option( 'pmpro_from_email', 'membership@cywater.org' );
 		update_option( 'pmpro_from_name', 'CYWater Membership' );
 		update_option( 'pmpro_only_filter_pmpro_emails', 1 );
+		update_option( 'pmpro_use_custom_page_template_invoice', 'yes' );
 		if ( ! get_option( 'cywater_membership_setup_version' ) ) {
 			update_option( 'pmpro_gateway', 'stripe' );
 			update_option( 'pmpro_gateway_environment', 'sandbox' );

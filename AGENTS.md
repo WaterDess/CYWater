@@ -1445,6 +1445,31 @@ describe sandbox activity as a real transaction.
   `/home/u111638297/cywater-release-backups/detail-cover-production-20260826T200456Z`.
 
 
+- On 2026-08-27 theme `0.6.53` and Membership `0.9.9` replaced the
+  generic Paid Memberships Pro payment confirmation with one canonical CYWater
+  membership-dues receipt for both the paid-checkout email and individual order
+  page. The receipt prints the full legal association name, mailing and billing
+  contacts, receipt/order number, payment date and status, member and institution,
+  membership term, masked card brand/last four digits, ISO transaction currency,
+  subtotal, tax, total paid, and balance due. UnionPay and other issuer-side
+  conversions are represented conservatively: production remains priced and
+  recorded in USD, while the receipt directs members to their card or bank
+  statement for the exact CNY amount and exchange rate instead of inventing a
+  merchant-side conversion. Order history continues to use PMPro's maintained
+  vendor view; only a selected order uses the CYWater receipt template. The
+  compact print stylesheet uses A4 portrait, 10 mm margins and 9 pt body text;
+  a sanitized Chrome print proof rendered as exactly one A4 page. Staging
+  invoice QA passed 18 assertions and editor QA passed 44 with complete
+  temporary-record cleanup. Production remained Stripe Live/USD and passed the
+  23-check membership UI, 88-check Forum role, and 16-check receipt audits;
+  those audits were read-only and sent no email, changed no order, and initiated
+  no payment. All seven deployed receipt/theme files match the local candidates
+  by SHA-256. Rollback materials are retained under
+  `/home/u111638297/cywater-release-backups/receipt-staging-20260827T084344`
+  and
+  `/home/u111638297/cywater-release-backups/receipt-production-20260827T085633`.
+
+
 ## Editing Guidance
 
 - Keep content IDs and query-string links in sync with `assets/js/content.js`.
