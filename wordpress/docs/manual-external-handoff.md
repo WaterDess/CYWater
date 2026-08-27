@@ -9,11 +9,11 @@ controlled real charge, receipt, balance/payout observation and full-refund
 reconciliation through the association-owned Stripe Live account.
 Hostinger File Manager recovered and archived the former Logo Call `0.2.3` and
 Environment `0.5.5` trees before the accepted releases. The current production
-baseline is Membership `0.9.8`, Partnerships `0.1.5`, Logo Call `0.4.2`, Forum
-`0.6.3`, Operations `0.3.2`, Environment `0.5.7`, Core `0.6.8`, and theme
-`0.6.52`. Forum staging QA passed 154 self-cleaning assertions and Account QA
-passed 92. The detail-cover editor QA passed 44 self-cleaning assertions.
-Production Membership UI and Forum role audits passed 23 and 86
+baseline is Membership `0.9.9`, Partnerships `0.1.5`, Logo Call `0.4.2`, Forum
+`0.6.3`, Operations `0.3.2`, Environment `0.5.7`, Core `0.6.9`, and theme
+`0.6.54`. Forum staging QA passed 154 self-cleaning assertions and Account QA
+passed 92. The content-boundary editor QA passed 50 self-cleaning assertions.
+Production Membership UI and Forum role audits passed 23 and 88
 read-only assertions. Production public-gate, protected-content, REST,
 navigation, membership-UI, role-separation, file-integrity, and cache checks
 passed. See `production-checklist.md` for the authoritative order.
@@ -22,6 +22,13 @@ The staging membership-term suite currently reports that Stripe Sandbox
 Connect is unavailable. Treat this as a staging payment-environment follow-up,
 not a production regression: production remains connected to Stripe Live and
 this release did not change either gateway environment or any payment record.
+
+Featured image is cover/list/card/carousel data only. News and Event detail
+pages render only editor-authored body blocks; there is no automatic cover
+insertion or deduplication layer. The 2022 meeting screenshot and founding
+story image are deliberate body figures. The generic Conference fees table has
+been removed; future Event fees must use the Event-specific approved ticket
+workflow.
 
 The items below additionally require an association decision, a named human
 identity, a paid license, a second browser/account, or a destructive host

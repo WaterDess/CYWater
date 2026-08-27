@@ -662,25 +662,21 @@ assertMarkers(seed.pages.bylaws.content, ["ARTICLE I", "ARTICLE IX", "Merger or 
 const membershipMarkers = [
   "membership-partners",
   "membership-partner-copy",
-  "membership-fees",
   "section-head center",
-  "fee-table",
-  "Professional Member",
-  "Student Member",
-  "Nonmember",
 ];
 assertMarkers(parityFiles.staticMembership, membershipMarkers, "Static Membership page");
 assertMarkers(parityFiles.wordpressMembership, membershipMarkers, "WordPress Membership template");
-assertMarkers(
-  parityFiles.staticPagesCss,
-  [
-    ".membership-partner-copy",
-    ".membership-fees .table-wrap",
-    ".fee-table thead th:not(:first-child)",
-    ".fee-table thead th,\n.fee-table tbody th {\n  font-family: var(--font-display);\n  font-size: var(--fs-md);",
-  ],
-  "Static page stylesheet"
-);
+for (const [label, contents] of [
+  ["Static Membership page", parityFiles.staticMembership],
+  ["WordPress Membership template", parityFiles.wordpressMembership],
+  ["Static page stylesheet", parityFiles.staticPagesCss],
+  ["WordPress page stylesheet", parityFiles.wordpressPagesCss],
+]) {
+  assert(
+    !/Conference fees|Abstract and registration fees|membership-fees|fee-table/.test(contents),
+    `${label} must not retain the retired conference-fee estimate.`
+  );
+}
 assertMarkers(
   parityFiles.wordpressPagesCss,
   [

@@ -911,6 +911,11 @@
           "text": "The meeting was organized online and connected participants from 106 institutions across six continents."
         },
         {
+          "type": "figure",
+          "src": "events/meeting-2022.png",
+          "caption": "Online participants at the 10th CYWater Annual Meeting."
+        },
+        {
           "type": "h2",
           "text": "Five themed sessions"
         },

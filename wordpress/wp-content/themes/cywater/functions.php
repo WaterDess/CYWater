@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CYWATER_THEME_VERSION', '0.6.53' );
+define( 'CYWATER_THEME_VERSION', '0.6.54' );
 
 function cywater_theme_setup() {
 	add_theme_support( 'title-tag' );
@@ -285,71 +285,6 @@ function cywater_event_summary( $post_id, $words = 44 ) {
 	}
 	$source = $post->post_excerpt ?: $post->post_content;
 	return wp_trim_words( wp_strip_all_tags( strip_shortcodes( $source ) ), $words, '…' );
-}
-
-/**
- * Determine whether an attachment is already present in the stored body.
- *
- * Modern blocks preserve an attachment ID, while imported legacy HTML may
- * contain only the original or a generated-size filename. Supporting both
- * keeps the detail template from rendering the same cover twice.
- */
-function cywater_content_contains_attachment( $post_id, $attachment_id ) {
-	$post_id       = absint( $post_id );
-	$attachment_id = absint( $attachment_id );
-	$content       = (string) get_post_field( 'post_content', $post_id, 'raw' );
-	if ( ! $post_id || ! $attachment_id || '' === $content ) {
-		return false;
-	}
-
-	if ( preg_match( '/\bwp-image-' . $attachment_id . '\b/', $content ) ) {
-		return true;
-	}
-
-	$attached_file = (string) get_post_meta( $attachment_id, '_wp_attached_file', true );
-	$filename      = pathinfo( wp_basename( $attached_file ), PATHINFO_FILENAME );
-	$extension     = pathinfo( wp_basename( $attached_file ), PATHINFO_EXTENSION );
-	if ( '' === $filename || '' === $extension ) {
-		return false;
-	}
-
-	$pattern = '/(?:^|[\/_-])' . preg_quote( $filename, '/' ) . '(?:-\d+x\d+)?\.' . preg_quote( $extension, '/' ) . '(?:[?"\'\s]|$)/i';
-	return (bool) preg_match( $pattern, $content );
-}
-
-/**
- * Render the listing cover once at the beginning of a News/Event detail.
- *
- * If an editor has deliberately placed the same attachment in the body, the
- * body placement wins and the automatic figure is omitted.
- */
-function cywater_detail_featured_figure( $post_id = null ) {
-	$post_id       = $post_id ? absint( $post_id ) : get_the_ID();
-	$attachment_id = get_post_thumbnail_id( $post_id );
-	if ( ! $attachment_id || cywater_content_contains_attachment( $post_id, $attachment_id ) ) {
-		return '';
-	}
-
-	$alt = trim( (string) get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ) );
-	if ( '' === $alt ) {
-		$alt = get_the_title( $post_id );
-	}
-	$image = wp_get_attachment_image(
-		$attachment_id,
-		'large',
-		false,
-		array(
-			'class'   => 'cywater-detail-cover-image',
-			'alt'     => $alt,
-			'loading' => 'eager',
-		)
-	);
-	if ( ! $image ) {
-		return '';
-	}
-
-	$caption = wp_get_attachment_caption( $attachment_id );
-	return '<figure class="cywater-detail-cover">' . $image . ( $caption ? '<figcaption>' . esc_html( $caption ) . '</figcaption>' : '' ) . '</figure>';
 }
 
 /**

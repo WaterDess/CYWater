@@ -1063,12 +1063,10 @@ HTTPS Stripe invoice or payment link to the private application status page.
 Approved website/logo recognition follows the MOU and must not imply product
 endorsement.
 
-Conference fees use a four-column matrix with separate Abstract, Early, and
-Standard fee columns. Build it from the established `.table-wrap` and `.table`
-components and keep one value per cell. Its column header uses the established
-Fraunces display face on a light teal surface; the registration-type row labels
-use the same display face, while all fee values remain in the Inter body face.
-Do not collapse Early and Standard prices into one unstructured cell.
+Do not publish generic Conference fee estimates on Membership. A paid Event's
+abstract or registration fees belong to that Event's separately approved ticket
+configuration and published terms. Do not restore a site-wide fee table or mix
+Event registration pricing into individual membership presentation.
 
 ## Visual Consistency Contract
 
@@ -1468,6 +1466,30 @@ describe sandbox activity as a real transaction.
   `/home/u111638297/cywater-release-backups/receipt-staging-20260827T084344`
   and
   `/home/u111638297/cywater-release-backups/receipt-production-20260827T085633`.
+
+- On 2026-08-27 theme `0.6.54` and Core `0.6.9` superseded the automatic
+  detail-cover behavior introduced by `0.6.52`. Featured image is once again
+  strictly independent presentation data for home, archives, cards and Event
+  carousels. News and Event detail templates render only the Gutenberg body as
+  authored; they do not inject, copy, deduplicate or otherwise treat a Featured
+  image as body content. The automatic helper functions and detail-cover styles
+  were removed rather than retained behind a conditional. The founding story's
+  known image and the 2022 online meeting screenshot are explicit body figures;
+  the meeting screenshot follows the introductory copy. No other cover-only
+  record was populated. The generic Conference fees / Abstract and registration
+  fees section and its unused styles were removed from WordPress Membership and
+  the mirrored static preview; Event fees remain Event-specific ticket data.
+  Staging editor and Account suites passed 50 and 92 checks. Production passed
+  the 23-check Membership UI, 88-check Forum role and 16-check receipt audits,
+  all read-only. A production browser check confirmed the intended text-image-
+  section order and no horizontal overflow. The 97 theme and 11 Core files are
+  byte-identical between local and production. Production remained
+  `Stripe/live` in USD with the Live safety gate open; no order, charge,
+  subscription, refund, gateway, webhook or email data changed. Reversible
+  backups are retained at
+  `/home/u111638297/cywater-release-backups/content-boundary-staging-20260827T094157`
+  and
+  `/home/u111638297/cywater-release-backups/content-boundary-production-20260827T020736Z`.
 
 
 ## Editing Guidance

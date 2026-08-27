@@ -71,8 +71,8 @@ final class CYWater_Editor {
 					'awardPanel'      => __( 'Award details', 'cywater-core' ),
 					'publicHeading'   => __( 'Public page visibility', 'cywater-core' ),
 					'publicCopy'      => __( 'Everyone can view this public record. Registration, submissions, voting, and payment eligibility are controlled separately by their own Event modules.', 'cywater-core' ),
-					'newsHelp'        => __( 'The editor canvas is the News detail story. News cover image appears on listings and once at the start of the detail page. Add other detail photographs here as Image or Gallery blocks; if the same cover is already in the body, the template will not repeat it.', 'cywater-core' ),
-					'eventHelp'       => __( 'The editor canvas is the Event detail story. Event cover image appears on listings, cards, the carousel, and once at the start of the detail page. Add other detail photographs here as Image or Gallery blocks; if the same cover is already in the body, the template will not repeat it. The Start date controls list order; Event placement is maintained in the next panel.', 'cywater-core' ),
+					'newsHelp'        => __( 'The editor canvas is the News detail story. News cover image is separate presentation data used only on listings and cards; it is never inserted into the detail body automatically. Add every detail photograph here as an Image or Gallery block in its intended story position.', 'cywater-core' ),
+					'eventHelp'       => __( 'The editor canvas is the Event detail story. Event cover image is separate presentation data used only on listings, cards, and the carousel; it is never inserted into the detail body automatically. Add every detail photograph here as an Image or Gallery block in its intended story position. The Start date controls list order; Event placement is maintained in the next panel.', 'cywater-core' ),
 					'awardHelp'       => __( 'Use the canvas for the public citation or ceremony narrative. Structured Award facts are maintained here.', 'cywater-core' ),
 				),
 			)

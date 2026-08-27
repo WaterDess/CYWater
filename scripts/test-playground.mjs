@@ -62,10 +62,9 @@ try {
     if (route === "/membership/") {
       assert.equal((html.match(/<article class="tier\b/g) || []).length, 3, "Membership must render three individual membership tiers");
       assert.match(html, /Become Our Partner/, "Membership must route institutions to the separate Partner application");
-      assert.match(html, /class="table fee-table"/, "Membership must retain the conference fee matrix");
       assert.match(html, /membership-partner-head/, "Membership partners must use the centered shared section heading");
       assert.match(html, /membership-partner-copy/, "Membership partner copy must retain its constrained centered layout");
-      assert.match(html, /membership-fees/, "Conference fees must retain its dedicated shared-layout hook");
+      assert.doesNotMatch(html, /Conference fees|Abstract and registration fees|membership-fees|fee-table/, "Membership must not retain the retired conference-fee estimate");
     }
     if (route === "/forum/") {
       assert.match(html, /CYWater Forum\./, "Forum archive must retain its public member-writing introduction");

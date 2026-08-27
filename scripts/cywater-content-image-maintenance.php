@@ -3,9 +3,9 @@
  * Idempotent News/Event content-image maintenance for staging or production.
  *
  * - normalizes legacy upload URLs to the current HTTPS environment;
- * - removes the legacy founding-story body copy of its listing cover;
+ * - preserves specific, editorially chosen photographs as body content;
  * - adds the verified 2020 keynote photograph to the matching Event detail;
- * - never copies a listing cover into the detail body.
+ * - does not apply any blanket Featured-image-to-body rule.
  *
  * Run with: wp eval-file /absolute/path/to/cywater-content-image-maintenance.php
  */
@@ -25,6 +25,52 @@ if ( ! empty( $uploads['error'] ) || empty( $uploads['baseurl'] ) ) {
 }
 $upload_base = untrailingslashit( set_url_scheme( $uploads['baseurl'], 'https' ) );
 $updated_ids = array();
+global $wpdb;
+
+$find_attachment = static function ( $filename ) use ( $wpdb ) {
+	$attachment_id = absint(
+		$wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = '_wp_attached_file' AND meta_value LIKE %s ORDER BY post_id ASC LIMIT 1",
+				'%' . $wpdb->esc_like( $filename )
+			)
+		)
+	);
+	return $attachment_id && 'attachment' === get_post_type( $attachment_id ) ? $attachment_id : 0;
+};
+
+$insert_figure_after_opening = static function ( $post, $attachment_id, $alt, $caption ) use ( &$updated_ids ) {
+	$content = (string) get_post_field( 'post_content', $post->ID, 'raw' );
+	$file    = (string) get_post_meta( $attachment_id, '_wp_attached_file', true );
+	if ( '' !== $file && false !== stripos( $content, wp_basename( $file ) ) ) {
+		return;
+	}
+
+	$image = wp_get_attachment_image(
+		$attachment_id,
+		'large',
+		false,
+		array(
+			'loading' => 'lazy',
+			'alt'     => $alt,
+		)
+	);
+	if ( ! $image ) {
+		WP_CLI::error( 'The selected content attachment could not be rendered for post ' . $post->ID . '.' );
+	}
+
+	$figure  = '<figure class="is-wide">' . $image . ( $caption ? '<figcaption>' . esc_html( $caption ) . '</figcaption>' : '' ) . '</figure>';
+	$updated = preg_replace( '#(<p\b[^>]*>.*?</p>)#is', '$1' . "\n\n" . $figure, $content, 1, $count );
+	if ( ! is_string( $updated ) || 1 !== $count ) {
+		WP_CLI::error( 'The opening paragraph could not be resolved for post ' . $post->ID . '.' );
+	}
+
+	$result = wp_update_post( array( 'ID' => $post->ID, 'post_content' => $updated ), true );
+	if ( is_wp_error( $result ) ) {
+		WP_CLI::error( 'Could not place the selected content image for post ' . $post->ID . ': ' . $result->get_error_message() );
+	}
+	$updated_ids[] = (int) $post->ID;
+};
 
 $posts = get_posts(
 	array(
@@ -51,46 +97,41 @@ foreach ( $posts as $post_id ) {
 }
 
 $founding_story = get_page_by_path( 'founding-story', OBJECT, 'post' );
-if ( $founding_story instanceof WP_Post && has_post_thumbnail( $founding_story ) ) {
-	$featured_file = get_attached_file( get_post_thumbnail_id( $founding_story ) );
-	if ( $featured_file && 'founding-2011.jpg' === strtolower( wp_basename( $featured_file ) ) ) {
-		$founding_content = (string) get_post_field( 'post_content', $founding_story->ID, 'raw' );
-		$deduplicated     = preg_replace(
-			'#<figure\b[^>]*>(?:(?!</figure>).)*founding-2011(?:-\d+x\d+)?\.jpg(?:(?!</figure>).)*</figure>#is',
-			'',
-			$founding_content,
-			1
-		);
-		if ( is_string( $deduplicated ) && $deduplicated !== $founding_content ) {
-			$result = wp_update_post(
-				array(
-					'ID'           => $founding_story->ID,
-					'post_content' => $deduplicated,
-				),
-				true
-			);
-			if ( is_wp_error( $result ) ) {
-				WP_CLI::error( 'Could not remove the duplicate founding-story cover: ' . $result->get_error_message() );
-			}
-			$updated_ids[] = (int) $founding_story->ID;
-		}
-	}
+if ( ! $founding_story instanceof WP_Post ) {
+	WP_CLI::error( 'The founding story could not be found.' );
 }
+$founding_image = $find_attachment( 'founding-2011.jpg' );
+if ( ! $founding_image ) {
+	WP_CLI::error( 'The verified 2011 founding attachment could not be found.' );
+}
+$insert_figure_after_opening(
+	$founding_story,
+	$founding_image,
+	'CYWater founding gathering in 2011',
+	'CYWater was initiated in December 2011, San Francisco.'
+);
+
+$tenth_event = get_page_by_path( '10th-summer', OBJECT, 'cyw_event' );
+if ( ! $tenth_event instanceof WP_Post ) {
+	WP_CLI::error( 'The 10th Annual Meeting Event could not be found.' );
+}
+$tenth_image = $find_attachment( 'meeting-2022.png' );
+if ( ! $tenth_image ) {
+	WP_CLI::error( 'The verified 2022 meeting attachment could not be found.' );
+}
+$insert_figure_after_opening(
+	$tenth_event,
+	$tenth_image,
+	'Online participants at the 10th CYWater Annual Meeting',
+	'Online participants at the 10th CYWater Annual Meeting.'
+);
 
 $event = get_page_by_path( '8th-summer', OBJECT, 'cyw_event' );
 if ( ! $event instanceof WP_Post ) {
 	WP_CLI::error( 'The 8th Annual Meeting Event could not be found.' );
 }
 
-global $wpdb;
-$attachment_id = absint(
-	$wpdb->get_var(
-		$wpdb->prepare(
-			"SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = '_wp_attached_file' AND meta_value LIKE %s ORDER BY post_id ASC LIMIT 1",
-			'%summer-2020-trenberth.png'
-		)
-	)
-);
+$attachment_id = $find_attachment( 'summer-2020-trenberth.png' );
 if ( ! $attachment_id || 'attachment' !== get_post_type( $attachment_id ) ) {
 	WP_CLI::error( 'The verified 2020 keynote attachment could not be found.' );
 }
@@ -124,4 +165,4 @@ if ( false === strpos( $event_content, 'summer-2020-trenberth.png' ) ) {
 }
 
 $updated_ids = array_values( array_unique( $updated_ids ) );
-WP_CLI::success( 'Content-image maintenance completed; updated post IDs: ' . ( $updated_ids ? implode( ', ', $updated_ids ) : 'none (already current)' ) . '. No featured images were copied into detail content.' );
+WP_CLI::success( 'Content-image maintenance completed; updated post IDs: ' . ( $updated_ids ? implode( ', ', $updated_ids ) : 'none (already current)' ) . '. No blanket Featured-image-to-body rule was applied.' );

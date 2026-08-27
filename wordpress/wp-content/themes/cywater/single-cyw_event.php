@@ -37,7 +37,6 @@ while ( have_posts() ) :
 		<div class="container">
 			<div class="event-body"><div>
 				<?php do_action( 'cywater_event_before_content', get_the_ID() ); ?>
-				<?php echo cywater_detail_featured_figure( get_the_ID() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				<span class="eyebrow">About this event</span>
 				<?php if ( ! $is_logo_call && $event_summary ) : ?><p class="lead" style="margin:var(--sp-4) 0 var(--sp-5)"<?php echo $reveal_attr; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>><?php echo esc_html( $event_summary ); ?></p><?php endif; ?>
 				<div class="prose entry-content"<?php echo $reveal_attr; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>><?php echo cywater_article_content(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>

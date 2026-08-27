@@ -58,12 +58,12 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 
 Hostinger staging is available at `https://staging.cywater.org/`, and the public
 production site is live at `https://cywater.org/`. The 2026-08-27 accepted code
-baseline uses the CYWater `0.6.52` theme, CYWater Membership `0.9.8`, CYWater
+baseline uses the CYWater `0.6.54` theme, CYWater Membership `0.9.9`, CYWater
 Partnerships `0.1.5`, CYWater Logo Call `0.4.2`, CYWater Forum `0.6.3`, CYWater
-Environment `0.5.7`, CYWater Core `0.6.8`, CYWater Operations `0.3.2`, and Event
+Environment `0.5.7`, CYWater Core `0.6.9`, CYWater Operations `0.3.2`, and Event
 Tickets `5.29.1`.
 
-Membership `0.9.8` removes public Change and Cancel self-service completely.
+Membership `0.9.9` removes public Change and Cancel self-service completely.
 Account presents one support route through `membership@cywater.org`; direct
 cancellation pages and attempts to switch an active member to another level
 also return to that support path. A same-level renewal remains available, and
@@ -74,26 +74,24 @@ PMPro vendor files. Staging Account QA passed 92 assertions, and the production
 membership UI audit passed 23 read-only assertions. Production remained Stripe
 Live; no order, charge, subscription, payment setting or refund was changed.
 
-Core `0.6.8` and theme `0.6.52` make the media boundary explicit in both editor
-and presentation. Featured image remains the cover source for home, archive,
-card and carousel contexts and is also rendered once as a large image at the
-start of its News or Event detail. If the editor has already placed that same
-attachment in the Gutenberg body, the template detects the attachment ID or
-legacy filename and omits its automatic copy. Other detail photographs remain
-editor-owned Image or Gallery blocks. The preceding maintenance normalized
-five legacy body-image records to current HTTPS, removed the old
-`founding-story` manual cover copy so the unified template now supplies that
-image once, retained its two independent photographs, and added the verified
-Kevin Trenberth keynote image to the 2020 online Event detail. The production
-inventory before template rendering has
-6 News/Event records with both cover and independent body media, 19 cover-only
-records and 9 text-only records. The 19 cover-only records were not filled with
-copied body HTML: the shared template now presents their cover once on detail,
-and editors may add distinct body media later without creating duplication.
-The self-cleaning staging editor suite passed 44 checks. Desktop and 375px
-browser checks confirmed the 2022 Event cover, and production checks confirmed
-that `founding-story` renders one cover plus two distinct body images while the
-2020 online Event renders one cover plus its independent keynote image.
+Core `0.6.9` and theme `0.6.54` restore the strict editorial media boundary.
+The native Featured image is presentation data for home, archive, card and
+carousel contexts only. News and Event detail templates render the Gutenberg
+body exactly as authored and never inject, copy, deduplicate, or otherwise
+interpret a Featured image as body content. Editors place every detail photo
+deliberately with an Image or Gallery block. The founding story's known image
+and the 2022 online meeting screenshot are explicit body figures; the meeting
+figure follows the introductory copy. No blanket Featured-image-to-body rule
+was applied to other records. The retired automatic-detail-cover helpers and
+styles are absent. The self-cleaning staging editor suite passed 50 checks, a
+production browser check confirmed the intended copy/image/section order with
+no horizontal overflow, and the 97 theme plus 11 Core files are byte-identical
+between the reviewed workspace and production.
+
+The generic Conference fees / Abstract and registration fees estimate is no
+longer part of Membership or the static preview. Any paid Event fee belongs to
+that Event's separately approved ticket configuration and published terms; it
+must not be restored as a site-wide Membership table.
 
 Logo Call `0.4.2` keeps submissions open through September 30, 2026 and adds a
 server-backed, responsive deadline countdown at the start of the Event body.
@@ -172,7 +170,7 @@ managed public pages; a direct `/wp-admin/` request keeps WordPress' native
 staff login; and an authenticated non-staff member receives HTTP 403. Front-end
 sign-out returns to `/member-login/?loggedout=true`, and identity pages are
 explicitly excluded from full-page caching so login state cannot be masked by a
-stale public form. Theme `0.6.52` consumes the same routing source for desktop
+stale public form. Theme `0.6.54` consumes the same routing source for desktop
 and mobile. The membership action now reflects entitlement independently from
 identity: signed-out visitors see **Join CYWater**, registered non-members see
 **Choose Membership**, and active individual members see **My Membership**

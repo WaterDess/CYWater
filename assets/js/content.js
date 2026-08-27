@@ -542,6 +542,7 @@ const EVENTS = {
     lead: "The online meeting brought together participants across six continents for five keynote lectures and more than 340 contributed presentations.",
     blocks: [
       { type: "p", text: "The meeting was organized online and connected participants from 106 institutions across six continents." },
+      { type: "figure", src: "events/meeting-2022.png", caption: "Online participants at the 10th CYWater Annual Meeting." },
       { type: "h2", text: "Five themed sessions" },
       { type: "list", items: [
         "Hydroclimate and global change",
