@@ -166,6 +166,24 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
 
 ### Temporary Staging Snapshot (2026-08-19)
 
+- On 2026-08-29 CYWater Meeting Registration `0.1.14` was deployed to staging
+  and production. The 2026 Annual Meeting Event now carries the complete English
+  first-announcement information: conference background and theme, organizer
+  and hosts, dates and venue, programme scale, all four thematic sessions plus
+  the youth forum and their conveners, participant scope, submission and award
+  details, fee/member-discount/payment/invoice guidance, accommodation and
+  shuttle details, and contacts. The source notice's separate reply-form route
+  is represented by the existing protected website form rather than a parallel
+  intake path. Session and fee tables share one CYWater table component;
+  desktop shows all columns without scrolling, while mobile confines horizontal
+  scrolling to the table and leaves the page, countdown, and registration form
+  within the viewport. Staging passed 33 self-cleaning meeting assertions.
+  Production retained Stripe Live; the meeting workflow still records only an
+  external, unverified fee recommendation. Rollbacks are retained at
+  `/home/u111638297/cywater-release-backups/meeting-content-staging-predeploy-20260828T164321Z`
+  and
+  `/home/u111638297/cywater-release-backups/meeting-content-production-predeploy-20260828T164359Z`.
+
 - On 2026-08-28 theme `0.6.55` and CYWater Meeting Registration `0.1.11`
   were deployed to staging and production. The complete Event body is now
   visible in the initial HTML and no longer depends on the optional scroll

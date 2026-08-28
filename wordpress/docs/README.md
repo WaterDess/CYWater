@@ -61,7 +61,25 @@ production site is live at `https://cywater.org/`. The 2026-08-28 accepted code
 baseline uses the CYWater `0.6.55` theme, CYWater Membership `0.9.10`, CYWater
 Partnerships `0.1.5`, CYWater Logo Call `0.4.2`, CYWater Forum `0.6.3`, CYWater
 Environment `0.5.7`, CYWater Core `0.6.9`, CYWater Operations `0.3.3`, Event
-Tickets `5.29.1`, and CYWater Meeting Registration `0.1.11`.
+Tickets `5.29.1`, and CYWater Meeting Registration `0.1.14`.
+
+Meeting Registration `0.1.14` restores the complete English first-announcement
+content for the 2026 Annual Meeting instead of retaining a compressed summary.
+The public Event now includes the conference background and theme, organizer
+and hosts, dates and venue, programme scale, all four thematic sessions plus
+the youth forum and their conveners, participant scope, submission and award
+details, fee and member-discount rules, external-payment and invoice guidance,
+accommodation/shuttle details, and contacts. The former off-site reply-form
+instruction is intentionally represented by the existing protected CYWater
+registration form rather than creating a second intake path. Session and fee
+tables share one CYWater table component. Desktop shows both tables in full;
+on narrow screens only the table surface scrolls horizontally, while the page,
+countdown, and registration form remain within the viewport. Staging passed 33
+self-cleaning meeting assertions, and production retained Stripe Live while the
+meeting workflow remained external and unverified. Rollbacks are retained at
+`/home/u111638297/cywater-release-backups/meeting-content-staging-predeploy-20260828T164321Z`
+and
+`/home/u111638297/cywater-release-backups/meeting-content-production-predeploy-20260828T164359Z`.
 
 Theme `0.6.55` makes the complete Event body part of the initial HTML-visible
 page rather than placing the whole article behind a scroll-reveal observer.

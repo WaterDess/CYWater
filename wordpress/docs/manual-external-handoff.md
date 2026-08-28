@@ -10,7 +10,7 @@ reconciliation through the association-owned Stripe Live account.
 Hostinger File Manager recovered and archived the former Logo Call `0.2.3` and
 Environment `0.5.5` trees before the accepted releases. The current production
 baseline is Membership `0.9.10`, Partnerships `0.1.5`, Logo Call `0.4.2`, Forum
-`0.6.3`, Operations `0.3.3`, Meeting Registration `0.1.11`, Event Tickets
+`0.6.3`, Operations `0.3.3`, Meeting Registration `0.1.14`, Event Tickets
 `5.29.1`, Environment `0.5.7`, Core `0.6.9`, and theme `0.6.55`. Forum staging
 QA passed 154 self-cleaning assertions and Account QA
 passed 92. The content-boundary editor QA passed 50 self-cleaning assertions.
