@@ -166,6 +166,56 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
 
 ### Temporary Staging Snapshot (2026-08-19)
 
+- On 2026-08-28 CYWater Meeting Registration `0.1.8` was deployed only to
+  Hostinger staging for the 2026 Annual Meeting. The reusable Event-scoped
+  module uses Event Tickets RSVP as the attendee store and PMPro only as the
+  membership source. It records participant, presentation/abstract/protected
+  file, student evidence, accommodation, arrival/departure, immutable
+  membership and fee snapshots, and provides capability-gated review, CSV, and
+  structured complete ZIP export. The ZIP contains a root CSV, README and JSON
+  manifest plus one participant folder containing its immutable JSON record and
+  original protected uploads. Participants can review or download their own
+  submitted files from the canonical confirmation, while authorized Event staff
+  retain the same protected access. Event Tickets remains the internal store,
+  but its generic RSVP link, editable ticket screen and unlabeled vendor button
+  are removed from the Annual Meeting participant flow. It never collects or
+  confirms payment: the organizer-designated
+  Alipay QR appears only after registration, while the hotel reservation QR is
+  a separate accommodation handoff; both use the same responsive CYWater card
+  layout. The nonexistent `events@cywater.org`
+  address was replaced with `contact@cywater.org`. A timezone-basis mismatch
+  that incorrectly showed registration as not open was fixed at its phase
+  calculation. Version `0.1.8` also replaces both native upload controls with
+  the accepted CYWater file-control component, reuses Membership's canonical
+  searchable country/region dataset (including Hong Kong SAR, China; Macao SAR,
+  China; and Taiwan, China), aligns the fee table and account recommendation
+  panel with the shared palette, and moves confirmation mail behind a queued,
+  exception-safe post-redirect boundary. This prevents a mail transport or
+  translated `sprintf` placeholder warning from replacing an already-saved
+  submission with WordPress' critical-error screen. Thirty self-cleaning runtime
+  assertions, 54 local structure assertions, 48 read-only staging acceptance
+  checks, and an authenticated Chrome UI check passed. The pre-fix real attendee, identity/fee snapshot,
+  and two protected uploads were preserved and render in the confirmation view.
+  Staging remains PMPro Sandbox; production remains Stripe Live and does not
+  contain this plugin. The current rollback is at
+  `/home/u111638297/cywater-release-backups/meeting-registration-staging-predeploy-20260828T083909Z`.
+
+- On 2026-08-28 the staging-accepted Annual Meeting workflow was formally
+  deployed to production as CYWater Meeting Registration `0.1.9`, Event Tickets
+  `5.29.1`, and CYWater Operations `0.3.3`. Program Reviewer now receives the
+  dedicated `cywater_review_meeting_registrations` capability for the Meeting
+  registrations workspace, protected participant files, and structured CSV/ZIP
+  export without receiving Event editing, payment confirmation, PMPro, Stripe,
+  or site-administration access. Content & Event Editor retains the review
+  capability for backward-compatible event operations. Production remained
+  Stripe Live for Membership; the meeting workflow only records registration
+  and an external fee recommendation and never collects or confirms its Alipay
+  payment. Staging passed 448 Operations and 30 Meeting self-cleaning assertions.
+  Production passed role-boundary, public-route, authenticated role-card, and
+  byte-for-byte custom-plugin checks without creating a test registration or
+  payment. The rollback is retained at
+  `/home/u111638297/cywater-release-backups/meeting-registration-production-predeploy-20260828T100334Z`.
+
 - Hostinger staging is available at `https://staging.cywater.org/` with the
   CYWater `0.6.31` theme, CYWater Membership `0.8.6`, CYWater Partnerships
   `0.1.3`, CYWater Logo Call `0.2.3`, CYWater Forum `0.4.0`, CYWater

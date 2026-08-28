@@ -193,7 +193,7 @@ final class CYWater_Operations_Admin {
 		return array(
 			CYWater_Operations_Roles::CONTENT_EDITOR      => __( 'Publish and update News, Events, and Awards. Paid Events can be prepared and submitted, but this role cannot approve its own paid registration.', 'cywater-operations' ),
 			CYWater_Operations_Roles::COMMUNITY_MODERATOR => __( 'Publish and moderate Forum articles and replies. This role does not grant access to Events, membership, payments, or site settings.', 'cywater-operations' ),
-			CYWater_Operations_Roles::PROGRAM_REVIEWER    => __( 'Review Logo Call entries and record voting eligibility through the dedicated review screen. This role cannot confirm finalists, select the official logo, fulfill rewards, or delete entries.', 'cywater-operations' ),
+			CYWater_Operations_Roles::PROGRAM_REVIEWER    => __( 'Review Logo Call entries and Annual Meeting registrations through dedicated review screens, including protected meeting files and structured CSV/ZIP exports. This role cannot edit Events, confirm payments, confirm Logo finalists, select the official logo, fulfill rewards, or delete entries.', 'cywater-operations' ),
 			CYWater_Operations_Roles::GOVERNANCE_APPROVER => __( 'Review Board records, Partner applications, paid-Event approval, and the Logo Call finalist and official-design decisions. This role does not grant final-file, reward, plugin, user, membership, or Stripe administration.', 'cywater-operations' ),
 		);
 	}

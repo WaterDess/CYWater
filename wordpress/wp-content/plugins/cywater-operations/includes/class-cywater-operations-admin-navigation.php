@@ -194,6 +194,9 @@ final class CYWater_Operations_Admin_Navigation {
 		if ( current_user_can( 'cywater_review_logo_entries' ) ) {
 			$allowed[] = 'cywater-logo-reviews';
 		}
+		if ( current_user_can( 'cywater_review_meeting_registrations' ) ) {
+			$allowed[] = 'cywater-meeting-registrations';
+		}
 		if ( current_user_can( 'cywater_approve_paid_event' ) ) {
 			$allowed[] = 'cywater-event-approvals';
 		}
@@ -221,6 +224,7 @@ final class CYWater_Operations_Admin_Navigation {
 			'edit-comments.php',
 			'edit.php?post_type=cyw_partner_app',
 			'cywater-logo-reviews',
+			'cywater-meeting-registrations',
 			'cywater-event-approvals',
 			'tec-tickets',
 			'pmpro-dashboard',
@@ -244,7 +248,7 @@ final class CYWater_Operations_Admin_Navigation {
 		if ( in_array( $slug, array( 'edit.php', 'edit.php?post_type=cyw_event', 'edit.php?post_type=cyw_award', 'edit.php?post_type=cyw_board_role', 'edit.php?post_type=page', 'upload.php' ), true ) ) {
 			return self::GROUP_CONTENT;
 		}
-		if ( in_array( $slug, array( 'edit.php?post_type=cyw_forum_post', 'edit-comments.php', 'edit.php?post_type=cyw_partner_app', 'cywater-logo-reviews', 'cywater-event-approvals', 'tec-tickets' ), true ) ) {
+		if ( in_array( $slug, array( 'edit.php?post_type=cyw_forum_post', 'edit-comments.php', 'edit.php?post_type=cyw_partner_app', 'cywater-logo-reviews', 'cywater-meeting-registrations', 'cywater-event-approvals', 'tec-tickets' ), true ) ) {
 			return self::GROUP_COMMUNITY;
 		}
 		if ( in_array( $slug, array( 'pmpro-dashboard', 'users.php' ), true ) ) {
@@ -339,6 +343,9 @@ final class CYWater_Operations_Admin_Navigation {
 		}
 		if ( current_user_can( 'cywater_review_logo_entries' ) ) {
 			$areas[] = array( __( 'Logo reviews', 'cywater-operations' ), admin_url( 'admin.php?page=cywater-logo-reviews' ), __( 'Review protected submissions and record outcomes.', 'cywater-operations' ) );
+		}
+		if ( current_user_can( 'cywater_review_meeting_registrations' ) ) {
+			$areas[] = array( __( 'Meeting registrations', 'cywater-operations' ), admin_url( 'admin.php?page=cywater-meeting-registrations' ), __( 'Review registrations and protected files, or export the structured meeting package.', 'cywater-operations' ) );
 		}
 		if ( current_user_can( 'cywater_approve_paid_event' ) ) {
 			$areas[] = array( __( 'Paid Event approvals', 'cywater-operations' ), admin_url( 'admin.php?page=cywater-event-approvals' ), __( 'Review submitted terms before paid registration opens.', 'cywater-operations' ) );

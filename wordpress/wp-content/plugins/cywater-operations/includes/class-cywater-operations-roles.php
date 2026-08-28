@@ -85,6 +85,7 @@ final class CYWater_Operations_Roles {
 				'edit_cyw_event_terms',
 				'delete_cyw_event_terms',
 				'cywater_configure_logo_call',
+				'cywater_review_meeting_registrations',
 				'cywater_submit_paid_event_approval',
 				'cywater_open_paid_event_registration',
 			),
@@ -113,6 +114,7 @@ final class CYWater_Operations_Roles {
 		$program_caps = array(
 			'read',
 			'cywater_review_logo_entries',
+			'cywater_review_meeting_registrations',
 		);
 
 		$governance_caps = array_merge(

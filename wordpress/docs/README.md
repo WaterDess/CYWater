@@ -57,11 +57,42 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 ## Current State
 
 Hostinger staging is available at `https://staging.cywater.org/`, and the public
-production site is live at `https://cywater.org/`. The 2026-08-27 accepted code
+production site is live at `https://cywater.org/`. The 2026-08-28 accepted code
 baseline uses the CYWater `0.6.54` theme, CYWater Membership `0.9.10`, CYWater
 Partnerships `0.1.5`, CYWater Logo Call `0.4.2`, CYWater Forum `0.6.3`, CYWater
-Environment `0.5.7`, CYWater Core `0.6.9`, CYWater Operations `0.3.2`, and Event
-Tickets `5.29.1`.
+Environment `0.5.7`, CYWater Core `0.6.9`, CYWater Operations `0.3.3`, Event
+Tickets `5.29.1`, and CYWater Meeting Registration `0.1.9`.
+
+Staging and production now run the accepted 2026 Annual Meeting workflow. The
+reusable module stores registrations in Event Tickets RSVP, reads but never changes PMPro
+membership, protects student/presentation uploads outside public Media, records
+travel/accommodation and an order-time fee recommendation, and exposes a staff
+review workspace with both CSV and a structured complete ZIP export. The ZIP
+contains a root CSV, README and JSON manifest plus one participant folder with
+its immutable JSON snapshot and original protected uploads. Payment remains
+external and unverified; the official
+Alipay handoff is shown only after registration, and the separate hotel QR does
+not book or collect accommodation through CYWater. It reuses the canonical
+Membership country/region selector and the shared CYWater upload, table and
+summary components. Participants can review or download their own protected
+submissions from the canonical confirmation, while authorized Event staff keep
+the same protected access. Event Tickets remains the internal attendee store,
+but its generic RSVP link, editable ticket screen and vendor button are removed
+from this Annual Meeting participant flow. The accommodation and payment QR
+handoffs use the same responsive CYWater card layout. Confirmation mail is
+queued only after the attendee and
+protected files are persisted and the browser redirect is established, so an
+optional mail fault cannot replace a successful submission with a critical
+error. Staging passed 30 self-cleaning runtime, 54 local structure, and 48
+read-only acceptance checks plus authenticated Chrome UI verification while
+remaining Sandbox. Operations `0.3.3` grants the dedicated
+`cywater_review_meeting_registrations` capability to Program Reviewer and keeps
+it independent from Event editing, payment confirmation, PMPro, Stripe and site
+administration. Production was deployed from the staging-accepted packages,
+remains Stripe Live for Membership, passed the read-only role-boundary, public
+route and byte-for-byte custom-plugin checks, and created no test registration
+or payment. The production rollback is retained at
+`/home/u111638297/cywater-release-backups/meeting-registration-production-predeploy-20260828T100334Z`.
 
 Membership `0.9.10` fixes the receipt identity boundary rather than adding a
 template-only workaround. PMPro's order API returns its linked user as a raw

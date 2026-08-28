@@ -384,6 +384,7 @@ assertMarkers(
     "cywater_content_event_editor",
     "cywater_community_moderator",
     "cywater_program_reviewer",
+    "cywater_review_meeting_registrations",
     "cywater_governance_approver",
     "cywater_delete_logo_entries",
     "cywater_delete_partnership_applications",
@@ -393,6 +394,10 @@ assertMarkers(
     "RETIRED_CAPS",
   ],
   "CYWater Operations role bundles"
+);
+assert(
+  operationsRoles.match(/\$program_caps[\s\S]*cywater_review_logo_entries[\s\S]*cywater_review_meeting_registrations/),
+  "Program Reviewer must receive both dedicated programme-review capabilities."
 );
 assert(
   !operationsRoles.includes("cywater_membership_finance_manager"),

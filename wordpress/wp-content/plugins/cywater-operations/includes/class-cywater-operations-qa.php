@@ -84,6 +84,7 @@ final class CYWater_Operations_QA {
 				: array();
 			self::assert_true( $program instanceof WP_User && array( CYWater_Operations_Roles::PROGRAM_REVIEWER ) === $program_managed_roles, 'Program Reviewer QA subject is rebound with the exact persisted managed-role bundle.' );
 			self::assert_true( $program instanceof WP_User && user_can( $program, 'cywater_review_logo_entries' ), 'Program Reviewer QA subject reads back the dedicated Logo review capability.' );
+			self::assert_true( $program instanceof WP_User && user_can( $program, 'cywater_review_meeting_registrations' ), 'Program Reviewer QA subject reads back the dedicated Meeting registration review capability.' );
 			foreach ( array( 'edit_cyw_logo_entries', 'edit_others_cyw_logo_entries', 'read_private_cyw_logo_entries', 'edit_private_cyw_logo_entries', 'edit_published_cyw_logo_entries' ) as $native_logo_capability ) {
 				self::assert_true( $program instanceof WP_User && ! user_can( $program, $native_logo_capability ), 'Program Reviewer QA subject has no native Logo primitive: ' . $native_logo_capability . '.' );
 			}
@@ -101,7 +102,7 @@ final class CYWater_Operations_QA {
 			$governance->add_role( CYWater_Operations_Roles::GOVERNANCE_APPROVER );
 			$moderator->add_role( CYWater_Operations_Roles::COMMUNITY_MODERATOR );
 			self::test_governance_dashboard_links( $governance );
-			self::test_admin_navigation( $moderator );
+			self::test_admin_navigation( $moderator, $program );
 			self::test_logo_event_panel_scope( $editor, $created_post_ids, $suffix );
 			self::test_logo_review_workflow( $program, $editor, $created_post_ids, $suffix );
 			self::test_logo_governance_workflow( $program, $governance, $editor, $moderator, $created_user_ids, $created_post_ids, $suffix );
@@ -184,14 +185,14 @@ final class CYWater_Operations_QA {
 		$program_role = get_role( CYWater_Operations_Roles::PROGRAM_REVIEWER );
 		$program_caps = $program_role instanceof WP_Role ? array_keys( array_filter( $program_role->capabilities ) ) : array();
 		sort( $program_caps );
-		$expected_program_caps = array( 'cywater_review_logo_entries', 'read' );
+		$expected_program_caps = array( 'cywater_review_logo_entries', 'cywater_review_meeting_registrations', 'read' );
 		sort( $expected_program_caps );
-		self::assert_true( $expected_program_caps === $program_caps, 'Program Reviewer persists only read and the dedicated Logo review capability.' );
+		self::assert_true( $expected_program_caps === $program_caps, 'Program Reviewer persists only read and the dedicated Logo and Meeting review capabilities.' );
 
 		$positive = array(
-			CYWater_Operations_Roles::CONTENT_EDITOR      => array( 'edit_cyw_events', 'cywater_submit_paid_event_approval', 'cywater_open_paid_event_registration' ),
+			CYWater_Operations_Roles::CONTENT_EDITOR      => array( 'edit_cyw_events', 'cywater_review_meeting_registrations', 'cywater_submit_paid_event_approval', 'cywater_open_paid_event_registration' ),
 			CYWater_Operations_Roles::COMMUNITY_MODERATOR => array( 'moderate_comments', 'edit_cyw_forum_posts' ),
-			CYWater_Operations_Roles::PROGRAM_REVIEWER    => array( 'cywater_review_logo_entries' ),
+			CYWater_Operations_Roles::PROGRAM_REVIEWER    => array( 'cywater_review_logo_entries', 'cywater_review_meeting_registrations' ),
 			CYWater_Operations_Roles::GOVERNANCE_APPROVER => array( 'edit_cyw_board_roles', 'cywater_approve_partnerships', 'cywater_approve_paid_event', 'cywater_review_logo_entries', 'cywater_select_logo_finalists', 'cywater_select_official_logo' ),
 		);
 		$negative = array(
@@ -282,15 +283,15 @@ final class CYWater_Operations_QA {
 	 * The navigation layer may simplify presentation but must preserve every
 	 * nonce-bearing action and must never turn menu visibility into authority.
 	 */
-	private static function test_admin_navigation( $moderator ) {
+	private static function test_admin_navigation( $moderator, $program ) {
 		$administrators = get_users(
 			array(
 				'role'   => 'administrator',
 				'number' => 1,
 			)
 		);
-		self::assert_true( $moderator instanceof WP_User && ! empty( $administrators ) && $administrators[0] instanceof WP_User, 'An Administrator and Community Moderator are available for navigation QA.' );
-		if ( ! $moderator instanceof WP_User || empty( $administrators ) || ! $administrators[0] instanceof WP_User ) {
+		self::assert_true( $moderator instanceof WP_User && $program instanceof WP_User && ! empty( $administrators ) && $administrators[0] instanceof WP_User, 'An Administrator, Community Moderator, and Program Reviewer are available for navigation QA.' );
+		if ( ! $moderator instanceof WP_User || ! $program instanceof WP_User || empty( $administrators ) || ! $administrators[0] instanceof WP_User ) {
 			return;
 		}
 
@@ -361,6 +362,19 @@ final class CYWater_Operations_QA {
 				self::assert_true( ! in_array( $forbidden_slug, $moderator_slugs, true ), 'Community Moderator menu excludes ' . $forbidden_slug . '.' );
 			}
 			self::assert_true( ! user_can( $moderator, 'list_users' ) && ! user_can( $moderator, 'manage_options' ) && ! user_can( $moderator, 'edit_cyw_events' ), 'Community Moderator retains no user, site-setting, or Event authority behind the simplified menu.' );
+
+			wp_set_current_user( $program->ID );
+			$menu = self::navigation_seed_menu();
+			CYWater_Operations_Admin_Navigation::organize_menu();
+			$program_slugs = array_values( array_map( static fn( $item ) => (string) $item[2], $menu ) );
+			$expected_program = array( 'index.php', 'cywater-logo-reviews', 'cywater-meeting-registrations', 'profile.php' );
+			self::assert_true( $expected_program === $program_slugs, 'Program Reviewer menu contains only Dashboard, Logo reviews, Meeting registrations, and Profile.' );
+			self::assert_true( ! in_array( 'edit.php?post_type=cyw_event', $program_slugs, true ) && ! user_can( $program, 'edit_cyw_events' ), 'Meeting registration review does not grant Event editing authority.' );
+			ob_start();
+			CYWater_Operations_Admin_Navigation::render_dashboard_widget();
+			$program_dashboard = (string) ob_get_clean();
+			self::assert_true( false !== strpos( $program_dashboard, 'admin.php?page=cywater-meeting-registrations' ), 'Program Reviewer dashboard links to the dedicated Meeting registrations work area.' );
+			self::assert_true( false === strpos( $program_dashboard, 'edit.php?post_type=cyw_event' ), 'Program Reviewer dashboard contains no Event editor shortcut.' );
 		} finally {
 			$menu = $previous_menu;
 			wp_set_current_user( $previous_user_id );
@@ -377,6 +391,7 @@ final class CYWater_Operations_QA {
 			array( 'Comments', 'moderate_comments', 'edit-comments.php', '', 'menu-top' ),
 			array( 'Events', 'edit_cyw_events', 'edit.php?post_type=cyw_event', '', 'menu-top' ),
 			array( 'Logo reviews', 'cywater_review_logo_entries', 'cywater-logo-reviews', '', 'menu-top' ),
+			array( 'Meeting registrations', 'cywater_review_meeting_registrations', 'cywater-meeting-registrations', '', 'menu-top' ),
 			array( 'Memberships', 'manage_options', 'pmpro-dashboard', '', 'menu-top' ),
 			array( 'Users', 'list_users', 'users.php', '', 'menu-top' ),
 			array( 'Plugins', 'activate_plugins', 'plugins.php', '', 'menu-top' ),

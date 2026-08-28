@@ -9,9 +9,10 @@ controlled real charge, receipt, balance/payout observation and full-refund
 reconciliation through the association-owned Stripe Live account.
 Hostinger File Manager recovered and archived the former Logo Call `0.2.3` and
 Environment `0.5.5` trees before the accepted releases. The current production
-baseline is Membership `0.9.9`, Partnerships `0.1.5`, Logo Call `0.4.2`, Forum
-`0.6.3`, Operations `0.3.2`, Environment `0.5.7`, Core `0.6.9`, and theme
-`0.6.54`. Forum staging QA passed 154 self-cleaning assertions and Account QA
+baseline is Membership `0.9.10`, Partnerships `0.1.5`, Logo Call `0.4.2`, Forum
+`0.6.3`, Operations `0.3.3`, Meeting Registration `0.1.9`, Event Tickets
+`5.29.1`, Environment `0.5.7`, Core `0.6.9`, and theme `0.6.54`. Forum staging
+QA passed 154 self-cleaning assertions and Account QA
 passed 92. The content-boundary editor QA passed 50 self-cleaning assertions.
 Production Membership UI and Forum role audits passed 23 and 88
 read-only assertions. Production public-gate, protected-content, REST,
@@ -97,7 +98,7 @@ assign one or more roles under **Users -> CYWater staff access**:
 | --- | --- | --- |
 | CYWater Content & Event Editor | Posts/News, media, Events, Awards, Event terms, Logo Call configuration, submit paid Event for approval, open/close registration after approval | Governance approval, Forum moderation, PMPro members/orders, payment settings |
 | CYWater Community Moderator | Cross-author Forum editing, take-down/restoration/permanent deletion, taxonomy, replies, and engagement cleanup | Other public content models, Events, membership/payment administration |
-| CYWater Program Reviewer | Inspect Logo entries and record eligibility for voting | Confirm finalists, select the official logo, delete submissions or protected files, fulfill rewards, Event/Partner approval, PMPro orders |
+| CYWater Program Reviewer | Inspect Logo entries and Annual Meeting registrations; review protected meeting files; export structured CSV/ZIP review packages | Edit Events, confirm meeting payments, confirm Logo finalists, select the official logo, delete submissions or protected files, fulfill rewards, Event/Partner approval, PMPro orders |
 | CYWater Governance Approver | Board records, Partner review/approval/payment confirmation, paid-Event approval, confirm a three- or five-entry Logo finalist group and select the official design from that group | Event editing, Logo reward/final-file fulfillment, PMPro membership/order operations, gateway credentials |
 
 Only a built-in Administrator may assign or remove these roles. The operational

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: CYWater Operations
  * Description: Auditable operational roles and paid-event approval gates for CYWater.
- * Version: 0.3.2
+ * Version: 0.3.3
  * Requires at least: 7.0
  * Requires PHP: 8.1
  * Text Domain: cywater-operations
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CYWATER_OPERATIONS_VERSION', '0.3.2' );
+define( 'CYWATER_OPERATIONS_VERSION', '0.3.3' );
 define( 'CYWATER_OPERATIONS_FILE', __FILE__ );
 define( 'CYWATER_OPERATIONS_DIR', plugin_dir_path( __FILE__ ) );
 
