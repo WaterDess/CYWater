@@ -2,7 +2,7 @@
 /**
  * Plugin Name: CYWater Meeting Registration
  * Description: Event-scoped Annual Meeting registration, membership-aware fee guidance, protected student evidence, and attendee export.
- * Version: 0.1.14
+ * Version: 0.1.15
  * Requires at least: 7.0
  * Requires PHP: 8.1
  * Text Domain: cywater-meeting-registration
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CYWATER_MEETING_REGISTRATION_VERSION', '0.1.14' );
+define( 'CYWATER_MEETING_REGISTRATION_VERSION', '0.1.15' );
 define( 'CYWATER_MEETING_REGISTRATION_DIR', plugin_dir_path( __FILE__ ) );
 define( 'CYWATER_MEETING_REGISTRATION_URL', plugin_dir_url( __FILE__ ) );
 
