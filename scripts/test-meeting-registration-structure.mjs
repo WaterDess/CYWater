@@ -10,8 +10,9 @@ const js = fs.readFileSync(path.join(root, 'assets/meeting-registration.js'), 'u
 const qr = fs.statSync(path.join(root, 'assets/img/annual-meeting-2026-payment-qr.png'));
 const hotelQr = fs.statSync(path.join(root, 'assets/img/annual-meeting-2026-accommodation-qr.png'));
 const countries = fs.readFileSync('wordpress/wp-content/plugins/cywater-membership/includes/class-cywater-membership-countries.php', 'utf8');
+const eventTemplate = fs.readFileSync('wordpress/wp-content/themes/cywater/single-cyw_event.php', 'utf8');
 
-assert.match(boot, /Version: 0\.1\.9/);
+assert.match(boot, /Version: 0\.1\.11/);
 assert.match(main, /Tribe__Tickets__RSVP::get_instance\(\)/, 'Event Tickets RSVP remains the attendee authority.');
 assert.match(main, /external_unverified/g, 'External payment state is explicit.');
 assert.doesNotMatch(main, /pmpro_changeMembershipLevel\s*\(/, 'Meeting registration must not mutate membership.');
@@ -65,6 +66,14 @@ assert.match(countries, /Macao SAR, China/);
 assert.match(countries, /Taiwan, China/);
 assert.match(countries, /China \(Chinese mainland\)/);
 assert.match(js, /setCustomValidity\(select\.value/, 'Typed free text must not bypass the canonical country/region selection.');
+assert.match(main, /cywater_event_before_content/);
+assert.match(main, /submission_deadline/);
+assert.match(main, /data-cywater-meeting-countdown/);
+assert.match(css, /cywater-meeting-countdown/);
+assert.match(js, /data-cywater-meeting-countdown/);
+assert.match(js, /data-server-now/);
+assert.doesNotMatch(eventTemplate, /reveal_attr/, 'The Event story must be visible without reveal JavaScript.');
+assert.doesNotMatch(eventTemplate, /entry-content[^>]*data-reveal/, 'The complete Event body must never be hidden behind one reveal trigger.');
 assert.doesNotMatch(main, /__\(\s*"[^"\n]*%[123]\$s/, 'Translated sprintf placeholders must not be interpolated as PHP variables.');
 
 console.log('Meeting registration structure assertions passed.');

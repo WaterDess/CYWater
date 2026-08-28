@@ -1,5 +1,35 @@
 (function () {
 	'use strict';
+	function initializeCountdowns() {
+		document.querySelectorAll('[data-cywater-meeting-countdown]').forEach(function (countdown) {
+			var deadline = Date.parse(countdown.getAttribute('data-deadline') || '');
+			var serverNow = Date.parse(countdown.getAttribute('data-server-now') || '');
+			if (!Number.isFinite(deadline) || !Number.isFinite(serverNow)) return;
+			var started = Date.now();
+			var units = {};
+			countdown.querySelectorAll('[data-cywater-meeting-countdown-unit]').forEach(function (node) { units[node.getAttribute('data-cywater-meeting-countdown-unit')] = node; });
+			var status = countdown.querySelector('[data-cywater-meeting-countdown-status]');
+			var title = countdown.querySelector('[data-cywater-meeting-countdown-title]');
+			var reloading = false;
+			function pad(value) { return String(Math.max(0, value)).padStart(2, '0'); }
+			function update() {
+				var remaining = Math.max(0, deadline - (serverNow + (Date.now() - started)));
+				var totalSeconds = Math.floor(remaining / 1000);
+				var values = { days: Math.floor(totalSeconds / 86400), hours: Math.floor((totalSeconds % 86400) / 3600), minutes: Math.floor((totalSeconds % 3600) / 60), seconds: totalSeconds % 60 };
+				Object.keys(values).forEach(function (key) { if (units[key]) units[key].textContent = pad(values[key]); });
+				if (status) status.textContent = values.days + ' days, ' + values.hours + ' hours, ' + values.minutes + ' minutes and ' + values.seconds + ' seconds remaining.';
+				if (remaining <= 0) {
+					countdown.classList.add('is-complete');
+					if (title) title.textContent = countdown.getAttribute('data-complete-title') || 'Milestone reached';
+					if (!reloading) { reloading = true; window.setTimeout(function () { window.location.reload(); }, 1500); }
+					return;
+				}
+				window.setTimeout(update, 1000);
+			}
+			update();
+		});
+	}
+	initializeCountdowns();
 	var form = document.querySelector('[data-cywater-meeting-form]');
 	if (!form) return;
 	var category = form.querySelector('[data-cywater-meeting-category]');

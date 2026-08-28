@@ -24,6 +24,7 @@ final class CYWater_Meeting_Registration {
 	public static function register() {
 		add_action( 'add_meta_boxes_cyw_event', array( __CLASS__, 'add_event_box' ) );
 		add_action( 'save_post_cyw_event', array( __CLASS__, 'save_event' ) );
+		add_action( 'cywater_event_before_content', array( __CLASS__, 'render_event_countdown' ) );
 		add_filter( 'the_content', array( __CLASS__, 'append_event_module' ), 38 );
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_assets' ) );
 		add_action( 'template_redirect', array( __CLASS__, 'redirect_internal_ticket_view' ), 1 );
@@ -59,17 +60,19 @@ final class CYWater_Meeting_Registration {
 
 	public static function render_event_box( $post ) {
 		wp_nonce_field( 'cywater_meeting_event', 'cywater_meeting_event_nonce' );
-		$enabled  = self::is_enabled( $post->ID );
-		$deadline = (string) get_post_meta( $post->ID, self::META_PREFIX . 'early_deadline', true );
-		$open_at  = (string) get_post_meta( $post->ID, self::META_PREFIX . 'open_at', true );
-		$close_at = (string) get_post_meta( $post->ID, self::META_PREFIX . 'close_at', true );
-		$rates    = self::rates( $post->ID );
+		$enabled            = self::is_enabled( $post->ID );
+		$deadline           = (string) get_post_meta( $post->ID, self::META_PREFIX . 'early_deadline', true );
+		$submission_deadline = (string) get_post_meta( $post->ID, self::META_PREFIX . 'submission_deadline', true );
+		$open_at            = (string) get_post_meta( $post->ID, self::META_PREFIX . 'open_at', true );
+		$close_at           = (string) get_post_meta( $post->ID, self::META_PREFIX . 'close_at', true );
+		$rates              = self::rates( $post->ID );
 		?>
 		<p><label><input type="checkbox" name="cywater_meeting_enabled" value="1" <?php checked( $enabled ); ?>> <strong><?php esc_html_e( 'Enable the reusable registration module on this Annual Meeting', 'cywater-meeting-registration' ); ?></strong></label></p>
 		<p class="description"><?php esc_html_e( 'This creates an Event Tickets RSVP attendee record and a fee recommendation only. Payment remains external and is never marked paid here.', 'cywater-meeting-registration' ); ?></p>
-		<div style="display:grid;grid-template-columns:repeat(3,minmax(180px,1fr));gap:12px">
+		<div style="display:grid;grid-template-columns:repeat(4,minmax(180px,1fr));gap:12px">
 			<p><label><strong><?php esc_html_e( 'Registration opens', 'cywater-meeting-registration' ); ?></strong><br><input type="datetime-local" name="cywater_meeting_open_at" value="<?php echo esc_attr( str_replace( ' ', 'T', $open_at ) ); ?>"></label></p>
 			<p><label><strong><?php esc_html_e( 'Early-bird deadline', 'cywater-meeting-registration' ); ?></strong><br><input type="datetime-local" name="cywater_meeting_early_deadline" value="<?php echo esc_attr( str_replace( ' ', 'T', $deadline ) ); ?>"></label></p>
+			<p><label><strong><?php esc_html_e( 'Presentation materials deadline', 'cywater-meeting-registration' ); ?></strong><br><input type="datetime-local" name="cywater_meeting_submission_deadline" value="<?php echo esc_attr( str_replace( ' ', 'T', $submission_deadline ) ); ?>"></label></p>
 			<p><label><strong><?php esc_html_e( 'Registration closes', 'cywater-meeting-registration' ); ?></strong><br><input type="datetime-local" name="cywater_meeting_close_at" value="<?php echo esc_attr( str_replace( ' ', 'T', $close_at ) ); ?>"></label></p>
 		</div>
 		<table class="widefat striped"><thead><tr><th><?php esc_html_e( 'Registration category', 'cywater-meeting-registration' ); ?></th><th><?php esc_html_e( 'Early CNY', 'cywater-meeting-registration' ); ?></th><th><?php esc_html_e( 'Standard CNY', 'cywater-meeting-registration' ); ?></th><th><?php esc_html_e( 'Approx. early USD', 'cywater-meeting-registration' ); ?></th><th><?php esc_html_e( 'Approx. standard USD', 'cywater-meeting-registration' ); ?></th></tr></thead><tbody>
@@ -85,7 +88,7 @@ final class CYWater_Meeting_Registration {
 			return;
 		}
 		update_post_meta( $post_id, self::META_PREFIX . 'enabled', isset( $_POST['cywater_meeting_enabled'] ) ? '1' : '0' );
-		foreach ( array( 'open_at', 'early_deadline', 'close_at' ) as $key ) {
+		foreach ( array( 'open_at', 'early_deadline', 'submission_deadline', 'close_at' ) as $key ) {
 			$value = isset( $_POST[ 'cywater_meeting_' . $key ] ) ? sanitize_text_field( wp_unslash( $_POST[ 'cywater_meeting_' . $key ] ) ) : '';
 			update_post_meta( $post_id, self::META_PREFIX . $key, str_replace( 'T', ' ', $value ) );
 		}
@@ -106,6 +109,71 @@ final class CYWater_Meeting_Registration {
 			wp_enqueue_style( 'cywater-meeting-registration', CYWATER_MEETING_REGISTRATION_URL . 'assets/meeting-registration.css', array(), CYWATER_MEETING_REGISTRATION_VERSION );
 			wp_enqueue_script( 'cywater-meeting-registration', CYWATER_MEETING_REGISTRATION_URL . 'assets/meeting-registration.js', array(), CYWATER_MEETING_REGISTRATION_VERSION, true );
 		}
+	}
+
+	/**
+	 * Render a server-complete countdown before the Event story. JavaScript only
+	 * updates the values; it never controls whether the component is visible.
+	 */
+	public static function render_event_countdown( $event_id ) {
+		$event_id = absint( $event_id );
+		if ( ! $event_id || ! self::is_enabled( $event_id ) ) {
+			return;
+		}
+
+		$now                 = current_datetime()->getTimestamp();
+		$early_deadline      = self::local_timestamp( get_post_meta( $event_id, self::META_PREFIX . 'early_deadline', true ) );
+		$submission_deadline = self::local_timestamp( get_post_meta( $event_id, self::META_PREFIX . 'submission_deadline', true ) );
+		$start_value         = (string) get_post_meta( $event_id, '_cyw_start_date', true );
+		$meeting_start       = self::local_timestamp( $start_value ? $start_value . ( false === strpos( $start_value, ':' ) ? ' 00:00:00' : '' ) : '' );
+
+		if ( $early_deadline && $now <= $early_deadline ) {
+			$eyebrow    = __( 'Early registration deadline', 'cywater-meeting-registration' );
+			$title      = __( 'Time remaining for early registration', 'cywater-meeting-registration' );
+			$description = sprintf( __( 'Register by %s.', 'cywater-meeting-registration' ), self::deadline_label( $early_deadline ) );
+			$deadline_ts = $early_deadline;
+		} elseif ( $submission_deadline && $now <= $submission_deadline ) {
+			$eyebrow    = __( 'Presentation materials deadline', 'cywater-meeting-registration' );
+			$title      = __( 'Time remaining to submit materials', 'cywater-meeting-registration' );
+			$description = sprintf( __( 'Upload presentation or poster materials by %s.', 'cywater-meeting-registration' ), self::deadline_label( $submission_deadline ) );
+			$deadline_ts = $submission_deadline;
+		} elseif ( $meeting_start && $now < $meeting_start ) {
+			$eyebrow    = __( 'Annual Meeting 2026', 'cywater-meeting-registration' );
+			$title      = __( 'Time remaining until the meeting', 'cywater-meeting-registration' );
+			$description = sprintf( __( 'The meeting begins %s.', 'cywater-meeting-registration' ), self::deadline_label( $meeting_start ) );
+			$deadline_ts = $meeting_start;
+		} else {
+			$eyebrow     = __( 'Annual Meeting 2026', 'cywater-meeting-registration' );
+			$title       = __( 'The meeting is underway', 'cywater-meeting-registration' );
+			$description = __( 'Welcome to the CYWater Annual Meeting.', 'cywater-meeting-registration' );
+			$deadline_ts = 0;
+		}
+
+		$remaining = $deadline_ts ? max( 0, $deadline_ts - $now ) : 0;
+		$days      = (int) floor( $remaining / DAY_IN_SECONDS );
+		$hours     = (int) floor( ( $remaining % DAY_IN_SECONDS ) / HOUR_IN_SECONDS );
+		$minutes   = (int) floor( ( $remaining % HOUR_IN_SECONDS ) / MINUTE_IN_SECONDS );
+		$seconds   = (int) ( $remaining % MINUTE_IN_SECONDS );
+		$title_id  = 'cywater-meeting-countdown-title-' . $event_id;
+		?>
+		<section class="cywater-meeting-countdown<?php echo $deadline_ts ? '' : ' is-complete'; ?>" aria-labelledby="<?php echo esc_attr( $title_id ); ?>" data-cywater-meeting-countdown data-deadline="<?php echo esc_attr( $deadline_ts ? wp_date( DATE_ATOM, $deadline_ts ) : '' ); ?>" data-server-now="<?php echo esc_attr( wp_date( DATE_ATOM, $now ) ); ?>" data-complete-title="<?php esc_attr_e( 'Milestone reached', 'cywater-meeting-registration' ); ?>">
+			<div class="cywater-meeting-countdown__copy">
+				<p class="cywater-meeting-countdown__eyebrow"><?php echo esc_html( $eyebrow ); ?></p>
+				<h2 id="<?php echo esc_attr( $title_id ); ?>" data-cywater-meeting-countdown-title><?php echo esc_html( $title ); ?></h2>
+				<p><?php echo esc_html( $description ); ?></p>
+			</div>
+			<div class="cywater-meeting-countdown__units" aria-hidden="true">
+				<?php foreach ( array( 'days' => $days, 'hours' => $hours, 'minutes' => $minutes, 'seconds' => $seconds ) as $unit => $value ) : ?>
+					<div class="cywater-meeting-countdown__unit"><strong data-cywater-meeting-countdown-unit="<?php echo esc_attr( $unit ); ?>"><?php echo esc_html( sprintf( '%02d', $value ) ); ?></strong><span><?php echo esc_html( $unit ); ?></span></div>
+				<?php endforeach; ?>
+			</div>
+			<p class="screen-reader-text" aria-live="polite" data-cywater-meeting-countdown-status></p>
+		</section>
+		<?php
+	}
+
+	private static function deadline_label( $timestamp ) {
+		return wp_date( 'F j, Y \a\t g:i a T', $timestamp );
 	}
 
 	/**
@@ -703,7 +771,7 @@ final class CYWater_Meeting_Registration {
 		if ( ! $event_id || 'cyw_event' !== get_post_type( $event_id ) ) { WP_CLI::error( 'Pass the existing 2026 cyw_event ID.' ); }
 		$content = self::annual_meeting_2026_content();
 		wp_update_post( array( 'ID' => $event_id, 'post_title' => 'The 14th CYWater Annual Meeting and High-Level Forum 2026', 'post_excerpt' => 'Join CYWater in Nanjing for the 14th Annual Meeting and a high-level forum on smart prevention and control of extreme water disasters driven by the meteorology–hydrology nexus.', 'post_content' => $content ) );
-		foreach ( array( '_cyw_start_date' => '2026-10-16', '_cyw_end_date' => '2026-10-19', '_cyw_date_label' => 'October 16–19, 2026', '_cyw_location' => 'Nanjing University of Information Science and Technology, Nanjing, China', '_cyw_format' => 'In person', '_cyw_attendees' => 'Registration open', '_cyw_status' => 'upcoming', self::META_PREFIX . 'enabled' => '1', self::META_PREFIX . 'open_at' => '2026-08-28 00:00:00', self::META_PREFIX . 'early_deadline' => '2026-09-20 23:59:59', self::META_PREFIX . 'close_at' => '2026-10-15 23:59:59', self::META_PREFIX . 'rates' => self::default_rates() ) as $key => $value ) { update_post_meta( $event_id, $key, $value ); }
+		foreach ( array( '_cyw_start_date' => '2026-10-16', '_cyw_end_date' => '2026-10-19', '_cyw_date_label' => 'October 16–19, 2026', '_cyw_location' => 'Nanjing University of Information Science and Technology, Nanjing, China', '_cyw_format' => 'In person', '_cyw_attendees' => 'Registration open', '_cyw_status' => 'upcoming', self::META_PREFIX . 'enabled' => '1', self::META_PREFIX . 'open_at' => '2026-08-28 00:00:00', self::META_PREFIX . 'early_deadline' => '2026-09-20 23:59:59', self::META_PREFIX . 'submission_deadline' => '2026-09-28 23:59:59', self::META_PREFIX . 'close_at' => '2026-10-15 23:59:59', self::META_PREFIX . 'rates' => self::default_rates() ) as $key => $value ) { update_post_meta( $event_id, $key, $value ); }
 		$ticket = self::ticket( $event_id );
 		if ( is_wp_error( $ticket ) ) { WP_CLI::error( $ticket->get_error_code() ); }
 		WP_CLI::success( 'Configured reusable registration on Event ' . $event_id . ' with private RSVP ticket ' . $ticket->ID . '. No payment configuration was changed.' );

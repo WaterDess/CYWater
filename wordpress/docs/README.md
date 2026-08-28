@@ -58,10 +58,25 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 
 Hostinger staging is available at `https://staging.cywater.org/`, and the public
 production site is live at `https://cywater.org/`. The 2026-08-28 accepted code
-baseline uses the CYWater `0.6.54` theme, CYWater Membership `0.9.10`, CYWater
+baseline uses the CYWater `0.6.55` theme, CYWater Membership `0.9.10`, CYWater
 Partnerships `0.1.5`, CYWater Logo Call `0.4.2`, CYWater Forum `0.6.3`, CYWater
 Environment `0.5.7`, CYWater Core `0.6.9`, CYWater Operations `0.3.3`, Event
-Tickets `5.29.1`, and CYWater Meeting Registration `0.1.9`.
+Tickets `5.29.1`, and CYWater Meeting Registration `0.1.11`.
+
+Theme `0.6.55` makes the complete Event body part of the initial HTML-visible
+page rather than placing the whole article behind a scroll-reveal observer.
+Meeting Registration `0.1.11` adds a server-rendered, progressively enhanced
+Annual Meeting countdown that advances from the early-registration deadline to
+the protected-material deadline and then to the meeting start. Its initial
+values remain readable without JavaScript, while JavaScript updates them once
+per second. The Event editor owns the configurable material deadline. Staging
+kept PMPro Sandbox and passed all 30 self-cleaning registration assertions plus
+authenticated desktop browser review; production kept Stripe Live and passed
+the read-only version, structure, public-route, countdown, registration-module
+and no-horizontal-overflow checks. Rollbacks are retained at
+`/home/u111638297/cywater-release-backups/meeting-countdown-staging-predeploy-20260828T103830Z`
+and
+`/home/u111638297/cywater-release-backups/meeting-countdown-production-predeploy-20260828T104130Z`.
 
 Staging and production now run the accepted 2026 Annual Meeting workflow. The
 reusable module stores registrations in Event Tickets RSVP, reads but never changes PMPro

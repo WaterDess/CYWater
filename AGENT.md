@@ -166,6 +166,21 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
 
 ### Temporary Staging Snapshot (2026-08-19)
 
+- On 2026-08-28 theme `0.6.55` and CYWater Meeting Registration `0.1.11`
+  were deployed to staging and production. The complete Event body is now
+  visible in the initial HTML and no longer depends on the optional scroll
+  reveal observer. The Annual Meeting page adds a server-rendered countdown
+  that progresses from the early-registration deadline to the configurable
+  protected-material deadline and then the meeting start; JavaScript only
+  updates the already-visible values. Staging kept PMPro Sandbox and passed 30
+  self-cleaning registration assertions plus authenticated desktop browser
+  review. Production kept Stripe Live and passed read-only structure, version,
+  public-route, countdown, registration-module and overflow checks. The current
+  rollbacks are retained at
+  `/home/u111638297/cywater-release-backups/meeting-countdown-staging-predeploy-20260828T103830Z`
+  and
+  `/home/u111638297/cywater-release-backups/meeting-countdown-production-predeploy-20260828T104130Z`.
+
 - On 2026-08-28 CYWater Meeting Registration `0.1.8` was deployed only to
   Hostinger staging for the 2026 Annual Meeting. The reusable Event-scoped
   module uses Event Tickets RSVP as the attendee store and PMPro only as the

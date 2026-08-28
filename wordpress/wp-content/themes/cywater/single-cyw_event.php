@@ -17,7 +17,6 @@ while ( have_posts() ) :
 	$attendees = get_post_meta( get_the_ID(), '_cyw_attendees', true );
 	$status    = get_post_meta( get_the_ID(), '_cyw_status', true );
 	$is_logo_call = '1' === (string) get_post_meta( get_the_ID(), '_cywater_logo_call_enabled', true );
-	$reveal_attr  = $is_logo_call ? '' : ' data-reveal';
 	$event_summary = cywater_event_summary( get_the_ID() );
 	?>
 	<section class="event-hero">
@@ -38,8 +37,8 @@ while ( have_posts() ) :
 			<div class="event-body"><div>
 				<?php do_action( 'cywater_event_before_content', get_the_ID() ); ?>
 				<span class="eyebrow">About this event</span>
-				<?php if ( ! $is_logo_call && $event_summary ) : ?><p class="lead" style="margin:var(--sp-4) 0 var(--sp-5)"<?php echo $reveal_attr; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>><?php echo esc_html( $event_summary ); ?></p><?php endif; ?>
-				<div class="prose entry-content"<?php echo $reveal_attr; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>><?php echo cywater_article_content(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
+				<?php if ( ! $is_logo_call && $event_summary ) : ?><p class="lead" style="margin:var(--sp-4) 0 var(--sp-5)"><?php echo esc_html( $event_summary ); ?></p><?php endif; ?>
+				<div class="prose entry-content"><?php echo cywater_article_content(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
 				<div style="text-align:center; margin-top:var(--sp-6)"><a class="link" href="<?php echo esc_url( get_post_type_archive_link( 'cyw_event' ) ); ?>">Back to Events</a></div>
 			</div></div>
 		</div>
