@@ -146,7 +146,7 @@ const themeFunctions = await readFile(path.join(root, "wordpress/wp-content/them
 const membershipPlugin = await readFile(path.join(root, "wordpress/wp-content/plugins/cywater-membership/cywater-membership.php"), "utf8");
 assert(themeHeader.includes("Version: 0.6.57"), "CYWater theme header version is not current.");
 assert(themeFunctions.includes("CYWATER_THEME_VERSION', '0.6.57"), "CYWater theme runtime version is not current.");
-assert(membershipPlugin.includes("CYWATER_MEMBERSHIP_VERSION', '0.9.12"), "CYWater Membership runtime version is not current.");
+assert(membershipPlugin.includes("CYWATER_MEMBERSHIP_VERSION', '0.9.14"), "CYWater Membership runtime version is not current.");
 for (const file of themeFrontendFiles) {
   const contents = await readFile(file, "utf8");
   assert(
@@ -260,6 +260,10 @@ const membershipFields = await readFile(
   path.join(root, "wordpress", "wp-content", "plugins", "cywater-membership", "includes", "class-cywater-membership-fields.php"),
   "utf8"
 );
+const membershipAdmin = await readFile(
+  path.join(root, "wordpress", "wp-content", "plugins", "cywater-membership", "includes", "class-cywater-membership-admin.php"),
+  "utf8"
+);
 const membershipProfileControls = await readFile(
   path.join(root, "wordpress", "wp-content", "plugins", "cywater-membership", "assets", "profile-controls.js"),
   "utf8"
@@ -302,12 +306,18 @@ assertMarkers(
     "Public display name (optional)",
     "data-cywater-profile-username-field",
     "validate_username_change",
+	"is_platform_owner_account",
     "profile_update",
     "user->user_login = $validation",
     "data-cywater-profile-file-input",
     "cywater-profile-file__button",
   ],
   "CYWater editable profile identity and file control"
+);
+assertMarkers(
+  membershipAdmin,
+  ["Public display name", "cywater_personal_name", "First / last name", "Account identity"],
+  "CYWater administrator identity labels"
 );
 assertMarkers(
   membershipProfileControls,

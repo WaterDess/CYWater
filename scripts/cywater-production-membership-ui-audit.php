@@ -20,7 +20,8 @@ $assert     = static function ( $condition, $message ) use ( &$assertions ) {
 try {
 	$assert( 'production' === wp_get_environment_type(), 'WordPress environment is production' );
 	$assert( 'cywater.org' === strtolower( (string) wp_parse_url( home_url( '/' ), PHP_URL_HOST ) ), 'Home URL is the CYWater production host' );
-	$assert( defined( 'CYWATER_MEMBERSHIP_VERSION' ) && '0.9.12' === CYWATER_MEMBERSHIP_VERSION, 'CYWater Membership version is 0.9.12' );
+	$assert( defined( 'CYWATER_MEMBERSHIP_VERSION' ) && '0.9.14' === CYWATER_MEMBERSHIP_VERSION, 'CYWater Membership version is 0.9.14' );
+	$assert( defined( 'CYWATER_OPERATIONS_VERSION' ) && '0.3.5' === CYWATER_OPERATIONS_VERSION, 'CYWater Operations version is 0.3.5' );
 	$assert( '0.6.57' === wp_get_theme()->get( 'Version' ), 'CYWater theme version is 0.6.57' );
 	$assert( class_exists( 'CYWater_Membership_Account_Routing' ), 'Membership account-routing authority is active' );
 	$registration_page = get_page_by_path( 'member-register' );
@@ -29,6 +30,8 @@ try {
 	$assert( 1 === substr_count( $registration_content, '[cywater_member_register]' ), 'Canonical member registration page renders the shared form exactly once' );
 	$assert( false === has_shortcode( $registration_content, 'pmpro_login' ) && false === has_shortcode( $registration_content, 'pmpro_checkout' ), 'Canonical member registration page contains no legacy or parallel account form' );
 	$assert( ! (bool) get_option( 'users_can_register' ), 'WordPress core public registration remains disabled in favor of the managed CYWater form' );
+	$identity_columns = CYWater_Membership_Admin::add_user_columns( array( 'username' => 'Username', 'name' => 'Name', 'email' => 'Email' ) );
+	$assert( 'Public display name' === (string) ( $identity_columns['name'] ?? '' ) && 'First / last name' === (string) ( $identity_columns['cywater_personal_name'] ?? '' ), 'Administrator Users table uses explicit identity labels' );
 
 	$original_user = get_current_user_id();
 	wp_set_current_user( 0 );

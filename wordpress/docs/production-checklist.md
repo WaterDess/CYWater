@@ -54,6 +54,16 @@ The unchecked items below are follow-up financial, governance, handover,
 restore-rehearsal, cross-browser, or future paid-Event operations. They are not
 staging/test residue and do not reopen the accepted public-site build baseline.
 
+- [x] Deploy Membership `0.9.14` and Operations `0.3.5` to staging and
+      production: rename the ambiguous Users-table `Name` heading to `Public
+      display name`; expose existing `first_name` and `last_name` metadata in a
+      separate column; use the same labels in Member record and Staff access;
+      and show `web@cywater.org` as a non-personal Owner account whose
+      First/Last values are not required. No user record was migrated or
+      rewritten. Staging passed 108 Account, 448 Operations, and 50 editor
+      assertions; production passed 25 Membership and 10 administrator-identity
+      read-only assertions; authenticated Chrome review passed.
+
 - [x] Deploy Membership `0.9.12` and theme `0.6.57` to staging and production:
       Member Profile exposes an editable, uniqueness-checked Username; keeps
       the optional public display name with a Username fallback; preserves the

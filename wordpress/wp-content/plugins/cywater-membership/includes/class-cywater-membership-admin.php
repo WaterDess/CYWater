@@ -9,6 +9,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 final class CYWater_Membership_Admin {
 	private const REQUIRED_PROFILE_FIELDS = array(
+		'first_name',
+		'last_name',
 		'cyw_institution_name',
 		'cyw_country',
 		'cyw_institution_type',
@@ -33,8 +35,10 @@ final class CYWater_Membership_Admin {
 			return;
 		}
 
+		$owner_account      = CYWater_Membership_Fields::is_platform_owner_account( $user );
+		$required_fields    = $owner_account ? array_values( array_diff( self::REQUIRED_PROFILE_FIELDS, array( 'first_name', 'last_name' ) ) ) : self::REQUIRED_PROFILE_FIELDS;
 		$completed_required = 0;
-		foreach ( self::REQUIRED_PROFILE_FIELDS as $field_key ) {
+		foreach ( $required_fields as $field_key ) {
 			if ( self::has_profile_value( get_user_meta( $user->ID, $field_key, true ) ) ) {
 				++$completed_required;
 			}
@@ -87,6 +91,16 @@ final class CYWater_Membership_Admin {
 		<p class="description"><?php esc_html_e( 'This view links the existing WordPress account, PMPro membership and order records, and CYWater privacy choices. It does not create a second member database.', 'cywater-membership' ); ?></p>
 		<table class="form-table" role="presentation">
 			<tr>
+				<th><?php esc_html_e( 'Account identity', 'cywater-membership' ); ?></th>
+				<td>
+					<strong><?php esc_html_e( 'Username:', 'cywater-membership' ); ?></strong> <?php echo esc_html( $user->user_login ); ?><br>
+					<strong><?php esc_html_e( 'Public display name:', 'cywater-membership' ); ?></strong> <?php echo esc_html( $user->display_name ?: $user->user_login ); ?><br>
+					<strong><?php esc_html_e( 'First name:', 'cywater-membership' ); ?></strong> <?php echo esc_html( (string) get_user_meta( $user->ID, 'first_name', true ) ?: ( $owner_account ? __( 'Not required for the platform Owner account', 'cywater-membership' ) : __( 'Not provided', 'cywater-membership' ) ) ); ?><br>
+					<strong><?php esc_html_e( 'Last name:', 'cywater-membership' ); ?></strong> <?php echo esc_html( (string) get_user_meta( $user->ID, 'last_name', true ) ?: ( $owner_account ? __( 'Not required for the platform Owner account', 'cywater-membership' ) : __( 'Not provided', 'cywater-membership' ) ) ); ?><br>
+					<strong><?php esc_html_e( 'Email:', 'cywater-membership' ); ?></strong> <?php echo esc_html( $user->user_email ); ?>
+				</td>
+			</tr>
+			<tr>
 				<th><?php esc_html_e( 'Account', 'cywater-membership' ); ?></th>
 				<td>
 					<?php echo esc_html( sprintf( __( 'User ID %1$d · created %2$s', 'cywater-membership' ), $user->ID, get_date_from_gmt( $user->user_registered, get_option( 'date_format' ) . ' ' . get_option( 'time_format' ) ) ) ); ?>
@@ -99,7 +113,7 @@ final class CYWater_Membership_Admin {
 			</tr>
 			<tr>
 				<th><?php esc_html_e( 'Required profile', 'cywater-membership' ); ?></th>
-				<td><?php echo esc_html( sprintf( '%d of %d fields completed', $completed_required, count( self::REQUIRED_PROFILE_FIELDS ) ) ); ?></td>
+				<td><?php echo esc_html( sprintf( '%d of %d fields completed', $completed_required, count( $required_fields ) ) ); ?><?php if ( $owner_account ) : ?><br><?php esc_html_e( 'First and last name are not required for the platform Owner account.', 'cywater-membership' ); ?><?php endif; ?></td>
 			</tr>
 			<tr>
 				<th><?php esc_html_e( 'Public directory', 'cywater-membership' ); ?></th>
@@ -167,12 +181,30 @@ final class CYWater_Membership_Admin {
 	}
 
 	public static function add_user_columns( $columns ) {
+		if ( isset( $columns['name'] ) ) {
+			$columns['name'] = __( 'Public display name', 'cywater-membership' );
+		}
+		$columns['cywater_personal_name'] = __( 'First / last name', 'cywater-membership' );
 		$columns['cywater_account']    = __( 'CYWater account', 'cywater-membership' );
 		$columns['cywater_membership'] = __( 'Membership', 'cywater-membership' );
 		return $columns;
 	}
 
 	public static function render_user_column( $output, $column_name, $user_id ) {
+		if ( 'cywater_personal_name' === $column_name ) {
+			if ( CYWater_Membership_Fields::is_platform_owner_account( $user_id ) ) {
+				return '<strong>' . esc_html__( 'Owner account', 'cywater-membership' ) . '</strong><br>' . esc_html__( 'First / last name not required', 'cywater-membership' );
+			}
+			$first_name = trim( (string) get_user_meta( $user_id, 'first_name', true ) );
+			$last_name  = trim( (string) get_user_meta( $user_id, 'last_name', true ) );
+			return sprintf(
+				'<span class="cywater-user-name-parts"><strong>%1$s</strong> %2$s<br><strong>%3$s</strong> %4$s</span>',
+				esc_html__( 'First:', 'cywater-membership' ),
+				esc_html( '' !== $first_name ? $first_name : __( 'Not provided', 'cywater-membership' ) ),
+				esc_html__( 'Last:', 'cywater-membership' ),
+				esc_html( '' !== $last_name ? $last_name : __( 'Not provided', 'cywater-membership' ) )
+			);
+		}
 		if ( 'cywater_account' === $column_name ) {
 			$parts   = array( CYWater_Membership_Account_Security::is_verified( $user_id ) ? __( 'Email verified', 'cywater-membership' ) : __( 'Verification required', 'cywater-membership' ) );
 			$status  = CYWater_Membership_Account_Security::closure_status( $user_id );

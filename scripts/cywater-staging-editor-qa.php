@@ -28,7 +28,7 @@ $assert = static function ( $condition, $message ) use ( &$checks ) {
 
 try {
 	$assert( defined( 'CYWATER_CORE_VERSION' ) && '0.6.9' === CYWATER_CORE_VERSION, 'Unexpected Core version.' );
-	$assert( defined( 'CYWATER_OPERATIONS_VERSION' ) && '0.3.3' === CYWATER_OPERATIONS_VERSION, 'Unexpected Operations version.' );
+	$assert( defined( 'CYWATER_OPERATIONS_VERSION' ) && '0.3.5' === CYWATER_OPERATIONS_VERSION, 'Unexpected Operations version.' );
 	$assert( defined( 'CYWATER_THEME_VERSION' ) && '0.6.57' === CYWATER_THEME_VERSION, 'Unexpected theme version.' );
 	$assert( current_theme_supports( 'editor-styles' ), 'Theme editor styles are not enabled.' );
 	$assert( file_exists( get_theme_file_path( 'assets/css/editor.css' ) ), 'Theme editor stylesheet is missing.' );

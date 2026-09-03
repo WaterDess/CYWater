@@ -58,12 +58,13 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 
 Hostinger staging is available at `https://staging.cywater.org/`, and the public
 production site is live at `https://cywater.org/`. The current accepted code
-baseline uses the CYWater `0.6.57` theme, CYWater Membership `0.9.12`, CYWater
+baseline uses the CYWater `0.6.57` theme, CYWater Membership `0.9.14`, CYWater
 Partnerships `0.1.5`, CYWater Logo Call `0.4.2`, CYWater Forum `0.6.3`, CYWater
-Environment `0.5.7`, CYWater Core `0.6.9`, CYWater Operations `0.3.3`, Event
+Environment `0.5.7`, CYWater Core `0.6.9`, CYWater Operations `0.3.5`, Event
 Tickets `5.29.1`, and CYWater Meeting Registration `0.1.15`.
 
-Membership `0.9.12` and theme `0.6.57` make account identity explicit without
+Membership `0.9.14`, Operations `0.3.5`, and theme `0.6.57` make account
+identity explicit without
 creating a parallel account store. The Member Profile layout is Username and
 optional public display name on the first row, first and last name on the
 second row, and a full-width email field on the third row. Username changes are
@@ -75,12 +76,22 @@ non-empty display names are preserved. New registrations use the username as
 their initial display name. The Profile photograph field keeps PMPro upload and
 validation ownership but presents only the accepted CYWater file button and
 selected filename, without the browser-default outer frame. Staging Account QA
-passed 104 self-cleaning assertions, staging editor QA passed 50, and production
-Membership/Forum audits passed 23/88 read-only assertions. Authenticated Chrome
-review confirmed the three-row desktop layout, full-width email control and
-unframed file button. Staging and production trees match the local 18-file
-Membership and 97-file theme manifests byte for byte. Stripe remained Sandbox
-on staging and Live on production. Rollbacks are retained at
+passed 108 self-cleaning assertions, staging Operations QA passed 448, staging
+editor QA passed 50, and production Membership/administrator-identity audits
+passed 25/10 read-only assertions. The WordPress Users table now labels
+`display_name` as `Public display name` and reads the existing `first_name` and
+`last_name` metadata in a separate `First / last name` column. The individual
+member record and staff-access summary use the same explicit labels. The
+association-owned `web@cywater.org` platform Owner is shown as non-personal and
+is exempt only from First/Last requirements; no name is guessed or written.
+Authenticated Chrome review confirmed the identity columns, ordinary name
+parts, Owner exception, three-row member-profile layout, full-width email
+control and unframed file button. Stripe remained Sandbox on staging and Live
+on production. The latest identity-display rollbacks are retained at
+`/home/u111638297/cywater-release-backups/admin-identity-owner-exemption-staging-predeploy-20260903T151744`
+and
+`/home/u111638297/cywater-release-backups/admin-identity-owner-exemption-production-predeploy-20260903T151744`.
+The preceding profile-layout rollbacks remain at
 `/home/u111638297/cywater-release-backups/profile-identity-staging-predeploy-20260903T060750Z`
 and
 `/home/u111638297/cywater-release-backups/profile-identity-production-predeploy-20260903T061555Z`.

@@ -122,6 +122,9 @@ final class CYWater_Membership_Countries {
 			'cyw_professional_title' => __( 'Enter your current title or role.', 'cywater-membership' ),
 			'cyw_career_stage'       => __( 'Select your career stage.', 'cywater-membership' ),
 		);
+		if ( CYWater_Membership_Fields::is_platform_owner_account( $user ) ) {
+			unset( $required['first_name'], $required['last_name'] );
+		}
 		$invalid = false;
 		foreach ( $required as $key => $message ) {
 			$value = isset( $_POST[ $key ] ) ? sanitize_text_field( wp_unslash( $_POST[ $key ] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing

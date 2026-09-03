@@ -145,6 +145,17 @@ try {
 		)
 	);
 	$assert( 'Public display name (optional)' === (string) ( $profile_fields['display_name'] ?? '' ), 'Profile distinguishes the optional public display name from the username' );
+	$identity_columns = CYWater_Membership_Admin::add_user_columns(
+		array(
+			'username' => 'Username',
+			'name'     => 'Name',
+			'email'    => 'Email',
+		)
+	);
+	$assert( 'Public display name' === (string) ( $identity_columns['name'] ?? '' ) && 'First / last name' === (string) ( $identity_columns['cywater_personal_name'] ?? '' ), 'Administrator Users table distinguishes the public display name from first and last name' );
+	wp_update_user( array( 'ID' => $user_id, 'first_name' => 'Identity', 'last_name' => 'Member' ) );
+	$personal_name_html = CYWater_Membership_Admin::render_user_column( '', 'cywater_personal_name', $user_id );
+	$assert( false !== strpos( $personal_name_html, 'First:</strong> Identity' ) && false !== strpos( $personal_name_html, 'Last:</strong> Member' ), 'Administrator Users table reads the existing WordPress first_name and last_name metadata without copying it' );
 	ob_start();
 	CYWater_Membership_Fields::render_username_field( get_userdata( $user_id ) );
 	$username_field_html = (string) ob_get_clean();
@@ -182,6 +193,22 @@ try {
 	$country_options = CYWater_Membership_Countries::options();
 	$assert( count( $country_options ) >= 240 && 'United States' === ( $country_options['US'] ?? '' ), 'Country selector reuses PMPro complete canonical country and region data' );
 	$assert( 'US' === CYWater_Membership_Countries::canonical_code( 'United States' ) && '' === CYWater_Membership_Countries::canonical_code( 'Typo Country' ), 'Country validation accepts canonical choices and rejects free-text typos' );
+	$owner_identity = (object) array( 'ID' => $user_id, 'user_email' => 'web@cywater.org' );
+	$assert( CYWater_Membership_Fields::is_platform_owner_account( $owner_identity ), 'The association-owned web account is recognized as the non-personal platform Owner account' );
+	$original_post = $_POST;
+	$_POST = array(
+		'first_name'             => '',
+		'last_name'              => '',
+		'cyw_institution_name'   => 'CYWater platform operations',
+		'cyw_country'            => 'US',
+		'cyw_institution_type'   => 'other',
+		'cyw_professional_title' => 'Platform owner',
+		'cyw_career_stage'       => 'other',
+	);
+	$owner_profile_errors = array();
+	CYWater_Membership_Countries::validate_frontend_profile( $owner_profile_errors, true, $owner_identity );
+	$_POST = $original_post;
+	$assert( empty( $owner_profile_errors ), 'First and last name validation exempts only the non-personal platform Owner account' );
 	$register_html = CYWater_Membership_Account_Flow::registration_form();
 	$registration_page = get_page_by_path( 'member-register' );
 	$assert( $registration_page instanceof WP_Post, 'Canonical member registration page exists' );

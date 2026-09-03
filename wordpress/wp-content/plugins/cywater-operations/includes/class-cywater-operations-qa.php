@@ -320,7 +320,8 @@ final class CYWater_Operations_QA {
 				array(
 					'cb'                         => 'Select',
 					'username'                   => 'Username',
-					'name'                       => 'Name',
+					'name'                       => 'Public display name',
+					'cywater_personal_name'      => 'First / last name',
 					'email'                      => 'Email',
 					'role'                       => 'Role',
 					'posts'                      => 'Posts',
@@ -333,7 +334,7 @@ final class CYWater_Operations_QA {
 				)
 			);
 			self::assert_true( ! isset( $columns['posts'], $columns['pmpro_membership_level'] ), 'Users table removes the irrelevant Posts count and duplicate PMPro membership summary.' );
-			self::assert_true( array( 'cb', 'username', 'name', 'email', 'cywater_account', 'cywater_membership', 'cyw_forum', 'cywater_operational_access', 'role', 'future_plugin_column' ) === array_keys( $columns ), 'Users table keeps account, membership, Forum and staff access in a predictable order without dropping future columns.' );
+			self::assert_true( array( 'cb', 'username', 'name', 'cywater_personal_name', 'email', 'cywater_account', 'cywater_membership', 'cyw_forum', 'cywater_operational_access', 'role', 'future_plugin_column' ) === array_keys( $columns ), 'Users table keeps explicit public-display and first/last-name identity, account, membership, Forum and staff access in a predictable order without dropping future columns.' );
 
 			$menu = self::navigation_seed_menu();
 			CYWater_Operations_Admin_Navigation::organize_menu();

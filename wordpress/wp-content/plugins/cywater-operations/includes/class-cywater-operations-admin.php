@@ -217,7 +217,7 @@ final class CYWater_Operations_Admin {
 
 		unset( $columns['posts'], $columns['pmpro_membership_level'] );
 		$ordered = array();
-		foreach ( array( 'cb', 'username', 'name', 'email', 'cywater_account', 'cywater_membership', 'cyw_forum', 'cywater_operational_access', 'role' ) as $key ) {
+		foreach ( array( 'cb', 'username', 'name', 'cywater_personal_name', 'email', 'cywater_account', 'cywater_membership', 'cyw_forum', 'cywater_operational_access', 'role' ) as $key ) {
 			if ( isset( $columns[ $key ] ) ) {
 				$ordered[ $key ] = $columns[ $key ];
 				unset( $columns[ $key ] );
@@ -322,7 +322,10 @@ final class CYWater_Operations_Admin {
 		<div class="cywater-access-person">
 			<div>
 				<h2><?php echo esc_html( $user->display_name ?: $user->user_login ); ?></h2>
-				<p><strong><?php esc_html_e( 'Username:', 'cywater-operations' ); ?></strong> <?php echo esc_html( $user->user_login ); ?><br>
+				<p><strong><?php esc_html_e( 'Public display name:', 'cywater-operations' ); ?></strong> <?php echo esc_html( $user->display_name ?: $user->user_login ); ?><br>
+				<strong><?php esc_html_e( 'Username:', 'cywater-operations' ); ?></strong> <?php echo esc_html( $user->user_login ); ?><br>
+				<strong><?php esc_html_e( 'First name:', 'cywater-operations' ); ?></strong> <?php echo esc_html( (string) get_user_meta( $user->ID, 'first_name', true ) ?: ( CYWater_Membership_Fields::is_platform_owner_account( $user ) ? __( 'Not required for the platform Owner account', 'cywater-operations' ) : __( 'Not provided', 'cywater-operations' ) ) ); ?><br>
+				<strong><?php esc_html_e( 'Last name:', 'cywater-operations' ); ?></strong> <?php echo esc_html( (string) get_user_meta( $user->ID, 'last_name', true ) ?: ( CYWater_Membership_Fields::is_platform_owner_account( $user ) ? __( 'Not required for the platform Owner account', 'cywater-operations' ) : __( 'Not provided', 'cywater-operations' ) ) ); ?><br>
 				<strong><?php esc_html_e( 'Email:', 'cywater-operations' ); ?></strong> <a href="mailto:<?php echo esc_attr( $user->user_email ); ?>"><?php echo esc_html( $user->user_email ); ?></a><br>
 				<strong><?php esc_html_e( 'WordPress account role:', 'cywater-operations' ); ?></strong> <?php echo esc_html( $base_labels ? implode( ', ', $base_labels ) : __( 'None', 'cywater-operations' ) ); ?></p>
 			</div>

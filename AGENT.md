@@ -166,6 +166,25 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
 
 ### Temporary Staging Snapshot (2026-08-19)
 
+- On 2026-09-03 CYWater Membership `0.9.14` and Operations `0.3.5` were
+  deployed to staging and production. The WordPress Users directory now
+  distinguishes Username, Public display name, and the existing `first_name`
+  and `last_name` metadata without introducing a parallel identity store. The
+  same labels appear in the individual CYWater member record and staff-access
+  summary. Ordinary accounts retain mandatory First/Last validation. The
+  association-owned `web@cywater.org` platform Owner is explicitly
+  non-personal, is exempt only from First/Last requirements, and is no longer
+  shown as an incomplete personal profile; no name was inferred or written.
+  Staging passed 108 Account, 448 Operations, and 50 editor assertions.
+  Production passed 25 Membership and 10 administrator-identity read-only
+  assertions, and authenticated Chrome review confirmed the headers, ordinary
+  name parts, and Owner exception. No user, membership, order, payment, or
+  session record was changed. Stripe remained Sandbox on staging and Live in
+  production. Retained rollbacks are at
+  `/home/u111638297/cywater-release-backups/admin-identity-owner-exemption-staging-predeploy-20260903T151744`
+  and
+  `/home/u111638297/cywater-release-backups/admin-identity-owner-exemption-production-predeploy-20260903T151744`.
+
 - On 2026-09-03 CYWater Membership `0.9.12` and theme `0.6.57` were deployed
   to staging and production. Member Profile now treats login identity and public
   presentation as separate account properties without adding a parallel user

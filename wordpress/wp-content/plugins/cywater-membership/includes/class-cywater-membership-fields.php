@@ -9,6 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 final class CYWater_Membership_Fields {
 	private static $pending_username = array();
+	private const PLATFORM_OWNER_EMAIL = 'web@cywater.org';
 
 	public static function register() {
 		add_action( 'init', array( __CLASS__, 'register_user_meta' ), 5 );
@@ -33,6 +34,15 @@ final class CYWater_Membership_Fields {
 			$fields['display_name'] = __( 'Public display name (optional)', 'cywater-membership' );
 		}
 		return $fields;
+	}
+
+	/** The association-owned platform account is not a personal member profile. */
+	public static function is_platform_owner_account( $user ) {
+		if ( is_numeric( $user ) ) {
+			$user = get_userdata( absint( $user ) );
+		}
+		$email = is_object( $user ) ? (string) ( $user->user_email ?? '' ) : '';
+		return 0 === strcasecmp( trim( $email ), self::PLATFORM_OWNER_EMAIL );
 	}
 
 	/**
