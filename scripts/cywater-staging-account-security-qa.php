@@ -97,8 +97,63 @@ try {
 	$assert( ! is_wp_error( $user_id ), 'Disposable Subscriber created' );
 	wp_update_user( array( 'ID' => $user_id, 'role' => 'subscriber' ) );
 	$assert( ! is_wp_error( wp_authenticate( $username, $initial_password ) ), 'Disposable account can authenticate with its initial password' );
+	$renamed_username = $username . '_renamed';
+	$renamed_user     = CYWater_Membership_Fields::update_username( $user_id, $renamed_username );
+	$assert( $renamed_user instanceof WP_User && $renamed_username === $renamed_user->user_login, 'Username can be changed without replacing the account' );
+	$assert( ! is_wp_error( wp_authenticate( $renamed_username, $initial_password ) ), 'Changed username authenticates with the existing password' );
+	$assert( false === username_exists( $username ), 'Old username is no longer an active sign-in identifier' );
+	$restored_user = CYWater_Membership_Fields::update_username( $user_id, $username );
+	$assert( $restored_user instanceof WP_User && $username === $restored_user->user_login, 'Disposable username is restored for the remaining account checks' );
 	$assert( ! CYWater_Membership_Account_Security::is_verified( $user_id ), 'New account starts unverified' );
 	wp_set_current_user( $user_id );
+	$frontend_username = $username . '_profile';
+	$original_post     = $_POST;
+	$_POST             = array( 'user_login' => $username . '_must_not_save' );
+	$blocked_errors    = array( 'Synthetic peer-field validation failure.' );
+	$blocked_user      = (object) array(
+		'ID'           => $user_id,
+		'display_name' => $username,
+		'nickname'     => $username,
+	);
+	CYWater_Membership_Fields::append_username_error( $blocked_errors, true, $blocked_user );
+	wp_update_user( array( 'ID' => $user_id, 'first_name' => 'Atomicity check' ) );
+	$assert( $username === get_userdata( $user_id )->user_login, 'A peer-field validation error cannot leak a pending username into a later user update' );
+	$_POST             = array( 'user_login' => $frontend_username );
+	$frontend_errors   = array();
+	$frontend_user     = (object) array(
+		'ID'           => $user_id,
+		'display_name' => '',
+		'nickname'     => '',
+	);
+	CYWater_Membership_Fields::append_username_error( $frontend_errors, true, $frontend_user );
+	$assert( empty( $frontend_errors ) && $frontend_username === $frontend_user->user_login && $frontend_username === $frontend_user->display_name, 'Profile validation uses username as the optional public-name fallback' );
+	$frontend_update = wp_update_user( (array) $frontend_user );
+	$frontend_fresh  = get_userdata( $user_id );
+	$assert( ! is_wp_error( $frontend_update ) && $frontend_fresh instanceof WP_User && $frontend_username === $frontend_fresh->user_login && $frontend_username === $frontend_fresh->display_name, 'Validated profile save commits username and public-name fallback together' );
+	$assert( (int) $frontend_fresh->ID === (int) $user_id && ! is_wp_error( wp_authenticate( $frontend_username, $initial_password ) ), 'Front-end username change preserves the account ID and existing password' );
+	$_POST = $original_post;
+	$restored_user = CYWater_Membership_Fields::update_username( $user_id, $username );
+	$assert( $restored_user instanceof WP_User && $username === $restored_user->user_login, 'Profile-save username is restored for the remaining account checks' );
+	wp_update_user( array( 'ID' => $user_id, 'display_name' => $username, 'nickname' => $username ) );
+	$profile_fields = apply_filters(
+		'pmpro_member_profile_edit_user_object_fields',
+		array(
+			'first_name'   => 'First Name',
+			'last_name'    => 'Last Name',
+			'display_name' => 'Display name publicly as',
+			'user_email'   => 'Email',
+		)
+	);
+	$assert( 'Public display name (optional)' === (string) ( $profile_fields['display_name'] ?? '' ), 'Profile distinguishes the optional public display name from the username' );
+	ob_start();
+	CYWater_Membership_Fields::render_username_field( get_userdata( $user_id ) );
+	$username_field_html = (string) ob_get_clean();
+	$assert( false !== strpos( $username_field_html, 'name="user_login"' ) && false !== strpos( $username_field_html, 'data-cywater-profile-username-field' ), 'Profile renders one editable username field for the current account' );
+	$photo_field = PMPro_Field_Group::get_field( 'cyw_profile_photo' );
+	ob_start();
+	$photo_field->display( '' );
+	$photo_field_html = (string) ob_get_clean();
+	$assert( false !== strpos( $photo_field_html, 'data-cywater-profile-file-input' ) && false !== strpos( $photo_field_html, 'cywater-profile-file__button' ), 'Profile photograph reuses the CYWater file control while retaining PMPro input ownership' );
 	$inactive_membership_action = CYWater_Membership_Account_Routing::membership_action();
 	$assert( 'Choose Membership' === (string) ( $inactive_membership_action['label'] ?? '' ) && false !== strpos( (string) ( $inactive_membership_action['url'] ?? '' ), '/membership/' ), 'Registered non-member header action offers membership without misidentifying the account' );
 	$level_ids = (array) get_option( 'cywater_membership_level_ids', array() );

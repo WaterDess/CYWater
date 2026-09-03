@@ -57,11 +57,33 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 ## Current State
 
 Hostinger staging is available at `https://staging.cywater.org/`, and the public
-production site is live at `https://cywater.org/`. The 2026-08-28 accepted code
-baseline uses the CYWater `0.6.55` theme, CYWater Membership `0.9.10`, CYWater
+production site is live at `https://cywater.org/`. The current accepted code
+baseline uses the CYWater `0.6.57` theme, CYWater Membership `0.9.12`, CYWater
 Partnerships `0.1.5`, CYWater Logo Call `0.4.2`, CYWater Forum `0.6.3`, CYWater
 Environment `0.5.7`, CYWater Core `0.6.9`, CYWater Operations `0.3.3`, Event
 Tickets `5.29.1`, and CYWater Meeting Registration `0.1.15`.
+
+Membership `0.9.12` and theme `0.6.57` make account identity explicit without
+creating a parallel account store. The Member Profile layout is Username and
+optional public display name on the first row, first and last name on the
+second row, and a full-width email field on the third row. Username changes are
+validated for syntax and uniqueness and are committed in the same `wp_users`
+update as the remaining account fields; the numeric user ID remains unchanged,
+so memberships, authored content and Event registrations stay attached. A
+blank public display name falls back to the effective username, while existing
+non-empty display names are preserved. New registrations use the username as
+their initial display name. The Profile photograph field keeps PMPro upload and
+validation ownership but presents only the accepted CYWater file button and
+selected filename, without the browser-default outer frame. Staging Account QA
+passed 104 self-cleaning assertions, staging editor QA passed 50, and production
+Membership/Forum audits passed 23/88 read-only assertions. Authenticated Chrome
+review confirmed the three-row desktop layout, full-width email control and
+unframed file button. Staging and production trees match the local 18-file
+Membership and 97-file theme manifests byte for byte. Stripe remained Sandbox
+on staging and Live on production. Rollbacks are retained at
+`/home/u111638297/cywater-release-backups/profile-identity-staging-predeploy-20260903T060750Z`
+and
+`/home/u111638297/cywater-release-backups/profile-identity-production-predeploy-20260903T061555Z`.
 
 Meeting Registration `0.1.15` restores the complete English first-announcement
 content for the 2026 Annual Meeting instead of retaining a compressed summary.
@@ -270,7 +292,7 @@ offsets. The canonical `/member-register/` page contains exactly one
 the Membership routing service and WordPress core public registration remains
 disabled. The signed-out Forum introduction retains one registration/sign-in
 action group rather than repeating it in both the Hero and access card.
-Staging Account and Forum QA passed 92 and 154 assertions, while production
+Staging Account and Forum QA passed 104 and 154 assertions, while production
 Membership UI and Forum role audits passed 23 and 86 read-only assertions. All
 95 theme files match the reviewed tree on both environments; the production
 payment runtime remained Stripe Live.

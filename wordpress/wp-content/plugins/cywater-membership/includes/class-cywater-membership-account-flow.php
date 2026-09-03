@@ -148,7 +148,7 @@ final class CYWater_Membership_Account_Flow {
 				'user_pass'    => $password,
 				'first_name'   => $first_name,
 				'last_name'    => $last_name,
-				'display_name' => trim( $first_name . ' ' . $last_name ),
+				'display_name' => $username,
 				'role'         => 'subscriber',
 			)
 		);

@@ -45,7 +45,9 @@ const required = [
   "wordpress/wp-content/plugins/cywater-core/includes/class-cywater-policy-drafts.php",
   "wordpress/wp-content/plugins/cywater-membership/cywater-membership.php",
   "wordpress/wp-content/plugins/cywater-membership/assets/default-avatar.svg",
+  "wordpress/wp-content/plugins/cywater-membership/assets/profile-controls.js",
   "wordpress/wp-content/plugins/cywater-membership/includes/class-cywater-membership-avatars.php",
+  "wordpress/wp-content/plugins/cywater-membership/includes/class-cywater-membership-fields.php",
   "wordpress/wp-content/plugins/cywater-membership/includes/class-cywater-membership-email-routing.php",
   "wordpress/wp-content/plugins/cywater-membership/includes/class-cywater-membership-countries.php",
   "wordpress/wp-content/plugins/cywater-membership/includes/class-cywater-membership-setup.php",
@@ -138,6 +140,13 @@ assert(
 const themeFrontendFiles = (await findTextFiles(path.join(root, "wordpress/wp-content/themes/cywater"))).filter(
   (file) => path.extname(file) === ".php"
 );
+
+const themeHeader = await readFile(path.join(root, "wordpress/wp-content/themes/cywater/style.css"), "utf8");
+const themeFunctions = await readFile(path.join(root, "wordpress/wp-content/themes/cywater/functions.php"), "utf8");
+const membershipPlugin = await readFile(path.join(root, "wordpress/wp-content/plugins/cywater-membership/cywater-membership.php"), "utf8");
+assert(themeHeader.includes("Version: 0.6.57"), "CYWater theme header version is not current.");
+assert(themeFunctions.includes("CYWATER_THEME_VERSION', '0.6.57"), "CYWater theme runtime version is not current.");
+assert(membershipPlugin.includes("CYWATER_MEMBERSHIP_VERSION', '0.9.12"), "CYWater Membership runtime version is not current.");
 for (const file of themeFrontendFiles) {
   const contents = await readFile(file, "utf8");
   assert(
@@ -247,6 +256,18 @@ const membershipAccountSecurity = await readFile(
   path.join(root, "wordpress", "wp-content", "plugins", "cywater-membership", "includes", "class-cywater-membership-account-security.php"),
   "utf8"
 );
+const membershipFields = await readFile(
+  path.join(root, "wordpress", "wp-content", "plugins", "cywater-membership", "includes", "class-cywater-membership-fields.php"),
+  "utf8"
+);
+const membershipProfileControls = await readFile(
+  path.join(root, "wordpress", "wp-content", "plugins", "cywater-membership", "assets", "profile-controls.js"),
+  "utf8"
+);
+const wordpressStyles = await readFile(
+  path.join(root, "wordpress", "wp-content", "themes", "cywater", "wordpress.css"),
+  "utf8"
+);
 const membershipPrivacy = await readFile(
   path.join(root, "wordpress", "wp-content", "plugins", "cywater-membership", "includes", "class-cywater-membership-privacy.php"),
   "utf8"
@@ -257,7 +278,7 @@ const membershipEmailRouting = await readFile(
 );
 assertMarkers(
   membershipAccountFlow,
-  ["account_unavailable", "Sign in or use account recovery"],
+  ["account_unavailable", "Sign in or use account recovery", "'display_name' => $username"],
   "CYWater registration identity privacy"
 );
 assert(
@@ -274,6 +295,40 @@ assertMarkers(
   avatarProvider,
   ["pre_get_avatar_data", "assets/default-avatar.svg", "cyw_profile_photo", "cyw_profile_public"],
   "CYWater avatar provider"
+);
+assertMarkers(
+  membershipFields,
+  [
+    "Public display name (optional)",
+    "data-cywater-profile-username-field",
+    "validate_username_change",
+    "profile_update",
+    "user->user_login = $validation",
+    "data-cywater-profile-file-input",
+    "cywater-profile-file__button",
+  ],
+  "CYWater editable profile identity and file control"
+);
+assertMarkers(
+  membershipProfileControls,
+  [
+    "grid.prepend(username)",
+    "username.after(display)",
+    "Leave blank to use your username.",
+    "input.files[0].name",
+  ],
+  "CYWater member profile control layout"
+);
+assertMarkers(
+  wordpressStyles,
+  [
+    ".cywater-profile-file__input",
+    "clip-path: inset(50%)",
+    ".cywater-profile-file__button",
+    ".pmpro_form_field-user_email {\n\tgrid-column: 1 / -1;",
+	"flex: 0 0 100%;",
+  ],
+  "CYWater member profile presentation"
 );
 assertMarkers(
   membershipEmailRouting,

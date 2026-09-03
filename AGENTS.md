@@ -166,6 +166,28 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
 
 ### Temporary Staging Snapshot (2026-08-19)
 
+- On 2026-09-03 CYWater Membership `0.9.12` and theme `0.6.57` were deployed
+  to staging and production. Member Profile now treats login identity and public
+  presentation as separate account properties without adding a parallel user
+  store: Username is editable and uniqueness-checked; the public display name
+  is optional and falls back to the effective Username; existing non-empty
+  display names remain unchanged; and new accounts start with Username as their
+  display name. The account card uses Username/Public display name, First/Last
+  name, and a full-width Email row. Username and the remaining `wp_users` fields
+  are committed in one validated update while the numeric user ID remains
+  unchanged, preserving memberships, authored content and Event registrations.
+  The Profile photograph field retains PMPro upload/validation ownership but
+  removes the browser-default outer frame and exposes only the reusable CYWater
+  Choose File button plus selected filename. Staging passed 104 self-cleaning
+  Account and 50 editor assertions; production passed 23 Membership and 88
+  Forum read-only assertions. Authenticated Chrome review confirmed field order,
+  full-width Email and the unframed file control. The 18 Membership and 97 theme
+  files match local on staging and production byte for byte. Stripe remained
+  Sandbox on staging and Live in production. Retained rollbacks are
+  `/home/u111638297/cywater-release-backups/profile-identity-staging-predeploy-20260903T060750Z`
+  and
+  `/home/u111638297/cywater-release-backups/profile-identity-production-predeploy-20260903T061555Z`.
+
 - On 2026-08-29 CYWater Meeting Registration `0.1.15` was deployed to staging
   and production. The 2026 Annual Meeting Event now carries the complete English
   first-announcement information: conference background and theme, organizer

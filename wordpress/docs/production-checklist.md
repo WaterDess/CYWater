@@ -54,6 +54,16 @@ The unchecked items below are follow-up financial, governance, handover,
 restore-rehearsal, cross-browser, or future paid-Event operations. They are not
 staging/test residue and do not reopen the accepted public-site build baseline.
 
+- [x] Deploy Membership `0.9.12` and theme `0.6.57` to staging and production:
+      Member Profile exposes an editable, uniqueness-checked Username; keeps
+      the optional public display name with a Username fallback; preserves the
+      numeric user ID and linked records; uses the accepted three-row account
+      layout with a full-width email field; and replaces the framed native
+      photograph input with the reusable CYWater file button. Staging passed
+      104 Account and 50 editor assertions, production passed 23 Membership and
+      88 Forum read-only assertions, authenticated Chrome layout review passed,
+      both active code trees match local byte for byte, and Stripe remained Live.
+
 - [x] Recover and archive the exact active Logo Call `0.2.3` and Environment
       `0.5.5` trees without overwriting staging
 - [x] Generate a production-clean manifest that includes accepted Logo Call
