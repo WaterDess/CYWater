@@ -76,7 +76,8 @@ non-empty display names are preserved. New registrations use the username as
 their initial display name. The Profile photograph field keeps PMPro upload and
 validation ownership but presents only the accepted CYWater file button and
 selected filename, without the browser-default outer frame. Staging Account QA
-passed 108 self-cleaning assertions, staging Operations QA passed 448, staging
+passed 114 self-cleaning assertions, including case-insensitive create and
+rename collision rejection; staging Operations QA passed 448, staging
 editor QA passed 50, and production Membership/administrator-identity audits
 passed 25/10 read-only assertions. The WordPress Users table now labels
 `display_name` as `Public display name` and reads the existing `first_name` and

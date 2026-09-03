@@ -60,8 +60,10 @@ staging/test residue and do not reopen the accepted public-site build baseline.
       separate column; use the same labels in Member record and Staff access;
       and show `web@cywater.org` as a non-personal Owner account whose
       First/Last values are not required. No user record was migrated or
-      rewritten. Staging passed 108 Account, 448 Operations, and 50 editor
-      assertions; production passed 25 Membership and 10 administrator-identity
+      rewritten. Staging passed 114 Account assertions, including
+      case-insensitive create and rename collision rejection; Operations passed
+      448 and editor QA passed 50 assertions. Production passed 25 Membership
+      and 10 administrator-identity
       read-only assertions; authenticated Chrome review passed.
 
 - [x] Deploy Membership `0.9.12` and theme `0.6.57` to staging and production:

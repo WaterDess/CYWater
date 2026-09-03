@@ -175,7 +175,9 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   association-owned `web@cywater.org` platform Owner is explicitly
   non-personal, is exempt only from First/Last requirements, and is no longer
   shown as an incomplete personal profile; no name was inferred or written.
-  Staging passed 108 Account, 448 Operations, and 50 editor assertions.
+  Staging passed 114 Account assertions, including case-insensitive collision
+  rejection for account creation, direct rename, and Member Profile rename;
+  Operations passed 448 and editor QA passed 50 assertions.
   Production passed 25 Membership and 10 administrator-identity read-only
   assertions, and authenticated Chrome review confirmed the headers, ordinary
   name parts, and Owner exception. No user, membership, order, payment, or

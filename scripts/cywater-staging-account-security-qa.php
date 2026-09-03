@@ -49,6 +49,7 @@ $initial_password = wp_generate_password( 32, false, false );
 $changed_password = wp_generate_password( 32, false, false );
 $reset_password   = wp_generate_password( 32, false, false );
 $user_id  = 0;
+$collision_user_id = 0;
 $checks   = array();
 
 $assert = static function ( $condition, $label ) use ( &$checks ) {
@@ -97,6 +98,34 @@ try {
 	$assert( ! is_wp_error( $user_id ), 'Disposable Subscriber created' );
 	wp_update_user( array( 'ID' => $user_id, 'role' => 'subscriber' ) );
 	$assert( ! is_wp_error( wp_authenticate( $username, $initial_password ) ), 'Disposable account can authenticate with its initial password' );
+	$collision_username = $username . '_occupied';
+	$collision_user_id  = wp_create_user( $collision_username, wp_generate_password( 32, false, false ), $collision_username . '@example.org' );
+	$assert( ! is_wp_error( $collision_user_id ), 'Disposable collision account created' );
+	$duplicate_create = wp_insert_user(
+		array(
+			'user_login' => $collision_username,
+			'user_pass'  => wp_generate_password( 32, false, false ),
+			'user_email' => $collision_username . '.duplicate@example.org',
+		)
+	);
+	$assert( is_wp_error( $duplicate_create ) && in_array( 'existing_user_login', $duplicate_create->get_error_codes(), true ), 'WordPress account creation rejects an occupied username' );
+	$assert( (int) $collision_user_id === (int) username_exists( strtoupper( $collision_username ) ), 'Username occupancy is case-insensitive on staging' );
+	$collision_rename = CYWater_Membership_Fields::update_username( $user_id, strtoupper( $collision_username ) );
+	$assert( is_wp_error( $collision_rename ) && 'cywater_username_exists' === $collision_rename->get_error_code(), 'Direct username rename rejects an occupied username regardless of letter case' );
+	$assert( $username === get_userdata( $user_id )->user_login && $collision_username === get_userdata( $collision_user_id )->user_login, 'Rejected rename leaves both accounts unchanged' );
+	wp_set_current_user( $user_id );
+	$collision_profile_errors = array();
+	$collision_profile_user   = (object) array(
+		'ID'           => $user_id,
+		'user_login'   => $username,
+		'display_name' => $username,
+		'nickname'     => $username,
+	);
+	$collision_original_post = $_POST;
+	$_POST                    = array( 'user_login' => strtoupper( $collision_username ) );
+	CYWater_Membership_Fields::append_username_error( $collision_profile_errors, true, $collision_profile_user );
+	$_POST = $collision_original_post;
+	$assert( ! empty( $collision_profile_errors ) && $username === $collision_profile_user->user_login, 'Member Profile rename rejects an occupied username before saving' );
 	$renamed_username = $username . '_renamed';
 	$renamed_user     = CYWater_Membership_Fields::update_username( $user_id, $renamed_username );
 	$assert( $renamed_user instanceof WP_User && $renamed_username === $renamed_user->user_login, 'Username can be changed without replacing the account' );
@@ -401,6 +430,9 @@ try {
 	$columns = CYWater_Membership_Admin::add_user_columns( array( 'username' => 'Username' ) );
 	$assert( isset( $columns['cywater_account'], $columns['cywater_membership'] ), 'Users list exposes account and membership columns' );
 } catch ( Throwable $error ) {
+	if ( $collision_user_id && ! is_wp_error( $collision_user_id ) ) {
+		$cleanup_user( $collision_user_id );
+	}
 	if ( $user_id && ! is_wp_error( $user_id ) ) {
 		$cleanup_user( $user_id );
 	}
@@ -408,6 +440,7 @@ try {
 	WP_CLI::error( 'Account-security QA failed: ' . $error->getMessage() );
 }
 
+$cleanup_user( $collision_user_id );
 $cleanup_user( $user_id );
 remove_filter( 'pre_wp_mail', $mail_filter, 10 );
 WP_CLI::success( sprintf( 'Account-security QA passed %d checks; intercepted mail was not sent and the disposable user was removed.', count( $checks ) ) );
