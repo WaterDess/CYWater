@@ -8,7 +8,8 @@ const fs = require('node:fs');
  }
  for (const width of [1440,390]) {
   await page.setViewportSize({width,height:900});
-  await page.goto('https://cywater.org/events/',{waitUntil:'networkidle'});
+  const path = process.env.CYWATER_VERIFY_PATH || '/events/';
+  await page.goto('https://cywater.org' + path,{waitUntil:'networkidle'});
   if (process.env.CYWATER_PREVIEW === '1') await page.locator('.event-index-nav').evaluate(e=>{e.removeAttribute('data-reveal');e.style.opacity='1';e.style.transform='none';});
   for(const y of [1400,2100]) {
    await page.evaluate(y=>window.scrollTo(0,y),y);
@@ -17,9 +18,10 @@ const fs = require('node:fs');
    console.log(JSON.stringify({width,y,...result}));
    if(result.position!=='sticky'||Math.abs(result.top-(width>1024?104:72))>2||result.overflow) throw Error('Sticky navigation failed');
   }
-  await page.locator('.event-index-nav a[href="#annual-meetings"]').click();
+  const target = path.includes('bylaws') ? '#a2' : '#annual-meetings';
+  await page.locator('.event-index-nav a[href="' + target + '"]').click();
   await page.waitForTimeout(1000);
-  const heading=await page.locator('#annual-meetings').boundingBox();
+  const heading=await page.locator(target).boundingBox();
   if(heading.y<72) throw Error('Heading obscured');
  }
  await browser.close();

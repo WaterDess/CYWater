@@ -134,53 +134,7 @@
 .role-card p { color: var(--ink-mute); }
 
 /* ============================ Bylaws ============================ */
-.bylaws-layout {
-  display: grid;
-  grid-template-columns: 260px 1fr;
-  gap: var(--sp-8);
-  align-items: start;
-}
-.toc {
-  position: sticky;
-  top: 100px;
-  background: var(--white);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  padding: var(--sp-5);
-}
-.toc h4 {
-  font-family: var(--font-body);
-  font-size: var(--fs-xs);
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ink-mute);
-  margin-bottom: var(--sp-3);
-}
-.toc ol { display: flex; flex-direction: column; gap: 0.3rem; counter-reset: toc; }
-.toc li { counter-increment: toc; }
-.toc a {
-  display: block;
-  font-size: var(--fs-sm);
-  color: var(--ink-soft);
-  padding: 0.35rem 0;
-  padding-left: 1.8rem;
-  position: relative;
-  border-radius: var(--radius);
-  transition: all var(--dur) var(--ease);
-}
-.toc a::before {
-  content: counter(toc, decimal-leading-zero);
-  position: absolute;
-  left: 0;
-  font-family: ui-monospace, monospace;
-  font-size: 0.72rem;
-  color: var(--teal);
-  top: 50%;
-  transform: translateY(-50%);
-  font-weight: 600;
-}
-.toc a:hover, .toc a.is-active { color: var(--ink); background: var(--paper); }
+/* Contents uses the shared sticky category navigation below. */
 
 .prose { max-width: 70ch; }
 .prose h2 { margin-top: var(--sp-7); margin-bottom: var(--sp-3); scroll-margin-top: 100px; }
@@ -948,8 +902,6 @@
     grid-template-columns: 1fr;
   }
   .about-intro-grid .media-frame { position: static; }
-  .bylaws-layout { grid-template-columns: 1fr; }
-  .toc { position: static; }
   .partner-overview { grid-template-columns: 1fr; }
   .partner-contribution { grid-template-columns: 1fr; gap: var(--sp-3); }
   .event-index-layout { grid-template-columns: 1fr; gap: var(--sp-6); }
@@ -961,6 +913,7 @@
     overflow: visible;
   }
   .event-category-section { scroll-margin-top: 156px; }
+  .bylaws-layout .prose h2 { scroll-margin-top: 156px; }
   .event-index-nav-inner {
     position: static;
     display: flex;

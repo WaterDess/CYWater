@@ -85,7 +85,7 @@
   window.CYWaterToast = toast;
 
   /* ---------- Events category navigation and upcoming carousel ---------- */
-  const eventNavLinks = Array.from(document.querySelectorAll(".event-index-nav a[href^='#']"));
+  const eventNavLinks = Array.from(document.querySelectorAll(".event-index-nav:not(.toc) a[href^='#']"));
   if (eventNavLinks.length && "IntersectionObserver" in window) {
     const eventSections = eventNavLinks
       .map((link) => document.querySelector(link.getAttribute("href")))

@@ -166,6 +166,14 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
 
 ### Temporary Staging Snapshot (2026-08-19)
 
+- On 2026-09-15 theme `0.6.59` unifies Bylaws Contents with the Events
+  category navigation. Both use the same layout, thin rule, teal highlights,
+  sticky positioning and mobile horizontal navigation. The old white-card TOC
+  styles were removed; all nine chapter links and heading tracking remain.
+  Production browser checks passed at 1440px and 390px for both pages.
+  Rollbacks: `cywater-release-backups/nav-format-staging-20260915` and
+  `cywater-release-backups/nav-format-production-20260915`.
+
 - On 2026-09-15 theme `0.6.58` fixes the Events category navigation by
   positioning the grid-level aside instead of its height-constrained child.
   Desktop navigation sticks below the site header; mobile retains a sticky

@@ -26,10 +26,12 @@ while ( have_posts() ) :
 	?>
 	<section class="section">
 		<div class="container">
-			<div class="bylaws-layout">
-				<aside class="toc" data-reveal>
-					<h4>Contents</h4>
-					<ol><?php foreach ( array( 'Name and mission', 'Membership', 'Governance', 'Board of directors', 'Meetings', 'Conferences and publications', 'Committees', 'Amendments', 'Merger or dissolution' ) as $index => $label ) : $target = 'a' . ( $index + 1 ); ?><li><a href="#<?php echo esc_attr( $target ); ?>" data-target="<?php echo esc_attr( $target ); ?>"><?php echo esc_html( $label ); ?></a></li><?php endforeach; ?></ol>
+			<div class="bylaws-layout event-index-layout">
+				<aside class="toc event-index-nav" aria-label="Bylaws contents">
+					<div class="event-index-nav-inner">
+						<span class="eyebrow">Contents</span>
+						<nav><?php foreach ( array( 'Name and mission', 'Membership', 'Governance', 'Board of directors', 'Meetings', 'Conferences and publications', 'Committees', 'Amendments', 'Merger or dissolution' ) as $index => $label ) : $target = 'a' . ( $index + 1 ); ?><a href="#<?php echo esc_attr( $target ); ?>" data-target="<?php echo esc_attr( $target ); ?>"><?php echo esc_html( $label ); ?></a><?php endforeach; ?></nav>
+					</div>
 				</aside>
 				<div class="prose entry-content"><?php the_content(); ?></div>
 			</div>
