@@ -56,6 +56,17 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 
 ## Current State
 
+On 2026-09-15, an editorial audit found 18 published News/Event records with
+an existing photograph but no body image, including the 2025 Wuhan meeting.
+`scripts/cywater-editorial-photo-backfill.php` records the explicit selection
+of photographs and inserts editable Image blocks after the opening paragraph.
+The 18 records were backed up, updated and read back on staging and production.
+This is a one-time content edit; templates and the independent Featured image
+field are unchanged. Original records are retained in the private server
+directories `cywater-release-backups/editorial-photos-staging-20260915` and
+`cywater-release-backups/editorial-photos-production-20260915`. The public Wuhan
+page and its image returned HTTP 200, with one body image after the introduction.
+
 Hostinger staging is available at `https://staging.cywater.org/`, and the public
 production site is live at `https://cywater.org/`. The current accepted code
 baseline uses the CYWater `0.6.57` theme, CYWater Membership `0.9.14`, CYWater
