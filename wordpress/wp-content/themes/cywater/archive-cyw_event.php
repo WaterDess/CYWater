@@ -165,7 +165,7 @@ $render_upcoming = static function ( $items ) {
 ?>
 <section class="section event-index-section">
 	<div class="container event-index-layout">
-		<aside class="event-index-nav" aria-label="Event categories" data-reveal="section">
+		<aside class="event-index-nav" aria-label="Event categories">
 			<div class="event-index-nav-inner">
 				<span class="eyebrow">Browse</span>
 				<nav>

@@ -565,9 +565,13 @@
   gap: clamp(2rem, 5vw, 5rem);
   align-items: start;
 }
-.event-index-nav-inner {
+.event-index-nav {
   position: sticky;
   top: 104px;
+  max-height: calc(100dvh - 120px);
+  overflow-y: auto;
+}
+.event-index-nav-inner {
   padding-left: var(--sp-4);
   border-left: 1px solid var(--line);
 }
@@ -949,6 +953,14 @@
   .partner-overview { grid-template-columns: 1fr; }
   .partner-contribution { grid-template-columns: 1fr; gap: var(--sp-3); }
   .event-index-layout { grid-template-columns: 1fr; gap: var(--sp-6); }
+  .event-index-nav {
+    top: 72px;
+    z-index: 10;
+    background: var(--paper);
+    max-height: none;
+    overflow: visible;
+  }
+  .event-category-section { scroll-margin-top: 156px; }
   .event-index-nav-inner {
     position: static;
     display: flex;

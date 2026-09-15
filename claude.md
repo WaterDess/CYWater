@@ -166,6 +166,15 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
 
 ### Temporary Staging Snapshot (2026-08-19)
 
+- On 2026-09-15 theme `0.6.58` fixes the Events category navigation by
+  positioning the grid-level aside instead of its height-constrained child.
+  Desktop navigation sticks below the site header; mobile retains a sticky
+  horizontal category bar. The navigation no longer depends on reveal motion.
+  Production browser checks at 1440px and 390px verify scrolling, category
+  jumps, and no horizontal overflow. Theme backups are retained under
+  `cywater-release-backups/sticky-nav-staging-20260915` and
+  `cywater-release-backups/sticky-nav-production-20260915`.
+
 - On 2026-09-03 CYWater Membership `0.9.14` and Operations `0.3.5` were
   deployed to staging and production. The WordPress Users directory now
   distinguishes Username, Public display name, and the existing `first_name`
