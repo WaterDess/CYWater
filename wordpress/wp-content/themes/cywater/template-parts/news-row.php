@@ -11,6 +11,8 @@ $visual_name = get_post_meta( get_the_ID(), '_cyw_visual_title', true );
 $visual_year = get_post_meta( get_the_ID(), '_cyw_visual_year', true );
 $categories  = get_the_category();
 $tag         = $categories ? $categories[0]->name : 'News';
+$is_opportunity = ! empty( $args['opportunity'] ) || has_category( 'opportunities' );
+if ( $is_opportunity ) { $tag = 'Opportunities'; }
 ?>
 <article class="<?php echo esc_attr( $featured ? 'news-feature' : 'news-item' ); ?>" data-reveal>
 	<a href="<?php the_permalink(); ?>" class="card-media" aria-label="<?php the_title_attribute(); ?>">
@@ -34,6 +36,6 @@ $tag         = $categories ? $categories[0]->name : 'News';
 		<div class="card-meta"><span class="card-tag"><?php echo esc_html( $tag ); ?></span><span><?php echo esc_html( get_the_date( 'Y-m-d' ) ); ?></span></div>
 		<h3<?php echo $featured ? ' class="card-title"' : ''; ?>><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
 		<p<?php echo $featured ? ' class="card-excerpt"' : ''; ?>><?php echo esc_html( get_the_excerpt() ); ?></p>
-		<?php if ( $featured ) : ?><a class="link" href="<?php the_permalink(); ?>">Read spotlight</a><?php endif; ?>
+		<?php if ( $featured ) : ?><a class="link" href="<?php the_permalink(); ?>"><?php echo $is_opportunity ? 'View opportunity' : 'Read spotlight'; ?></a><?php endif; ?>
 	</div>
 </article>

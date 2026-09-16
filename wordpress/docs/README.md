@@ -56,6 +56,14 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 
 ## Current State
 
+Theme `0.6.60` connects the News Opportunities section to the native WordPress
+category `Opportunities` (slug `opportunities`). Editors select it in the
+standard Categories panel. Its published posts are excluded from Spotlights.
+The UMich 2027 recruitment article was classified on 2026-09-16 with its body
+and existing categories preserved. Featured news images fill the desktop card
+height using cover cropping; previews are capped at four lines and mobile uses
+a stacked layout. Desktop/mobile public browser checks passed.
+
 On 2026-09-15, an editorial audit found 18 published News/Event records with
 an existing photograph but no body image, including the 2025 Wuhan meeting.
 `scripts/cywater-editorial-photo-backfill.php` records the explicit selection
@@ -69,7 +77,7 @@ page and its image returned HTTP 200, with one body image after the introduction
 
 Hostinger staging is available at `https://staging.cywater.org/`, and the public
 production site is live at `https://cywater.org/`. The current accepted code
-baseline uses the CYWater `0.6.57` theme, CYWater Membership `0.9.14`, CYWater
+baseline uses the CYWater `0.6.60` theme, CYWater Membership `0.9.14`, CYWater
 Partnerships `0.1.5`, CYWater Logo Call `0.4.2`, CYWater Forum `0.6.3`, CYWater
 Environment `0.5.7`, CYWater Core `0.6.9`, CYWater Operations `0.3.5`, Event
 Tickets `5.29.1`, and CYWater Meeting Registration `0.1.15`.

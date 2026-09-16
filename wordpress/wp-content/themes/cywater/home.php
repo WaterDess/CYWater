@@ -19,6 +19,13 @@ get_template_part(
 	)
 );
 
+$opportunity_term = get_term_by( 'slug', 'opportunities', 'category' );
+$opportunity_ids = $opportunity_term ? array_merge( array( (int) $opportunity_term->term_id ), get_term_children( $opportunity_term->term_id, 'category' ) ) : array();
+$opportunities = new WP_Query( array(
+	'post_type' => 'post', 'post_status' => 'publish', 'posts_per_page' => -1,
+	'category__in' => $opportunity_ids, 'post__in' => $opportunity_ids ? array() : array( 0 ),
+	'orderby' => 'date', 'order' => 'DESC',
+) );
 $spotlights = new WP_Query(
 	array(
 		'post_type'      => 'post',
@@ -26,6 +33,7 @@ $spotlights = new WP_Query(
 		'posts_per_page' => -1,
 		'orderby'        => 'date',
 		'order'          => 'DESC',
+		'category__not_in' => $opportunity_ids,
 	)
 );
 ?>
@@ -36,10 +44,16 @@ $spotlights = new WP_Query(
 				<span class="eyebrow">Open calls and positions</span>
 				<h2 id="opportunities-title">Opportunities</h2>
 			</div>
+			<?php if ( $opportunities->have_posts() ) : ?>
+				<?php $index = 0; while ( $opportunities->have_posts() ) : $opportunities->the_post(); ?>
+					<?php get_template_part( 'template-parts/news-row', null, array( 'featured' => 0 === $index, 'opportunity' => true ) ); ++$index; ?>
+				<?php endwhile; wp_reset_postdata(); ?>
+			<?php else : ?>
 			<div class="opportunities-empty" data-reveal>
 				<strong>No verified opportunities are currently published.</strong>
 				<p>Historical listings are being reviewed before republication so that closed or outdated positions are not presented as active.</p>
 			</div>
+			<?php endif; ?>
 		</section>
 
 		<section id="spotlights" class="news-section-block" aria-labelledby="spotlights-title">

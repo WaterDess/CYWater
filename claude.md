@@ -166,6 +166,16 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
 
 ### Temporary Staging Snapshot (2026-08-19)
 
+- On 2026-09-16 theme `0.6.60` connects News Opportunities to the native
+  WordPress `opportunities` category. Editors select it in Categories;
+  its posts appear under Opportunities and are excluded from Spotlights.
+  The requested UMich 2027 recruitment post was assigned this category while
+  preserving its prior categories and full body. Featured news cards now crop
+  images to fill the desktop column and limit previews to four lines; mobile
+  stacks the image above the copy. Live browser checks passed at 1440/390px.
+  Rollbacks: `cywater-release-backups/news-opportunities-staging-20260916`
+  and `cywater-release-backups/news-opportunities-production-20260916`.
+
 - On 2026-09-15 theme `0.6.59` unifies Bylaws Contents with the Events
   category navigation. Both use the same layout, thin rule, teal highlights,
   sticky positioning and mobile horizontal navigation. The old white-card TOC

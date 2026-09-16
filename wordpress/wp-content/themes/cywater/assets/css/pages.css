@@ -723,10 +723,11 @@
   overflow: hidden;
   margin-bottom: var(--sp-7);
 }
-.news-feature .card-media { aspect-ratio: 4/3; }
+.news-feature .card-media { position: relative; aspect-ratio: auto; min-height: 280px; align-self: stretch; }
+.news-feature .card-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .news-feature .card-body { padding: var(--sp-6); justify-content: center; }
 .news-feature .card-title { font-size: var(--fs-lg); }
-.news-feature .card-excerpt { font-size: var(--fs-sm); }
+.news-feature .card-excerpt { font-size: var(--fs-sm); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; overflow: hidden; }
 
 .news-list { display: flex; flex-direction: column; }
 .news-item {
@@ -1000,6 +1001,7 @@
   .benefits-grid, .mission-stats { grid-template-columns: 1fr; }
   .dash-layout, .dash-cards { grid-template-columns: 1fr; }
   .news-feature { grid-template-columns: 1fr; }
+  .news-feature .card-media { aspect-ratio: 4/3; min-height: 0; }
   .news-item { grid-template-columns: 1fr; }
   .news-item .title-visual strong { font-size: var(--fs-md); }
   .news-item .title-visual-year { font-size: var(--fs-3xl); }
