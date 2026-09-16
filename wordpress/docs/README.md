@@ -56,6 +56,13 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 
 ## Current State
 
+On 2026-09-16 the UMich recruitment article's application section was repaired
+as native editor blocks: separate PhD (five items) and Postdoc (three items)
+lists, a standalone contact paragraph, and consistent H2/H3 body headings.
+All non-whitespace text was verified unchanged. Desktop/mobile checks found
+zero empty list items and no page overflow. The prior article is retained at
+`cywater-release-backups/umich-format-20260916/article-242.json` on the server.
+
 Theme `0.6.61` displays article bodies and opening content immediately. Content
 is visible without JavaScript; only later off-screen reveal blocks are opted
 into animation. The observer triggers before a block enters the viewport and
