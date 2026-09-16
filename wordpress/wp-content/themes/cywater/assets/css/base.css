@@ -190,9 +190,13 @@ small { font-size: var(--fs-sm); }
 
 /* ---------- Page transitions / reveal ---------- */
 [data-reveal] {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+}
+[data-reveal].reveal-pending:not(.is-visible) {
   opacity: 0;
   transform: translateY(16px);
-  transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
 }
 [data-reveal].is-visible { opacity: 1; transform: none; }
 
@@ -206,5 +210,5 @@ small { font-size: var(--fs-sm); }
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  [data-reveal] { opacity: 1; transform: none; }
+  [data-reveal], [data-reveal].reveal-pending:not(.is-visible) { opacity: 1; transform: none; }
 }

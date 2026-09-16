@@ -56,6 +56,11 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 
 ## Current State
 
+Theme `0.6.61` displays article bodies and opening content immediately. Content
+is visible without JavaScript; only later off-screen reveal blocks are opted
+into animation. The observer triggers before a block enters the viewport and
+does not require a percentage of a long article to become visible.
+
 Theme `0.6.60` connects the News Opportunities section to the native WordPress
 category `Opportunities` (slug `opportunities`). Editors select it in the
 standard Categories panel. Its published posts are excluded from Spotlights.
@@ -77,7 +82,7 @@ page and its image returned HTTP 200, with one body image after the introduction
 
 Hostinger staging is available at `https://staging.cywater.org/`, and the public
 production site is live at `https://cywater.org/`. The current accepted code
-baseline uses the CYWater `0.6.60` theme, CYWater Membership `0.9.14`, CYWater
+baseline uses the CYWater `0.6.61` theme, CYWater Membership `0.9.14`, CYWater
 Partnerships `0.1.5`, CYWater Logo Call `0.4.2`, CYWater Forum `0.6.3`, CYWater
 Environment `0.5.7`, CYWater Core `0.6.9`, CYWater Operations `0.3.5`, Event
 Tickets `5.29.1`, and CYWater Meeting Registration `0.1.15`.

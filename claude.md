@@ -166,6 +166,15 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
 
 ### Temporary Staging Snapshot (2026-08-19)
 
+- On 2026-09-16 theme `0.6.61` makes reveal content visible by default.
+  Article bodies, the first three reveal blocks, and initial viewport content
+  remain visible immediately. Only later off-screen blocks receive a pending
+  animation class, with an early zero-threshold observer. This prevents long
+  article bodies from waiting for a percentage of their height to enter view.
+  Desktop/mobile checks cover enabled and disabled JavaScript. Rollbacks:
+  `cywater-release-backups/reveal-content-staging-20260916` and
+  `cywater-release-backups/reveal-content-production-20260916`.
+
 - On 2026-09-16 theme `0.6.60` connects News Opportunities to the native
   WordPress `opportunities` category. Editors select it in Categories;
   its posts appear under Opportunities and are excluded from Spotlights.

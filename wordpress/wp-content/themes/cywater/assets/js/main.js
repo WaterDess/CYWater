@@ -50,17 +50,25 @@
           entries.forEach((entry) => {
             if (!entry.isIntersecting) return;
             entry.target.classList.add("is-visible");
+            entry.target.classList.remove("reveal-pending");
             revealObserver.unobserve(entry.target);
           });
         },
-        { threshold: 0.12, rootMargin: "0px 0px -40px 0px" }
+        { threshold: 0, rootMargin: "0px 0px 120px 0px" }
       )
     : null;
 
   function refreshReveals(root = document) {
-    root.querySelectorAll("[data-reveal]:not(.is-visible)").forEach((el) => {
-      if (revealObserver) revealObserver.observe(el);
-      else el.classList.add("is-visible");
+    root.querySelectorAll("[data-reveal]:not(.is-visible)").forEach((el, index) => {
+      const opening = index < 3 || el.getBoundingClientRect().top < window.innerHeight + 120;
+      const article = el.matches(".entry-content") || el.querySelector(".entry-content");
+      if (!revealObserver || opening || article || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        el.classList.remove("reveal-pending");
+        el.classList.add("is-visible");
+      } else {
+        revealObserver.observe(el);
+        el.classList.add("reveal-pending");
+      }
     });
   }
 
