@@ -56,6 +56,17 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 
 ## Current State
 
+On 2026-09-18 theme `0.6.62` fixes the Awards archive's stale global post
+context by reading each award's explicit ID. All 14 published years retain
+their own recipients and papers. The year range is derived from published
+records. Primary links open independent Award records; announcement links are
+explicitly labelled Related News. No database content was changed. Read-only
+runtime regression passed on staging and production; production desktop/mobile
+checks verified distinct years, independent details and no page overflow.
+Staging's HTTP cache purge returned 401 behind its access gate; production
+purge succeeded. Rollbacks: `cywater-release-backups/awards-loop-staging-20260918`
+and `cywater-release-backups/awards-loop-production-20260918`.
+
 On 2026-09-16 the UMich recruitment article's application section was repaired
 as native editor blocks: separate PhD (five items) and Postdoc (three items)
 lists, a standalone contact paragraph, and consistent H2/H3 body headings.

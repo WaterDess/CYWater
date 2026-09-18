@@ -45,6 +45,11 @@ usort(
 	}
 );
 
+$award_years = array_filter( array_map( static function ( $award ) {
+	return (int) get_post_meta( $award->ID, '_cyw_year', true );
+}, $awards ) );
+$year_range = $award_years ? min( $award_years ) . '–' . max( $award_years ) : 'Published records';
+
 $render_paper = static function ( $paper ) {
 	if ( empty( $paper ) ) {
 		return;
@@ -69,21 +74,22 @@ $render_paper = static function ( $paper ) {
 </section>
 <section class="section section-tint">
 	<div class="container container-narrow">
-		<div class="section-head" data-reveal><span class="eyebrow">2012&ndash;2025</span><h2>Award yearbook.</h2></div>
+		<div class="section-head" data-reveal><span class="eyebrow"><?php echo esc_html( $year_range ); ?></span><h2>Award yearbook.</h2></div>
 		<div id="awards-yearbook" class="awards-yearbook">
 			<?php
 			foreach ( $awards as $award ) :
-				setup_postdata( $award );
-				$record = json_decode( (string) get_post_meta( get_the_ID(), '_cyw_award_record', true ), true );
+				// Use the record ID explicitly: setup_postdata does not replace global $post.
+				$award_id = $award->ID;
+				$record = json_decode( (string) get_post_meta( $award_id, '_cyw_award_record', true ), true );
 				$record = is_array( $record ) ? $record : array();
-				$year   = (string) get_post_meta( get_the_ID(), '_cyw_year', true );
+				$year   = (string) get_post_meta( $award_id, '_cyw_year', true );
 				$year_label  = $year ?: 'Year pending';
-				$year_anchor = $year ? 'award-' . $year : 'award-record-' . get_the_ID();
+				$year_anchor = $year ? 'award-' . $year : 'award-record-' . $award_id;
 				$best   = $record['bestPaper'] ?? array();
-				$best['author']  = get_post_meta( get_the_ID(), '_cyw_recipient', true ) ?: ( $best['author'] ?? '' );
-				$best['title']   = get_post_meta( get_the_ID(), '_cyw_paper_title', true ) ?: ( $best['title'] ?? '' );
-				$best['journal'] = get_post_meta( get_the_ID(), '_cyw_journal', true ) ?: ( $best['journal'] ?? '' );
-				$article_id      = get_post_meta( get_the_ID(), '_cyw_article_id', true ) ?: ( $record['articleId'] ?? '' );
+				$best['author']  = get_post_meta( $award_id, '_cyw_recipient', true ) ?: ( $best['author'] ?? '' );
+				$best['title']   = get_post_meta( $award_id, '_cyw_paper_title', true ) ?: ( $best['title'] ?? '' );
+				$best['journal'] = get_post_meta( $award_id, '_cyw_journal', true ) ?: ( $best['journal'] ?? '' );
+				$article_id      = get_post_meta( $award_id, '_cyw_article_id', true ) ?: ( $record['articleId'] ?? '' );
 				$article_url     = $article_id ? cywater_source_permalink( 'news:' . $article_id ) : '';
 				$ceremony        = is_array( $record['ceremony'] ?? null ) ? $record['ceremony'] : array();
 				?>
@@ -99,9 +105,9 @@ $render_paper = static function ( $paper ) {
 							<p class="award-pending"><?php echo esc_html( $record['note'] ?? 'Award record pending confirmation.' ); ?></p>
 						<?php endif; ?>
 						<?php if ( $ceremony ) : ?>
-							<a class="event-archive-row" href="<?php echo esc_url( $article_url ?: get_permalink() ); ?>">
+							<a class="event-archive-row" href="<?php echo esc_url( get_permalink( $award_id ) ); ?>">
 								<span class="event-archive-media">
-									<img src="<?php echo esc_url( cywater_featured_image_url( get_the_ID(), 'cywater-card', $ceremony['image'] ?? '' ) ); ?>" alt="<?php echo esc_attr( $ceremony['imageAlt'] ?? $ceremony['title'] ?? '' ); ?>">
+									<img src="<?php echo esc_url( cywater_featured_image_url( $award_id, 'cywater-card', $ceremony['image'] ?? '' ) ); ?>" alt="<?php echo esc_attr( $ceremony['imageAlt'] ?? $ceremony['title'] ?? '' ); ?>">
 								</span>
 								<span class="event-archive-copy">
 									<span class="badge badge-mute">Award ceremony</span>
@@ -111,12 +117,15 @@ $render_paper = static function ( $paper ) {
 								</span>
 								<span class="link">View details</span>
 							</a>
-						<?php elseif ( $article_url ) : ?>
-							<a class="link" href="<?php echo esc_url( $article_url ); ?>">Read award announcement</a>
+						<?php else : ?>
+							<p><a class="link" href="<?php echo esc_url( get_permalink( $award_id ) ); ?>">View award record</a></p>
+						<?php endif; ?>
+						<?php if ( $article_url ) : ?>
+							<p class="meta"><a href="<?php echo esc_url( $article_url ); ?>">Related News: award announcement</a></p>
 						<?php endif; ?>
 					</div>
 				</article>
-			<?php endforeach; wp_reset_postdata(); ?>
+			<?php endforeach; ?>
 		</div>
 	</div>
 </section>
