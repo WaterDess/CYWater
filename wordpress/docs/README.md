@@ -56,6 +56,12 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 
 ## Current State
 
+On 2026-09-21 the About Milestones template was updated on staging and
+production to sort years numerically newest first (2026 through 2011).
+Copy and timeline styling are unchanged. PHP lint and production 1440/390px
+order/overflow checks passed. Previous templates are retained under
+`cywater-release-backups/milestones-desc-{staging,production}-20260921`.
+
 On 2026-09-18 theme `0.6.62` fixes the Awards archive's stale global post
 context by reading each award's explicit ID. All 14 published years retain
 their own recipients and papers. The year range is derived from published

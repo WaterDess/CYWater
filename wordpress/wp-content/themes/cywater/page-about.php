@@ -26,7 +26,16 @@ while ( have_posts() ) :
 		<div class="media-frame" data-reveal><img src="<?php echo esc_url( cywater_asset_uri( 'img/article/founding-2011.jpg' ) ); ?>" alt="CYWater founding gathering in 2011" loading="lazy"></div>
 	</div></div></section>
 	<section class="section section-tint"><div class="container container-narrow"><div class="section-head center" data-reveal><span class="eyebrow center">Milestones</span><h2>Milestones</h2></div><div class="timeline" data-reveal>
-		<?php foreach ( array( '2011' => 'CYWater was founded as an international water-science community.', '2012' => 'The Young Scientist Best Paper Award was established.', '2013' => 'The first Annual Meeting was held in Beijing.', '2020' => 'The Annual Meeting moved online and reached participants across multiple continents.', '2026' => 'The next Annual Meeting will take place in Nanjing, China.' ) as $year => $copy ) : ?><div class="timeline-item"><div class="timeline-year"><?php echo esc_html( $year ); ?></div><p style="margin-top:.3rem"><?php echo esc_html( $copy ); ?></p></div><?php endforeach; ?>
+		<?php
+		$milestones = array(
+			2011 => 'CYWater was founded as an international water-science community.',
+			2012 => 'The Young Scientist Best Paper Award was established.',
+			2013 => 'The first Annual Meeting was held in Beijing.',
+			2020 => 'The Annual Meeting moved online and reached participants across multiple continents.',
+			2026 => 'The next Annual Meeting will take place in Nanjing, China.',
+		);
+		krsort( $milestones, SORT_NUMERIC );
+		foreach ( $milestones as $year => $copy ) : ?><div class="timeline-item"><div class="timeline-year"><?php echo esc_html( $year ); ?></div><p style="margin-top:.3rem"><?php echo esc_html( $copy ); ?></p></div><?php endforeach; ?>
 	</div></div></section>
 	<section class="section"><div class="container container-narrow"><div class="section-head center" data-reveal><span class="eyebrow center">Governance</span><h2>Governance</h2></div><p class="lead" style="text-align:center; margin-bottom:var(--sp-6)">The Board of Directors holds the Association's corporate powers, sets strategic direction, oversees finances, appoints committees, and ensures compliance with law and mission. Current appointments are being updated.</p><div class="hero-actions" style="justify-content:center"><a class="btn btn-outline" href="<?php echo esc_url( home_url( '/board/' ) ); ?>">Board</a><a class="btn btn-outline" href="<?php echo esc_url( home_url( '/bylaws/' ) ); ?>">Bylaws</a></div></div></section>
 	<?php
