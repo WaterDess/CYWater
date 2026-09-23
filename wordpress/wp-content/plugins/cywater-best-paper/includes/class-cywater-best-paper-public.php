@@ -9,6 +9,7 @@ final class CYWater_Best_Paper_Public {
 	public static function register() {
 		add_filter( 'the_content', array( __CLASS__, 'append_module' ), 38 );
 		add_shortcode( 'cywater_best_paper', array( __CLASS__, 'shortcode' ) );
+		add_shortcode( 'cywater_best_paper_preview', array( __CLASS__, 'preview_shortcode' ) );
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_assets' ) );
 		add_action( 'template_redirect', array( __CLASS__, 'protect_personal_response' ) );
 		add_action( 'admin_post_cywater_best_paper_submit', array( __CLASS__, 'handle_submit' ) );
@@ -22,7 +23,7 @@ final class CYWater_Best_Paper_Public {
 
 	public static function enqueue_assets() {
 		$post = get_post();
-		if ( ! $post || ( ! is_singular( 'cyw_award' ) && ! has_shortcode( $post->post_content, 'cywater_best_paper' ) ) ) {
+		if ( ! $post || ( ! is_singular( 'cyw_award' ) && ! has_shortcode( $post->post_content, 'cywater_best_paper' ) && ! has_shortcode( $post->post_content, 'cywater_best_paper_preview' ) ) ) {
 			return;
 		}
 		self::assets();
@@ -43,12 +44,19 @@ final class CYWater_Best_Paper_Public {
 		$config = 'cyw_award' === $post->post_type ? CYWater_Best_Paper::config( $post->ID ) : array();
 		// The public open/closed state also changes at cycle boundaries. Never
 		// cache an enabled module, including its anonymous sign-in gate.
-		if ( ! empty( $config['enabled'] ) || has_shortcode( $post->post_content, 'cywater_best_paper' ) ) {
+		$is_preview = has_shortcode( $post->post_content, 'cywater_best_paper_preview' );
+		if ( ! empty( $config['enabled'] ) || has_shortcode( $post->post_content, 'cywater_best_paper' ) || $is_preview ) {
 			if ( ! defined( 'DONOTCACHEPAGE' ) ) {
 				define( 'DONOTCACHEPAGE', true );
 			}
 			nocache_headers();
 			do_action( 'litespeed_control_set_nocache', 'CYWater Best Paper application state' );
+		}
+		if ( $is_preview ) {
+			header( 'X-Robots-Tag: noindex, nofollow, noarchive', true );
+			if ( ! current_user_can( 'manage_options' ) ) {
+				wp_die( 'This preview is available only to CYWater administrators.', 'Private preview', array( 'response' => 403 ) );
+			}
 		}
 	}
 
@@ -80,10 +88,19 @@ final class CYWater_Best_Paper_Public {
 		return $award_id ? self::render( $award_id ) : '';
 	}
 
+	/** A separate administrator-only surface, never an alternate intake route. */
+	public static function preview_shortcode( $attributes ) {
+		if ( doing_filter( 'get_the_excerpt' ) || ! current_user_can( 'manage_options' ) ) {
+			return '';
+		}
+		$attributes = shortcode_atts( array( 'award_id' => 0 ), $attributes, 'cywater_best_paper_preview' );
+		return self::render( absint( $attributes['award_id'] ), true );
+	}
+
 	/** A direct, permission-checked renderer is also available for staging QA. */
-	public static function render( $award_id ) {
+	public static function render( $award_id, $interactive_preview = false ) {
 		$award_id = absint( $award_id );
-		if ( ! self::may_render( $award_id ) ) {
+		if ( ! self::may_render( $award_id ) || ( $interactive_preview && ! current_user_can( 'manage_options' ) ) ) {
 			return '';
 		}
 		$config = CYWater_Best_Paper::config( $award_id );
@@ -92,10 +109,12 @@ final class CYWater_Best_Paper_Public {
 		}
 		self::assets();
 		$phase = CYWater_Best_Paper::phase( $award_id );
-		$application = is_user_logged_in() ? CYWater_Best_Paper::own_application( $award_id, get_current_user_id() ) : null;
-		$flash = self::consume_flash( $award_id );
-		$preview = current_user_can( 'manage_options' ) && ( empty( $config['enabled'] ) || 'draft' === $phase );
-		$open = 'applications' === $phase && 'publish' === get_post_status( $award_id );
+		// A preview uses only account defaults, never saved applications or their
+		// one-time feedback. It remains non-submitting even when real intake opens.
+		$application = ! $interactive_preview && is_user_logged_in() ? CYWater_Best_Paper::own_application( $award_id, get_current_user_id() ) : null;
+		$flash = $interactive_preview ? null : self::consume_flash( $award_id );
+		$preview = $interactive_preview || ( current_user_can( 'manage_options' ) && ( empty( $config['enabled'] ) || 'draft' === $phase ) );
+		$open = ! $interactive_preview && 'applications' === $phase && 'publish' === get_post_status( $award_id );
 		ob_start();
 		?>
 		<section class="cywater-best-paper" id="cywater-best-paper-<?php echo esc_attr( $award_id ); ?>" aria-labelledby="cywater-best-paper-heading-<?php echo esc_attr( $award_id ); ?>">
@@ -103,7 +122,11 @@ final class CYWater_Best_Paper_Public {
 			<h2 id="cywater-best-paper-heading-<?php echo esc_attr( $award_id ); ?>"><?php echo esc_html( $application ? 'Your application' : 'Apply for this award' ); ?></h2>
 			<p>Submit your paper and CV for the annual CYWater Best Paper Award. Receiving an application does not confirm eligibility or an award; the committee reviews eligible applications and confirms the final results.</p>
 			<?php if ( $preview ) : ?>
+				<?php if ( $interactive_preview ) : ?>
+					<div class="cywater-best-paper__notice" role="note"><strong>Private interactive preview — no application will be submitted.</strong><p>You can check your account defaults, fill in the fields and choose local files. Nothing entered or selected here is uploaded or saved. The Submit application button is disabled. The official application schedule is unchanged.</p></div>
+				<?php else : ?>
 				<div class="cywater-best-paper__notice" role="note"><strong>Administrator preview — applications are not open.</strong><p>The form below is a read-only preview. No application can be submitted from this preview.</p></div>
+				<?php endif; ?>
 			<?php endif; ?>
 			<?php self::render_schedule( $config, $phase ); ?>
 			<div class="cywater-best-paper__rules">
@@ -126,7 +149,7 @@ final class CYWater_Best_Paper_Public {
 			<?php if ( ! is_user_logged_in() && $open ) : ?>
 				<div class="cywater-best-paper__gate"><h3>Sign in to apply</h3><p>Your CYWater account keeps your application and files available to you. A paid membership is not required for this application.</p><a class="btn btn-primary" href="<?php echo esc_url( wp_login_url( get_permalink( $award_id ) . '#cywater-best-paper-' . $award_id ) ); ?>">Sign in to apply</a></div>
 			<?php elseif ( $open || $preview ) : ?>
-				<?php self::render_form( $award_id, $application, $flash, $preview ); ?>
+				<?php self::render_form( $award_id, $application, $flash, $preview, $interactive_preview ); ?>
 			<?php elseif ( ! $application ) : ?>
 				<div class="cywater-best-paper__gate"><h3><?php echo esc_html( in_array( $phase, array( 'draft', 'not_open' ), true ) ? 'Applications are not open yet' : 'Applications are closed' ); ?></h3><p><?php echo esc_html( in_array( $phase, array( 'draft', 'not_open' ), true ) ? 'The confirmed opening date and deadline will be published here before applications open.' : 'New applications and changes are no longer accepted for this award round.' ); ?></p></div>
 			<?php endif; ?>
@@ -203,8 +226,9 @@ final class CYWater_Best_Paper_Public {
 		<?php
 	}
 
-	private static function render_form( $award_id, $application, $flash, $preview ) {
+	private static function render_form( $award_id, $application, $flash, $preview, $interactive_preview = false ) {
 		$user = wp_get_current_user();
+		$read_only = $preview && ! $interactive_preview;
 		// Reuse Membership's existing profile field; never infer legal name parts
 		// from a username/display name or copy private birth dates from elsewhere.
 		$institution = get_user_meta( $user->ID, 'cyw_institution_name', true );
@@ -232,10 +256,15 @@ final class CYWater_Best_Paper_Public {
 		}
 		?>
 		<?php if ( $application ) : ?><h3 class="cywater-best-paper__edit-heading">Update your application</h3><p>Before the deadline, you can correct the details below or replace a document. Leaving a file field empty keeps the file already submitted. Your account profile is not changed.</p><?php endif; ?>
+		<?php if ( $interactive_preview ) : ?>
+		<!-- Deliberately not a form: Enter and disabled JavaScript cannot submit. -->
+		<div class="cywater-best-paper__form" data-cywater-best-paper-form data-cywater-best-paper-preview>
+		<?php else : ?>
 		<form class="cywater-best-paper__form" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post" enctype="multipart/form-data" data-cywater-best-paper-form>
 			<input type="hidden" name="action" value="cywater_best_paper_submit"><input type="hidden" name="award_id" value="<?php echo esc_attr( $award_id ); ?>">
 			<?php wp_nonce_field( 'cywater_best_paper_submit_' . $award_id, 'cywater_best_paper_nonce' ); ?>
-			<fieldset <?php disabled( $preview ); ?>>
+		<?php endif; ?>
+			<fieldset <?php disabled( $read_only ); ?>>
 				<legend>Applicant information</legend>
 				<?php if ( ! $application ) : ?><p class="cywater-best-paper__help">Your name, email and institution are filled from your CYWater account where available. Please check these details before submitting. Changes here apply only to this application and do not change your account profile.</p><?php endif; ?>
 				<div class="cywater-best-paper__grid">
@@ -246,7 +275,7 @@ final class CYWater_Best_Paper_Public {
 					<div class="cywater-best-paper__field wide"><label for="cywater-bp-<?php echo esc_attr( $award_id ); ?>-dob">Date of birth <span aria-hidden="true">*</span></label><input type="date" id="cywater-bp-<?php echo esc_attr( $award_id ); ?>-dob" name="dob" value="<?php echo esc_attr( $values['dob'] ); ?>" required <?php echo $application ? 'readonly' : ''; ?> aria-describedby="cywater-bp-<?php echo esc_attr( $award_id ); ?>-dob-help"><small id="cywater-bp-<?php echo esc_attr( $award_id ); ?>-dob-help">Used privately to verify your age on first submission. It is not published and cannot be changed through a later edit. Contact CYWater if a correction is needed.</small></div>
 				</div>
 			</fieldset>
-			<fieldset <?php disabled( $preview ); ?>>
+			<fieldset <?php disabled( $read_only ); ?>>
 				<legend>Paper details</legend>
 				<div class="cywater-best-paper__grid">
 					<?php self::field( $award_id, 'title', 'Paper title', $values['title'], 'text', true, 'off', true ); ?>
@@ -255,19 +284,19 @@ final class CYWater_Best_Paper_Public {
 					<div class="cywater-best-paper__field wide"><label for="cywater-bp-<?php echo esc_attr( $award_id ); ?>-doi">DOI <span class="cywater-best-paper__optional">(if available)</span></label><input type="text" id="cywater-bp-<?php echo esc_attr( $award_id ); ?>-doi" name="doi" value="<?php echo esc_attr( $values['doi'] ); ?>" maxlength="255" placeholder="10.1234/example" aria-describedby="cywater-bp-<?php echo esc_attr( $award_id ); ?>-doi-help"><small id="cywater-bp-<?php echo esc_attr( $award_id ); ?>-doi-help">Enter the DOI or its https://doi.org/ link. If no DOI is available, leave this field blank; the paper title is still checked for duplicate applications.</small></div>
 				</div>
 			</fieldset>
-			<fieldset <?php disabled( $preview ); ?>>
+			<fieldset <?php disabled( $read_only ); ?>>
 				<legend>Application documents</legend>
 				<p class="cywater-best-paper__help">Upload the paper and your current CV as PDF files, up to 20 MB each. Files are stored privately. Do not include unnecessary personal identification documents.</p>
 				<?php foreach ( array( 'paper' => 'Paper PDF', 'cv' => 'CV PDF' ) as $kind => $label ) { self::file_field( $award_id, $kind, $label, $application['files'][ $kind ] ?? null ); } ?>
 			</fieldset>
-			<fieldset <?php disabled( $preview ); ?>>
+			<fieldset <?php disabled( $read_only ); ?>>
 				<legend>Declarations</legend>
 				<label class="cywater-best-paper__consent"><input type="checkbox" name="no_prior_award" value="yes" required <?php checked( ! empty( $values['no_prior_award'] ) ); ?>><span>I confirm that I have never received either the CYWater Best Paper Award or the Outstanding Paper Award. <span aria-hidden="true">*</span></span></label>
 				<label class="cywater-best-paper__consent"><input type="checkbox" name="eligibility" value="yes" required <?php checked( ! empty( $values['eligibility'] ) ); ?>><span>I confirm that the information and files are accurate, that I meet the stated eligibility requirements, and that this paper is submitted only once for this award round. I agree to authorized award staff and committee members accessing these materials for the selection process. <span aria-hidden="true">*</span></span></label>
-				<div class="cywater-best-paper__actions"><button type="submit" class="btn btn-primary" <?php disabled( $preview ); ?>><?php echo $application ? 'Save application changes' : 'Submit application'; ?></button></div>
-				<p class="cywater-best-paper__help">Your saved application and files will appear here after successful submission. Please review the confirmation before leaving this page.</p>
+				<div class="cywater-best-paper__actions"><button type="<?php echo $interactive_preview ? 'button' : 'submit'; ?>" class="btn btn-primary" <?php disabled( $preview ); ?>><?php echo $application ? 'Save application changes' : 'Submit application'; ?></button></div>
+				<p class="cywater-best-paper__help"><?php echo $interactive_preview ? 'Preview only. These fields and local file selections are not saved or uploaded.' : 'Your saved application and files will appear here after successful submission. Please review the confirmation before leaving this page.'; ?></p>
 			</fieldset>
-		</form>
+		<?php if ( $interactive_preview ) : ?></div><?php else : ?></form><?php endif; ?>
 		<?php
 	}
 

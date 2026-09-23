@@ -8,7 +8,7 @@ Awards archive, create News posts automatically, or maintain a second account
 store. Application and review tables are private. Deactivating the plugin keeps
 the records and protected files intact.
 
-The user authorized production deployment on 2026-09-23. Version `0.1.1` and
+The user authorized production deployment on 2026-09-23. Version `0.1.2` and
 theme `0.6.64` are installed on both sites. The 2026 information page is public;
 its workflow remains in Draft with exact opening/closing dates blank until
 approved. Do not infer that publishing this information opens intake, appoints
@@ -21,6 +21,31 @@ from the historical yearbook until its results are explicitly announced.
 The archive contains only the current-cycle entry and historical yearbook,
 with the yearbook explanation under its heading; eligibility belongs on the
 individual cycle page, not in a separate archive section.
+
+## Independent private front-end preview
+
+The requested interactive preview is at
+`https://cywater.org/best-paper-2026-preview/`. Sign in with an Administrator
+account first; anonymous requests deliberately receive 404. The preview is a
+private WordPress Page (`253` production, `1212` staging), not a new Award,
+Event or public application cycle. It is not in public navigation, search,
+sitemaps or anonymous REST results. The renderer additionally checks
+`manage_options` and emits no-cache/noindex headers.
+
+The page uses `[cywater_best_paper_preview award_id="251"]` in production
+(Award `1202` on staging). It reuses the accepted applicant form and current
+account defaults. Inputs and local file choices are enabled for inspection,
+but there is no HTML form, action or nonce, and the type-button Submit control
+is disabled. No entered values or selected files are uploaded or saved; it
+does not load existing applications or consume their one-time feedback.
+These protections remain in place even when the real cycle later opens.
+
+To take this preview offline, change **Pages → Best Paper 2026 — application
+preview** to **Draft**. To restore it, choose **Private**, never Public.
+Do not change the official Award or disable the whole plugin just to hide the
+preview. The setup helper preserves any existing preview state, including Draft.
+The previous plugin is retained under
+`cywater-release-backups/best-paper-preview-{staging,production}-20260923`.
 
 ## Confirmed operating requirements
 
@@ -99,8 +124,8 @@ scripts/cywater-staging-best-paper-qa.php`. It uses uniquely marked test account
 and Award records, suppresses email, and removes its own fixtures. Never run it
 against production. Keep live applicant data out of browser fixtures and logs.
 
-Verified on 2026-09-23: 84 runtime assertions and desktop/mobile Chrome checks
-of four synthetic staging-rendered states with and without JavaScript. The
+Verified on 2026-09-23: 97 runtime assertions and desktop/mobile Chrome checks
+of five synthetic staging-rendered states with and without JavaScript. The
 source PDFs were replaced only by synthetic QA files; no historical applications
 were imported. The exact ZIP file bytes and per-application paths were checked.
 Actual production public archive/detail pages also passed the 1440/390px,

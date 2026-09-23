@@ -2,7 +2,7 @@
 /**
  * Plugin Name: CYWater Best Paper
  * Description: Award-cycle applications, private supporting files, scoped peer review, and committee decision support.
- * Version: 0.1.1
+ * Version: 0.1.2
  * Requires at least: 7.0
  * Requires PHP: 8.1
  * Text Domain: cywater-best-paper
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CYWATER_BEST_PAPER_VERSION', '0.1.1' );
+define( 'CYWATER_BEST_PAPER_VERSION', '0.1.2' );
 define( 'CYWATER_BEST_PAPER_DIR', plugin_dir_path( __FILE__ ) );
 define( 'CYWATER_BEST_PAPER_URL', plugin_dir_url( __FILE__ ) );
 

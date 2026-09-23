@@ -166,6 +166,25 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
 
 ### Temporary Staging Snapshot (2026-08-19)
 
+- On 2026-09-23 Best Paper `0.1.2` added the explicitly requested
+  independent front-end preview at `/best-paper-2026-preview/`. It is a
+  private WordPress Page (production `253`, staging `1212`) and its renderer
+  additionally requires `manage_options`. It is absent from public navigation,
+  search and sitemaps, denies anonymous REST reads, and sends no-cache/noindex
+  headers for its administrative view. Its inputs and local file chooser are
+  interactive, but it renders no HTML form, submission action or nonce, and
+  disables its type-button submit control. Enter/JavaScript-disabled usage
+  cannot upload or save. It uses account defaults without loading saved
+  applications or consuming their feedback. The real Award remains unchanged
+  and closed. Taking only the preview Page to Draft takes it offline; the setup
+  helper never republishes an existing page. Staging passed 97 self-cleaning
+  assertions; five synthetic UI states passed 1440/390px with JS on/off;
+  actual preview records passed 18 read-only render checks on each site.
+  Production anonymous HTTP/REST/navigation/sitemap checks passed. Six plugin
+  files match the artifact; account/membership/order/history hashes did not
+  change. Previous code is under
+  `cywater-release-backups/best-paper-preview-{staging,production}-20260923`.
+
 - Later on 2026-09-23 theme `0.6.64` simplified the Awards archive after
   user review: the standalone Eligibility/early-career section was removed,
   and the historical-record explanation now sits directly under Award

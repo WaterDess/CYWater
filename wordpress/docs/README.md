@@ -43,7 +43,7 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 ## Document Map
 
 - `module-boundaries.md` - ownership and dependency rules
-- `best-paper-workflow.md` - staging-only award applications, private review and committee decisions
+- `best-paper-workflow.md` - award applications, private preview, review and committee decisions
 - `member-workflow.md` - registration, profile, privacy, and status model
 - `payment-testing.md` - Stripe sandbox and refund test matrix
 - `stripe-live-verification.md` - US nonprofit Live KYC and bank-document packet
@@ -56,6 +56,17 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 - `email-copy.md` - approved-content drafts, not active mail overrides
 
 ## Current State
+
+On 2026-09-23 Best Paper `0.1.2` added a separate private frontend preview at
+`/best-paper-2026-preview/` (production Page `253`, staging Page `1212`). Only
+administrators can render it; it is not linked publicly. Fields and local file
+selection are interactive, but no HTML form/action/nonce or working submit
+control exists, so it cannot save or upload, even with JavaScript disabled.
+Changing this Page to Draft takes it offline without touching the real Award.
+Ninety-seven staging assertions, five UI-state desktop/mobile/JS variants,
+18 actual-record read-only checks per site, and production anonymous access,
+public REST, navigation and sitemap exclusions passed. Account/membership/order
+and historical-Award hashes are unchanged; official intake remains closed.
 
 Later on 2026-09-23 theme `0.6.64` removed the separate Eligibility section
 from the Awards archive. The yearbook explanation is now part of the yearbook
