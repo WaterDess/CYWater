@@ -43,7 +43,7 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 ## Document Map
 
 - `module-boundaries.md` - ownership and dependency rules
-- `best-paper-workflow.md` - award applications, private preview, review and committee decisions
+- `best-paper-workflow.md` - award applications, direct-link preview, review and committee decisions
 - `member-workflow.md` - registration, profile, privacy, and status model
 - `payment-testing.md` - Stripe sandbox and refund test matrix
 - `stripe-live-verification.md` - US nonprofit Live KYC and bank-document packet
@@ -57,16 +57,23 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 
 ## Current State
 
-On 2026-09-23 Best Paper `0.1.2` added a separate private frontend preview at
-`/best-paper-2026-preview/` (production Page `253`, staging Page `1212`). Only
-administrators can render it; it is not linked publicly. Fields and local file
-selection are interactive, but no HTML form/action/nonce or working submit
-control exists, so it cannot save or upload, even with JavaScript disabled.
-Changing this Page to Draft takes it offline without touching the real Award.
-Ninety-seven staging assertions, five UI-state desktop/mobile/JS variants,
-18 actual-record read-only checks per site, and production anonymous access,
-public REST, navigation and sitemap exclusions passed. Account/membership/order
-and historical-Award hashes are unchanged; official intake remains closed.
+On 2026-09-23 Best Paper `0.1.3` changed the separate frontend preview at
+`/best-paper-2026-preview/` (production Page `253`, staging Page `1212`) to
+public direct-link access at the user's request. No sign-in is required;
+anonymous identity fields are blank and signed-in visitors see only their
+own account defaults. This supersedes the `0.1.2` administrator-only preview.
+Fields and local file selection are interactive, but no HTML form/action/nonce
+or working submit control exists, so it cannot save or upload, even without
+JavaScript. It sends no-cache/noindex headers and is excluded from navigation,
+site search and Core page sitemaps; it is unlisted, not private. Changing only
+this Page to Draft takes it offline without touching the real Award. Staging
+passed 107 self-cleaning assertions; both actual-page render audits passed 32
+checks. Anonymous production browser checks passed at 1440/390px with JS
+enabled and disabled, including actual CSS/JS delivery, applied form styling,
+no overflow, no Enter/file-selection submission, and discovery exclusions.
+Account/membership/order and historical-Award hashes are unchanged;
+official intake remains closed. Rollback code and original Page data are under
+`cywater-release-backups/best-paper-public-preview-{staging,production}-20260923`.
 
 Later on 2026-09-23 theme `0.6.64` removed the separate Eligibility section
 from the Awards archive. The yearbook explanation is now part of the yearbook

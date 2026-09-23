@@ -12,6 +12,9 @@ final class CYWater_Best_Paper_Public {
 		add_shortcode( 'cywater_best_paper_preview', array( __CLASS__, 'preview_shortcode' ) );
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_assets' ) );
 		add_action( 'template_redirect', array( __CLASS__, 'protect_personal_response' ) );
+		add_action( 'pre_get_posts', array( __CLASS__, 'exclude_preview_search' ) );
+		add_filter( 'wp_sitemaps_posts_query_args', array( __CLASS__, 'exclude_preview_sitemap' ), 10, 2 );
+		add_filter( 'wp_nav_menu_objects', array( __CLASS__, 'exclude_preview_menu' ) );
 		add_action( 'admin_post_cywater_best_paper_submit', array( __CLASS__, 'handle_submit' ) );
 		add_action( 'admin_post_nopriv_cywater_best_paper_submit', array( __CLASS__, 'handle_logged_out_submit' ) );
 	}
@@ -54,10 +57,33 @@ final class CYWater_Best_Paper_Public {
 		}
 		if ( $is_preview ) {
 			header( 'X-Robots-Tag: noindex, nofollow, noarchive', true );
-			if ( ! current_user_can( 'manage_options' ) ) {
-				wp_die( 'This preview is available only to CYWater administrators.', 'Private preview', array( 'response' => 403 ) );
-			}
 		}
+	}
+
+	/** Public by direct URL, but not promoted in browse/search surfaces. */
+	private static function preview_page_ids() {
+		global $wpdb;
+		return array_map( 'absint', $wpdb->get_col( $wpdb->prepare( "SELECT DISTINCT post_id FROM {$wpdb->postmeta} WHERE meta_key = %s AND meta_value = %s", '_cyw_bp_preview_marker', 'interactive-preview-20260923' ) ) );
+	}
+
+	public static function exclude_preview_search( $query ) {
+		if ( ! is_admin() && $query->is_search() ) {
+			$query->set( 'post__not_in', array_values( array_unique( array_merge( (array) $query->get( 'post__not_in' ), self::preview_page_ids() ) ) ) );
+		}
+	}
+
+	public static function exclude_preview_sitemap( $args, $post_type ) {
+		if ( 'page' === $post_type ) {
+			$args['post__not_in'] = array_values( array_unique( array_merge( $args['post__not_in'] ?? array(), self::preview_page_ids() ) ) );
+		}
+		return $args;
+	}
+
+	public static function exclude_preview_menu( $items ) {
+		$ids = self::preview_page_ids();
+		return array_values( array_filter( $items, static function ( $item ) use ( $ids ) {
+			return 'page' !== $item->object || ! in_array( (int) $item->object_id, $ids, true );
+		} ) );
 	}
 
 	public static function append_module( $content ) {
@@ -88,9 +114,9 @@ final class CYWater_Best_Paper_Public {
 		return $award_id ? self::render( $award_id ) : '';
 	}
 
-	/** A separate administrator-only surface, never an alternate intake route. */
+	/** A direct-link preview of public Award information, never an intake route. */
 	public static function preview_shortcode( $attributes ) {
-		if ( doing_filter( 'get_the_excerpt' ) || ! current_user_can( 'manage_options' ) ) {
+		if ( doing_filter( 'get_the_excerpt' ) ) {
 			return '';
 		}
 		$attributes = shortcode_atts( array( 'award_id' => 0 ), $attributes, 'cywater_best_paper_preview' );
@@ -100,7 +126,7 @@ final class CYWater_Best_Paper_Public {
 	/** A direct, permission-checked renderer is also available for staging QA. */
 	public static function render( $award_id, $interactive_preview = false ) {
 		$award_id = absint( $award_id );
-		if ( ! self::may_render( $award_id ) || ( $interactive_preview && ! current_user_can( 'manage_options' ) ) ) {
+		if ( ! self::may_render( $award_id ) ) {
 			return '';
 		}
 		$config = CYWater_Best_Paper::config( $award_id );
@@ -123,7 +149,7 @@ final class CYWater_Best_Paper_Public {
 			<p>Submit your paper and CV for the annual CYWater Best Paper Award. Receiving an application does not confirm eligibility or an award; the committee reviews eligible applications and confirms the final results.</p>
 			<?php if ( $preview ) : ?>
 				<?php if ( $interactive_preview ) : ?>
-					<div class="cywater-best-paper__notice" role="note"><strong>Private interactive preview — no application will be submitted.</strong><p>You can check your account defaults, fill in the fields and choose local files. Nothing entered or selected here is uploaded or saved. The Submit application button is disabled. The official application schedule is unchanged.</p></div>
+					<div class="cywater-best-paper__notice" role="note"><strong>Preview only — no application will be submitted.</strong><p>No sign-in is required to view or try this form. If you are signed in, your own account details are filled where available. Nothing entered or selected here is uploaded or saved. The Submit application button is disabled.</p></div>
 				<?php else : ?>
 				<div class="cywater-best-paper__notice" role="note"><strong>Administrator preview — applications are not open.</strong><p>The form below is a read-only preview. No application can be submitted from this preview.</p></div>
 				<?php endif; ?>

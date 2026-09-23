@@ -132,18 +132,12 @@ try {
 	$_GET['bp_notice'] = $notice_token;
 	$flash = array( 'success' => false, 'message' => 'QA retry notice', 'values' => array( 'first_name' => 'Retry name', 'institution' => 'Retry University', 'email' => 'retry@example.invalid', 'dob' => '2000-01-01' ) );
 	set_transient( $notice_key, $flash, MINUTE_IN_SECONDS );
-	// A staff member may also own an application. The interactive layout-only
+	// A signed-in participant may also own an application. The public layout-only
 	// preview must show account defaults, not their saved record or retry flash.
-	$preview_user = wp_get_current_user();
-	$preview_user->add_cap( 'manage_options' );
-	try {
-		$interactive_own = CYWater_Best_Paper_Public::render( $award, true );
-		$assert( 'Later Account University' === $field_value( $interactive_own, 'institution' ) && '' === $field_value( $interactive_own, 'title' ) && '' === $field_value( $interactive_own, 'dob' ), 'Interactive preview used a saved application or failed-submission values instead of account defaults.' );
-		$assert( ! str_contains( $interactive_own, 'test-paper.pdf' ) && ! str_contains( $interactive_own, 'test-cv.pdf' ) && ! str_contains( $interactive_own, 'Your submitted files' ), 'Interactive preview exposed an existing application document.' );
-		$assert( $flash === get_transient( $notice_key ) && $app === CYWater_Best_Paper::get_application( $id ), 'Interactive preview consumed a pending notice or changed the saved application.' );
-	} finally {
-		$preview_user->remove_cap( 'manage_options' );
-	}
+	$interactive_own = CYWater_Best_Paper_Public::render( $award, true );
+	$assert( 'Later Account University' === $field_value( $interactive_own, 'institution' ) && '' === $field_value( $interactive_own, 'title' ) && '' === $field_value( $interactive_own, 'dob' ), 'Interactive preview used a saved application or failed-submission values instead of account defaults.' );
+	$assert( ! str_contains( $interactive_own, 'test-paper.pdf' ) && ! str_contains( $interactive_own, 'test-cv.pdf' ) && ! str_contains( $interactive_own, 'Your submitted files' ), 'Interactive preview exposed an existing application document.' );
+	$assert( $flash === get_transient( $notice_key ) && $app === CYWater_Best_Paper::get_application( $id ), 'Interactive preview consumed a pending notice or changed the saved application.' );
 	$excerpt_shortcode_guard = static function ( $excerpt ) use ( $award, $assert ) {
 		$assert( '' === CYWater_Best_Paper_Public::shortcode( array( 'award_id' => $award ) ), 'An excerpt rendered the application shortcode.' );
 		return $excerpt;
@@ -275,9 +269,20 @@ try {
 	$assert( str_contains( $interactive_shortcode, 'Applicant information' ) && ! preg_match( '/<form\b/i', $interactive_shortcode ), 'Standalone preview shortcode did not use the non-submitting preview renderer.' );
 	$assert( $preview_meta === get_user_meta( $manager ) && $preview_config === CYWater_Best_Paper::config( $draft ) && $preview_applications === CYWater_Best_Paper::applications( $award ), 'Standalone preview changed profile, cycle configuration or applications.' );
 	wp_set_current_user( $applicant );
-	$assert( '' === CYWater_Best_Paper_Public::render( $award, true ) && '' === do_shortcode( '[cywater_best_paper_preview award_id="' . $award . '"]' ), 'Subscriber can access the administrator-only interactive preview.' );
+	$subscriber_preview = CYWater_Best_Paper_Public::render( $award, true );
+	$assert( str_contains( $subscriber_preview, 'Applicant information' ) && str_contains( do_shortcode( '[cywater_best_paper_preview award_id="' . $award . '"]' ), 'Applicant information' ), 'Signed-in participant cannot view the published-award preview.' );
+	$assert( 'Later Account University' === $field_value( $subscriber_preview, 'institution' ) && 'applicant' === $field_value( $subscriber_preview, 'last_name' ) && '' === $field_value( $subscriber_preview, 'title' ), 'Signed-in preview did not use only the current account defaults.' );
+	$assert( ! str_contains( $subscriber_preview, 'test-paper.pdf' ) && ! str_contains( $subscriber_preview, 'cywater_best_paper_download' ), 'Signed-in preview leaked saved files.' );
 	wp_set_current_user( 0 );
-	$assert( '' === CYWater_Best_Paper_Public::render( $award, true ) && '' === do_shortcode( '[cywater_best_paper_preview award_id="' . $award . '"]' ), 'Anonymous visitor can access the administrator-only interactive preview.' );
+	$anonymous_preview = CYWater_Best_Paper_Public::render( $award, true );
+	$renders['interactive-preview-anonymous'] = $anonymous_preview;
+	$assert( str_contains( $anonymous_preview, 'Applicant information' ) && str_contains( do_shortcode( '[cywater_best_paper_preview award_id="' . $award . '"]' ), 'Applicant information' ), 'Anonymous visitor cannot view the published-award preview.' );
+	foreach ( array( 'first_name', 'last_name', 'email', 'institution', 'dob' ) as $name ) {
+		$assert( '' === $field_value( $anonymous_preview, $name ), 'Anonymous preview exposed an account identity field.' );
+	}
+	$assert( ! preg_match( '/<form\b|<fieldset\b[^>]*\bdisabled/i', $anonymous_preview ) && ! str_contains( $anonymous_preview, 'cywater_best_paper_nonce' ) && preg_match( '/<button\b(?=[^>]*\btype="button")(?=[^>]*\bdisabled)[^>]*>/i', $anonymous_preview ), 'Anonymous preview is not editable and non-submitting.' );
+	$assert( ! str_contains( $anonymous_preview, 'test-paper.pdf' ) && ! str_contains( $anonymous_preview, 'cywater_best_paper_download' ) && ! str_contains( $anonymous_preview, 'Your submitted files' ), 'Anonymous preview exposed a saved application or file.' );
+	$assert( '' === CYWater_Best_Paper_Public::render( $draft, true ) && '' === do_shortcode( '[cywater_best_paper_preview award_id="' . $draft . '"]' ), 'Anonymous preview bypassed unpublished Award protection.' );
 	$assert( '' === CYWater_Best_Paper_Public::render( $draft ), 'Anonymous user can view an unpublished award module.' );
 	file_put_contents( '/tmp/cywater-best-paper-render.json', wp_json_encode( $renders ) );
 	WP_CLI::log( 'Best Paper QA passed ' . $checks . ' assertions.' );

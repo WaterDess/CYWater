@@ -166,6 +166,27 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
 
 ### Temporary Staging Snapshot (2026-08-19)
 
+- On 2026-09-23 Best Paper `0.1.3` replaced the earlier administrator-only
+  preview with public direct-link access at `/best-paper-2026-preview/`, as
+  explicitly requested. Production Page `253` and staging Page `1212` are
+  published; the official Award and its closed intake remain unchanged.
+  Anonymous visitors see blank identity fields; signed-in visitors get only
+  their own account defaults, never existing applications or protected files.
+  The preview has editable fields/local file pickers but no HTML form, action,
+  nonce or working submit control. It cannot upload or save with JS on or off.
+  No-cache/noindex headers and exclusions from navigation, site search and Core
+  page sitemaps keep it unlisted, not private or access-controlled. Staging's
+  environment-wide Basic-auth protection is unchanged. The setup helper
+  converts the previous private page once and preserves later Draft/offline
+  decisions. Staging passed 107 self-cleaning assertions and both actual-page
+  render audits passed 32 checks. Account/membership/order/history hashes are
+  unchanged. Production anonymous browser checks passed at 1440/390px with JS
+  on/off, including asset HTTP 200, applied styling, no overflow, no interaction
+  submissions and discovery exclusions. Public plugin roots require mode 755;
+  private data and backups retain their restricted permissions.
+  Previous code and Page data are retained under
+  `cywater-release-backups/best-paper-public-preview-{staging,production}-20260923`.
+
 - On 2026-09-23 Best Paper `0.1.2` added the explicitly requested
   independent front-end preview at `/best-paper-2026-preview/`. It is a
   private WordPress Page (production `253`, staging `1212`) and its renderer
