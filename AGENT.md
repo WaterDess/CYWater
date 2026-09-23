@@ -166,6 +166,28 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
 
 ### Temporary Staging Snapshot (2026-08-19)
 
+- On 2026-09-23 CYWater Best Paper `0.1.0` was deployed **only to staging**.
+  It attaches a closed cycle workflow to the existing Award model and owns
+  private applications, protected paper/CV PDFs, scoped reviewer assignments,
+  independent scores, sample-SD z-score summaries, committee decisions, and
+  structured eligible-only/all-application ZIP exports. A separate review CSV
+  prevents scores from leaking into the material package. Staging Award
+  `1202` is a draft 2026 preview with no dates, Chair or reviewers assigned;
+  no real intake is open. Hong Yang is the selection-questions/meeting
+  coordination contact, not automatically the Chair. Planning months:
+  October call, November close, results before December AGU. Do not contact
+  him, send invitations, or publish the cycle without further authorization.
+  Confirmed rules: age <=35 at first submission; formal online date within
+  12 calendar months back from the closing date; prior Best/Outstanding
+  recipients excluded; one paper considered once; one Best Paper and an
+  unfixed Outstanding count. Sixty-eight self-cleaning staging assertions
+  passed, including private files, ZIP contents and score calculations.
+  Browser-rendered staging fixtures passed 1440/390px with JavaScript enabled
+  and disabled. The staging HTTP Basic-auth gate remains unchanged; a full
+  authenticated HTTP acceptance pass remains required before intake.
+  Production does not include this plugin. See
+  `wordpress/docs/best-paper-workflow.md`.
+
 - On 2026-09-16 theme `0.6.61` makes reveal content visible by default.
   Article bodies, the first three reveal blocks, and initial viewport content
   remain visible immediately. Only later off-screen blocks receive a pending

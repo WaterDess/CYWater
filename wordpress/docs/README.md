@@ -43,6 +43,7 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 ## Document Map
 
 - `module-boundaries.md` - ownership and dependency rules
+- `best-paper-workflow.md` - staging-only award applications, private review and committee decisions
 - `member-workflow.md` - registration, profile, privacy, and status model
 - `payment-testing.md` - Stripe sandbox and refund test matrix
 - `stripe-live-verification.md` - US nonprofit Live KYC and bank-document packet
@@ -55,6 +56,15 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 - `email-copy.md` - approved-content drafts, not active mail overrides
 
 ## Current State
+
+On 2026-09-23 Best Paper `0.1.0` was installed on staging only. Award `1202`
+is an unpublished 2026 preview; applications remain closed, exact dates and
+committee assignments remain blank, and no production code or real accounts
+were changed. The private application/review service passed 68 self-cleaning
+runtime assertions. Synthetic HTML rendered by the staging runtime passed
+Chrome checks at 1440/390px with and without JavaScript. Staging's existing
+HTTP Basic-auth protection was not changed; authenticated HTTP acceptance is
+still a pre-intake gate. See `best-paper-workflow.md` for scope and handoffs.
 
 On 2026-09-21 the About Milestones template was updated on staging and
 production to sort years numerically newest first (2026 through 2011).
