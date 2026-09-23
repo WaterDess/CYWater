@@ -1,4 +1,4 @@
-# Best Paper workflow — staging implementation
+# Best Paper workflow
 
 ## Release boundary
 
@@ -8,10 +8,16 @@ Awards archive, create News posts automatically, or maintain a second account
 store. Application and review tables are private. Deactivating the plugin keeps
 the records and protected files intact.
 
-This first release is for staging review only. Keep the 2026 Award record a draft,
-its workflow in Draft, and exact opening/closing dates blank until approved. Do
-not assign real reviewers, send real applicant mail, publish results, or enable
-production intake as part of this preview.
+The user authorized production deployment on 2026-09-23. Version `0.1.1` and
+theme `0.6.63` are installed on both sites. The 2026 information page is public;
+its workflow remains in Draft with exact opening/closing dates blank until
+approved. Do not infer that publishing this information opens intake, appoints
+reviewers, authorizes invitations or publishes award results.
+
+Public entry: **Awards → Current award cycle → View details and application**,
+at `https://cywater.org/awards/best-paper-award-2026/`. It is an Award, not an
+Event or an automatically created News post. The current cycle is separate
+from the historical yearbook until its results are explicitly announced.
 
 ## Confirmed operating requirements
 
@@ -43,6 +49,11 @@ production intake as part of this preview.
    the Applications phase selected, and the configured time window is open.
 3. Signed-in applicants submit identity, paper metadata, declarations, paper PDF,
    and CV PDF. They can review the saved record and download their own files.
+   First/Last name, email and institution default to the current account's
+   existing WordPress and Membership fields (`cyw_institution_name`). A saved
+   application takes precedence over later profile changes; retry values take
+   precedence over both. Application-only edits never change the account.
+   Birth date is not inferred or copied from unrelated private data.
 4. Staff check eligibility, missing information, and previous-winner restrictions.
    Only eligible applications may be assigned for scoring.
 5. Configured committee members can read the eligible papers in their cycle
@@ -85,18 +96,36 @@ scripts/cywater-staging-best-paper-qa.php`. It uses uniquely marked test account
 and Award records, suppresses email, and removes its own fixtures. Never run it
 against production. Keep live applicant data out of browser fixtures and logs.
 
-Verified on 2026-09-23: 68 runtime assertions and desktop/mobile Chrome checks
+Verified on 2026-09-23: 84 runtime assertions and desktop/mobile Chrome checks
 of four synthetic staging-rendered states with and without JavaScript. The
 source PDFs were replaced only by synthetic QA files; no historical applications
 were imported. The exact ZIP file bytes and per-application paths were checked.
-Production remains unchanged. Full authenticated HTTP submit/download/reviewer
+Actual production public archive/detail pages also passed the 1440/390px,
+JavaScript-on/off matrix: one current cycle, 14 historical Awards, one module,
+closed anonymous intake, no overflow and explicit no-cache response headers.
+Hashes of all pre-existing users, user metadata, Membership rows, orders and
+historical Awards were unchanged on both sites. No test registrations or real
+applicant mail were created in production. Full authenticated HTTP submit/download/reviewer
 acceptance is still required before opening intake; staging's existing HTTP
 Basic-auth gate has deliberately not been bypassed or changed.
 
-Current staging preview: Award `1202`, draft, module enabled in Draft phase,
-no opening/closing dates and no reviewer assignments. Open **Award records →
-Best Paper workflow**, choose the 2026 record, or use the WordPress preview.
-The pre-install active-plugin list is retained at
-`/home/u111638297/cywater-release-backups/best-paper-staging-20260923/active-plugins-before.json`.
-Rollback is plugin deactivation and leaving the draft unpublished; do not drop
-application tables or private files. No existing theme or plugin tree was changed.
+Current records: production Award `251`, staging Award `1202`, both published
+at `/awards/best-paper-award-2026/`; workflow Draft, no exact dates, no committee.
+Administrators use **Award records → Best Paper workflow**, choose the 2026
+record and follow **Preview application page** to see the disabled form, including
+account defaults. Ordinary visitors see the closed-cycle information only.
+
+Full database, previous theme and active-plugin-list backups are retained at
+`/home/u111638297/cywater-release-backups/best-paper-release-production-20260923`
+and `.../best-paper-release-staging-20260923`; staging also has its previous
+Best Paper tree. Nine deployed code files were SHA-256 verified against the
+release artifact. Production remains Stripe Live; staging remains Sandbox.
+
+Safe rollback: first disable the affected cycle and draft only its current
+information record, deactivate the new plugin on production (restore the prior
+plugin tree on staging), and restore the three changed theme files from the
+theme backup. Never drop private tables/files or bulk-restore a database over
+new user activity. Database snapshots are disaster-recovery evidence, not an
+automatic rollback instruction. `scripts/cywater-best-paper-publish-2026.php`
+is a narrowly scoped, idempotent information-release helper, not a future-cycle
+setup tool; it refuses progressed cycles and preserves published content.

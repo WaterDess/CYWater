@@ -11,6 +11,8 @@ $users = array();
 $posts = array();
 $files = array();
 $renders = array();
+$transients = array();
+$original_get = $_GET;
 $original_user = get_current_user_id();
 $marker = 'cyw_bp_qa_' . strtolower( wp_generate_password( 10, false, false ) );
 $mail_guard = static function () { return true; };
@@ -31,6 +33,32 @@ $make_award = static function () use ( &$posts, $marker ) {
 	$posts[] = $id;
 	return (int) $id;
 };
+$field_value = static function ( $html, $name ) {
+	return preg_match( '/<input\b[^>]*\bname="' . preg_quote( $name, '/' ) . '"[^>]*\bvalue="([^"]*)"/', $html, $match ) ? html_entity_decode( $match[1], ENT_QUOTES, 'UTF-8' ) : null;
+};
+$in_main_loop = static function ( $award_id, $callback ) {
+	// Exercise content/excerpt filters in the same singular main-loop context
+	// as the theme, then restore every global touched by WP_Query::the_post().
+	$keys = array( 'wp_query', 'wp_the_query', 'post', 'id', 'authordata', 'currentday', 'currentmonth', 'page', 'pages', 'multipage', 'more', 'numpages' );
+	$before = array();
+	foreach ( $keys as $key ) { $before[$key] = array( array_key_exists( $key, $GLOBALS ), $GLOBALS[$key] ?? null ); }
+	try {
+		$query = new WP_Query( array( 'post_type' => 'cyw_award', 'p' => $award_id, 'post_status' => 'publish' ) );
+		$GLOBALS['wp_query'] = $query;
+		$GLOBALS['wp_the_query'] = $query;
+		$query->the_post();
+		return $callback();
+	} finally {
+		foreach ( $before as $key => $value ) {
+			if ( $value[0] ) { $GLOBALS[$key] = $value[1]; } else { unset( $GLOBALS[$key] ); }
+		}
+	}
+};
+$cache_bypass_count = 0;
+$cache_observer = static function ( $reason ) use ( &$cache_bypass_count ) {
+	if ( 'CYWater Best Paper application state' === $reason ) { ++$cache_bypass_count; }
+};
+add_action( 'litespeed_control_set_nocache', $cache_observer );
 
 try {
 	CYWater_Best_Paper::install();
@@ -43,6 +71,8 @@ try {
 	$award = $make_award();
 	$config = CYWater_Best_Paper::config( $award );
 	$assert( empty( $config['enabled'] ), 'A new Award must not accept applications by default.' );
+	$in_main_loop( $award, array( CYWater_Best_Paper_Public::class, 'protect_personal_response' ) );
+	$assert( 0 === $cache_bypass_count, 'Ordinary non-workflow Awards must retain their cache behavior.' );
 	$assert( CYWater_Best_Paper::can_manage(), 'Administrator must manage the workflow.' );
 	wp_set_current_user( $applicant );
 	$assert( ! CYWater_Best_Paper::can_manage(), 'Applicant must not manage the workflow.' );
@@ -52,10 +82,18 @@ try {
 	$saved = CYWater_Best_Paper::save_config( $award, $config );
 	$assert( ! is_wp_error( $saved ), 'Valid cycle configuration was rejected.' );
 	wp_set_current_user( 0 );
+	$in_main_loop( $award, array( CYWater_Best_Paper_Public::class, 'protect_personal_response' ) );
+	$assert( 1 === $cache_bypass_count && defined( 'DONOTCACHEPAGE' ) && DONOTCACHEPAGE, 'Anonymous workflow pages can cache stale open/closed state.' );
 	$renders['logged-out'] = CYWater_Best_Paper_Public::render( $award );
 	$assert( str_contains( $renders['logged-out'], 'Sign in to apply' ) && ! str_contains( $renders['logged-out'], 'name="dob"' ), 'Anonymous view exposes a form instead of the login gate.' );
 	wp_set_current_user( $applicant );
+	update_user_meta( $applicant, 'cyw_institution_name', 'Account QA University' );
+	$account_meta = get_user_meta( $applicant );
 	$renders['form'] = CYWater_Best_Paper_Public::render( $award );
+	$assert( 'QA' === $field_value( $renders['form'], 'first_name' ) && 'applicant' === $field_value( $renders['form'], 'last_name' ), 'New application did not use existing account name parts.' );
+	$assert( $marker . 'applicant@example.invalid' === $field_value( $renders['form'], 'email' ) && 'Account QA University' === $field_value( $renders['form'], 'institution' ), 'New application did not use current account email and canonical institution.' );
+	$assert( '' === $field_value( $renders['form'], 'dob' ), 'New application inferred a birth date.' );
+	$assert( $account_meta === get_user_meta( $applicant ), 'Rendering the application mutated account profile metadata.' );
 	wp_set_current_user( $manager );
 	$assert( CYWater_Best_Paper::is_reviewer( $award, $reviewer ), 'Configured reviewer was not recognized.' );
 	$assert( ! CYWater_Best_Paper::is_reviewer( $award, $other ), 'Unassigned account is a reviewer.' );
@@ -78,18 +116,49 @@ try {
 	$id = CYWater_Best_Paper::submit( $award, $input, $uploads );
 	$assert( ! is_wp_error( $id ) && $id > 0, 'Valid age-35 application with PDFs failed.' );
 	$app = CYWater_Best_Paper::get_application( $id );
+	$assert( $account_meta === get_user_meta( $applicant ), 'Application submission changed account profile metadata.' );
+	update_user_meta( $applicant, 'cyw_institution_name', 'Later Account University' );
+	$account_meta = get_user_meta( $applicant );
 	$assert( 35 === $app['record']['age_at_submission'] && '10.1234/qa-a' === $app['record']['doi'], 'Age or DOI normalization is incorrect.' );
 	$assert( count( $app['files'] ) === 2 && is_file( CYWater_Best_Paper::file_path( $app, 'paper' ) ), 'Saved PDF is not available to its owner.' );
 	$assert( str_contains( CYWater_Best_Paper::download_url( $id, 'paper' ), '_wpnonce=' ), 'Protected download is missing its nonce.' );
 	$html = CYWater_Best_Paper_Public::render( $award );
 	$renders['confirmation'] = $html;
+	$assert( 'QA University' === $field_value( $html, 'institution' ) && $input['email'] === $field_value( $html, 'email' ), 'Later account changes replaced saved application details.' );
 	$assert( str_contains( $html, 'test-paper.pdf' ) && str_contains( $html, 'test-cv.pdf' ) && str_contains( $html, 'Download' ), 'Applicant cannot review their saved files.' );
+	$notice_token = wp_generate_password( 24, false, false );
+	$notice_key = 'cyw_bp_flash_' . $applicant . '_' . $award . '_' . $notice_token;
+	$transients[] = $notice_key;
+	$_GET['bp_notice'] = $notice_token;
+	$flash = array( 'success' => false, 'message' => 'QA retry notice', 'values' => array( 'first_name' => 'Retry name', 'institution' => 'Retry University', 'email' => 'retry@example.invalid', 'dob' => '2000-01-01' ) );
+	set_transient( $notice_key, $flash, MINUTE_IN_SECONDS );
+	$excerpt_shortcode_guard = static function ( $excerpt ) use ( $award, $assert ) {
+		$assert( '' === CYWater_Best_Paper_Public::shortcode( array( 'award_id' => $award ) ), 'An excerpt rendered the application shortcode.' );
+		return $excerpt;
+	};
+	add_filter( 'get_the_excerpt', $excerpt_shortcode_guard, 9 );
+	try {
+		$in_main_loop( $award, static function () use ( $award, $assert, $field_value, $notice_key, $flash, $input ) {
+			$assert( is_singular( 'cyw_award' ) && in_the_loop() && is_main_query(), 'Excerpt QA did not establish the singular main loop.' );
+			$excerpt = get_the_excerpt( $award );
+			$assert( ! str_contains( $excerpt, 'Apply for this award' ) && ! str_contains( $excerpt, 'Your application' ) && ! str_contains( $excerpt, 'QA retry notice' ), 'An automatic excerpt contains private workflow output.' );
+			$assert( $flash === get_transient( $notice_key ), 'Automatic excerpt consumed the application notice before the body.' );
+			$body = apply_filters( 'the_content', get_post_field( 'post_content', $award ) );
+			$assert( str_contains( $body, 'QA retry notice' ) && false === get_transient( $notice_key ), 'The full article did not receive and consume its one-time notice.' );
+			$assert( 'Retry name' === $field_value( $body, 'first_name' ) && 'Retry University' === $field_value( $body, 'institution' ) && 'retry@example.invalid' === $field_value( $body, 'email' ), 'Failed submission values did not take priority over saved application/account values.' );
+			$assert( $input['dob'] === $field_value( $body, 'dob' ), 'Retry notice replaced the immutable first-submission birth date.' );
+		} );
+	} finally {
+		remove_filter( 'get_the_excerpt', $excerpt_shortcode_guard, 9 );
+		unset( $_GET['bp_notice'] );
+	}
 	$assert( is_wp_error( CYWater_Best_Paper::staff_update( $id, array( 'status' => 'eligible' ) ) ), 'Applicant changed eligibility.' );
 	$assert( is_wp_error( CYWater_Best_Paper::submit( $award, array_merge( $input, array( 'dob' => $today->modify( '-34 years' )->format( 'Y-m-d' ) ) ) ) ), 'DOB snapshot could be silently changed.' );
 	$update = CYWater_Best_Paper::submit( $award, array_merge( $input, array( 'institution' => 'Updated QA University' ) ) );
 	$updated = CYWater_Best_Paper::get_application( $id );
 	$assert( $id === $update && $app['created_at'] === $updated['created_at'] && 2 === $updated['record']['version'], 'Update duplicated the application or changed first submission.' );
 	$assert( $app['files'] === $updated['files'] && count( $updated['record']['history'] ) === 1, 'Update lost documents or audit history.' );
+	$assert( $account_meta === get_user_meta( $applicant ), 'Rendering/retrying/updating an application changed account profile metadata.' );
 	$assert( array() === CYWater_Best_Paper::reviews( $id ), 'Applicant can see private reviews.' );
 	wp_set_current_user( $other );
 	$assert( null === CYWater_Best_Paper::get_application( $id ) && is_wp_error( CYWater_Best_Paper::file_path( $id, 'paper' ) ), 'Another applicant can read the private record/file.' );
@@ -202,9 +271,12 @@ try {
 		wp_delete_post( $id, true );
 	}
 	foreach ( $files as $file ) { if ( is_file( $file ) ) { unlink( $file ); } }
+	foreach ( $transients as $key ) { delete_transient( $key ); }
 	require_once ABSPATH . 'wp-admin/includes/user.php';
 	foreach ( $users as $id ) { wp_delete_user( $id ); }
 	wp_set_current_user( $original_user );
+	$_GET = $original_get;
 	remove_filter( 'pre_wp_mail', $mail_guard, PHP_INT_MAX );
+	remove_action( 'litespeed_control_set_nocache', $cache_observer );
 	WP_CLI::log( 'Temporary Best Paper fixtures removed.' );
 }

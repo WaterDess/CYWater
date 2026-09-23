@@ -166,7 +166,30 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
 
 ### Temporary Staging Snapshot (2026-08-19)
 
-- On 2026-09-23 CYWater Best Paper `0.1.0` was deployed **only to staging**.
+- On 2026-09-23, after explicit production authorization, Best Paper `0.1.1`
+  and theme `0.6.63` were deployed to staging and production. Awards now
+  separates the current application cycle from the 14 historical results.
+  The published 2026 information page is
+  `/awards/best-paper-award-2026/` (production Award `251`, staging `1202`).
+  Intake stays closed in Draft phase with no fabricated dates or committee.
+  Applicant defaults reuse existing account First/Last name, email and
+  `cyw_institution_name`; saved applications and retry values take precedence,
+  and application edits never update the account. Automatic excerpts cannot
+  render the form or consume feedback. Enabled cycle pages bypass shared
+  caching for guests as well as signed-in users. Activation verifies storage.
+  Staging passed 84 self-cleaning assertions and four synthetic browser states
+  at 1440/390px with JavaScript on/off. Actual production public pages passed
+  the same viewport/JavaScript matrix, including closed intake and no-cache
+  headers. Hashes of accounts, user metadata, memberships, orders and all
+  14 historical Awards were unchanged; production remains Stripe Live and
+  staging Sandbox. No real application, email or reviewer assignment was made.
+  Full authenticated HTTP submit/download/reviewer acceptance remains a gate
+  before opening intake; staging Basic authentication was not changed.
+  Full database and previous-code backups are under
+  `/home/u111638297/cywater-release-backups/best-paper-release-{staging,production}-20260923`.
+  See `wordpress/docs/best-paper-workflow.md` for safe rollback and handoff.
+
+- Earlier on 2026-09-23 CYWater Best Paper `0.1.0` was deployed **only to staging**.
   It attaches a closed cycle workflow to the existing Award model and owns
   private applications, protected paper/CV PDFs, scoped reviewer assignments,
   independent scores, sample-SD z-score summaries, committee decisions, and
@@ -185,7 +208,7 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
   Browser-rendered staging fixtures passed 1440/390px with JavaScript enabled
   and disabled. The staging HTTP Basic-auth gate remains unchanged; a full
   authenticated HTTP acceptance pass remains required before intake.
-  Production does not include this plugin. See
+  At that earlier preview stage production did not include this plugin. See
   `wordpress/docs/best-paper-workflow.md`.
 
 - On 2026-09-16 theme `0.6.61` makes reveal content visible by default.

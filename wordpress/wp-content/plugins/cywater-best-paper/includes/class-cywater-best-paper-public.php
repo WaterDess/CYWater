@@ -37,16 +37,23 @@ final class CYWater_Best_Paper_Public {
 
 	public static function protect_personal_response() {
 		$post = get_post();
-		if ( is_user_logged_in() && $post && ( is_singular( 'cyw_award' ) || has_shortcode( $post->post_content, 'cywater_best_paper' ) ) ) {
+		if ( ! $post || ! is_singular() ) {
+			return;
+		}
+		$config = 'cyw_award' === $post->post_type ? CYWater_Best_Paper::config( $post->ID ) : array();
+		// The public open/closed state also changes at cycle boundaries. Never
+		// cache an enabled module, including its anonymous sign-in gate.
+		if ( ! empty( $config['enabled'] ) || has_shortcode( $post->post_content, 'cywater_best_paper' ) ) {
 			if ( ! defined( 'DONOTCACHEPAGE' ) ) {
 				define( 'DONOTCACHEPAGE', true );
 			}
 			nocache_headers();
+			do_action( 'litespeed_control_set_nocache', 'CYWater Best Paper application state' );
 		}
 	}
 
 	public static function append_module( $content ) {
-		if ( is_admin() || ! is_singular( 'cyw_award' ) || ! in_the_loop() || ! is_main_query() || has_shortcode( $content, 'cywater_best_paper' ) ) {
+		if ( doing_filter( 'get_the_excerpt' ) || is_admin() || ! is_singular( 'cyw_award' ) || ! in_the_loop() || ! is_main_query() || has_shortcode( $content, 'cywater_best_paper' ) ) {
 			return $content;
 		}
 		$award_id = get_the_ID();
@@ -63,6 +70,11 @@ final class CYWater_Best_Paper_Public {
 	}
 
 	public static function shortcode( $attributes ) {
+		// Excerpts must not render private forms or consume the one-time notice
+		// that belongs to the full application page.
+		if ( doing_filter( 'get_the_excerpt' ) ) {
+			return '';
+		}
 		$attributes = shortcode_atts( array( 'award_id' => 0 ), $attributes, 'cywater_best_paper' );
 		$award_id = absint( $attributes['award_id'] );
 		return $award_id ? self::render( $award_id ) : '';
@@ -193,7 +205,22 @@ final class CYWater_Best_Paper_Public {
 
 	private static function render_form( $award_id, $application, $flash, $preview ) {
 		$user = wp_get_current_user();
-		$values = array( 'first_name' => $user->first_name, 'last_name' => $user->last_name, 'email' => $user->user_email, 'institution' => '', 'dob' => '', 'title' => '', 'journal' => '', 'doi' => '', 'online_date' => '' );
+		// Reuse Membership's existing profile field; never infer legal name parts
+		// from a username/display name or copy private birth dates from elsewhere.
+		$institution = get_user_meta( $user->ID, 'cyw_institution_name', true );
+		$values = array(
+			'first_name'  => $user->first_name,
+			'last_name'   => $user->last_name,
+			'email'       => $user->user_email,
+			'institution' => is_scalar( $institution ) ? sanitize_text_field( (string) $institution ) : '',
+			'dob'         => '',
+			'title'       => '',
+			'journal'     => '',
+			'doi'         => '',
+			'online_date' => '',
+		);
+		// Profile data is only a starting point. A saved application, then a
+		// failed submission's values, take precedence over later profile changes.
 		if ( $application && is_array( $application['record'] ?? null ) ) {
 			$values = array_merge( $values, $application['record'] );
 		}
@@ -210,6 +237,7 @@ final class CYWater_Best_Paper_Public {
 			<?php wp_nonce_field( 'cywater_best_paper_submit_' . $award_id, 'cywater_best_paper_nonce' ); ?>
 			<fieldset <?php disabled( $preview ); ?>>
 				<legend>Applicant information</legend>
+				<?php if ( ! $application ) : ?><p class="cywater-best-paper__help">Your name, email and institution are filled from your CYWater account where available. Please check these details before submitting. Changes here apply only to this application and do not change your account profile.</p><?php endif; ?>
 				<div class="cywater-best-paper__grid">
 					<?php self::field( $award_id, 'first_name', 'First name', $values['first_name'], 'text', true, 'given-name' ); ?>
 					<?php self::field( $award_id, 'last_name', 'Last name', $values['last_name'], 'text', true, 'family-name' ); ?>

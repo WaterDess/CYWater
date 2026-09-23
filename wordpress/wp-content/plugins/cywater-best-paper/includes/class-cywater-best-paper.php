@@ -11,6 +11,13 @@ final class CYWater_Best_Paper {
 		add_action( 'cywater_bp_receipt', array( __CLASS__, 'send_receipt' ), 10, 2 );
 	}
 
+	public static function activate() {
+		$result = self::install();
+		if ( is_wp_error( $result ) ) {
+			wp_die( esc_html( $result->get_error_message() ), 'Best Paper activation failed', array( 'response' => 500, 'back_link' => true ) );
+		}
+	}
+
 	public static function install() {
 		global $wpdb;
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';

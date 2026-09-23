@@ -57,14 +57,18 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 
 ## Current State
 
-On 2026-09-23 Best Paper `0.1.0` was installed on staging only. Award `1202`
-is an unpublished 2026 preview; applications remain closed, exact dates and
-committee assignments remain blank, and no production code or real accounts
-were changed. The private application/review service passed 68 self-cleaning
-runtime assertions. Synthetic HTML rendered by the staging runtime passed
-Chrome checks at 1440/390px with and without JavaScript. Staging's existing
-HTTP Basic-auth protection was not changed; authenticated HTTP acceptance is
-still a pre-intake gate. See `best-paper-workflow.md` for scope and handoffs.
+On 2026-09-23 Best Paper `0.1.1` and theme `0.6.63` were deployed to staging
+and production with explicit authorization. Awards now provides a separate
+current-cycle entry at `/awards/best-paper-award-2026/` (production `251`,
+staging `1202`), preserving all 14 historical records. Intake remains closed
+until exact dates and committee are confirmed. Applicant information uses
+the current account's existing name, email and institution as editable defaults
+without changing the account or replacing saved applications. Eighty-four
+staging assertions, synthetic form checks and actual public production
+1440/390px browser checks with JavaScript on/off passed. Account, membership,
+order and historical-Award hashes were unchanged. Staging's HTTP Basic-auth
+protection remains; authenticated HTTP acceptance is still a pre-intake gate.
+See `best-paper-workflow.md` for scope, backups and handoffs.
 
 On 2026-09-21 the About Milestones template was updated on staging and
 production to sort years numerically newest first (2026 through 2011).

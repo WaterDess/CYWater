@@ -144,8 +144,8 @@ const themeFrontendFiles = (await findTextFiles(path.join(root, "wordpress/wp-co
 const themeHeader = await readFile(path.join(root, "wordpress/wp-content/themes/cywater/style.css"), "utf8");
 const themeFunctions = await readFile(path.join(root, "wordpress/wp-content/themes/cywater/functions.php"), "utf8");
 const membershipPlugin = await readFile(path.join(root, "wordpress/wp-content/plugins/cywater-membership/cywater-membership.php"), "utf8");
-assert(themeHeader.includes("Version: 0.6.62"), "CYWater theme header version is not current.");
-assert(themeFunctions.includes("CYWATER_THEME_VERSION', '0.6.62"), "CYWater theme runtime version is not current.");
+assert(themeHeader.includes("Version: 0.6.63"), "CYWater theme header version is not current.");
+assert(themeFunctions.includes("CYWATER_THEME_VERSION', '0.6.63"), "CYWater theme runtime version is not current.");
 assert(membershipPlugin.includes("CYWATER_MEMBERSHIP_VERSION', '0.9.14"), "CYWater Membership runtime version is not current.");
 for (const file of themeFrontendFiles) {
   const contents = await readFile(file, "utf8");

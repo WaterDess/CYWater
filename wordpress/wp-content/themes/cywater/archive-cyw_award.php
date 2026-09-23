@@ -45,6 +45,17 @@ usort(
 	}
 );
 
+// An application cycle is not an awarded result. Keep it above the historical
+// yearbook until the committee has explicitly announced that cycle's results.
+$current_cycles = array();
+$awards = array_values( array_filter( $awards, static function ( $award ) use ( &$current_cycles ) {
+	$config = get_post_meta( $award->ID, '_cyw_best_paper_config', true );
+	if ( is_array( $config ) && ! empty( $config['enabled'] ) && 'announced' !== ( $config['status'] ?? 'draft' ) ) {
+		$current_cycles[] = $award;
+		return false;
+	}
+	return true;
+} ) );
 $award_years = array_filter( array_map( static function ( $award ) {
 	return (int) get_post_meta( $award->ID, '_cyw_year', true );
 }, $awards ) );
@@ -64,6 +75,23 @@ $render_paper = static function ( $paper ) {
 	<?php
 };
 ?>
+<?php if ( $current_cycles ) : ?>
+<section class="section-tight" aria-labelledby="current-award-cycles">
+	<div class="container container-narrow">
+		<div class="section-head"><span class="eyebrow">Applications and selection</span><h2 id="current-award-cycles">Current award cycle.</h2></div>
+		<?php foreach ( $current_cycles as $cycle ) : ?>
+			<article class="award-year" id="award-<?php echo esc_attr( get_post_meta( $cycle->ID, '_cyw_year', true ) ?: 'record-' . $cycle->ID ); ?>">
+				<div class="award-year-label"><?php echo esc_html( get_post_meta( $cycle->ID, '_cyw_year', true ) ); ?></div>
+				<div class="award-year-content">
+					<h3><?php echo esc_html( get_the_title( $cycle->ID ) ); ?></h3>
+					<?php if ( $cycle->post_excerpt ) : ?><p><?php echo esc_html( $cycle->post_excerpt ); ?></p><?php endif; ?>
+					<p><a class="btn btn-primary" href="<?php echo esc_url( get_permalink( $cycle->ID ) ); ?>">View details and application</a></p>
+				</div>
+			</article>
+		<?php endforeach; ?>
+	</div>
+</section>
+<?php endif; ?>
 <section class="section-tight">
 	<div class="container container-narrow">
 		<div class="award-intro" data-reveal>
