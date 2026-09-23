@@ -166,6 +166,14 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
 
 ### Temporary Staging Snapshot (2026-08-19)
 
+- Later on 2026-09-23 theme `0.6.64` simplified the Awards archive after
+  user review: the standalone Eligibility/early-career section was removed,
+  and the historical-record explanation now sits directly under Award
+  yearbook. The current-cycle entry and all 14 historical records are unchanged;
+  eligibility remains on the individual cycle page. No workflow, account or
+  database content was changed. The three prior theme files are retained at
+  `cywater-release-backups/awards-layout-{staging,production}-20260923`.
+
 - On 2026-09-23, after explicit production authorization, Best Paper `0.1.1`
   and theme `0.6.63` were deployed to staging and production. Awards now
   separates the current application cycle from the 14 historical results.

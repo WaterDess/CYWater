@@ -92,17 +92,13 @@ $render_paper = static function ( $paper ) {
 	</div>
 </section>
 <?php endif; ?>
-<section class="section-tight">
-	<div class="container container-narrow">
-		<div class="award-intro" data-reveal>
-			<div><span class="eyebrow">Eligibility</span><h2 style="margin-top:var(--sp-3)">Recognizing early-career research.</h2></div>
-			<p class="lead">Applicants must be no more than 35 years old when submitting an application. Each yearbook entry below identifies the Best Paper Award and, where applicable, Outstanding Papers.</p>
-		</div>
-	</div>
-</section>
 <section class="section section-tint">
 	<div class="container container-narrow">
-		<div class="section-head" data-reveal><span class="eyebrow"><?php echo esc_html( $year_range ); ?></span><h2>Award yearbook.</h2></div>
+		<div class="section-head" data-reveal>
+			<span class="eyebrow"><?php echo esc_html( $year_range ); ?></span>
+			<h2>Award yearbook.</h2>
+			<p class="lead">Each yearbook entry below identifies the Best Paper Award and, where applicable, Outstanding Papers.</p>
+		</div>
 		<div id="awards-yearbook" class="awards-yearbook">
 			<?php
 			foreach ( $awards as $award ) :

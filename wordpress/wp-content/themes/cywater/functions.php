@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CYWATER_THEME_VERSION', '0.6.63' );
+define( 'CYWATER_THEME_VERSION', '0.6.64' );
 
 function cywater_theme_setup() {
 	add_theme_support( 'title-tag' );

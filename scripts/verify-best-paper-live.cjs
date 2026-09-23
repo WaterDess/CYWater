@@ -55,6 +55,26 @@ function assertUncached(response, label) {
           const current = page.locator('section[aria-labelledby="current-award-cycles"]');
           assert.equal(await current.count(), 1, 'Missing or duplicate Current award cycle section');
           assert.equal(await current.locator('article.award-year').count(), 1, 'Expected one current cycle');
+          assert.equal(await page.locator('main > section:not(.page-hero)').count(), 2,
+            'Awards body must contain only the current cycle and historical yearbook sections');
+          assert.equal(await page.locator('.award-intro').count(), 0,
+            'The standalone eligibility block must not return');
+          assert.doesNotMatch(await page.locator('main').innerText(),
+            /Recognizing early-career research|Applicants must be no more than 35|35 years old when submitting/i,
+            'The archive must not repeat application eligibility rules');
+          const yearbookHeading = page.getByRole('heading', { name: 'Award yearbook.', exact: true });
+          assert.equal(await yearbookHeading.count(), 1, 'Historical yearbook title missing');
+          const yearbookDescription = await yearbookHeading.evaluate(heading => ({
+            tag: heading.nextElementSibling?.tagName || '',
+            text: heading.nextElementSibling?.textContent?.trim() || '',
+            sameSectionHead: Boolean(heading.parentElement?.classList.contains('section-head')),
+          }));
+          assert.equal(yearbookDescription.tag, 'P', 'Historical explanation must directly follow its heading');
+          assert.equal(yearbookDescription.sameSectionHead, true,
+            'Historical explanation must share the yearbook heading group');
+          assert.equal(yearbookDescription.text,
+            'Each yearbook entry below identifies the Best Paper Award and, where applicable, Outstanding Papers.',
+            'Historical explanation was lost or includes unrelated eligibility text');
           assert.equal(await page.locator('#awards-yearbook > article.award-year').count(), expectedHistory,
             'Historical Award count changed');
           assert.equal(await page.locator('#awards-yearbook #award-2026').count(), 0,
@@ -71,6 +91,19 @@ function assertUncached(response, label) {
           assert.match(await current.innerText(), /Applications are not open yet\./);
           await assertPageFits(page, `Awards ${width}/${javaScriptEnabled}`);
           await page.screenshot({ path: path.join(output, `best-paper-live-awards-${width}-${javaScriptEnabled ? 'js' : 'nojs'}.png`) });
+          if (javaScriptEnabled) {
+            await yearbookHeading.evaluate(heading => {
+              window.scrollTo({
+                top: Math.max(0, heading.getBoundingClientRect().top + window.scrollY - Math.min(360, innerHeight * 0.35)),
+                behavior: 'instant',
+              });
+              return new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+            });
+            await assertPageFits(page, `Awards transition ${width}`);
+            await page.screenshot({
+              path: path.join(output, `best-paper-live-awards-transition-${width}.png`), animations: 'disabled',
+            });
+          }
 
           const response = await page.goto(detailUrl.href, { waitUntil: 'load', timeout: 45000 });
           const cache = assertUncached(response, 'Award detail');
@@ -99,6 +132,7 @@ function assertUncached(response, label) {
           assertUncached(await page.reload({ waitUntil: 'load', timeout: 45000 }), 'Reloaded Award detail');
           assert.equal(await page.locator('section.cywater-best-paper').count(), 1);
           results.push({ width, javaScriptEnabled, currentCycles: 1, historicalAwards: expectedHistory,
+            archiveBodySections: 2, standaloneEligibilityBlock: false, historicalDescriptionAdjacent: true,
             moduleCount: 1, intakeOpen: false, noOverflow: true, ...cache });
           console.log(JSON.stringify(results.at(-1)));
         } finally {

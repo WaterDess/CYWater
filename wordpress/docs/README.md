@@ -57,6 +57,12 @@ secrets never enter the tracked `.wp-env.json` or a process command line.
 
 ## Current State
 
+Later on 2026-09-23 theme `0.6.64` removed the separate Eligibility section
+from the Awards archive. The yearbook explanation is now part of the yearbook
+heading; eligibility stays on the individual cycle page. The current-cycle
+entry, historical results and application state are unchanged. Previous theme
+files are retained under `cywater-release-backups/awards-layout-{staging,production}-20260923`.
+
 On 2026-09-23 Best Paper `0.1.1` and theme `0.6.63` were deployed to staging
 and production with explicit authorization. Awards now provides a separate
 current-cycle entry at `/awards/best-paper-award-2026/` (production `251`,

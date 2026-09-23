@@ -9,7 +9,7 @@ store. Application and review tables are private. Deactivating the plugin keeps
 the records and protected files intact.
 
 The user authorized production deployment on 2026-09-23. Version `0.1.1` and
-theme `0.6.63` are installed on both sites. The 2026 information page is public;
+theme `0.6.64` are installed on both sites. The 2026 information page is public;
 its workflow remains in Draft with exact opening/closing dates blank until
 approved. Do not infer that publishing this information opens intake, appoints
 reviewers, authorizes invitations or publishes award results.
@@ -18,6 +18,9 @@ Public entry: **Awards → Current award cycle → View details and application*
 at `https://cywater.org/awards/best-paper-award-2026/`. It is an Award, not an
 Event or an automatically created News post. The current cycle is separate
 from the historical yearbook until its results are explicitly announced.
+The archive contains only the current-cycle entry and historical yearbook,
+with the yearbook explanation under its heading; eligibility belongs on the
+individual cycle page, not in a separate archive section.
 
 ## Confirmed operating requirements
 
