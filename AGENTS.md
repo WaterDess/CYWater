@@ -166,6 +166,30 @@ WordPress branch to `main` or `gh-pages` before staging acceptance.
 
 ### Temporary Staging Snapshot (2026-08-19)
 
+- On 2026-09-28 Membership `0.9.15`, Meeting Registration `0.1.16`,
+  Best Paper `0.1.4` and Forum `0.6.4` were deployed to staging and
+  production. Unverified accounts retain limited sign-in for email verification,
+  profile/email correction and password maintenance, but public login/Account
+  routes lead to `/verify-email/` and the header prioritizes Verify Email.
+  Server-side guards cover PMPro checkout (including resumed review orders),
+  Meeting and Best Paper submissions before writes/uploads, and Forum likes.
+  Existing publication/comment/Logo/directory gates remain. Old-address tokens
+  are invalidated before replacement delivery, including rate-limited changes;
+  query flags cannot impersonate verification; return URLs retain query/fragment.
+  No accounts were bulk verified or altered. Staging passed 148 Account,
+  41 Meeting, 115 Best Paper and 162 Forum checks, plus 14 route callback checks.
+  Synthetic staging HTML passed desktop/mobile browser review without scripts;
+  long email wrapping was corrected. Authenticated staging HTTP checks remain
+  behind unchanged Basic Auth; no credentials were supplied. Production passed
+  14 read-only checks, live guest no-cache/false-success checks and verified-user
+  browser review. Accounts, metadata, memberships, orders and history hashes
+  were unchanged across deployment; Stripe remains Live/Sandbox respectively.
+  No real email, application or payment was submitted. Original rollback:
+  `cywater-release-backups/email-verification-{staging,production}-20260928`.
+  Postmark delivery/quota remains separate from account verification and was
+  not purchased or modified by this release.
+
+
 - On 2026-09-23 Best Paper `0.1.3` replaced the earlier administrator-only
   preview with public direct-link access at `/best-paper-2026-preview/`, as
   explicitly requested. Production Page `253` and staging Page `1212` are

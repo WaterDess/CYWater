@@ -182,6 +182,7 @@ final class CYWater_Best_Paper {
 		if ( ! is_array( $input ) || ! is_array( $uploads ) ) { return self::error( 'input', 'The application input is invalid.' ); }
 		foreach ( array( 'first_name', 'last_name', 'institution', 'title', 'journal', 'email', 'dob', 'online_date', 'doi', 'no_prior_award', 'eligibility' ) as $field ) { if ( isset( $input[ $field ] ) && ! is_scalar( $input[ $field ] ) ) { return self::error( 'input', 'Provide a single value for each application field.' ); } }
 		if ( ! $uid || $uid !== get_current_user_id() ) { return self::error( 'login', 'Sign in to submit your own application.' ); }
+		if ( ! self::is_verified( $uid ) ) { return self::error( 'verification', 'Verify your current account email before submitting or updating an application.' ); }
 		if ( 'cyw_award' !== get_post_type( $award_id ) || ( 'publish' !== get_post_status( $award_id ) && ! self::can_manage() ) ) { return self::error( 'award', 'This award is not available for applications.' ); }
 		$lock = self::lock( $award_id ); if ( is_wp_error( $lock ) ) { return $lock; }
 		$new_files = array();
@@ -240,6 +241,11 @@ final class CYWater_Best_Paper {
 			try { wp_schedule_single_event( time() + 20, 'cywater_bp_receipt', array( $id, $record['version'] ), true ); } catch ( Throwable $e ) { /* Receipt transport must never replace a saved application with an error screen. */ }
 			return $id;
 		} finally { foreach ( $new_files as $file ) { self::delete_new_file( $file ); } self::unlock( $lock ); }
+	}
+
+	/** Reuse the account verification authority; an unavailable dependency denies intake. */
+	public static function is_verified( $uid ) {
+		return is_callable( array( 'CYWater_Membership_Account_Security', 'is_verified' ) ) && CYWater_Membership_Account_Security::is_verified( $uid );
 	}
 
 	/** Storage is outside the entire HTTP document tree, including when WP runs in staging/. */

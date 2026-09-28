@@ -93,6 +93,22 @@ try {
 	wp_set_current_user( 0 );
 	$guest_membership_action = CYWater_Membership_Account_Routing::membership_action();
 	$assert( 'Join CYWater' === (string) ( $guest_membership_action['label'] ?? '' ) && false !== strpos( (string) ( $guest_membership_action['url'] ?? '' ), '/membership/' ), 'Signed-out header action invites the visitor to join CYWater' );
+	$assert( 100 === has_filter( 'pmpro_registration_checks', array( 'CYWater_Membership_Account_Security', 'check_verified_checkout' ) ), 'Checkout verification guard is attached to the PMPro server-side write checks' );
+	$assert( 100 === has_filter( 'pmpro_checkout_checks', array( 'CYWater_Membership_Account_Security', 'check_verified_checkout' ) ), 'Checkout verification guard also covers resumed review-order processing' );
+	foreach ( array( 'pmpro_registration_checks', 'pmpro_checkout_checks' ) as $checkout_hook ) {
+		$assert( false === apply_filters( $checkout_hook, true ), 'Guest is rejected through the active ' . $checkout_hook . ' filter' );
+	}
+	$assert( false === CYWater_Membership_Account_Security::check_verified_checkout( true ), 'Guest cannot bypass email verification through the PMPro checkout write path' );
+	$assert( false === CYWater_Membership_Account_Security::check_verified_checkout( false ), 'Checkout verification preserves an earlier rejection for a guest' );
+	$login_error = new WP_Error( 'qa_login_failure' );
+	$assert( home_url( '/account/' ) === CYWater_Membership_Account_Routing::filter_pending_login_redirect( home_url( '/account/' ), '', $login_error ), 'Login errors are preserved without treating the error object as an account' );
+	$loop_url = CYWater_Membership_Account_Routing::verification_url( add_query_arg( 'redirect_to', home_url( '/membership/' ), home_url( '/verify-email/' ) ) );
+	$loop_query = array();
+	parse_str( (string) wp_parse_url( $loop_url, PHP_URL_QUERY ), $loop_query );
+	$assert( CYWater_Membership_Account_Routing::account_url() === ( $loop_query['redirect_to'] ?? '' ), 'Verification return URLs avoid a verify-email redirect loop' );
+	$external_verify_query = array();
+	parse_str( (string) wp_parse_url( CYWater_Membership_Account_Routing::verification_url( 'https://example.org/not-cywater' ), PHP_URL_QUERY ), $external_verify_query );
+	$assert( CYWater_Membership_Account_Routing::account_url() === ( $external_verify_query['redirect_to'] ?? '' ), 'Verification return URLs discard off-site destinations' );
 
 	$user_id = wp_create_user( $username, $initial_password, $email );
 	$assert( ! is_wp_error( $user_id ), 'Disposable Subscriber created' );
@@ -135,6 +151,41 @@ try {
 	$assert( $restored_user instanceof WP_User && $username === $restored_user->user_login, 'Disposable username is restored for the remaining account checks' );
 	$assert( ! CYWater_Membership_Account_Security::is_verified( $user_id ), 'New account starts unverified' );
 	wp_set_current_user( $user_id );
+	$pending_destination = home_url( '/events/' ) . '#meeting-registration';
+	$pending_login = CYWater_Membership_Account_Routing::filter_pending_login_redirect( $pending_destination, $pending_destination, get_userdata( $user_id ) );
+	$pending_query = array();
+	parse_str( (string) wp_parse_url( $pending_login, PHP_URL_QUERY ), $pending_query );
+	$assert( false !== strpos( $pending_login, '/verify-email/' ) && $pending_destination === ( $pending_query['redirect_to'] ?? '' ), 'Unverified sign-in returns to verification while retaining its intended destination' );
+	$assert( false !== strpos( CYWater_Membership_Account_Routing::filter_pending_login_redirect( admin_url( '/' ), admin_url( '/' ), get_userdata( $user_id ) ), '/verify-email/' ), 'An unverified ordinary account cannot bypass the login gate with an administration destination' );
+	$staff_fixture = get_userdata( $collision_user_id );
+	$staff_fixture->add_cap( 'edit_posts' );
+	$assert( false !== strpos( CYWater_Membership_Account_Routing::filter_pending_login_redirect( admin_url( '/' ), admin_url( '/' ), $staff_fixture ), '/verify-email/' ), 'A generic edit_posts primitive does not grant the staff recovery exception' );
+	$staff_fixture->remove_cap( 'edit_posts' );
+	$staff_fixture->set_role( 'administrator' );
+	$assert( admin_url( '/' ) === CYWater_Membership_Account_Routing::filter_pending_login_redirect( admin_url( '/' ), admin_url( '/' ), $staff_fixture ), 'Unverified authorized staff retains native administration recovery' );
+	$assert( false !== strpos( CYWater_Membership_Account_Routing::filter_pending_login_redirect( home_url( '/account/' ), '', $staff_fixture ), '/verify-email/' ), 'Staff recovery does not bypass verification on the public account surface' );
+	$staff_fixture->set_role( 'cywater_program_reviewer' );
+	$assert( admin_url( '/' ) === CYWater_Membership_Account_Routing::filter_pending_login_redirect( admin_url( '/' ), admin_url( '/' ), $staff_fixture ), 'Scoped Program Reviewer retains native administration recovery without generic edit_posts access' );
+	$staff_fixture->set_role( 'subscriber' );
+	$assert( false === CYWater_Membership_Account_Security::check_verified_checkout( true ), 'Unverified signed-in account cannot pass the checkout write guard' );
+	foreach ( array( 'pmpro_registration_checks', 'pmpro_checkout_checks' ) as $checkout_hook ) {
+		$assert( false === apply_filters( $checkout_hook, true ), 'Unverified account is rejected through the active ' . $checkout_hook . ' filter' );
+	}
+	$pending_original_get = $_GET;
+	try {
+		$_GET = array( 'cywater_verification' => 'verified', 'redirect_to' => home_url( '/membership/' ) );
+		$pending_html = CYWater_Membership_Account_Security::verification_shortcode();
+		$assert( false !== strpos( $pending_html, 'Account created — email verification pending' ) && false === strpos( $pending_html, 'Email ownership has been confirmed' ) && false === strpos( $pending_html, 'Your email address is verified.' ), 'A forged verified query flag cannot falsely display verification success' );
+		$assert( false !== strpos( $pending_html, 'Correct email or profile' ) && false !== strpos( $pending_html, 'Sign out' ) && false !== strpos( $pending_html, 'Send a new verification link' ), 'Pending account retains only clearly labeled verification and correction actions' );
+		$pending_register_html = CYWater_Membership_Account_Flow::registration_form();
+		$assert( false !== strpos( $pending_register_html, 'email verification pending' ) && false === strpos( $pending_register_html, 'Your account is ready' ), 'Signed-in unverified registration view does not claim the account is ready' );
+		wp_set_current_user( 0 );
+		$anonymous_forged_html = CYWater_Membership_Account_Security::verification_shortcode();
+		$assert( false !== strpos( $anonymous_forged_html, 'Sign in to check your verification status' ) && false === strpos( $anonymous_forged_html, 'Email ownership has been confirmed' ), 'An anonymous forged query flag cannot display verification success' );
+	} finally {
+		$_GET = $pending_original_get;
+		wp_set_current_user( $user_id );
+	}
 	$frontend_username = $username . '_profile';
 	$original_post     = $_POST;
 	$_POST             = array( 'user_login' => $username . '_must_not_save' );
@@ -195,7 +246,7 @@ try {
 	$photo_field_html = (string) ob_get_clean();
 	$assert( false !== strpos( $photo_field_html, 'data-cywater-profile-file-input' ) && false !== strpos( $photo_field_html, 'cywater-profile-file__button' ), 'Profile photograph reuses the CYWater file control while retaining PMPro input ownership' );
 	$inactive_membership_action = CYWater_Membership_Account_Routing::membership_action();
-	$assert( 'Choose Membership' === (string) ( $inactive_membership_action['label'] ?? '' ) && false !== strpos( (string) ( $inactive_membership_action['url'] ?? '' ), '/membership/' ), 'Registered non-member header action offers membership without misidentifying the account' );
+	$assert( 'Verify Email' === (string) ( $inactive_membership_action['label'] ?? '' ) && false !== strpos( (string) ( $inactive_membership_action['url'] ?? '' ), '/verify-email/' ), 'Unverified account header prioritizes verification instead of offering membership checkout' );
 	$level_ids = (array) get_option( 'cywater_membership_level_ids', array() );
 	$student_level_id = absint( $level_ids['student'] ?? 0 );
 	$professional_level_id = absint( $level_ids['professional'] ?? 0 );
@@ -316,6 +367,12 @@ try {
 	$assert( CYWater_Membership_Account_Security::verify_token( $user_id, $query['token'] ), 'One-time verification token accepted' );
 	$assert( CYWater_Membership_Account_Security::is_verified( $user_id ), 'Verified email matches the current account email' );
 	$assert( ! CYWater_Membership_Account_Security::verify_token( $user_id, $query['token'] ), 'Verification token replay rejected' );
+	wp_set_current_user( $user_id );
+	$assert( $pending_destination === CYWater_Membership_Account_Routing::filter_pending_login_redirect( $pending_destination, '', get_userdata( $user_id ) ), 'Verified sign-in preserves the intended ordinary destination' );
+	$assert( true === CYWater_Membership_Account_Security::check_verified_checkout( true ), 'Verified account passes the checkout email-verification guard' );
+	$assert( false === CYWater_Membership_Account_Security::check_verified_checkout( false ), 'A verified account cannot override an earlier checkout rejection' );
+	$verified_nonmember_action = CYWater_Membership_Account_Routing::membership_action();
+	$assert( 'Choose Membership' === ( $verified_nonmember_action['label'] ?? '' ), 'Verified non-member receives the normal membership action' );
 	$level_ids      = (array) get_option( 'cywater_membership_level_ids', array() );
 	$professional_id = absint( $level_ids['professional'] ?? 0 );
 	$assert( $professional_id > 0 && pmpro_changeMembershipLevel( $professional_id, $user_id ), 'Disposable account received a temporary active individual membership' );
@@ -341,6 +398,18 @@ try {
 	$assert( CYWater_Membership_Account_Security::issue_verification( $user_id, home_url( '/account/' ) ), 'Verification hourly allowance accepts message five' );
 	$assert( CYWater_Membership_Account_Security::verification_rate_limited( $user_id ), 'Verification messages are limited to five per hour' );
 	$assert( ! CYWater_Membership_Account_Security::issue_verification( $user_id, home_url( '/account/' ) ), 'Verification message six is rejected' );
+	$rate_limited_query = $extract_verification( end( $captured_mail ) );
+	$assert( '' !== (string) get_user_meta( $user_id, 'cyw_email_verification_hash', true ), 'Rate-limit fixture retains an outstanding previous-address token' );
+	$rate_limited_email = $username . '.limited@example.net';
+	$rate_limited_change = wp_update_user( array( 'ID' => $user_id, 'user_email' => $rate_limited_email ) );
+	$assert( ! is_wp_error( $rate_limited_change ) && CYWater_Membership_Account_Security::verification_rate_limited( $user_id ), 'Changing the email does not bypass the hourly verification allowance' );
+	$assert( ! CYWater_Membership_Account_Security::is_verified( $user_id ) && '' === (string) get_user_meta( $user_id, 'cyw_email_verification_hash', true ) && '' === (string) get_user_meta( $user_id, 'cyw_email_verification_expires', true ), 'Rate-limited email change clears prior verification and outstanding token metadata' );
+	$assert( ! CYWater_Membership_Account_Security::verify_token( $user_id, $rate_limited_query['token'] ), 'A previous-address token cannot verify a replacement address when resend is rate-limited' );
+	$assert( false === CYWater_Membership_Account_Security::check_verified_checkout( true ), 'Rate-limited replacement address remains blocked from checkout' );
+	// Restore only this disposable fixture's verified state so the remaining
+	// password, closure and checkout checks retain their intended prerequisites.
+	update_user_meta( $user_id, 'cyw_verified_email', $rate_limited_email );
+	$assert( CYWater_Membership_Account_Security::is_verified( $user_id ), 'Disposable verification prerequisite restored for later independent checks' );
 
 	$original_password_post = $_POST;
 	$original_password_user = get_current_user_id();
@@ -393,11 +462,13 @@ try {
 	$assert( 'cooling_off' === CYWater_Membership_Account_Security::closure_status( $user_id ), 'Closure request enters the seven-day cooling-off period' );
 	$assert( CYWater_Membership_Account_Security::closure_deadline( $user_id ) > time() + ( 6 * DAY_IN_SECONDS ), 'Closure review date is seven days after the request' );
 	$assert( 'closure_requested' === CYWater_Membership_Account_Security::checkout_block_reason( $user_id ), 'Open closure request blocks new membership checkout' );
+	$assert( false === CYWater_Membership_Account_Security::check_verified_checkout( true ), 'Verified account with an open closure request cannot pass the checkout write guard' );
 	update_user_meta( $user_id, 'cyw_account_closure_requested_at', time() - ( 8 * DAY_IN_SECONDS ) );
 	$assert( 'review_due' === CYWater_Membership_Account_Security::closure_status( $user_id ), 'Expired cooling-off period enters administrator review' );
 	CYWater_Membership_Account_Security::withdraw_closure( $user_id );
 	$assert( 0 === CYWater_Membership_Account_Security::closure_requested_at( $user_id ), 'Closure request can be withdrawn' );
 	$assert( '' === CYWater_Membership_Account_Security::checkout_block_reason( $user_id ), 'Withdrawing closure restores checkout eligibility' );
+	$assert( true === CYWater_Membership_Account_Security::check_verified_checkout( true ), 'Withdrawing closure restores the verified checkout write guard' );
 
 	CYWater_Membership_Account_Security::record_last_login( $username, get_user_by( 'id', $user_id ) );
 	$assert( CYWater_Membership_Account_Security::last_login_at( $user_id ) > 0, 'Last sign-in timestamp recorded' );

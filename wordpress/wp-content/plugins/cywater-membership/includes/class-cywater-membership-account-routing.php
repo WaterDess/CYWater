@@ -18,7 +18,10 @@ final class CYWater_Membership_Account_Routing {
 		/* PMPro installs its public-login filter at priority 50 on wp_loaded. */
 		add_filter( 'login_url', array( __CLASS__, 'filter_admin_login_url' ), 100, 2 );
 		add_filter( 'logout_url', array( __CLASS__, 'filter_frontend_logout_url' ), 100, 2 );
+		add_filter( 'login_redirect', array( __CLASS__, 'filter_pending_login_redirect' ), 100, 3 );
 		add_action( 'template_redirect', array( __CLASS__, 'prevent_identity_page_cache' ), 0 );
+		add_action( 'template_redirect', array( __CLASS__, 'redirect_pending_account' ), 7 );
+		add_filter( 'the_content', array( __CLASS__, 'pending_profile_notice' ), 20 );
 		add_action( 'template_redirect', array( __CLASS__, 'prevent_frontend_membership_self_service' ), 5 );
 		add_action( 'template_redirect', array( __CLASS__, 'redirect_authenticated_login_page' ), 14 );
 		add_filter( 'pmpro_member_action_links', array( __CLASS__, 'remove_self_service_membership_actions' ), 20, 2 );
@@ -40,11 +43,12 @@ final class CYWater_Membership_Account_Routing {
 					get_option( 'pmpro_login_page_id' ),
 					get_option( 'pmpro_account_page_id' ),
 					get_option( 'pmpro_billing_page_id' ),
+					get_option( 'pmpro_member_profile_edit_page_id' ),
 				)
 			)
 		);
 
-		if ( ! is_page( $page_ids ) && ! is_page( 'member-register' ) ) {
+		if ( ! is_page( $page_ids ) && ! is_page( array( 'member-register', 'verify-email', 'member-profile', 'close-account' ) ) ) {
 			return;
 		}
 
@@ -67,7 +71,7 @@ final class CYWater_Membership_Account_Routing {
 		}
 
 		$redirect = self::same_site_redirect( $redirect, '' );
-		return '' === $redirect ? $url : add_query_arg( 'redirect_to', $redirect, $url );
+		return '' === $redirect ? $url : add_query_arg( 'redirect_to', rawurlencode( $redirect ), $url );
 	}
 
 	/**
@@ -78,13 +82,67 @@ final class CYWater_Membership_Account_Routing {
 	public static function registration_url( $redirect = '' ) {
 		$url      = home_url( '/member-register/' );
 		$redirect = self::same_site_redirect( $redirect, '' );
-		return '' === $redirect ? $url : add_query_arg( 'redirect_to', $redirect, $url );
+		return '' === $redirect ? $url : add_query_arg( 'redirect_to', rawurlencode( $redirect ), $url );
 	}
 
 	/** Return the canonical public account URL. */
 	public static function account_url() {
 		$url = function_exists( 'pmpro_url' ) ? (string) pmpro_url( 'account' ) : '';
 		return '' !== $url ? $url : home_url( '/account/' );
+	}
+
+	/** A limited sign-in permits email correction; it does not verify ownership. */
+	public static function needs_verification( $user_id = 0 ) {
+		$user_id = $user_id ? absint( $user_id ) : get_current_user_id();
+		return $user_id && ! CYWater_Membership_Account_Security::is_verified( $user_id );
+	}
+
+	public static function profile_url() {
+		$page_id = absint( get_option( 'pmpro_member_profile_edit_page_id' ) );
+		return $page_id ? get_permalink( $page_id ) : home_url( '/member-profile/' );
+	}
+
+	public static function verification_url( $redirect = '' ) {
+		$url = home_url( '/verify-email/' );
+		$redirect = self::same_site_redirect( $redirect, self::account_url() );
+		if ( wp_parse_url( $redirect, PHP_URL_PATH ) === wp_parse_url( $url, PHP_URL_PATH ) ) {
+			$redirect = self::account_url();
+		}
+		return add_query_arg( array( 'cywater_verification' => 'required', 'redirect_to' => rawurlencode( $redirect ) ), $url );
+	}
+
+	public static function filter_pending_login_redirect( $redirect, $requested, $user ) {
+		if ( ! $user instanceof WP_User || ! self::needs_verification( $user->ID ) ) {
+			return $redirect;
+		}
+		// Retain native staff recovery, without treating staff as email-verified.
+		$staff = is_callable( array( 'CYWater_Forum_Workspace', 'can_access_admin' ) )
+			? CYWater_Forum_Workspace::can_access_admin( $user->ID )
+			: user_can( $user, 'manage_options' );
+		if ( $staff && self::is_admin_destination( $redirect ) ) {
+			return $redirect;
+		}
+		return self::verification_url( $redirect );
+	}
+
+	public static function redirect_pending_account() {
+		if ( ! self::needs_verification() ) {
+			return;
+		}
+		$account_id = absint( get_option( 'pmpro_account_page_id' ) );
+		if ( ( $account_id && is_page( $account_id ) ) || is_page( array( 'account', 'member-register' ) ) ) {
+			wp_safe_redirect( self::verification_url( self::account_url() ) );
+			exit;
+		}
+	}
+
+	/** Leave the existing nonce-protected profile editor available for corrections. */
+	public static function pending_profile_notice( $content ) {
+		$profile_id = absint( get_option( 'pmpro_member_profile_edit_page_id' ) );
+		if ( ! self::needs_verification() || ! is_main_query() || ! in_the_loop() || ! ( ( $profile_id && is_page( $profile_id ) ) || is_page( 'member-profile' ) ) ) {
+			return $content;
+		}
+		return '<div class="cywater-register" role="status"><h2>' . esc_html__( 'Email verification pending', 'cywater-membership' ) . '</h2><p>' . esc_html__( 'You can correct your account details here. Membership checkout, applications and community contributions remain unavailable until your email is verified.', 'cywater-membership' ) . '</p><a class="btn btn-outline" href="' . esc_url( self::verification_url() ) . '">' . esc_html__( 'Return to email verification', 'cywater-membership' ) . '</a></div>' . $content;
 	}
 
 	/** Return whether an account owns a current individual CYWater membership. */
@@ -148,6 +206,9 @@ final class CYWater_Membership_Account_Routing {
 			);
 		}
 
+		if ( self::needs_verification() ) {
+			return array( 'label' => __( 'Verify Email', 'cywater-membership' ), 'url' => self::verification_url() );
+		}
 		if ( self::has_active_individual_membership() ) {
 			return array(
 				'label' => __( 'My Membership', 'cywater-membership' ),
@@ -258,7 +319,7 @@ final class CYWater_Membership_Account_Routing {
 			return $logout_url;
 		}
 
-		return add_query_arg( 'redirect_to', self::logout_landing_url(), $logout_url );
+		return add_query_arg( 'redirect_to', rawurlencode( self::logout_landing_url() ), $logout_url );
 	}
 
 	/**
@@ -287,7 +348,7 @@ final class CYWater_Membership_Account_Routing {
 		}
 
 		$native_url = site_url( 'wp-login.php', 'login' );
-		return $args ? add_query_arg( $args, $native_url ) : $native_url;
+		return $args ? add_query_arg( array_map( 'rawurlencode', $args ), $native_url ) : $native_url;
 	}
 
 	/** Send an already-authenticated visitor away from the public sign-in form. */
@@ -309,6 +370,7 @@ final class CYWater_Membership_Account_Routing {
 		$fallback = self::account_url();
 		$redirect = isset( $_GET['redirect_to'] ) ? esc_url_raw( wp_unslash( $_GET['redirect_to'] ) ) : $fallback;
 		$redirect = self::same_site_redirect( $redirect, $fallback );
+		$redirect = self::filter_pending_login_redirect( $redirect, $redirect, wp_get_current_user() );
 		wp_safe_redirect( $redirect );
 		exit;
 	}

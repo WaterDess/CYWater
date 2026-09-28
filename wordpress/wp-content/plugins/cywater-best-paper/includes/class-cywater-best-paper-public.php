@@ -174,6 +174,8 @@ final class CYWater_Best_Paper_Public {
 			<?php if ( $application ) { self::render_confirmation( $application, $phase ); } ?>
 			<?php if ( ! is_user_logged_in() && $open ) : ?>
 				<div class="cywater-best-paper__gate"><h3>Sign in to apply</h3><p>Your CYWater account keeps your application and files available to you. A paid membership is not required for this application.</p><a class="btn btn-primary" href="<?php echo esc_url( wp_login_url( get_permalink( $award_id ) . '#cywater-best-paper-' . $award_id ) ); ?>">Sign in to apply</a></div>
+			<?php elseif ( $open && ! $preview && ! CYWater_Best_Paper::is_verified( get_current_user_id() ) ) : ?>
+				<div class="cywater-best-paper__gate"><h3>Verify your email before applying</h3><p>Your account is awaiting email verification. Verify your current account email, then return here to submit or update your application.</p><a class="btn btn-primary" href="<?php echo esc_url( self::verification_url( $award_id ) ); ?>">Verify email address</a></div>
 			<?php elseif ( $open || $preview ) : ?>
 				<?php self::render_form( $award_id, $application, $flash, $preview, $interactive_preview ); ?>
 			<?php elseif ( ! $application ) : ?>
@@ -363,6 +365,10 @@ final class CYWater_Best_Paper_Public {
 		exit;
 	}
 
+	private static function verification_url( $award_id ) {
+		return add_query_arg( 'redirect_to', rawurlencode( self::return_url( $award_id ) . '#cywater-best-paper-' . $award_id ), home_url( '/verify-email/' ) );
+	}
+
 	public static function handle_submit() {
 		if ( ! is_user_logged_in() ) {
 			self::handle_logged_out_submit();
@@ -370,6 +376,10 @@ final class CYWater_Best_Paper_Public {
 		$award_id = isset( $_POST['award_id'] ) && is_scalar( $_POST['award_id'] ) ? absint( $_POST['award_id'] ) : 0;
 		if ( ! self::may_render( $award_id ) ) {
 			wp_safe_redirect( home_url( '/awards/' ), 303 );
+			exit;
+		}
+		if ( ! CYWater_Best_Paper::is_verified( get_current_user_id() ) ) {
+			wp_safe_redirect( self::verification_url( $award_id ), 303 );
 			exit;
 		}
 		$input = array();
@@ -414,6 +424,7 @@ final class CYWater_Best_Paper_Public {
 		$messages = array(
 			'expired_session' => 'Your form session has expired. Review the saved details and submit again. Please select your files again if needed.',
 			'closed' => 'Applications are not currently open. No changes were saved.',
+			'verification' => 'Verify your current account email before submitting or updating an application. No changes were saved.',
 			'not_open' => 'Applications are not currently open. No changes were saved.',
 			'age' => 'Applicants must be 35 years old or younger on their first submission date. Check the date of birth.',
 			'online_date' => 'Check the online publication date. It must fall within the 12-calendar-month window ending on the application deadline.',

@@ -1,7 +1,7 @@
 <?php
 /** Self-cleaning Best Paper integration regression. Staging only; no mail. */
 if ( ! defined( 'ABSPATH' ) || ! defined( 'WP_CLI' ) || ! WP_CLI ) { exit( 1 ); }
-if ( 'staging' !== wp_get_environment_type() || ! class_exists( 'CYWater_Best_Paper' ) ) {
+if ( 'staging' !== wp_get_environment_type() || ! class_exists( 'CYWater_Best_Paper' ) || ! is_callable( array( 'CYWater_Membership_Account_Security', 'is_verified' ) ) ) {
 	WP_CLI::error( 'Best Paper QA requires the staging runtime and active plugin.' );
 }
 
@@ -25,6 +25,7 @@ $make_user = static function ( $suffix, $role = 'subscriber' ) use ( &$users, $m
 	$id = wp_insert_user( array( 'user_login' => $marker . $suffix, 'user_pass' => wp_generate_password( 32, true, true ), 'user_email' => $marker . $suffix . '@example.invalid', 'role' => $role, 'first_name' => 'QA', 'last_name' => $suffix ) );
 	if ( is_wp_error( $id ) ) { throw new RuntimeException( $id->get_error_message() ); }
 	$users[] = $id;
+	update_user_meta( $id, 'cyw_verified_email', $marker . $suffix . '@example.invalid' );
 	return (int) $id;
 };
 $make_award = static function () use ( &$posts, $marker ) {
@@ -67,6 +68,8 @@ try {
 	$other = $make_user( 'other' );
 	$reviewer = $make_user( 'reviewer' );
 	$reviewer2 = $make_user( 'reviewer2' );
+	$unverified = $make_user( 'unverified' );
+	delete_user_meta( $unverified, 'cyw_verified_email' );
 	wp_set_current_user( $manager );
 	$award = $make_award();
 	$config = CYWater_Best_Paper::config( $award );
@@ -106,6 +109,17 @@ try {
 	$uploads = array( 'paper' => $upload, 'cv' => array_merge( $upload, array( 'name' => 'test-cv.pdf' ) ) );
 	$today = new DateTimeImmutable( 'today', wp_timezone() );
 	$input = array( 'first_name' => 'QA', 'last_name' => 'Applicant', 'email' => $marker . '@example.invalid', 'institution' => 'QA University', 'title' => 'QA Water Science Paper', 'journal' => 'QA Journal', 'doi' => 'https://doi.org/10.1234/QA-A', 'dob' => $today->modify( '-35 years' )->format( 'Y-m-d' ), 'online_date' => $today->modify( '-1 day' )->format( 'Y-m-d' ), 'no_prior_award' => 'yes', 'eligibility' => 'yes' );
+	wp_set_current_user( $unverified );
+	$unverified_html = CYWater_Best_Paper_Public::render( $award );
+	$assert( str_contains( $unverified_html, 'Verify your email before applying' ) && ! preg_match( '/<form\b/i', $unverified_html ), 'Unverified account received a live application form.' );
+	$assert( str_contains( $unverified_html, 'redirect_to=' ) && str_contains( $unverified_html, rawurlencode( '#cywater-best-paper-' . $award ) ), 'Verification CTA lost its award return destination.' );
+	$unverified_preview = CYWater_Best_Paper_Public::render( $award, true );
+	$assert( str_contains( $unverified_preview, 'Applicant information' ) && ! preg_match( '/<form\b/i', $unverified_preview ), 'Unverified account lost access to the harmless public preview.' );
+	$before_rows = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cyw_bp_applications" );
+	$before_files = glob( $directory . '/*' );
+	$denied = CYWater_Best_Paper::submit( $award, $input, $uploads );
+	$assert( is_wp_error( $denied ) && 'cywater_bp_verification' === $denied->get_error_code(), 'Unverified direct service submission was not denied.' );
+	$assert( $before_rows === (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cyw_bp_applications" ) && $before_files === glob( $directory . '/*' ), 'Unverified submission created application rows or protected files.' );
 	wp_set_current_user( $applicant );
 	$assert( is_wp_error( CYWater_Best_Paper::submit( $award, array_merge( $input, array( 'dob' => $today->modify( '-36 years' )->format( 'Y-m-d' ) ) ), $uploads ) ), 'Age 36 must be rejected.' );
 	$assert( is_wp_error( CYWater_Best_Paper::submit( $award, array_merge( $input, array( 'online_date' => $today->modify( '-13 months' )->format( 'Y-m-d' ) ) ), $uploads ) ), 'Out-of-window paper was accepted.' );
@@ -121,6 +135,13 @@ try {
 	$account_meta = get_user_meta( $applicant );
 	$assert( 35 === $app['record']['age_at_submission'] && '10.1234/qa-a' === $app['record']['doi'], 'Age or DOI normalization is incorrect.' );
 	$assert( count( $app['files'] ) === 2 && is_file( CYWater_Best_Paper::file_path( $app, 'paper' ) ), 'Saved PDF is not available to its owner.' );
+	update_user_meta( $applicant, 'cyw_verified_email', 'previous@example.invalid' );
+	$before_files = glob( $directory . '/*' );
+	$denied = CYWater_Best_Paper::submit( $award, array_merge( $input, array( 'institution' => 'Must not save' ) ), $uploads );
+	$assert( is_wp_error( $denied ) && 'cywater_bp_verification' === $denied->get_error_code(), 'A changed account email bypassed update verification.' );
+	$assert( $app === CYWater_Best_Paper::get_application( $id ) && $before_files === glob( $directory . '/*' ), 'A denied application update changed the stored record or files.' );
+	$assert( is_file( CYWater_Best_Paper::file_path( $app, 'paper' ) ), 'Reverification removed the owner’s existing protected-file access.' );
+	update_user_meta( $applicant, 'cyw_verified_email', $marker . 'applicant@example.invalid' );
 	$assert( str_contains( CYWater_Best_Paper::download_url( $id, 'paper' ), '_wpnonce=' ), 'Protected download is missing its nonce.' );
 	$html = CYWater_Best_Paper_Public::render( $award );
 	$renders['confirmation'] = $html;

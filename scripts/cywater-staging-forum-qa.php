@@ -1,6 +1,6 @@
 <?php
 /**
- * Staging-only, self-cleaning runtime QA for CYWater Forum 0.6.3.
+ * Staging-only, self-cleaning runtime QA for CYWater Forum 0.6.4.
  *
  * Run with:
  *   wp eval-file /absolute/path/to/cywater-staging-forum-qa.php
@@ -36,8 +36,8 @@ if ( ! is_plugin_active( 'cywater-forum/cywater-forum.php' ) ) {
 }
 
 $forum_plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/cywater-forum/cywater-forum.php', false, false );
-if ( '0.6.3' !== (string) ( $forum_plugin_data['Version'] ?? '' ) || ! defined( 'CYWATER_FORUM_VERSION' ) || '0.6.3' !== CYWATER_FORUM_VERSION ) {
-	WP_CLI::error( 'Refusing to run: this QA is pinned to CYWater Forum 0.6.3.' );
+if ( '0.6.4' !== (string) ( $forum_plugin_data['Version'] ?? '' ) || ! defined( 'CYWATER_FORUM_VERSION' ) || '0.6.4' !== CYWATER_FORUM_VERSION ) {
+	WP_CLI::error( 'Refusing to run: this QA is pinned to CYWater Forum 0.6.4.' );
 }
 
 $forum_qa_required_classes = array(
@@ -642,9 +642,33 @@ try {
 	$forum_qa_assert( 200 === $forum_qa_rest_status( $forum_qa_registered_article_read ), 'Registered non-member could not read a Forum article through REST.' );
 
 	$forum_qa_assert( 0 === CYWater_Forum_Community::like_count( $forum_qa_workspace_post_id ), 'Temporary Forum article started with unrelated likes.' );
+	$forum_qa_verified_email = get_user_meta( $forum_qa_subscriber_id, 'cyw_verified_email', true );
+	delete_user_meta( $forum_qa_subscriber_id, 'cyw_verified_email' );
+	$forum_qa_assert( ! CYWater_Forum_Community::can_like( $forum_qa_subscriber_id ), 'Unverified registered account is eligible to change Forum likes.' );
+	$forum_qa_unverified_like = CYWater_Forum_Community::toggle_like( $forum_qa_workspace_post_id, $forum_qa_subscriber_id );
+	$forum_qa_assert( is_wp_error( $forum_qa_unverified_like ) && 'email_unverified' === $forum_qa_unverified_like->get_error_code() && 403 === $forum_qa_unverified_like->get_error_data()['status'], 'Unverified registered account did not receive an actionable like rejection.' );
+	$forum_qa_assert( 0 === CYWater_Forum_Community::like_count( $forum_qa_workspace_post_id ) && ! CYWater_Forum_Community::has_liked( $forum_qa_workspace_post_id, $forum_qa_subscriber_id ), 'Rejected unverified like wrote an interaction record.' );
+	$forum_qa_unverified_article_read = $forum_qa_rest( $forum_qa_subscriber_id, 'GET', '/wp/v2/cyw_forum_post/' . $forum_qa_workspace_post_id );
+	$forum_qa_assert( 200 === $forum_qa_rest_status( $forum_qa_unverified_article_read ), 'The like verification gate changed registered read-only Forum access.' );
+	wp_set_current_user( $forum_qa_subscriber_id );
+	ob_start();
+	CYWater_Forum_Community::render_like_control( $forum_qa_workspace_post_id );
+	$forum_qa_unverified_like_control = ob_get_clean();
+	$forum_qa_assert( false !== strpos( $forum_qa_unverified_like_control, '/verify-email/' ) && false !== strpos( $forum_qa_unverified_like_control, 'Verify email' ) && false === strpos( $forum_qa_unverified_like_control, '<form' ) && false === strpos( $forum_qa_unverified_like_control, 'cywater_forum_like_nonce' ), 'Unverified Forum reader does not receive a verification link instead of a mutation form.' );
+	update_user_meta( $forum_qa_subscriber_id, 'cyw_verified_email', $forum_qa_verified_email );
+	$forum_qa_assert( CYWater_Forum_Community::can_like( $forum_qa_subscriber_id ), 'Verified non-member remains blocked from changing Forum likes.' );
+	ob_start();
+	CYWater_Forum_Community::render_like_control( $forum_qa_workspace_post_id );
+	$forum_qa_verified_like_control = ob_get_clean();
+	$forum_qa_assert( false !== strpos( $forum_qa_verified_like_control, '<form' ) && false !== strpos( $forum_qa_verified_like_control, 'cywater_forum_like_nonce' ), 'Verified Forum reader lost the nonce-protected like control.' );
+	wp_set_current_user( $forum_qa_admin_id );
 	$forum_qa_like_result = CYWater_Forum_Community::toggle_like( $forum_qa_workspace_post_id, $forum_qa_author_id );
 	$forum_qa_assert( true === $forum_qa_like_result && 1 === CYWater_Forum_Community::like_count( $forum_qa_workspace_post_id ) && CYWater_Forum_Community::has_liked( $forum_qa_workspace_post_id, $forum_qa_author_id ), 'Eligible member could not like a published Forum article.' );
 	$forum_qa_assert( true === CYWater_Forum_Community::toggle_like( $forum_qa_workspace_post_id, $forum_qa_subscriber_id ) && 2 === CYWater_Forum_Community::like_count( $forum_qa_workspace_post_id ), 'Registered non-member could not like a Forum article.' );
+	delete_user_meta( $forum_qa_subscriber_id, 'cyw_verified_email' );
+	$forum_qa_unverified_unlike = CYWater_Forum_Community::toggle_like( $forum_qa_workspace_post_id, $forum_qa_subscriber_id );
+	$forum_qa_assert( is_wp_error( $forum_qa_unverified_unlike ) && 'email_unverified' === $forum_qa_unverified_unlike->get_error_code() && 2 === CYWater_Forum_Community::like_count( $forum_qa_workspace_post_id ) && CYWater_Forum_Community::has_liked( $forum_qa_workspace_post_id, $forum_qa_subscriber_id ), 'Unverified account removed a pre-existing like or changed the count.' );
+	update_user_meta( $forum_qa_subscriber_id, 'cyw_verified_email', $forum_qa_verified_email );
 	$forum_qa_account_entry = CYWater_Forum_Community::account_entry();
 	$forum_qa_assert( false !== strpos( $forum_qa_account_entry, '/forum/activity/' ) && false === strpos( $forum_qa_account_entry, esc_html( get_the_title( $forum_qa_workspace_post_id ) ) ), 'Member Account does not use the compact Forum activity link.' );
 	$forum_qa_activity_panel = CYWater_Forum_Community::activity_panel( $forum_qa_author_id );

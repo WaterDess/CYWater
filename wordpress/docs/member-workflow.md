@@ -27,11 +27,23 @@ The account state is explicit:
    transport. Replies go to `membership@cywater.org`.
 3. The link expires after 24 hours and is deleted after its first successful
    use. Replaying the same link is rejected.
-4. An unverified account may sign in and request another link, but it cannot
-   enter PMPro checkout, activate a membership, or publish a directory profile.
-   Resends are limited to one per minute.
-5. Changing the account email invalidates the previous verification and sends
-   a new link to the replacement address.
+4. An unverified account has a limited sign-in for verification and maintenance.
+   Front-end sign-in, Account and signed-in registration lead to `/verify-email/`;
+   the header offers **Verify Email**. This page permits a resend, correction via
+   the existing Member Profile editor, or sign-out. Profile/password maintenance
+   and public browsing remain available; the profile editor displays a pending
+   notice. Existing records are not deleted or changed by this routing.
+5. Membership checkout (including resumed review orders), Meeting registration,
+   Best Paper submission/update, Forum publishing/comments/likes, Logo participation
+   and directory publication require current-email verification. Server-side
+   checks precede writes/uploads; hiding a form is not the permission boundary.
+   Existing owned application records/files remain readable, and the public
+   non-submitting Best Paper preview is unchanged. Scoped staff retain the native
+   administration recovery path, without being marked verified.
+6. Resends are limited to one per minute and five per hour. Changing the email
+   invalidates both prior verification and every outstanding old-address token
+   before attempting replacement delivery, even when sending is rate-limited.
+   A requested/accepted email is not proof of inbox delivery or ownership.
 
 The deployment migration marks accounts that existed before this gate as
 verified for their current stored email. New accounts must always complete the

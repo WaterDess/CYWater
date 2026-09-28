@@ -257,6 +257,8 @@ final class CYWater_Meeting_Registration {
 				<?php self::render_confirmation( $existing ); ?>
 			<?php elseif ( 'open' !== $phase ) : ?>
 				<div class="cywater-meeting__gate"><h3><?php echo esc_html( 'before' === $phase ? __( 'Registration is not open yet', 'cywater-meeting-registration' ) : __( 'Online registration is closed', 'cywater-meeting-registration' ) ); ?></h3><p><?php esc_html_e( 'For registration questions, contact contact@cywater.org.', 'cywater-meeting-registration' ); ?></p></div>
+			<?php elseif ( ! self::is_verified( $user_id ) ) : ?>
+				<div class="cywater-meeting__gate"><h3><?php esc_html_e( 'Verify your email before registering', 'cywater-meeting-registration' ); ?></h3><p><?php esc_html_e( 'Your account is awaiting email verification. Verify your current account email, then return here to submit your meeting registration.', 'cywater-meeting-registration' ); ?></p><a class="btn btn-primary" href="<?php echo esc_url( self::verification_url( $event_id ) ); ?>"><?php esc_html_e( 'Verify email address', 'cywater-meeting-registration' ); ?></a></div>
 			<?php else : ?>
 				<form id="meeting-registration" class="cywater-meeting__form" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" enctype="multipart/form-data" data-cywater-meeting-form data-rates="<?php echo esc_attr( wp_json_encode( $rates ) ); ?>" data-member-kind="<?php echo esc_attr( $member['kind'] ); ?>" data-early="<?php echo esc_attr( self::is_early( $event_id ) ? '1' : '0' ); ?>">
 					<input type="hidden" name="action" value="cywater_meeting_register"><input type="hidden" name="event_id" value="<?php echo esc_attr( $event_id ); ?>"><?php wp_nonce_field( 'cywater_meeting_register_' . $event_id, 'cywater_meeting_nonce' ); ?>
@@ -296,6 +298,11 @@ final class CYWater_Meeting_Registration {
 		$user_id  = get_current_user_id();
 		if ( ! $user_id || ! self::is_enabled( $event_id ) || 'open' !== self::phase( $event_id ) || ! isset( $_POST['cywater_meeting_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['cywater_meeting_nonce'] ) ), 'cywater_meeting_register_' . $event_id ) ) {
 			self::redirect( $event_id, 'invalid' );
+		}
+		// Recheck the current account email before touching uploads, tickets or attendees.
+		if ( ! self::is_verified( $user_id ) ) {
+			wp_safe_redirect( self::verification_url( $event_id ), 303 );
+			exit;
 		}
 		if ( self::existing_attendee( $event_id, $user_id ) ) {
 			self::redirect( $event_id, 'already' );
@@ -762,6 +769,13 @@ final class CYWater_Meeting_Registration {
 	private static function phase( $event_id ) { $now = current_datetime()->getTimestamp(); $open = self::local_timestamp( get_post_meta( $event_id, self::META_PREFIX . 'open_at', true ) ); $close = self::local_timestamp( get_post_meta( $event_id, self::META_PREFIX . 'close_at', true ) ); if ( $open && $now < $open ) { return 'before'; } if ( $close && $now > $close ) { return 'closed'; } return 'open'; }
 	private static function format_fee( $fee ) { return 0 === (int) $fee['cny'] ? __( 'Fee waived, subject to organizer verification', 'cywater-meeting-registration' ) : sprintf( __( 'CNY %1$d (approximately USD %2$d)', 'cywater-meeting-registration' ), (int) $fee['cny'], (int) $fee['usd'] ); }
 	private static function message( $key ) { $messages = array( 'submitted' => __( 'Your registration was received. The recommended fee remains subject to organizer verification, and payment is external.', 'cywater-meeting-registration' ), 'already' => __( 'This account already has a registration for the meeting.', 'cywater-meeting-registration' ), 'required' => __( 'Complete every required field and provide a presentation title when applicable.', 'cywater-meeting-registration' ), 'proof' => __( 'Students must upload a valid PDF, JPG or PNG evidence file no larger than 5 MB.', 'cywater-meeting-registration' ), 'presentation_file' => __( 'The presentation file must be a PDF, PPT, PPTX, DOC or DOCX no larger than 20 MB.', 'cywater-meeting-registration' ), 'unavailable' => __( 'Registration could not be stored. No payment was attempted. Please contact contact@cywater.org.', 'cywater-meeting-registration' ), 'invalid' => __( 'The registration request was invalid or registration is not currently open.', 'cywater-meeting-registration' ) ); return $messages[ $key ] ?? __( 'The registration request could not be completed.', 'cywater-meeting-registration' ); }
+	private static function is_verified( $user_id ) {
+		return is_callable( array( 'CYWater_Membership_Account_Security', 'is_verified' ) ) && CYWater_Membership_Account_Security::is_verified( $user_id );
+	}
+	private static function verification_url( $event_id ) {
+		$return = get_permalink( $event_id ) ?: home_url( '/events/' );
+		return add_query_arg( 'redirect_to', rawurlencode( $return . '#meeting-registration' ), home_url( '/verify-email/' ) );
+	}
 	private static function redirect( $event_id, $message ) { $url = $event_id ? get_permalink( $event_id ) : home_url( '/events/' ); wp_safe_redirect( add_query_arg( 'meeting_registration', sanitize_key( $message ), $url ) . '#meeting-registration' ); exit; }
 	private static function login_url( $redirect ) { return class_exists( 'CYWater_Membership_Account_Routing' ) ? CYWater_Membership_Account_Routing::login_url( $redirect ) : wp_login_url( $redirect ); }
 	private static function registration_url( $redirect ) { return class_exists( 'CYWater_Membership_Account_Routing' ) ? CYWater_Membership_Account_Routing::registration_url( $redirect ) : add_query_arg( 'redirect_to', $redirect, home_url( '/member-register/' ) ); }
@@ -826,6 +840,11 @@ HTML;
 		$failure     = null;
 		$mail_filter = null;
 		$package     = '';
+		$original_post = $_POST;
+		$original_files = $_FILES;
+		$original_user = get_current_user_id();
+		$mail_guard = static function () { return true; };
+		add_filter( 'pre_wp_mail', $mail_guard, PHP_INT_MAX );
 
 		$assert = static function ( $condition, $message ) use ( &$checks ) {
 			if ( ! $condition ) {
@@ -884,20 +903,35 @@ HTML;
 				)
 			);
 			$assert( ! is_wp_error( $user_id ) && $user_id > 0, 'Unable to create the temporary participant.' );
-
-			$provider    = Tribe__Tickets__RSVP::get_instance();
-			$attendee_id = $provider->create_attendee_for_ticket(
-				$ticket,
-				array(
-					'full_name'       => 'Meeting QA',
-					'email'           => $marker . '@example.invalid',
-					'user_id'         => $user_id,
-					'attendee_status' => 'going',
-					'optout'          => true,
-				)
-			);
+			$assert( is_callable( array( 'CYWater_Membership_Account_Security', 'is_verified' ) ), 'Account verification authority is unavailable.' );
+			wp_set_current_user( $user_id );
+			delete_user_meta( $user_id, 'cyw_verified_email' );
+			$rendered = self::render_module( $event_id );
+			$assert( str_contains( $rendered, 'Verify your email before registering' ) && ! str_contains( $rendered, '<form' ), 'Unverified participant received a live registration form.' );
+			$assert( str_contains( $rendered, 'redirect_to=' ) && str_contains( $rendered, rawurlencode( '#meeting-registration' ) ), 'Meeting verification CTA lost its return destination.' );
+			$_POST = array( 'event_id' => $event_id, 'cywater_meeting_nonce' => wp_create_nonce( 'cywater_meeting_register_' . $event_id ), 'first_name' => 'Meeting', 'last_name' => 'QA', 'institution' => 'QA University', 'country' => 'HK', 'professional_title' => 'Researcher', 'phone' => '+1 555 0100', 'participant_category' => 'regular', 'participation_plan' => 'attend', 'accommodation_plan' => 'self_arranged', 'accuracy' => '1' );
+			$_FILES = array( 'presentation_file' => array( 'name' => 'unverified.pdf', 'tmp_name' => __FILE__, 'error' => UPLOAD_ERR_OK ) );
+			$before_files = glob( trailingslashit( self::private_directory() ) . '*' );
+			// Interrupt only the normal redirect, so the real POST handler can be
+			// exercised without exiting before the self-cleaning finally block.
+			$run_handler = static function () {
+				$destination = '';
+				$intercept = static function ( $location ) use ( &$destination ) { $destination = $location; throw new RuntimeException( 'CYWATER_MEETING_QA_REDIRECT' ); };
+				add_filter( 'wp_redirect', $intercept, PHP_INT_MAX );
+				try { self::handle_registration(); } catch ( RuntimeException $error ) { if ( 'CYWATER_MEETING_QA_REDIRECT' !== $error->getMessage() ) { throw $error; } } finally { remove_filter( 'wp_redirect', $intercept, PHP_INT_MAX ); }
+				return $destination;
+			};
+			$denied_redirect = $run_handler();
+			$assert( str_contains( $denied_redirect, '/verify-email/' ) && str_contains( $denied_redirect, 'redirect_to=' ), 'Direct unverified registration did not require email verification.' );
+			$assert( 0 === count( self::attendees( $event_id ) ) && $before_files === glob( trailingslashit( self::private_directory() ) . '*' ), 'Unverified submission created an attendee or protected file.' );
+			update_user_meta( $user_id, 'cyw_verified_email', $marker . '@example.invalid' );
+			$assert( str_contains( self::render_module( $event_id ), 'data-cywater-meeting-form' ), 'Verified participant could not access the form.' );
+			$_FILES = array();
+			$submitted_redirect = $run_handler();
+			$attendee_id = self::existing_attendee( $event_id, $user_id );
+			if ( $attendee_id ) { $created_ids[] = (int) $attendee_id; }
+			$assert( str_contains( $submitted_redirect, 'meeting_registration=submitted' ), 'Verified participant failed the real registration handler.' );
 			$assert( is_numeric( $attendee_id ) && $attendee_id > 0, 'Unable to create the temporary attendee.' );
-			$created_ids[] = (int) $attendee_id;
 			update_post_meta( $attendee_id, self::META_PREFIX . 'event_id', $event_id );
 			update_post_meta( $attendee_id, self::META_PREFIX . 'user_id', $user_id );
 			update_post_meta( $attendee_id, self::META_PREFIX . 'snapshot', array( 'event_id' => $event_id, 'user_id' => $user_id, 'email' => $marker . '@example.invalid', 'first_name' => 'Meeting', 'last_name' => 'QA', 'country' => 'Hong Kong SAR, China', 'country_code' => 'HK', 'participant_category' => 'student', 'participation_plan' => 'poster', 'presentation_title' => 'Temporary QA presentation', 'presentation_abstract' => 'Temporary protected programme-review content.', 'accommodation_plan' => 'hotel_qr', 'arrival_date' => '2026-10-16', 'departure_date' => '2026-10-19', 'membership_label' => 'Active Student membership', 'payment_status' => 'external_unverified', 'recommended_fee_cny' => 500, 'approximate_fee_usd' => 75 ) );
@@ -938,6 +972,10 @@ HTML;
 		} catch ( Throwable $error ) {
 			$failure = $error;
 		} finally {
+			$_POST = $original_post;
+			$_FILES = $original_files;
+			wp_set_current_user( $original_user );
+			remove_filter( 'pre_wp_mail', $mail_guard, PHP_INT_MAX );
 			if ( is_string( $package ) && $package && is_file( $package ) ) {
 				wp_delete_file( $package );
 			}

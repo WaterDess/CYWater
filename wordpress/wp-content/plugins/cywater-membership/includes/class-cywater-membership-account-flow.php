@@ -40,7 +40,7 @@ final class CYWater_Membership_Account_Flow {
 			$verification_url = add_query_arg(
 				array(
 					'cywater_verification' => 'required',
-					'redirect_to'          => self::current_url(),
+					'redirect_to'          => rawurlencode( self::current_url() ),
 				),
 				home_url( '/verify-email/' )
 			);
@@ -52,7 +52,7 @@ final class CYWater_Membership_Account_Flow {
 		$login_url = add_query_arg(
 			array(
 				'cywater_checkout' => 'login_required',
-				'redirect_to'      => self::current_url(),
+				'redirect_to'      => rawurlencode( self::current_url() ),
 			),
 			$login_url
 		);
@@ -177,7 +177,7 @@ final class CYWater_Membership_Account_Flow {
 			add_query_arg(
 				array(
 					'cywater_verification' => $sent ? 'sent' : 'send_failed',
-					'redirect_to'          => $redirect,
+					'redirect_to'          => rawurlencode( $redirect ),
 				),
 				home_url( '/verify-email/' )
 			)
@@ -189,6 +189,9 @@ final class CYWater_Membership_Account_Flow {
 		$redirect = isset( $_GET['redirect_to'] ) ? esc_url_raw( wp_unslash( $_GET['redirect_to'] ) ) : home_url( '/membership/' );
 		$redirect = wp_validate_redirect( $redirect, home_url( '/membership/' ) );
 		if ( is_user_logged_in() ) {
+			if ( ! CYWater_Membership_Account_Security::is_verified( get_current_user_id() ) ) {
+				return CYWater_Membership_Account_Security::verification_shortcode();
+			}
 			return sprintf(
 				'<div class="cywater-register"><h2>%1$s</h2><p>%2$s</p><a class="btn btn-primary" href="%3$s">%4$s</a></div>',
 				esc_html__( 'Your account is ready', 'cywater-membership' ),

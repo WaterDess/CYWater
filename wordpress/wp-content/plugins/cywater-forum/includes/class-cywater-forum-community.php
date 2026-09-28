@@ -338,7 +338,10 @@ final class CYWater_Forum_Community {
 
 	public static function can_like( $user_id ) {
 		$user_id = absint( $user_id );
-		return $user_id > 0 && get_userdata( $user_id ) instanceof WP_User;
+		return $user_id > 0
+			&& get_userdata( $user_id ) instanceof WP_User
+			&& class_exists( 'CYWater_Membership_Account_Security' )
+			&& CYWater_Membership_Account_Security::is_verified( $user_id );
 	}
 
 	public static function has_liked( $post_id, $user_id ) {
@@ -368,8 +371,11 @@ final class CYWater_Forum_Community {
 		if ( ! $post instanceof WP_Post || CYWater_Forum_Content::POST_TYPE !== $post->post_type || 'publish' !== $post->post_status ) {
 			return new WP_Error( 'article_unavailable', __( 'That Forum article is unavailable.', 'cywater-forum' ) );
 		}
+		if ( ! $user_id || ! get_userdata( $user_id ) instanceof WP_User ) {
+			return new WP_Error( 'like_forbidden', __( 'Sign in with a registered CYWater account to like Forum articles.', 'cywater-forum' ), array( 'status' => 403 ) );
+		}
 		if ( ! self::can_like( $user_id ) ) {
-			return new WP_Error( 'like_forbidden', __( 'Sign in with a registered CYWater account to like Forum articles.', 'cywater-forum' ) );
+			return new WP_Error( 'email_unverified', __( 'Verify your email address before changing Forum likes.', 'cywater-forum' ), array( 'status' => 403 ) );
 		}
 
 		if ( self::has_liked( $post_id, $user_id ) ) {
@@ -404,6 +410,10 @@ final class CYWater_Forum_Community {
 		$posted   = esc_url_raw( wp_unslash( $_POST['forum_return_url'] ?? '' ) );
 		$url      = wp_validate_redirect( $posted, $fallback );
 		$anchor   = sanitize_html_class( wp_unslash( $_POST['forum_return_anchor'] ?? 'forum-engagement' ) );
+		if ( is_wp_error( $result ) && 'email_unverified' === $result->get_error_code() ) {
+			wp_safe_redirect( self::like_verification_url( $url . '#' . $anchor ) );
+			exit;
+		}
 		wp_safe_redirect( add_query_arg( $args, $url ) . '#' . $anchor );
 		exit;
 	}
@@ -442,6 +452,18 @@ final class CYWater_Forum_Community {
 		$liked   = $user_id ? self::has_liked( $post_id, $user_id ) : false;
 		$return   = self::current_public_url( get_permalink( $post_id ) );
 		$anchor   = 'card' === $context ? 'forum-card-' . $post_id : 'forum-engagement';
+		if ( $user_id && ! self::can_like( $user_id ) ) {
+			?>
+			<div class="forum-like-form forum-like-form--<?php echo esc_attr( sanitize_html_class( $context ) ); ?>">
+				<a class="forum-like-control" href="<?php echo esc_url( self::like_verification_url( $return . '#' . $anchor ) ); ?>" aria-label="<?php esc_attr_e( 'Verify your email address to like Forum posts', 'cywater-forum' ); ?>">
+					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"/></svg>
+					<span><?php echo esc_html( (string) $count ); ?></span>
+					<span><?php esc_html_e( 'Verify email', 'cywater-forum' ); ?></span>
+				</a>
+			</div>
+			<?php
+			return;
+		}
 		?>
 		<form class="forum-like-form forum-like-form--<?php echo esc_attr( sanitize_html_class( $context ) ); ?>" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 			<input type="hidden" name="action" value="cywater_forum_toggle_like">
@@ -455,6 +477,16 @@ final class CYWater_Forum_Community {
 			</button>
 		</form>
 		<?php
+	}
+
+	private static function like_verification_url( $return ) {
+		return add_query_arg(
+			array(
+				'cywater_verification' => 'required',
+				'redirect_to'          => rawurlencode( wp_validate_redirect( $return, home_url( '/forum/' ) ) ),
+			),
+			home_url( '/verify-email/' )
+		);
 	}
 
 	private static function current_public_url( $fallback ) {

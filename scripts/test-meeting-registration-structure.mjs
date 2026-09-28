@@ -12,7 +12,14 @@ const hotelQr = fs.statSync(path.join(root, 'assets/img/annual-meeting-2026-acco
 const countries = fs.readFileSync('wordpress/wp-content/plugins/cywater-membership/includes/class-cywater-membership-countries.php', 'utf8');
 const eventTemplate = fs.readFileSync('wordpress/wp-content/themes/cywater/single-cyw_event.php', 'utf8');
 
-assert.match(boot, /Version: 0\.1\.11/);
+assert.match(boot, /Version: 0\.1\.16/);
+const submitHandler = main.slice(main.indexOf('public static function handle_registration()'), main.indexOf('private static function render_confirmation('));
+assert.ok(submitHandler.includes('! self::is_verified( $user_id )'), 'The server-side registration handler must require current email verification.');
+assert.ok(submitHandler.indexOf('! self::is_verified( $user_id )') < submitHandler.indexOf('self::store_proof('), 'Email verification must precede protected file storage.');
+assert.ok(submitHandler.indexOf('! self::is_verified( $user_id )') < submitHandler.indexOf('self::ticket( $event_id )'), 'Email verification must precede attendee/ticket creation.');
+assert.match(main, /is_callable\( array\( 'CYWater_Membership_Account_Security', 'is_verified' \) \) && CYWater_Membership_Account_Security::is_verified/, 'Missing verification authority must fail closed.');
+assert.match(main, /Verify your email before registering/);
+assert.match(main, /add_query_arg\( 'redirect_to', rawurlencode\( \$return \. '#meeting-registration' \), home_url\( '\/verify-email\/' \) \)/, 'Verification must encode and retain the event return destination.');
 assert.match(main, /Tribe__Tickets__RSVP::get_instance\(\)/, 'Event Tickets RSVP remains the attendee authority.');
 assert.match(main, /external_unverified/g, 'External payment state is explicit.');
 assert.doesNotMatch(main, /pmpro_changeMembershipLevel\s*\(/, 'Meeting registration must not mutate membership.');

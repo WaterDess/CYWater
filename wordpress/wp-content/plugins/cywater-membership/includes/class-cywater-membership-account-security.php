@@ -31,6 +31,8 @@ final class CYWater_Membership_Account_Security {
 		add_shortcode( 'cywater_account_security', array( __CLASS__, 'account_security_shortcode' ) );
 		add_shortcode( 'cywater_account_closure', array( __CLASS__, 'account_closure_shortcode' ) );
 		add_action( 'profile_update', array( __CLASS__, 'handle_email_change' ), 10, 3 );
+		add_filter( 'pmpro_registration_checks', array( __CLASS__, 'check_verified_checkout' ), 100 );
+		add_filter( 'pmpro_checkout_checks', array( __CLASS__, 'check_verified_checkout' ), 100 );
 		add_action( 'wp_login', array( __CLASS__, 'record_last_login' ), 10, 2 );
 		add_action( 'cywater_after_core_setup', array( __CLASS__, 'backfill_existing_accounts' ), 20 );
 	}
@@ -98,7 +100,7 @@ final class CYWater_Membership_Account_Security {
 				'cywater_verify' => '1',
 				'user_id'         => $user->ID,
 				'token'           => $token,
-				'redirect_to'     => $redirect,
+				'redirect_to'     => rawurlencode( $redirect ),
 			),
 			home_url( '/verify-email/' )
 		);
@@ -150,7 +152,7 @@ final class CYWater_Membership_Account_Security {
 			add_query_arg(
 				array(
 					'cywater_verification' => $state,
-					'redirect_to'          => wp_validate_redirect( $redirect, home_url( '/account/' ) ),
+					'redirect_to'          => rawurlencode( wp_validate_redirect( $redirect, home_url( '/account/' ) ) ),
 				),
 				home_url( '/verify-email/' )
 			)
@@ -186,7 +188,7 @@ final class CYWater_Membership_Account_Security {
 		} else {
 			$state = self::issue_verification( $user_id, $redirect ) ? 'sent' : 'send_failed';
 		}
-		wp_safe_redirect( add_query_arg( array( 'cywater_verification' => $state, 'redirect_to' => $redirect ), home_url( '/verify-email/' ) ) );
+		wp_safe_redirect( add_query_arg( array( 'cywater_verification' => $state, 'redirect_to' => rawurlencode( wp_validate_redirect( $redirect, home_url( '/account/' ) ) ) ), home_url( '/verify-email/' ) ) );
 		exit;
 	}
 
@@ -220,35 +222,43 @@ final class CYWater_Membership_Account_Security {
 
 	public static function verification_shortcode() {
 		$state    = isset( $_GET['cywater_verification'] ) ? sanitize_key( wp_unslash( $_GET['cywater_verification'] ) ) : '';
+		$verified = is_user_logged_in() && self::is_verified( get_current_user_id() );
+		if ( 'verified' === $state && ! $verified ) {
+			$state = '';
+		}
 		$fallback = home_url( '/account/' );
 		$redirect = isset( $_GET['redirect_to'] ) ? wp_validate_redirect( esc_url_raw( wp_unslash( $_GET['redirect_to'] ) ), $fallback ) : $fallback;
 		$messages = array(
 			'verified'    => __( 'Your email address is verified.', 'cywater-membership' ),
-			'sent'        => __( 'We sent a verification link. Check your inbox and spam folder.', 'cywater-membership' ),
+			'sent'        => __( 'A verification email was requested. Check your inbox and spam folder; your account remains pending until you open the link.', 'cywater-membership' ),
 			'send_failed' => __( 'The verification email could not be sent. Please try again.', 'cywater-membership' ),
 			'too_soon'    => __( 'Please wait one minute before requesting another verification email.', 'cywater-membership' ),
 			'rate_limited' => __( 'Too many verification messages were requested. Please wait one hour and try again.', 'cywater-membership' ),
 			'invalid'     => __( 'This verification link is invalid or expired. Request a new one below.', 'cywater-membership' ),
-			'required'    => __( 'Verify your email address before continuing to checkout.', 'cywater-membership' ),
+			'required'    => __( 'Verify your email address before using membership checkout, applications or community contributions.', 'cywater-membership' ),
 		);
 		ob_start();
 		?>
 		<div class="cywater-register">
 			<h2><?php esc_html_e( 'Verify your email', 'cywater-membership' ); ?></h2>
 			<?php if ( isset( $messages[ $state ] ) ) : ?><div class="notice" role="status"><p><?php echo esc_html( $messages[ $state ] ); ?></p></div><?php endif; ?>
-			<?php if ( 'verified' === $state || ( is_user_logged_in() && self::is_verified( get_current_user_id() ) ) ) : ?>
+			<?php if ( $verified ) : ?>
 				<p><?php esc_html_e( 'Email ownership has been confirmed. You may continue.', 'cywater-membership' ); ?></p>
 				<a class="btn btn-primary" href="<?php echo esc_url( $redirect ); ?>"><?php esc_html_e( 'Continue', 'cywater-membership' ); ?></a>
 			<?php elseif ( is_user_logged_in() ) : $user = wp_get_current_user(); ?>
-				<p><?php echo esc_html( sprintf( __( 'A verification link is required for %s.', 'cywater-membership' ), $user->user_email ) ); ?></p>
+				<p class="eyebrow"><?php esc_html_e( 'Account created — email verification pending', 'cywater-membership' ); ?></p>
+				<p><?php esc_html_e( 'You are signed in only to manage your account and complete verification. Signing in does not confirm that you own this email address.', 'cywater-membership' ); ?></p>
+				<p style="overflow-wrap:anywhere"><?php echo esc_html( sprintf( __( 'A verification link is required for %s.', 'cywater-membership' ), $user->user_email ) ); ?></p>
 				<form method="post" action="">
 					<?php wp_nonce_field( 'cywater_resend_verification', 'cywater_verification_nonce' ); ?>
 					<input type="hidden" name="cywater_resend_verification" value="1" />
 					<input type="hidden" name="redirect_to" value="<?php echo esc_attr( $redirect ); ?>" />
 					<button class="btn btn-primary" type="submit"><?php esc_html_e( 'Send a new verification link', 'cywater-membership' ); ?></button>
 				</form>
+				<p><a class="btn btn-outline" href="<?php echo esc_url( CYWater_Membership_Account_Routing::profile_url() ); ?>"><?php esc_html_e( 'Correct email or profile', 'cywater-membership' ); ?></a> <a class="btn btn-outline" href="<?php echo esc_url( wp_logout_url() ); ?>"><?php esc_html_e( 'Sign out', 'cywater-membership' ); ?></a></p>
+				<p><?php esc_html_e( 'Still no email? Contact CYWater support. Email delivery does not automatically verify or activate your account.', 'cywater-membership' ); ?> <a href="mailto:contact@cywater.org">contact@cywater.org</a></p>
 			<?php else : ?>
-				<p><?php esc_html_e( 'Sign in to request another verification email.', 'cywater-membership' ); ?></p>
+				<p><?php esc_html_e( 'Sign in to check your verification status and continue, or request another verification email.', 'cywater-membership' ); ?></p>
 				<a class="btn btn-primary" href="<?php echo esc_url( self::login_url( home_url( '/verify-email/' ) ) ); ?>"><?php esc_html_e( 'Sign in', 'cywater-membership' ); ?></a>
 			<?php endif; ?>
 		</div>
@@ -324,6 +334,10 @@ final class CYWater_Membership_Account_Security {
 		$user = get_user_by( 'id', absint( $user_id ) );
 		if ( $user && strtolower( $old_user_data->user_email ) !== strtolower( $user->user_email ) ) {
 			delete_user_meta( $user->ID, self::VERIFIED_EMAIL_META );
+			// An old-address link must never verify a replacement address, even if sending is rate-limited.
+			delete_user_meta( $user->ID, self::TOKEN_HASH_META );
+			delete_user_meta( $user->ID, self::TOKEN_EXPIRES_META );
+			delete_user_meta( $user->ID, self::TOKEN_SENT_META );
 			update_user_meta( $user->ID, 'cyw_profile_public', 0 );
 			self::issue_verification( $user->ID, home_url( '/account/' ) );
 		}
@@ -376,6 +390,21 @@ final class CYWater_Membership_Account_Security {
 			return 'email_unverified';
 		}
 		return '';
+	}
+
+	/** PMPro runs checkout before template_redirect; enforce on its write path too. */
+	public static function check_verified_checkout( $allowed ) {
+		if ( ! $allowed ) {
+			return $allowed;
+		}
+		$reason = self::checkout_block_reason( get_current_user_id() );
+		if ( ! $reason ) {
+			return $allowed;
+		}
+		if ( function_exists( 'pmpro_setMessage' ) ) {
+			pmpro_setMessage( 'closure_requested' === $reason ? __( 'Membership checkout is paused while your account-closure request is open.', 'cywater-membership' ) : __( 'Sign in and verify your email address before membership checkout.', 'cywater-membership' ), 'pmpro_error' );
+		}
+		return false;
 	}
 
 	public static function request_closure( $user_id ) {
